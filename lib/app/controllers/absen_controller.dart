@@ -5,6 +5,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -72,13 +73,16 @@ class AbsenController extends GetxController {
 
   getLoc(List<dynamic>? dataUser) async {
     // print(dataUser![0]);
-    loadingDialog("Memindai posisi Anda...");
+    loadingDialog(
+        "Memindai posisi Anda...\nProses ini membutuhkan koneksi internet yang stabil");
     Position position = await determinePosition();
     // print('${position.latitude} , ${position.longitude}');
-    // List<Placemark> placemarks = await placemarkFromCoordinates(
-    //     position.latitude, position.longitude);
+    List<Placemark> placemarks =
+        await placemarkFromCoordinates(position.latitude, position.longitude);
     // print(placemarks);
-    lokasi.value = '${position.latitude} , ${position.longitude}';
+    // lokasi.value = '${position.latitude} , ${position.longitude}';
+    lokasi.value =
+        '${placemarks[0].street!}, ${placemarks[0].subLocality!}\n${placemarks[0].subAdministrativeArea!}, ${placemarks[0].administrativeArea!}';
     double distance = Geolocator.distanceBetween(
         double.parse(dataUser![6]),
         double.parse(dataUser[7]),
@@ -86,17 +90,8 @@ class AbsenController extends GetxController {
         position.longitude.toDouble());
     print('$distance ini jarak');
     if (distance >= 200) {
-      Get.defaultDialog(
-          title: '',
-          content: Center(
-              child: Column(
-            children: const [
-              Text(
-                  'Posisi Anda berada diluar jangkauan area.\nHarap berpindah posisi ke area yang sudah ditentukan')
-            ],
-          )),
-          onCancel: () => Get.back(),
-          textCancel: 'Tutup');
+      dialogMsgCncl('Terjadi Kesalahan',
+          'Posisi Anda berada diluar jangkauan area.\nHarap berpindah posisi ke area yang sudah ditentukan');
     } else {
       await countDataAbsen(dataUser[0]);
       // print(dataAbsen.value.total);

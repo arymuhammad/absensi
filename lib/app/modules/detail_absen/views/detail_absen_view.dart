@@ -1,4 +1,3 @@
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
@@ -47,7 +46,8 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
                           width: 75,
                           color: Colors.white,
                           child: Center(
-                            child: Image.network("${ServiceApi().baseUrl}${Get.arguments['foto_masuk']}",
+                            child: Image.network(
+                              "${ServiceApi().baseUrl}${Get.arguments['foto_masuk']}",
                               fit: BoxFit.cover,
                               // progressIndicatorBuilder:
                               //     (context, url, progress) {
@@ -68,16 +68,42 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('${Get.arguments["nama"]}'),
-                              const Text(
-                                'Masuk',
-                                style: TextStyle(
-                                    fontSize: 18, fontWeight: FontWeight.bold),
+                              Row(
+                                children: [
+                                  const Text('Nama'),
+                                  const SizedBox(
+                                    width: 5,
+                                  ),
+                                  Text('${Get.arguments["nama"]}',
+                                      style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold)),
+                                ],
                               ),
-                              const SizedBox(
-                                height: 5,
+                              Row(
+                                children: [
+                                  const Text('Shift'),
+                                  const SizedBox(
+                                    width: 5,
+                                  ),
+                                  Text('${Get.arguments['nama_shift']}',
+                                      style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold)),
+                                ],
                               ),
-                              Text('${Get.arguments['jam_absen_masuk']}'),
+                              Row(
+                                children: [
+                                  const Text('Masuk'),
+                                  const SizedBox(
+                                    width: 5,
+                                  ),
+                                  Text('${Get.arguments['jam_absen_masuk']}',
+                                      style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold)),
+                                ],
+                              ),
                               // const Text(
                               //   'Pulang',
                               //   style: TextStyle(
@@ -160,18 +186,21 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
                           width: 75,
                           color: Colors.white,
                           child: Center(
-                            child: Get.arguments['foto_pulang'] !="" ? Image.network("${ServiceApi().baseUrl}${Get.arguments['foto_pulang']}",
-                              fit: BoxFit.cover,
-                              // progressIndicatorBuilder:
-                              //     (context, url, progress) {
-                              //   print(
-                              //       "${ServiceApi().baseUrl}${Get.arguments['foto_masuk']}");
-                              //   return CircularProgressIndicator(
-                              //     value: progress.progress,
-                              //     strokeWidth: 5,
-                              //   );
-                              // },
-                            ) : Icon(Icons.image_not_supported_sharp),
+                            child: Get.arguments['foto_pulang'] != ""
+                                ? Image.network(
+                                    "${ServiceApi().baseUrl}${Get.arguments['foto_pulang']}",
+                                    fit: BoxFit.cover,
+                                    // progressIndicatorBuilder:
+                                    //     (context, url, progress) {
+                                    //   print(
+                                    //       "${ServiceApi().baseUrl}${Get.arguments['foto_masuk']}");
+                                    //   return CircularProgressIndicator(
+                                    //     value: progress.progress,
+                                    //     strokeWidth: 5,
+                                    //   );
+                                    // },
+                                  )
+                                : Icon(Icons.image_not_supported_sharp),
                           ),
                         ),
                       ),

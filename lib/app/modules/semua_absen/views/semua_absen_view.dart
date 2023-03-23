@@ -151,7 +151,40 @@ class SemuaAbsenView extends GetView<SemuaAbsenController> {
                             return InkWell(
                               onTap: () {
                                 absenC.searchAbsen;
-                                Get.toNamed(Routes.DETAIL_ABSEN);
+                                Get.toNamed(Routes.DETAIL_ABSEN, arguments: {
+                                  "nama": absenC.searchAbsen[i].nama!,
+                                  "nama_shift": absenC.searchAbsen[i].namaShift!,
+                                  "id_user": absenC.searchAbsen[i].idUser!,
+                                  "tanggal": absenC.searchAbsen[i].tanggal!,
+                                  "jam_masuk": DateFormat("HH:mm:ss")
+                                          .parse(absenC
+                                              .searchAbsen[i].jamAbsenMasuk!)
+                                          .isBefore(DateFormat("HH:mm:ss")
+                                              .parse(absenC
+                                                  .searchAbsen[i].jamMasuk!))
+                                      ? "Awal Waktu"
+                                      : "Telat",
+                                  "jam_pulang": absenC
+                                              .searchAbsen[i].jamAbsenPulang! ==
+                                          ""
+                                      ? "Belum / Tidak\nAbsen Pulang"
+                                      : DateFormat("HH:mm:ss")
+                                              .parse(absenC.searchAbsen[i]
+                                                  .jamAbsenPulang!)
+                                              .isBefore(DateFormat("HH:mm:ss")
+                                                  .parse(absenC.searchAbsen[i]
+                                                      .jamPulang!))
+                                          ? "Pulang Cepat"
+                                          : "Lembur",
+                                  "jam_absen_masuk":
+                                      absenC.searchAbsen[i].jamAbsenMasuk!,
+                                  "jam_absen_pulang":
+                                      absenC.searchAbsen[i].jamAbsenPulang!,
+                                  "foto_masuk":
+                                      absenC.searchAbsen[i].fotoMasuk!,
+                                  "foto_pulang":
+                                      absenC.searchAbsen[i].fotoPulang!
+                                });
                                 absenC.filterAbsen.clear();
                               },
                               child: Container(

@@ -18,6 +18,18 @@ void dialogMsg(code, msg) {
     confirmTextColor: Colors.white,
     textConfirm: 'Tutup',
     onConfirm: () => Get.back(),
+      barrierDismissible: false
+  );
+}
+
+void dialogMsgCncl(code, msg) {
+  Get.defaultDialog(
+    title: code,
+    middleText: msg,
+    confirmTextColor: Colors.white,
+    textCancel: 'Tutup',
+    onCancel: () => Get.back(),
+      barrierDismissible: false
   );
 }
 
@@ -25,11 +37,13 @@ void dialogMsgAbsen(code, msg) {
   Get.defaultDialog(
     title: code,
     middleText: msg,
+    confirmTextColor: Colors.white,
     onConfirm: () {
       Get.back();
       Get.back();
       Get.back();
     },
+      barrierDismissible: false
   );
 }
 
@@ -45,5 +59,6 @@ void loadingDialog(msg) {
           ),
           Text(msg)
         ],
-      )));
+      )),
+      barrierDismissible: false);
 }

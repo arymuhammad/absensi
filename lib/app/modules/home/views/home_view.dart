@@ -342,6 +342,8 @@ class HomeView extends GetView<HomeController> {
                                         Routes.DETAIL_ABSEN,
                                         arguments: {
                                           "nama": loc.dataLimitAbsen[i].nama!,
+                                          "nama_shift":
+                                              loc.dataLimitAbsen[i].namaShift!,
                                           "id_user":
                                               loc.dataLimitAbsen[i].idUser!,
                                           "tanggal":

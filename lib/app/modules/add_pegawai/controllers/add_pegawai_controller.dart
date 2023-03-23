@@ -16,7 +16,6 @@ import 'package:get_storage/get_storage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:restart_app/restart_app.dart';
 import '../../../helper/toast.dart';
 import '../../../model/cabang_model.dart';
 import '../../../model/cabang_model.dart';
@@ -163,26 +162,19 @@ class AddPegawaiController extends GetxController {
   void cekUser() async {
     var data = {"no_telp": telp.text};
     if (telp.text != "") {
-      Get.defaultDialog(
-          title: '',
-          content: Center(
-              child: Column(
-            children: const [
-              CircularProgressIndicator(),
-              SizedBox(
-                height: 5,
-              ),
-              Text('Sedang mencari data user...')
-            ],
-          )));
+      loadingDialog("Sedang mencari data user");
       final response = await ServiceApi().cekUser(data);
       cekDataUser.value = response;
       Get.back();
       if (cekDataUser.isNotEmpty) {
         telp.clear();
+        // print(cekDataUser.length);
         Get.to(() => UpdatePassword(), arguments: {
           "id_user": cekDataUser[0].id,
-          "username": cekDataUser[0].username
+          "username": cekDataUser[0].username,
+          "nama": cekDataUser[0].nama,
+          "no_telp":cekDataUser[0].notelp,
+          "foto":cekDataUser[0].foto,
         });
       } else {
         dialogMsg("Terjadi Kesalahan",
@@ -196,13 +188,13 @@ class AddPegawaiController extends GetxController {
   updatePassword(String id, String username) async {
     var data = {"id": id, "username": username, "password": pass.text};
     if (pass.text != "") {
-      dialogMsg("Sukses", "Password berhasil diperbarui");
+      dialogMsgAbsen("Sukses", "Password berhasil diperbarui\nSilahkan melakukan login ulang");
       loadingDialog("Memperbarui data user...");
       final response = await ServiceApi().updatePasswordUser(data);
       cekDataUser.value = response;
       Get.back();
       if (cekDataUser.isNotEmpty) {
-        
+        // print(cekDataUser.length);
       } else {
         dialogMsg(
             "Terjadi Kesalahan", "Tidak dapat memperbarui password. Coba lagi");

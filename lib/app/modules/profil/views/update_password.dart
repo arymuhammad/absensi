@@ -1,8 +1,7 @@
+import 'package:absensi/app/Repo/service_api.dart';
 import 'package:absensi/app/modules/add_pegawai/controllers/add_pegawai_controller.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:get/get.dart';
-import 'package:restart_app/restart_app.dart';
 
 class UpdatePassword extends GetView {
   UpdatePassword({super.key});
@@ -20,25 +19,49 @@ class UpdatePassword extends GetView {
         child: ListView(
           children: [
             const SizedBox(height: 20),
-            const Text(
-              'Masukkan Password yang mudah Anda ingat',
-              style: TextStyle(fontSize: 18),
+            Text(
+              'Ditemukan user yang cocok dengan No Telp ${Get.arguments["no_telp"]}',
+              style: const TextStyle(fontSize: 18),
+            ),
+            const SizedBox(height: 20),
+            Row(
+              children: [
+                ClipOval(
+                  child: Container(
+                    height: 100,
+                    width: 100,
+                    decoration: const BoxDecoration(
+                      color: Colors.grey
+                    ),
+                    child: Get.arguments["foto"] == "" ? Image.network(
+                                        "https://ui-avatars.com/api/?name=${Get.arguments["nama"]}",
+                                        fit: BoxFit.cover,
+                                      ):Image.network( "${ServiceApi().baseUrl}${Get.arguments["foto"]}"),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            Text(
+              'Username : ${Get.arguments["username"]}',
+              style: const TextStyle(fontSize: 18),
             ),
             const SizedBox(height: 20),
             TextField(
               obscureText: true,
               controller: pegawaiC.pass,
               decoration: InputDecoration(
-                  labelText: 'Password',
-                  prefixIcon: const Icon(Icons.phone_android),
+                  labelText: 'Ketik password baru',
+                  prefixIcon: const Icon(Icons.lock_outline),
                   border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10))),
             ),
             const SizedBox(height: 20),
             ElevatedButton(
-              onPressed: () async{
-               await pegawaiC.updatePassword(Get.arguments["id_user"], Get.arguments["username"]);
-               Restart.restartApp();
+              onPressed: () async {
+                await pegawaiC.updatePassword(
+                    Get.arguments["id_user"], Get.arguments["username"]);
+                //  Restart.restartApp();
               },
               style: ElevatedButton.styleFrom(
                   minimumSize: Size(Get.mediaQuery.size.width, 50)),

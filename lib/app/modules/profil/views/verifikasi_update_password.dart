@@ -41,7 +41,7 @@ class VerifikasiUpdatePassword extends GetView {
                   minimumSize: Size(Get.mediaQuery.size.width, 50)),
               child: const Text(
                 'VALIDASI',
-                style: TextStyle(fontSize: 20),
+                style: TextStyle(fontSize: 18),
               ),
             )
           ],
