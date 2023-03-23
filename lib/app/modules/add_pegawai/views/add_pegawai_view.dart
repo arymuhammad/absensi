@@ -242,7 +242,7 @@ class AddPegawaiView extends GetView<AddPegawaiController> {
                       void Function(String) onSelected,
                       Iterable<String> options) {
                     return Align(
-                      alignment: Alignment.topLeft,
+                      alignment: Alignment.topRight,
                       child: Material(
                           child: SizedBox(
                         width: 210,

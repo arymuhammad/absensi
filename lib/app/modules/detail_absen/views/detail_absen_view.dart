@@ -9,7 +9,7 @@ import '../controllers/detail_absen_controller.dart';
 
 class DetailAbsenView extends GetView<DetailAbsenController> {
   const DetailAbsenView({Key? key}) : super(key: key);
-  // final pageC = Get.put(PageIndexController());
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

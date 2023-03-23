@@ -72,18 +72,7 @@ class AbsenController extends GetxController {
 
   getLoc(List<dynamic>? dataUser) async {
     // print(dataUser![0]);
-    Get.defaultDialog(
-        title: '',
-        content: Center(
-            child: Column(
-          children: const [
-            CircularProgressIndicator(),
-            SizedBox(
-              height: 5,
-            ),
-            Text('Memindai posisi anda....')
-          ],
-        )));
+    loadingDialog("Memindai posisi Anda...");
     Position position = await determinePosition();
     // print('${position.latitude} , ${position.longitude}');
     // List<Placemark> placemarks = await placemarkFromCoordinates(
@@ -169,18 +158,7 @@ class AbsenController extends GetxController {
               } else {
                 await uploadFotoAbsen();
               }
-              Get.defaultDialog(
-                  title: '',
-                  content: Center(
-                      child: Column(
-                    children: const [
-                      CircularProgressIndicator(),
-                      SizedBox(
-                        height: 5,
-                      ),
-                      Text('Sedang mengirim data...')
-                    ],
-                  )));
+              loadingDialog("Sedang mengirim data...");
               if (image != null || imageWeb != null) {
                 // // print(File(imageWeb!.files.single.name.toString()));
                 // Position position = await determinePosition();
@@ -254,18 +232,7 @@ class AbsenController extends GetxController {
               } else {
                 await uploadFotoAbsen();
               }
-              Get.defaultDialog(
-                  title: '',
-                  content: Center(
-                      child: Column(
-                    children: const [
-                      CircularProgressIndicator(),
-                      SizedBox(
-                        height: 5,
-                      ),
-                      Text('Sedang mengirim data...')
-                    ],
-                  )));
+              loadingDialog("Sedang mengirim data...");
 
               // '${placemarks[0].street!}, ${placemarks[0].subLocality!}\n${placemarks[0].subAdministrativeArea!}, ${placemarks[0].administrativeArea!}';
 
@@ -353,7 +320,7 @@ class AbsenController extends GetxController {
       // Location services are not enabled don't continue
       // accessing the position and request users of the
       // App to enable the location services.
-      showToast("failed", "Lokasi belum diaktifkan");
+      showToast("Lokasi belum diaktifkan");
       return Future.error('Location services are disabled.');
     }
 

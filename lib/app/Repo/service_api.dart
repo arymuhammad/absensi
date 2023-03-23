@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:absensi/app/model/cabang_model.dart';
 import 'package:absensi/app/model/cabang_model.dart';
 import 'package:absensi/app/model/cek_absen_model.dart';
+import 'package:absensi/app/model/cek_user_model.dart';
 import 'package:absensi/app/model/level_model.dart';
 import 'package:absensi/app/model/shift_kerja_model.dart';
 import 'package:flutter/foundation.dart';
@@ -46,7 +47,7 @@ class ServiceApi {
       }
     } on FetchDataException catch (e) {
       // print('error caught: ${e.message}');
-      showToast("failed", "${e.message}\nUsername atau Password salah!");
+      showToast("${e.message}\nUsername atau Password salah!");
       isLoading.value = false;
     } on SocketException catch (_) {
       Get.defaultDialog(
@@ -288,7 +289,7 @@ class ServiceApi {
       }
     } on FetchDataException catch (e) {
       // print('error caught: ${e.message}');
-      showToast("failed", "${e.message}");
+      showToast("${e.message}");
     }
   }
 
@@ -315,7 +316,61 @@ class ServiceApi {
       }
     } on FetchDataException catch (e) {
       // print('error caught: ${e.message}');
-      showToast("failed", "${e.message}");
+      showToast("${e.message}");
+    }
+  }
+
+  cekUser(Map<String, String> data) async {
+    try {
+      final response =
+          await http.post(Uri.parse('${baseUrl}cek_user'), body: data);
+      switch (response.statusCode) {
+        case 200:
+          List<dynamic> result = json.decode(response.body)['data'];
+          List<CekUser> dataUser =
+              result.map((e) => CekUser.fromJson(e)).toList();
+          return dataUser;
+        case 400:
+        case 401:
+        case 402:
+        case 404:
+          final result = json.decode(response.body);
+          throw FetchDataException(result["message"]);
+        default:
+          throw FetchDataException(
+            'Something went wrong.',
+          );
+      }
+    } on FetchDataException catch (e) {
+      // print('error caught: ${e.message}');
+      showToast("${e.message}");
+    }
+  }
+
+  updatePasswordUser(Map<String, String> data) async {
+    try {
+      final response =
+          await http.post(Uri.parse('${baseUrl}update_password'), body: data);
+      switch (response.statusCode) {
+        case 200:
+          List<dynamic> result = json.decode(response.body)['data'];
+          List<CekUser> dataUser =
+              result.map((e) => CekUser.fromJson(e)).toList();
+          return dataUser;
+        case 400:
+        case 401:
+        case 402:
+        case 404:
+          final result = json.decode(response.body);
+          throw FetchDataException(result["message"]);
+        default:
+          throw FetchDataException(
+            'Something went wrong.',
+          );
+      }
+    } on FetchDataException catch (e) {
+      // print('error caught: ${e.message}');
+      showToast("${e.message}");
     }
   }
 }

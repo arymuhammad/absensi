@@ -47,7 +47,7 @@ class PageIndexController extends GetxController {
       // Location services are not enabled don't continue
       // accessing the position and request users of the
       // App to enable the location services.
-      showToast("failed", "Lokasi belum diaktifkan");
+      showToast("Lokasi belum diaktifkan");
       return Future.error('Location services are disabled.');
     }
 

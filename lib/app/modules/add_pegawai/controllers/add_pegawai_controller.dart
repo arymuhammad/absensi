@@ -4,6 +4,9 @@ import 'dart:math';
 
 import 'package:absensi/app/Repo/service_api.dart';
 import 'package:absensi/app/model/level_model.dart';
+import 'package:absensi/app/modules/login/views/login_view.dart';
+import 'package:absensi/app/modules/profil/views/update_password.dart';
+import 'package:absensi/app/routes/app_pages.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
@@ -15,6 +18,7 @@ import 'package:permission_handler/permission_handler.dart';
 import '../../../helper/toast.dart';
 import '../../../model/cabang_model.dart';
 import '../../../model/cabang_model.dart';
+import '../../../model/cek_user_model.dart';
 
 class AddPegawaiController extends GetxController {
   late TextEditingController nip;
@@ -38,6 +42,7 @@ class AddPegawaiController extends GetxController {
   var levelUser = <Level>[].obs;
   var selectedCabang = "".obs;
   var selectedLevel = "".obs;
+  var cekDataUser = <CekUser>[].obs;
   @override
   void onInit() {
     super.onInit();
@@ -153,62 +158,57 @@ class AddPegawaiController extends GetxController {
     }
   }
 
-  // uploadFoto() async {
-  //   FilePickerResult? result = await FilePicker.platform.pickFiles(
-  //     type: FileType.custom,
-  //     allowedExtensions: ['jpg', 'pdf', 'doc'],
-  //   );
-  //   // final pickedImage = await picker.pickImage(source: ImageSource.gallery);
-  //   // // setState(() {
-  //   // _image = File(pickedImage!.path);
-  //   // });
-  //   if (result != null) {
-  //     PlatformFile file = result.files.first;
-  //     fileFoto.text = file.name;
-  //     pathfileBanner = File(result.files.single.path.toString());
-  //     // print(file.name);
-  //     // print(file.bytes);
-  //     // print(file.size);
-  //     // print(file.extension);
-  //     // print(file.path);
-  //   } else {
-  //     // print('No file selected');
-  //   }
-  // }
-  // FirebaseAuth auth = FirebaseAuth.instance;
-  // FirebaseFirestore firestore = FirebaseFirestore.instance;
+  void cekUser() async {
+    var data = {"no_telp": telp.text};
+    if (telp.text != "") {
+      Get.defaultDialog(
+          title: '',
+          content: Center(
+              child: Column(
+            children: const [
+              CircularProgressIndicator(),
+              SizedBox(
+                height: 5,
+              ),
+              Text('Sedang mencari data user...')
+            ],
+          )));
+      final response = await ServiceApi().cekUser(data);
+      cekDataUser.value = response;
+      Get.back();
+      if (cekDataUser.isNotEmpty) {
+        telp.clear();
+        Get.to(() => UpdatePassword(), arguments: {
+          "id_user": cekDataUser[0].id,
+          "username": cekDataUser[0].username
+        });
+      } else {
+        dialogMsg("Terjadi Kesalahan",
+            "Tidak ditemukan user dengan No Telp ${telp.text}. Pastikan No Telp yang diinput sudah sesuai");
+      }
+    } else {
+      showToast( "Anda harus mengisi kolom No Telp");
+    }
+  }
 
-  // void addPegawai() async {
-  //   if (nip.text.isNotEmpty && name.text.isNotEmpty && email.text.isNotEmpty) {
-  //     try {
-  //       UserCredential userCredential =
-  //           await auth.createUserWithEmailAndPassword(
-  //               email: email.text, password: "password");
-  //       if (userCredential.user != null) {
-  //         String uid = userCredential.user!.uid;
-  //         firestore.collection("pegawai").doc(uid).set(
-  //           {
-  //             "email":email.text,
-  //             "nama":name.text,
-  //             "nip":nip.text,
-  //             "createdAt":DateTime.now().toIso8601String(),
-  //             "uid":uid
-
-  //           }
-  //         );
-  //       }
-  //     } on FirebaseException catch (e) {
-  //       if (e.code == 'weak-password') {
-  //         log('The password provided is too weak.');
-  //         showToast("failed", "Password terlalu lemah");
-  //       } else if (e.code == 'email-already-in-use') {
-  //         log('The account already exists for that email.');
-  //         showToast("failed", "Email ini sudah terdaftar");
-  //         Get.snackbar("Error", "Terjadi kesalahan");
-  //       }
-  //     }
-  //   } else {
-  //     showToast("failed", "Terjadi kesalahan saat mengirim data ke server");
-  //   }
-  // }
+  void updatePassword(String id, String username) async {
+    var data = {"id": id, "username": username, "password": pass.text};
+    if (pass.text != "") {
+      loadingDialog("Memperbarui data user...");
+      dialogMsg("Sukses", "Password berhasil diperbarui");
+      final response = await ServiceApi().updatePasswordUser(data);
+      cekDataUser.value = response;
+      Get.back();
+      if (cekDataUser.isNotEmpty) {
+        pass.clear();
+        Get.offAll(const LoginView());
+      } else {
+        dialogMsg(
+            "Terjadi Kesalahan", "Tidak dapat memperbarui password. Coba lagi");
+      }
+    } else {
+      showToast("Anda belum mengisi kolom Password");
+    }
+  }
+  
 }

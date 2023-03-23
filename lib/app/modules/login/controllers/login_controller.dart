@@ -48,19 +48,9 @@ class LoginController extends GetxController {
   login() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     var data = {"username": username.text, "password": password.text};
-    Get.defaultDialog(
-        title: '',
-        content: Center(
-            child: Column(
-          children: const [
-            CircularProgressIndicator(),
-            SizedBox(
-              height: 5,
-            ),
-            Text('Loading...')
-          ],
-        )));
+    loadingDialog('Loading...');
     var response = await ServiceApi().loginUser(data);
+     Get.back();
     dataUser.value = response;
     if (dataUser.value.success! == true) {
       // Get.offAllNamed(Routes.HOME);
@@ -93,11 +83,11 @@ class LoginController extends GetxController {
       // print(pref.getStringList('userDataLogin'));
       username.clear();
       password.clear();
-      showToast("success", "Anda Berhasil Login");
+      showToast("Anda Berhasil Login");
       Get.back();
     } else {
-      showToast("failed",
-          "User tidak ditemukan\nHarap periksa username dan password");
+     
+      showToast("User tidak ditemukan\nHarap periksa username dan password");
     }
   }
 
@@ -121,6 +111,6 @@ class LoginController extends GetxController {
     selected.value = 0;
     Get.delete<AbsenController>(force: true);
     // Get.offAllNamed(Routes.LOGIN);
-    showToast("success", "Logout Berhasil");
+    showToast("Logout Berhasil");
   }
 }
