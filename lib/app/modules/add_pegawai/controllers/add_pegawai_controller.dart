@@ -4,6 +4,7 @@ import 'dart:math';
 
 import 'package:absensi/app/Repo/service_api.dart';
 import 'package:absensi/app/model/level_model.dart';
+import 'package:absensi/app/modules/login/controllers/login_controller.dart';
 import 'package:absensi/app/modules/login/views/login_view.dart';
 import 'package:absensi/app/modules/profil/views/update_password.dart';
 import 'package:absensi/app/routes/app_pages.dart';
@@ -15,6 +16,7 @@ import 'package:get_storage/get_storage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:restart_app/restart_app.dart';
 import '../../../helper/toast.dart';
 import '../../../model/cabang_model.dart';
 import '../../../model/cabang_model.dart';
@@ -187,21 +189,20 @@ class AddPegawaiController extends GetxController {
             "Tidak ditemukan user dengan No Telp ${telp.text}. Pastikan No Telp yang diinput sudah sesuai");
       }
     } else {
-      showToast( "Anda harus mengisi kolom No Telp");
+      showToast("Anda harus mengisi kolom No Telp");
     }
   }
 
-  void updatePassword(String id, String username) async {
+  updatePassword(String id, String username) async {
     var data = {"id": id, "username": username, "password": pass.text};
     if (pass.text != "") {
-      loadingDialog("Memperbarui data user...");
       dialogMsg("Sukses", "Password berhasil diperbarui");
+      loadingDialog("Memperbarui data user...");
       final response = await ServiceApi().updatePasswordUser(data);
       cekDataUser.value = response;
       Get.back();
       if (cekDataUser.isNotEmpty) {
-        pass.clear();
-        Get.offAll(const LoginView());
+        
       } else {
         dialogMsg(
             "Terjadi Kesalahan", "Tidak dapat memperbarui password. Coba lagi");
@@ -210,5 +211,4 @@ class AddPegawaiController extends GetxController {
       showToast("Anda belum mengisi kolom Password");
     }
   }
-  
 }

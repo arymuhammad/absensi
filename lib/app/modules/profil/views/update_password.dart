@@ -2,6 +2,7 @@ import 'package:absensi/app/modules/add_pegawai/controllers/add_pegawai_controll
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:get/get.dart';
+import 'package:restart_app/restart_app.dart';
 
 class UpdatePassword extends GetView {
   UpdatePassword({super.key});
@@ -35,8 +36,9 @@ class UpdatePassword extends GetView {
             ),
             const SizedBox(height: 20),
             ElevatedButton(
-              onPressed: () {
-                pegawaiC.updatePassword(Get.arguments["id_user"], Get.arguments["username"]);
+              onPressed: () async{
+               await pegawaiC.updatePassword(Get.arguments["id_user"], Get.arguments["username"]);
+               Restart.restartApp();
               },
               style: ElevatedButton.styleFrom(
                   minimumSize: Size(Get.mediaQuery.size.width, 50)),
