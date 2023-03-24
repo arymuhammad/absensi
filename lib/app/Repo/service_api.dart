@@ -18,7 +18,7 @@ import '../model/login_model.dart';
 import 'app_exceptions.dart';
 
 class ServiceApi {
-  var baseUrl = "http://103.156.15.60/absensi/";
+  var baseUrl = "https://api.attendance.urbanco.id/";
   var isLoading = false.obs;
 
   loginUser(data) async {
@@ -81,7 +81,7 @@ class ServiceApi {
               child: Text('Server tidak merespon'),
             ),
             ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
                   loginUser(data);
                   isLoading.value = true;
                   Get.back();

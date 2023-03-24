@@ -42,22 +42,25 @@ void dialogMsgAbsen(code, msg) {
       Get.back();
       Get.back();
       Get.back();
+      Get.back();
     },
       barrierDismissible: false
   );
 }
 
-void loadingDialog(msg) {
+void loadingDialog(msg, String? msg2) {
   Get.defaultDialog(
       title: '',
       content: Center(
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
         children:  [
          const CircularProgressIndicator(),
          const SizedBox(
-            height: 5,
+            height:10,
           ),
-          Text(msg)
+          Text(msg),
+          Text(msg2!),
         ],
       )),
       barrierDismissible: false);

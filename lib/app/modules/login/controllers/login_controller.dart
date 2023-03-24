@@ -48,7 +48,7 @@ class LoginController extends GetxController {
   login() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     var data = {"username": username.text, "password": password.text};
-    loadingDialog('Loading...');
+    loadingDialog('Loading...',"");
     var response = await ServiceApi().loginUser(data);
      Get.back();
     dataUser.value = response;

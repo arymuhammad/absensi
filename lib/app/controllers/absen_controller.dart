@@ -73,8 +73,8 @@ class AbsenController extends GetxController {
 
   getLoc(List<dynamic>? dataUser) async {
     // print(dataUser![0]);
-    loadingDialog(
-        "Memindai posisi Anda...\nProses ini membutuhkan koneksi internet yang stabil");
+    loadingDialog("Memindai posisi Anda...",
+        "Proses ini membutuhkan koneksi internet yang stabil");
     Position position = await determinePosition();
     // print('${position.latitude} , ${position.longitude}');
     List<Placemark> placemarks =
@@ -92,6 +92,7 @@ class AbsenController extends GetxController {
     if (distance >= 200) {
       dialogMsgCncl('Terjadi Kesalahan',
           'Posisi Anda berada diluar jangkauan area.\nHarap berpindah posisi ke area yang sudah ditentukan');
+      Get.back();
     } else {
       await countDataAbsen(dataUser[0]);
       // print(dataAbsen.value.total);
@@ -142,6 +143,11 @@ class AbsenController extends GetxController {
                 )
               ],
             ),
+            textCancel: 'Batal',
+            onCancel: () {
+              Get.back();
+              Get.back();
+            },
             textConfirm: 'Ambil Foto',
             confirmTextColor: Colors.white,
             onConfirm: () async {
@@ -153,7 +159,7 @@ class AbsenController extends GetxController {
               } else {
                 await uploadFotoAbsen();
               }
-              loadingDialog("Sedang mengirim data...");
+              loadingDialog("Sedang mengirim data...", "");
               if (image != null || imageWeb != null) {
                 // // print(File(imageWeb!.files.single.name.toString()));
                 // Position position = await determinePosition();
@@ -210,12 +216,18 @@ class AbsenController extends GetxController {
               // Get.defaultDialog(content: CircularProgressIndicator());
               dialogMsgAbsen("Sukses", "Anda berhasil Absen");
               // Get.back();
-            });
+            },
+            barrierDismissible: false);
       } else {
         msg.value = "Anda yakin ingin absen pulang hari ini?";
         Get.defaultDialog(
             title: 'Absen',
             middleText: msg.value,
+            textCancel: 'Batal',
+            onCancel: () {
+              Get.back();
+              Get.back();
+            },
             textConfirm: 'Ambil Foto',
             confirmTextColor: Colors.white,
             onConfirm: () async {
@@ -227,7 +239,7 @@ class AbsenController extends GetxController {
               } else {
                 await uploadFotoAbsen();
               }
-              loadingDialog("Sedang mengirim data...");
+              loadingDialog("Sedang mengirim data...", "");
 
               // '${placemarks[0].street!}, ${placemarks[0].subLocality!}\n${placemarks[0].subAdministrativeArea!}, ${placemarks[0].administrativeArea!}';
 
@@ -275,7 +287,8 @@ class AbsenController extends GetxController {
               // Get.defaultDialog(content: CircularProgressIndicator());
               dialogMsgAbsen("Sukses", "Anda berhasil Absen");
               // Get.back();
-            });
+            },
+            barrierDismissible: false);
       }
     }
   }

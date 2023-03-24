@@ -2,6 +2,7 @@ import 'package:absensi/app/controllers/absen_controller.dart';
 import 'package:absensi/app/controllers/page_index_controller.dart';
 import 'package:absensi/app/modules/login/controllers/login_controller.dart';
 import 'package:absensi/app/modules/profil/views/update_profil.dart';
+import 'package:absensi/app/modules/profil/views/verifikasi_update_password.dart';
 import 'package:absensi/app/routes/app_pages.dart';
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 import 'package:flutter/material.dart';
@@ -46,8 +47,7 @@ class ProfilView extends GetView<ProfilController> {
                                   backgroundDecoration:
                                       BoxDecoration(color: Colors.grey[200]),
                                   imageProvider: NetworkImage(
-                                      "${ServiceApi().baseUrl}${listDataUser![5]}"
-                                      ),
+                                      "${ServiceApi().baseUrl}${listDataUser![5]}"),
                                 )
                               : Image.network(
                                   "https://ui-avatars.com/api/?name=${listDataUser![1]}",
@@ -74,13 +74,19 @@ class ProfilView extends GetView<ProfilController> {
             const SizedBox(height: 20),
             ListTile(
               onTap: () {
-                Get.to(() => UpdateProfil(userData: listDataUser!,), transition: Transition.cupertino);
+                Get.to(
+                    () => UpdateProfil(
+                          userData: listDataUser!,
+                        ),
+                    transition: Transition.cupertino);
               },
               leading: const Icon(Icons.person),
               title: const Text('Update Profile'),
             ),
             ListTile(
-              onTap: () {},
+              onTap: () {
+                Get.to(() => VerifikasiUpdatePassword(), transition: Transition.cupertinoDialog);
+              },
               leading: const Icon(Icons.vpn_key),
               title: const Text('Update Password'),
             ),

@@ -162,7 +162,7 @@ class AddPegawaiController extends GetxController {
   void cekUser() async {
     var data = {"no_telp": telp.text};
     if (telp.text != "") {
-      loadingDialog("Sedang mencari data user");
+      loadingDialog("Sedang mencari data user","");
       final response = await ServiceApi().cekUser(data);
       cekDataUser.value = response;
       Get.back();
@@ -189,7 +189,7 @@ class AddPegawaiController extends GetxController {
     var data = {"id": id, "username": username, "password": pass.text};
     if (pass.text != "") {
       dialogMsgAbsen("Sukses", "Password berhasil diperbarui\nSilahkan melakukan login ulang");
-      loadingDialog("Memperbarui data user...");
+      loadingDialog("Memperbarui data user...","");
       final response = await ServiceApi().updatePasswordUser(data);
       cekDataUser.value = response;
       Get.back();
