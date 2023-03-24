@@ -188,7 +188,7 @@ class HomeView extends GetView<HomeController> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const Text(
-                      'Data absen terkini',
+                      'Riwayat absen',
                       style:
                           TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                     ),
@@ -330,7 +330,7 @@ class HomeView extends GetView<HomeController> {
                           )
                         : loc.dataLimitAbsen.isEmpty
                             ? const Center(
-                                child: Text('Belum ada data absen'),
+                                child: Text('Belum ada riwayat absen'),
                               )
                             : ListView.builder(
                                 shrinkWrap: true,
@@ -398,11 +398,58 @@ class HomeView extends GetView<HomeController> {
                                             mainAxisAlignment:
                                                 MainAxisAlignment.spaceBetween,
                                             children: [
-                                              const Text(
-                                                'Masuk',
-                                                style: TextStyle(
-                                                    fontWeight:
-                                                        FontWeight.bold),
+                                              Row(
+                                                children: [
+                                                  const Text(
+                                                    'Masuk',
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold),
+                                                  ),
+                                                  const SizedBox(width: 5),
+                                                  Container(
+                                                    height: 25,
+                                                    width: 75,
+                                                    decoration: BoxDecoration(
+                                                        color: DateFormat(
+                                                                    "HH:mm:ss")
+                                                                .parse(loc
+                                                                    .dataLimitAbsen[
+                                                                        i]
+                                                                    .jamAbsenMasuk!)
+                                                                .isBefore(DateFormat(
+                                                                        "HH:mm:ss")
+                                                                    .parse(loc
+                                                                        .dataLimitAbsen[
+                                                                            i]
+                                                                        .jamMasuk!))
+                                                            ? Colors.green[600]
+                                                            : Colors.red[600],
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(5)),
+                                                    child: Center(
+                                                      child: Text(
+                                                        DateFormat("HH:mm:ss")
+                                                                .parse(loc
+                                                                    .dataLimitAbsen[
+                                                                        i]
+                                                                    .jamAbsenMasuk!)
+                                                                .isBefore(DateFormat(
+                                                                        "HH:mm:ss")
+                                                                    .parse(loc
+                                                                        .dataLimitAbsen[
+                                                                            i]
+                                                                        .jamMasuk!))
+                                                            ? "Awal Waktu"
+                                                            : "Telat",
+                                                        style: const TextStyle(
+                                                            color:
+                                                                Colors.white),
+                                                      ),
+                                                    ),
+                                                  )
+                                                ],
                                               ),
                                               Text(
                                                   DateFormat('EE, dd-MM-yyyy')
@@ -423,10 +470,64 @@ class HomeView extends GetView<HomeController> {
                                           const SizedBox(
                                             height: 8,
                                           ),
-                                          const Text(
-                                            'Keluar',
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.bold),
+                                          Row(
+                                            children: [
+                                              const Text(
+                                                'Keluar',
+                                                style: TextStyle(
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                              const SizedBox(width: 5),
+                                              Container(
+                                                height: 25,
+                                                width: 75,
+                                                decoration: BoxDecoration(
+                                                    color: loc.dataLimitAbsen[i]
+                                                                .jamAbsenPulang! !=
+                                                            ""
+                                                        ? DateFormat("HH:mm:ss")
+                                                                .parse(loc
+                                                                    .dataLimitAbsen[
+                                                                        i]
+                                                                    .jamAbsenPulang!)
+                                                                .isBefore(DateFormat(
+                                                                        "HH:mm:ss")
+                                                                    .parse(loc
+                                                                        .dataLimitAbsen[
+                                                                            i]
+                                                                        .jamPulang!))
+                                                            ? Colors.red[600]
+                                                            : Colors.green[600]
+                                                        : Colors.red[600],
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            5)),
+                                                child: Center(
+                                                  child: Text(
+                                                    loc.dataLimitAbsen[i]
+                                                                .jamAbsenPulang! ==
+                                                            ""
+                                                        ? "Belum Absen"
+                                                        : DateFormat("HH:mm:ss")
+                                                                .parse(loc
+                                                                    .dataLimitAbsen[
+                                                                        i]
+                                                                    .jamAbsenPulang!)
+                                                                .isBefore(DateFormat(
+                                                                        "HH:mm:ss")
+                                                                    .parse(loc
+                                                                        .dataLimitAbsen[
+                                                                            i]
+                                                                        .jamPulang!))
+                                                            ? "Pulang Cepat"
+                                                            : "Lembur",
+                                                    style: const TextStyle(
+                                                        color: Colors.white),
+                                                  ),
+                                                ),
+                                              )
+                                            ],
                                           ),
                                           Text(loc.dataLimitAbsen[i]
                                                       .jamAbsenPulang !=

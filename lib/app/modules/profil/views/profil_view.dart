@@ -85,7 +85,7 @@ class ProfilView extends GetView<ProfilController> {
             ),
             ListTile(
               onTap: () {
-                Get.to(() => VerifikasiUpdatePassword(), transition: Transition.cupertinoDialog);
+                Get.to(() => VerifikasiUpdatePassword(), transition: Transition.cupertino);
               },
               leading: const Icon(Icons.vpn_key),
               title: const Text('Update Password'),
