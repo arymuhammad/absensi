@@ -1,4 +1,4 @@
-import 'package:absensi/app/helper/toast.dart';
+import 'package:absensi/app/helper/loading_dialog.dart';
 import 'package:get/get.dart';
 
 import '../routes/app_pages.dart';

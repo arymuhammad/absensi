@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:absensi/app/modules/add_pegawai/controllers/add_pegawai_controller.dart';
 import 'package:absensi/app/modules/profil/controllers/profil_controller.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:get/get.dart';
@@ -32,16 +33,28 @@ class UpdateProfil extends GetView {
               child: ClipOval(
                 child: GetBuilder<AddPegawaiController>(
                   builder: (c) {
-                    if (c.image != null) {
-                      return Container(
-                        height: 150,
-                        width: 150,
-                        decoration: BoxDecoration(color: Colors.grey[300]),
-                        child: Image.file(
-                          File(c.image!.path),
-                          fit: BoxFit.cover,
-                        ),
-                      );
+                    if (c.image != null || c.webImage.isNotEmpty) {
+                      return kIsWeb
+                          ? Container(
+                              height: 150,
+                              width: 150,
+                              decoration:
+                                  BoxDecoration(color: Colors.grey[300]),
+                              child: Image.memory(
+                                c.webImage,
+                                fit: BoxFit.contain,
+                              ),
+                            )
+                          : Container(
+                              height: 150,
+                              width: 150,
+                              decoration:
+                                  BoxDecoration(color: Colors.grey[300]),
+                              child: Image.file(
+                                File(c.image!.path),
+                                fit: BoxFit.cover,
+                              ),
+                            );
                     } else {
                       return Container(
                         height: 150,
@@ -268,13 +281,20 @@ class UpdateProfil extends GetView {
             },
           ),
           const SizedBox(
-            height: 20,
+            height: 30,
           ),
-          ElevatedButton(
-              onPressed: () {
-                ctr.addUpdatePegawai("update", userData!);
-              },
-              child: const Text('UPDATE PROFILE'))
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 30),
+            child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(50)),
+                    minimumSize: Size(Get.size.width / 2, 50)),
+                onPressed: () {
+                  ctr.addUpdatePegawai("update", userData!);
+                },
+                child: const Text('UPDATE PROFILE')),
+          )
         ],
       ),
     );

@@ -5,6 +5,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:geocoder2/geocoder2.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
@@ -12,7 +13,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../Repo/service_api.dart';
-import '../helper/toast.dart';
+import '../helper/loading_dialog.dart';
 import '../model/absen_model.dart';
 import '../model/cek_absen_model.dart';
 
@@ -73,26 +74,27 @@ class AbsenController extends GetxController {
 
   getLoc(List<dynamic>? dataUser) async {
     // print(dataUser![0]);
-    loadingDialog("Memindai posisi Anda...",
-        "Proses ini membutuhkan koneksi internet yang stabil");
     Position position = await determinePosition();
-    // print('${position.latitude} , ${position.longitude}');
-    List<Placemark> placemarks =
-        await placemarkFromCoordinates(position.latitude, position.longitude);
-    // print(placemarks);
-    // lokasi.value = '${position.latitude} , ${position.longitude}';
-    lokasi.value =
-        '${placemarks[0].street!}, ${placemarks[0].subLocality!}\n${placemarks[0].subAdministrativeArea!}, ${placemarks[0].administrativeArea!}';
+    print('${position.latitude} , ${position.longitude}');
+    print('${dataUser![6]} , ${dataUser[7]}');
+    if (!kIsWeb) {
+      List<Placemark> placemarks =
+          await placemarkFromCoordinates(position.latitude, position.longitude);
+      lokasi.value =
+          '${placemarks[0].street!}, ${placemarks[0].subLocality!}\n${placemarks[0].subAdministrativeArea!}, ${placemarks[0].administrativeArea!}';
+    } else {
+      lokasi.value = '${position.latitude} , ${position.longitude}';
+    }
     double distance = Geolocator.distanceBetween(
-        double.parse(dataUser![6]),
+        double.parse(dataUser[6]),
         double.parse(dataUser[7]),
         position.latitude.toDouble(),
         position.longitude.toDouble());
+
     print('$distance ini jarak');
     if (distance >= 200) {
       dialogMsgCncl('Terjadi Kesalahan',
           'Posisi Anda berada diluar jangkauan area.\nHarap berpindah posisi ke area yang sudah ditentukan');
-      Get.back();
     } else {
       await countDataAbsen(dataUser[0]);
       // print(dataAbsen.value.total);
@@ -330,6 +332,8 @@ class AbsenController extends GetxController {
       // App to enable the location services.
       showToast("Lokasi belum diaktifkan");
       return Future.error('Location services are disabled.');
+    } else {
+      loadingDialog("Memindai posisi Anda...", "");
     }
 
     permission = await Geolocator.checkPermission();

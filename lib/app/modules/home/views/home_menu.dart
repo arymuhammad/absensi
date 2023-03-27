@@ -1,3 +1,4 @@
+import 'package:absensi/app/helper/const.dart';
 import 'package:absensi/app/modules/home/controllers/home_controller.dart';
 import 'package:absensi/app/modules/home/views/home_view.dart';
 import 'package:absensi/app/modules/profil/views/profil_view.dart';
@@ -6,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:ternav_icons/ternav_icons.dart';
 
 import '../../../controllers/absen_controller.dart';
 import '../../login/controllers/login_controller.dart';
@@ -22,7 +24,6 @@ class HomeMenu extends GetView {
 
   @override
   Widget build(BuildContext context) {
-    print(' ini list data user di home menu = ${listDataUser!}');
     final List<Widget> widgetList = <Widget>[
       HomeView(listDataUser: listDataUser!),
       Container(),
@@ -34,14 +35,15 @@ class HomeMenu extends GetView {
           IndexedStack(index: loginC.selected.value, children: widgetList)),
       bottomNavigationBar: Obx(
         () => ConvexAppBar(
-          items: const [
-            TabItem(icon: Icons.home, title: 'Home'),
-            TabItem(icon: Icons.camera_outlined),
-            TabItem(icon: Icons.person, title: 'Profile'),
+          items:  [
+            TabItem(icon: TernavIcons.light.home, title: 'Home'),
+            TabItem(icon: TernavIcons.lightOutline.camera),
+            TabItem(icon: TernavIcons.light.profile, title: 'Profile'),
           ],
           initialActiveIndex: loginC.selected.value,
           activeColor: Colors.white,
           style: TabStyle.fixedCircle,
+          backgroundColor: mainColor,
           onTap: (i) {
             if (i == 1) {
               // Get.defaultDialog(

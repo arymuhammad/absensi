@@ -1,3 +1,4 @@
+import 'package:absensi/app/helper/const.dart';
 import 'package:absensi/app/modules/home/views/home_menu.dart';
 import 'package:absensi/app/modules/home/views/home_view.dart';
 import 'package:absensi/app/modules/login/controllers/login_controller.dart';
@@ -6,6 +7,7 @@ import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_strategy/url_strategy.dart';
 
@@ -33,18 +35,20 @@ void main() async {
     auth.logUser.value = userDataLogin;
   }
 
-  print('ini data user di main =  ${auth.logUser}');
+  // print('ini data user di main =  ${auth.logUser}');
   //  else {
   //   print(auth.isAuth.value);
   // }
+  await initializeDateFormatting('id_ID', "").then((_) =>
   runApp(
     GetMaterialApp(
       debugShowCheckedModeBanner: false,
-      title: "Application",
+      title: "Absensi",
+      theme: ThemeData(primarySwatch: Colors.blueGrey),
       home: Obx(() => auth.isAuth.value
           ? HomeMenu(listDataUser: auth.logUser)
           : const LoginView()),
       getPages: AppPages.routes,
     ),
-  );
+  ));
 }

@@ -25,12 +25,9 @@ class LoginView extends GetView<LoginController> {
                     height: 150,
                     width: 150,
                     decoration: BoxDecoration(color: Colors.grey[300]),
-                    child: const Center(
-                        child: Icon(
-                      Icons.account_circle_rounded,
-                      color: Colors.grey,
-                      size: 150,
-                    )),
+                    child:  Image.asset("assets/selfie.png",
+                    fit: BoxFit.contain,
+                    ),
                   ),
                 ),
               ),

@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:absensi/app/helper/toast.dart';
+import 'package:absensi/app/helper/loading_dialog.dart';
 import 'package:absensi/app/routes/app_pages.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -68,7 +68,8 @@ class LoginController extends GetxController {
         '${dataUser.value.data!.foto}',
         '${dataUser.value.data!.lat}',
         '${dataUser.value.data!.long}',
-        '${dataUser.value.data!.kodeCabang}'
+        '${dataUser.value.data!.kodeCabang}',
+        '${dataUser.value.data!.level}'
       ]);
       //  pref.getStringList('userDataLogin');
       List<String>? tempUser = pref.getStringList('userDataLogin');
@@ -76,7 +77,7 @@ class LoginController extends GetxController {
       isAuth.value = await pref.setBool("is_login", true);
       // print(isAuth.value);
       // update();
-      print('ini list data user di controller login  = $logUser');
+      
       // currUser.add(pref.getStringList('userDataLogin'));
       // print('${dataUser.value.data!}');
       // print('login');
@@ -106,7 +107,7 @@ class LoginController extends GetxController {
     logUser.clear();
     // absen.dataAllAbsen.clear();
     // absen.dataLimitAbsen.clear();
-    print('ini list data yang seharusnya kosong ( $logUser )');
+    
     isAuth.value = false;
     selected.value = 0;
     Get.delete<AbsenController>(force: true);

@@ -11,8 +11,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
-
-import '../helper/toast.dart';
+import 'package:http_parser/http_parser.dart';
+import '../helper/loading_dialog.dart';
 import '../model/absen_model.dart';
 import '../model/login_model.dart';
 import 'app_exceptions.dart';
@@ -142,7 +142,6 @@ class ServiceApi {
   }
 
   addUpdatePegawai(data) async {
-    // print(data["mode"]);
     try {
       //post date
       // Map<String, String> headers = {
@@ -152,25 +151,48 @@ class ServiceApi {
           http.MultipartRequest('POST', Uri.parse('${baseUrl}add_user'));
 
       // request.headers.addAll(headers);
-      request.fields['id'] = data["id"];
-      if (data["mode"] == "add") {
+      request.fields['status'] = data["status"];
+      if (data["status"] == "add") {
+        request.fields['id'] = data["id"];
         request.fields['username'] = data["username"];
         request.fields['password'] = data["password"];
+        request.fields['nama'] = data["nama"];
+        request.fields['no_telp'] = data["no_telp"];
+        request.fields['kode_cabang'] = data["kode_cabang"];
+        request.fields['level'] = data["level"];
+        if (data["foto"] != null) {
+          if (kIsWeb) {
+            request.files.add(http.MultipartFile(
+                "foto", data["foto"].readStream, data["foto"].size,
+                filename: data["foto"].name));
+          } else {
+            request.files.add(http.MultipartFile(
+                'foto',
+                data["foto"].readAsBytes().asStream(),
+                data["foto"].lengthSync(),
+                filename: data["foto"].path.split("/").last));
+          }
+        } else {}
+      } else {
+        request.fields['id'] = data["id"];
+        request.fields['nama'] = data["nama"];
+        request.fields['no_telp'] = data["no_telp"];
+        request.fields['kode_cabang'] = data["kode_cabang"];
+        request.fields['level'] = data["level"];
+        if (data["foto"] != null) {
+          if (kIsWeb) {
+            request.files.add(http.MultipartFile(
+                "foto", data["foto"].readStream, data["foto"].size,
+                filename: data["foto"].name));
+          } else {
+            request.files.add(http.MultipartFile(
+                'foto',
+                data["foto"].readAsBytes().asStream(),
+                data["foto"].lengthSync(),
+                filename: data["foto"].path.split("/").last));
+          }
+        } else {}
       }
-      request.fields['nama'] = data["nama"];
-      request.fields['no_telp'] = data["no_telp"];
-      request.fields['kode_cabang'] = data["kode_cabang"];
-      request.fields['level'] = data["level"];
-      if (data["foto"] != "") {
-        request.files.add(http.MultipartFile('foto',
-            data["foto"].readAsBytes().asStream(), data["foto"].lengthSync(),
-            filename: data["foto"].path.split("/").last));
-      } else {}
-      // request.files.add(http.MultipartFile(
-      //     'proposal',
-      //     data["proposal"].readAsBytes().asStream(),
-      //     data["proposal"].lengthSync(),
-      //     filename: data["proposal"].path.split("/").last));
 
       var res = await request.send();
       var responseBytes = await res.stream.toBytes();

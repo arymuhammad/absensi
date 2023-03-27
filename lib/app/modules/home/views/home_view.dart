@@ -1,3 +1,4 @@
+import 'package:absensi/app/helper/const.dart';
 import 'package:absensi/app/modules/profil/views/profil_view.dart';
 import 'package:absensi/app/routes/app_pages.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -40,7 +41,7 @@ class HomeView extends GetView<HomeController> {
             child: Container(
               height: 200,
               width: Get.width,
-              color: Colors.blue,
+              color: mainColor,
             ),
           ),
           Padding(
@@ -217,9 +218,9 @@ class HomeView extends GetView<HomeController> {
                               // Get.back();
                             },
                             child: const Text('Lihat Detail')),
-                        const Icon(
+                         Icon(
                           Icons.keyboard_arrow_right_rounded,
-                          color: Colors.blue,
+                          color: mainColor,
                         )
                       ],
                     )
@@ -361,7 +362,7 @@ class HomeView extends GetView<HomeController> {
                                           "jam_pulang": loc.dataLimitAbsen[i]
                                                       .jamAbsenPulang! ==
                                                   ""
-                                              ? "Belum / Tidak\nAbsen Pulang"
+                                              ? "Belum Absen"
                                               : DateFormat("HH:mm:ss")
                                                       .parse(loc
                                                           .dataLimitAbsen[i]
@@ -381,7 +382,15 @@ class HomeView extends GetView<HomeController> {
                                           "foto_masuk":
                                               loc.dataLimitAbsen[i].fotoMasuk!,
                                           "foto_pulang":
-                                              loc.dataLimitAbsen[i].fotoPulang!
+                                              loc.dataLimitAbsen[i].fotoPulang!,
+                                          "lat_masuk":
+                                              loc.dataLimitAbsen[i].latMasuk!,
+                                          "long_masuk":
+                                              loc.dataLimitAbsen[i].longMasuk!,
+                                          "lat_pulang":
+                                              loc.dataLimitAbsen[i].latPulang!,
+                                          "long_pulang":
+                                              loc.dataLimitAbsen[i].longPulang!,
                                         }),
                                     child: Container(
                                       margin: const EdgeInsets.only(bottom: 20),
@@ -452,7 +461,9 @@ class HomeView extends GetView<HomeController> {
                                                 ],
                                               ),
                                               Text(
-                                                  DateFormat('EE, dd-MM-yyyy')
+                                                  DateFormat(
+                                                          "EEEE, d MMMM yyyy",
+                                                          "id_ID")
                                                       .format(DateTime.parse(loc
                                                           .dataLimitAbsen[i]
                                                           .tanggal!)),

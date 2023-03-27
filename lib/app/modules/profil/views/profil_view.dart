@@ -1,5 +1,6 @@
 import 'package:absensi/app/controllers/absen_controller.dart';
 import 'package:absensi/app/controllers/page_index_controller.dart';
+import 'package:absensi/app/helper/const.dart';
 import 'package:absensi/app/modules/login/controllers/login_controller.dart';
 import 'package:absensi/app/modules/profil/views/update_profil.dart';
 import 'package:absensi/app/modules/profil/views/verifikasi_update_password.dart';
@@ -11,6 +12,7 @@ import 'package:full_screen_image_null_safe/full_screen_image_null_safe.dart';
 import 'package:get/get.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:ternav_icons/ternav_icons.dart';
 
 import '../../../Repo/service_api.dart';
 import '../controllers/profil_controller.dart';
@@ -80,21 +82,25 @@ class ProfilView extends GetView<ProfilController> {
                         ),
                     transition: Transition.cupertino);
               },
-              leading: const Icon(Icons.person),
+              leading: Icon(TernavIcons.bold.profile,
+                color: mainColor,),
               title: const Text('Update Profile'),
             ),
             ListTile(
               onTap: () {
-                Get.to(() => VerifikasiUpdatePassword(), transition: Transition.cupertino);
+                Get.to(() => VerifikasiUpdatePassword(),
+                    transition: Transition.cupertino);
               },
-              leading: const Icon(Icons.vpn_key),
+              leading: Icon(TernavIcons.bold.key,
+                color: mainColor,),
               title: const Text('Update Password'),
             ),
             ListTile(
               onTap: () {
                 Get.toNamed(Routes.ADD_PEGAWAI);
               },
-              leading: const Icon(Icons.person_add),
+              leading: Icon(TernavIcons.bold.add_user,
+                color: mainColor,),
               title: const Text('Add Pegawai'),
             ),
             ListTile(
@@ -139,7 +145,10 @@ class ProfilView extends GetView<ProfilController> {
                   ),
                 );
               },
-              leading: const Icon(Icons.logout),
+              leading: Icon(
+                TernavIcons.lightOutline.logout,
+                color: mainColor,
+              ),
               title: const Text('Logout'),
             ),
           ],

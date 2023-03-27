@@ -153,7 +153,8 @@ class SemuaAbsenView extends GetView<SemuaAbsenController> {
                                 absenC.searchAbsen;
                                 Get.toNamed(Routes.DETAIL_ABSEN, arguments: {
                                   "nama": absenC.searchAbsen[i].nama!,
-                                  "nama_shift": absenC.searchAbsen[i].namaShift!,
+                                  "nama_shift":
+                                      absenC.searchAbsen[i].namaShift!,
                                   "id_user": absenC.searchAbsen[i].idUser!,
                                   "tanggal": absenC.searchAbsen[i].tanggal!,
                                   "jam_masuk": DateFormat("HH:mm:ss")
@@ -183,7 +184,14 @@ class SemuaAbsenView extends GetView<SemuaAbsenController> {
                                   "foto_masuk":
                                       absenC.searchAbsen[i].fotoMasuk!,
                                   "foto_pulang":
-                                      absenC.searchAbsen[i].fotoPulang!
+                                      absenC.searchAbsen[i].fotoPulang!,
+                                  "lat_masuk": absenC.searchAbsen[i].latMasuk!,
+                                  "long_masuk":
+                                      absenC.searchAbsen[i].longMasuk!,
+                                  "lat_pulang":
+                                      absenC.searchAbsen[i].latPulang!,
+                                  "long_pulang":
+                                      absenC.searchAbsen[i].longPulang!,
                                 });
                                 absenC.filterAbsen.clear();
                               },

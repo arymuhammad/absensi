@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
@@ -31,26 +32,43 @@ class AddPegawaiView extends GetView<AddPegawaiController> {
               child: ClipOval(
                 child: GetBuilder<AddPegawaiController>(
                   builder: (c) {
-                    if (c.image != null) {
-                      return Container(
-                        height: 150,
-                        width: 150,
-                        decoration: BoxDecoration(color: Colors.grey[300]),
-                        child: Image.file(
-                          File(c.image!.path),
-                          fit: BoxFit.cover,
-                        ),
-                      );
+                    if (c.image != null || c.webImage.isNotEmpty) {
+                      return kIsWeb
+                          ? Container(
+                              height: 150,
+                              width: 150,
+                              decoration:
+                                  BoxDecoration(color: Colors.grey[300]),
+                              child: Image.memory(
+                                c.webImage,
+                                fit: BoxFit.contain,
+                              ),
+                            )
+                          : Container(
+                              height: 150,
+                              width: 150,
+                              decoration:
+                                  BoxDecoration(color: Colors.grey[300]),
+                              child: Image.file(
+                                File(c.image!.path),
+                                fit: BoxFit.cover,
+                              ),
+                            );
                     } else {
                       return Container(
                         height: 150,
                         width: 150,
                         decoration: BoxDecoration(color: Colors.grey[300]),
-                        child: const Center(
-                            child: Icon(
-                          Icons.camera_alt_rounded,
-                          size: 50,
-                        )),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: const [
+                            Icon(
+                              Icons.camera_alt_rounded,
+                              size: 50,
+                            ),
+                            Text('Choose File', style: TextStyle(color: Colors.blue),)
+                          ],
+                        ),
                       );
                     }
                   },
@@ -144,11 +162,11 @@ class AddPegawaiView extends GetView<AddPegawaiController> {
               return Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: const [
-                  Text('Sedang memuat...'),
-                  SizedBox(width: 5),
                   Center(
                     child: CupertinoActivityIndicator(),
                   ),
+                  SizedBox(width: 5),
+                  Text('Sedang memuat...'),
                 ],
               );
             },
@@ -273,11 +291,11 @@ class AddPegawaiView extends GetView<AddPegawaiController> {
               return Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: const [
-                  Text('Sedang memuat...'),
-                  SizedBox(width: 5),
                   Center(
                     child: CupertinoActivityIndicator(),
                   ),
+                  SizedBox(width: 5),
+                  Text('Sedang memuat...'),
                 ],
               );
             },
@@ -285,11 +303,18 @@ class AddPegawaiView extends GetView<AddPegawaiController> {
           const SizedBox(
             height: 20,
           ),
-          ElevatedButton(
-              onPressed: () {
-                controller.addUpdatePegawai("add", [""]);
-              },
-              child: const Text('ADD PEGAWAI'))
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 30),
+            child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
+                  minimumSize:  Size(Get.size.width/2, 50)
+                ),
+                onPressed: () {
+                  controller.addUpdatePegawai("add", [""]);
+                },
+                child: const Text('ADD PEGAWAI')),
+          )
         ],
       ),
       // bottomNavigationBar: ConvexAppBar(
