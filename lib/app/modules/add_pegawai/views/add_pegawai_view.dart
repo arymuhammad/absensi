@@ -121,6 +121,8 @@ class AddPegawaiView extends GetView<AddPegawaiController> {
                     return TextField(
                       decoration: const InputDecoration(
                           labelText: 'Ketik Nama Cabang',
+                  filled: true,
+                  fillColor: Colors.white,
                           border: OutlineInputBorder()),
                       controller: cabang,
                       focusNode: focusNode,
@@ -177,7 +179,9 @@ class AddPegawaiView extends GetView<AddPegawaiController> {
           TextField(
             controller: controller.username,
             decoration: const InputDecoration(
-                labelText: 'Username', border: OutlineInputBorder()),
+                labelText: 'Username',
+                  filled: true,
+                  fillColor: Colors.white, border: OutlineInputBorder()),
           ),
           const SizedBox(
             height: 20,
@@ -186,7 +190,9 @@ class AddPegawaiView extends GetView<AddPegawaiController> {
             obscureText: true,
             controller: controller.pass,
             decoration: const InputDecoration(
-                labelText: 'Password', border: OutlineInputBorder()),
+                labelText: 'Password',
+                  filled: true,
+                  fillColor: Colors.white, border: OutlineInputBorder()),
           ),
           const SizedBox(
             height: 20,
@@ -194,7 +200,9 @@ class AddPegawaiView extends GetView<AddPegawaiController> {
           TextField(
             controller: controller.name,
             decoration: const InputDecoration(
-                labelText: 'Nama', border: OutlineInputBorder()),
+                labelText: 'Nama', 
+                  filled: true,
+                  fillColor: Colors.white,border: OutlineInputBorder()),
           ),
           const SizedBox(
             height: 20,
@@ -202,7 +210,9 @@ class AddPegawaiView extends GetView<AddPegawaiController> {
           TextField(
             controller: controller.telp,
             decoration: const InputDecoration(
-                labelText: 'No Telp', border: OutlineInputBorder()),
+                labelText: 'No Telp',
+                  filled: true,
+                  fillColor: Colors.white, border: OutlineInputBorder()),
             keyboardType: TextInputType.phone,
           ),
           const SizedBox(
@@ -250,6 +260,8 @@ class AddPegawaiView extends GetView<AddPegawaiController> {
                     return TextField(
                       decoration: const InputDecoration(
                           labelText: 'Ketik Level User',
+                  filled: true,
+                  fillColor: Colors.white,
                           border: OutlineInputBorder()),
                       controller: mk,
                       focusNode: focusNode,

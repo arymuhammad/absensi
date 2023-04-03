@@ -10,7 +10,7 @@ class VerifikasiUpdatePassword extends GetView {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Verifikasi User'),
+        title: const Text('VERIFIKASI USER'),
         centerTitle: true,
       ),
       body: Padding(
@@ -19,29 +19,36 @@ class VerifikasiUpdatePassword extends GetView {
           children: [
             const SizedBox(height: 20),
             const Text(
-              'Masukkan No telp yang terdaftar untuk validasi user',
+              'Masukkan No Telp yang terdaftar untuk validasi user',
               style: TextStyle(fontSize: 18),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 50),
             TextField(
               controller: pegawaiC.telp,
               decoration: InputDecoration(
                   labelText: 'No Telp',
                   prefixIcon: const Icon(Icons.phone_android),
+                  filled: true,
+                  fillColor: Colors.white,
                   border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10))),
               keyboardType: TextInputType.phone,
             ),
             const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                pegawaiC.cekUser();
-              },
-              style: ElevatedButton.styleFrom(
-                  minimumSize: Size(Get.mediaQuery.size.width, 50)),
-              child: const Text(
-                'VALIDASI',
-                style: TextStyle(fontSize: 18),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 60),
+              child: ElevatedButton(
+                onPressed: () {
+                  pegawaiC.cekUser();
+                },
+               style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(50)),
+                      minimumSize: Size(Get.size.width / 2, 50)),
+                child: const Text(
+                  'VALIDASI',
+                  style: TextStyle(fontSize: 18),
+                ),
               ),
             )
           ],

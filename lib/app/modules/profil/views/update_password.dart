@@ -11,7 +11,7 @@ class UpdatePassword extends GetView {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Update Password'),
+        title: const Text('UPDATE PASSWORD'),
         centerTitle: true,
       ),
       body: Padding(
@@ -52,22 +52,29 @@ class UpdatePassword extends GetView {
               controller: pegawaiC.pass,
               decoration: InputDecoration(
                   labelText: 'Ketik password baru',
+                  filled: true,
+                  fillColor: Colors.white,
                   prefixIcon: const Icon(Icons.lock_outline),
                   border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10))),
             ),
             const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () async {
-                await pegawaiC.updatePassword(
-                    Get.arguments["id_user"], Get.arguments["username"]);
-                //  Restart.restartApp();
-              },
-              style: ElevatedButton.styleFrom(
-                  minimumSize: Size(Get.mediaQuery.size.width, 50)),
-              child: const Text(
-                'SIMPAN',
-                style: TextStyle(fontSize: 18),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 80),
+              child: ElevatedButton(
+                onPressed: () async {
+                  await pegawaiC.updatePassword(
+                      Get.arguments["id_user"], Get.arguments["username"]);
+                  //  Restart.restartApp();
+                },
+               style: ElevatedButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(50)),
+                        minimumSize: Size(Get.size.width / 2, 50)),
+                child: const Text(
+                  'SIMPAN',
+                  style: TextStyle(fontSize: 18),
+                ),
               ),
             )
           ],

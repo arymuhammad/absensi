@@ -64,14 +64,58 @@ class ProfilView extends GetView<ProfilController> {
             ),
             const SizedBox(height: 15),
             Text(
-              listDataUser![1].toString().toUpperCase(),
+              listDataUser![1].toString().capitalize!,
               textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 20),
+              style: TextStyle(
+                  fontSize: 20, fontWeight: FontWeight.bold, color: titleColor),
             ),
             Text(
               '${listDataUser![4]}',
               textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 15),
+              style: TextStyle(fontSize: 13, color: subTitleColor),
+            ),
+            const SizedBox(height: 5),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Icon(
+                      TernavIcons.bold.profile,
+                      color: mainColor,
+                    ),
+                    const SizedBox(width: 5),
+                    Text(
+                      '${listDataUser![10]}',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 13, color: subTitleColor),
+                    ),
+                  ],
+                ),
+                const SizedBox(width: 8),
+                Container(
+                  height: 20,
+                  width: 1,
+                  color: mainColor,
+                ),
+                const SizedBox(width: 5),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Icon(
+                      TernavIcons.bold.call,
+                      color: mainColor,
+                    ),
+                    const SizedBox(width: 5),
+                    Text(
+                      '${listDataUser![3]}',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 13, color: subTitleColor),
+                    ),
+                  ],
+                ),
+              ],
             ),
             const SizedBox(height: 20),
             ListTile(
@@ -82,8 +126,10 @@ class ProfilView extends GetView<ProfilController> {
                         ),
                     transition: Transition.cupertino);
               },
-              leading: Icon(TernavIcons.bold.profile,
-                color: mainColor,),
+              leading: Icon(
+                TernavIcons.bold.profile,
+                color: mainColor,
+              ),
               title: const Text('Update Profile'),
             ),
             ListTile(
@@ -91,17 +137,24 @@ class ProfilView extends GetView<ProfilController> {
                 Get.to(() => VerifikasiUpdatePassword(),
                     transition: Transition.cupertino);
               },
-              leading: Icon(TernavIcons.bold.key,
-                color: mainColor,),
+              leading: Icon(
+                TernavIcons.bold.key,
+                color: mainColor,
+              ),
               title: const Text('Update Password'),
             ),
-            ListTile(
-              onTap: () {
-                Get.toNamed(Routes.ADD_PEGAWAI);
-              },
-              leading: Icon(TernavIcons.bold.add_user,
-                color: mainColor,),
-              title: const Text('Add Pegawai'),
+            Visibility(
+              visible: listDataUser![9] == "1" ? true : false,
+              child: ListTile(
+                onTap: () {
+                  Get.toNamed(Routes.ADD_PEGAWAI);
+                },
+                leading: Icon(
+                  TernavIcons.bold.add_user,
+                  color: mainColor,
+                ),
+                title: const Text('Add Pegawai'),
+              ),
             ),
             ListTile(
               onTap: () {
@@ -109,40 +162,17 @@ class ProfilView extends GetView<ProfilController> {
                   barrierDismissible: false,
                   radius: 5,
                   title: 'Peringatan',
-                  content: Column(
-                    children: [
-                      const Text('Anda yakin ingin Logout?'),
-                      const SizedBox(
-                        height: 20,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          ElevatedButton(
-                              onPressed: () async {
-                                await auth.logout();
-                                // loginC.isLoading.value = false;
-                                // homeC.selected.value = 0;
-                                // Fluttertoast.showToast(
-                                //     msg: "Sukses, Anda berhasil Logout.",
-                                //     toastLength: Toast.LENGTH_SHORT,
-                                //     gravity: ToastGravity.BOTTOM,
-                                //     timeInSecForIosWeb: 1,
-                                //     backgroundColor: Colors.greenAccent[700],
-                                //     textColor: Colors.white,
-                                //     fontSize: 16.0);
-                                Get.back();
-                              },
-                              child: const Text('Ya')),
-                          ElevatedButton(
-                              onPressed: () {
-                                Get.back();
-                              },
-                              child: const Text('Tidak')),
-                        ],
-                      ),
-                    ],
-                  ),
+                  middleText: 'Anda yakin ingin keluar?',
+                  onConfirm: () {
+                    auth.logout();
+                    Get.back();
+                  },
+                  textConfirm: 'Keluar',
+                  confirmTextColor: Colors.white,
+                  onCancel: () {
+                    Get.back();
+                  },
+                  textCancel: 'Batal',
                 );
               },
               leading: Icon(

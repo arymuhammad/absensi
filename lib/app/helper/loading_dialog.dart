@@ -11,10 +11,12 @@ void showToast(message) {
       msg: message,
       backgroundColor:
          Colors.grey[700],
-      textColor: Colors.grey[200],
+      textColor: Colors.white,
       toastLength: Toast.LENGTH_SHORT,
-      webPosition: 'center',
-      webBgColor: '#00b09b,'
+      gravity: ToastGravity.TOP,
+      webBgColor: ' #979B999',
+      timeInSecForIosWeb: 2,
+      webPosition: 'center'
       );
 }
 

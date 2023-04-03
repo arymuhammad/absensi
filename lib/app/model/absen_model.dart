@@ -14,6 +14,8 @@ class Absen {
   String? latPulang;
   String? longPulang;
   String? namaShift;
+  String? devInfo;
+  String? devInfo2;
 
   Absen(
       {this.idUser,
@@ -30,7 +32,10 @@ class Absen {
       this.longMasuk,
       this.latPulang,
       this.longPulang,
-      this.namaShift});
+      this.namaShift,
+      this.devInfo,
+      this.devInfo2,
+      });
 
   Absen.fromJson(Map<String, dynamic> json) {
     idUser = json['id_user'];
@@ -48,6 +53,8 @@ class Absen {
     latPulang = json['lat_pulang'];
     longPulang = json['long_pulang'];
     namaShift = json['nama_shift'];
+    devInfo = json['device_info'];
+    devInfo2 = json['device_info2'];
   }
 
   Map<String, dynamic> toJson() {
@@ -67,6 +74,8 @@ class Absen {
     data['lat_pulang'] = latPulang;
     data['long_pulang'] = longPulang;
     data['nama_shift'] = namaShift;
+    data['device_info'] = devInfo;
+    data['device_info2'] = devInfo2;
     return data;
   }
 }

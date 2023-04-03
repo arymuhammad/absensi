@@ -7,6 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:get/get.dart';
+import 'package:get/get_connect/http/src/request/request.dart';
 
 import '../../../Repo/service_api.dart';
 
@@ -118,6 +119,8 @@ class UpdateProfil extends GetView {
                     return TextField(
                       decoration: const InputDecoration(
                           labelText: 'Ketik Nama Cabang',
+                          filled: true,
+                          fillColor: Colors.white,
                           border: OutlineInputBorder()),
                       controller: cabang,
                       focusNode: focusNode,
@@ -131,8 +134,8 @@ class UpdateProfil extends GetView {
                       alignment: Alignment.topLeft,
                       child: Material(
                           child: SizedBox(
-                        width: 210,
-                        height: 170,
+                        width: Get.size.width / 2,
+                        height: 200,
                         child: ListView.builder(
                           itemCount: options.length,
                           itemBuilder: (context, index) => Column(
@@ -159,31 +162,14 @@ class UpdateProfil extends GetView {
               return Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: const [
-                  Text('Sedang memuat...'),
-                  SizedBox(width: 5),
                   Center(
                     child: CupertinoActivityIndicator(),
                   ),
+                  SizedBox(width: 5),
+                  Text('Sedang memuat...'),
                 ],
               );
             },
-          ),
-          const SizedBox(
-            height: 20,
-          ),
-          TextField(
-            controller: ctr.name,
-            decoration: const InputDecoration(
-                labelText: 'Nama', border: OutlineInputBorder()),
-          ),
-          const SizedBox(
-            height: 20,
-          ),
-          TextField(
-            controller: ctr.telp,
-            decoration: const InputDecoration(
-                labelText: 'No Telp', border: OutlineInputBorder()),
-            keyboardType: TextInputType.phone,
           ),
           const SizedBox(
             height: 20,
@@ -230,6 +216,8 @@ class UpdateProfil extends GetView {
                     return TextField(
                       decoration: const InputDecoration(
                           labelText: 'Ketik Level User',
+                          filled: true,
+                          fillColor: Colors.white,
                           border: OutlineInputBorder()),
                       controller: mk,
                       focusNode: focusNode,
@@ -271,14 +259,38 @@ class UpdateProfil extends GetView {
               return Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: const [
-                  Text('Sedang memuat...'),
-                  SizedBox(width: 5),
                   Center(
                     child: CupertinoActivityIndicator(),
                   ),
+                  SizedBox(width: 5),
+                  Text('Sedang memuat...'),
                 ],
               );
             },
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          TextField(
+            controller: ctr.name,
+            decoration: const InputDecoration(
+              labelText: 'Nama',
+              border: OutlineInputBorder(),
+              filled: true,
+              fillColor: Colors.white,
+            ),
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          TextField(
+            controller: ctr.telp,
+            decoration: const InputDecoration(
+                labelText: 'No Telp',
+                filled: true,
+                fillColor: Colors.white,
+                border: OutlineInputBorder()),
+            keyboardType: TextInputType.phone,
           ),
           const SizedBox(
             height: 30,

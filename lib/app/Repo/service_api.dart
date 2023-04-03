@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:async/async.dart';
 
 import 'package:absensi/app/model/cabang_model.dart';
 import 'package:absensi/app/model/cabang_model.dart';
@@ -12,6 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
+import 'package:image_picker/image_picker.dart';
 import '../helper/loading_dialog.dart';
 import '../model/absen_model.dart';
 import '../model/login_model.dart';
@@ -152,9 +154,11 @@ class ServiceApi {
 
       // request.headers.addAll(headers);
       request.fields['status'] = data["status"];
+      if (data["username"] != null) {
+        request.fields['username'] = data["username"];
+      } else {}
       if (data["status"] == "add") {
         request.fields['id'] = data["id"];
-        request.fields['username'] = data["username"];
         request.fields['password'] = data["password"];
         request.fields['nama'] = data["nama"];
         request.fields['no_telp'] = data["no_telp"];
@@ -181,9 +185,20 @@ class ServiceApi {
         request.fields['level'] = data["level"];
         if (data["foto"] != null) {
           if (kIsWeb) {
+            // print(data["foto"]);
+            // print(data["foto"]["img"]);
             request.files.add(http.MultipartFile(
                 "foto", data["foto"].readStream, data["foto"].size,
                 filename: data["foto"].name));
+            // String imageFilePath = "name";
+            // PickedFile imageFile = PickedFile(data["foto"]["path"]);
+            // var stream =
+            //     http.ByteStream(DelegatingStream(imageFile.openRead()));
+            // request.files.add(http.MultipartFile(
+            //     "foto", stream, data["foto"]["img"].length,
+            //     filename: "data[foto].name"));
+            // request.files.add(http.MultipartFile.fromBytes('foto', data["foto"],
+            //     filename: "Profile.jpg"));
           } else {
             request.files.add(http.MultipartFile(
                 'foto',
@@ -227,16 +242,19 @@ class ServiceApi {
       request.fields['tanggal'] = data["tanggal"];
       request.fields['nama'] = data["nama"];
       if (data["status"] == "add") {
+        request.fields['kode_cabang'] = data["kode_cabang"];
         request.fields['id_shift'] = data["id_shift"];
         request.fields['jam_masuk'] = data["jam_masuk"];
         request.fields['jam_pulang'] = data["jam_pulang"];
         request.fields['jam_absen_masuk'] = data["jam_absen_masuk"];
         request.fields['lat_masuk'] = data["lat_masuk"];
         request.fields['long_masuk'] = data["long_masuk"];
+        request.fields['device_info'] = data["device_info"];
       } else {
         request.fields['jam_absen_pulang'] = data["jam_absen_pulang"];
         request.fields['lat_pulang'] = data["lat_pulang"];
         request.fields['long_pulang'] = data["long_pulang"];
+        request.fields['device_info2'] = data["device_info2"];
       }
 
       if (data["status"] == "add") {
@@ -378,6 +396,32 @@ class ServiceApi {
           List<dynamic> result = json.decode(response.body)['data'];
           List<CekUser> dataUser =
               result.map((e) => CekUser.fromJson(e)).toList();
+          return dataUser;
+        case 400:
+        case 401:
+        case 402:
+        case 404:
+          final result = json.decode(response.body);
+          throw FetchDataException(result["message"]);
+        default:
+          throw FetchDataException(
+            'Something went wrong.',
+          );
+      }
+    } on FetchDataException catch (e) {
+      // print('error caught: ${e.message}');
+      showToast("${e.message}");
+    }
+  }
+
+  getFilteredAbsen(Map<String, dynamic> data) async {
+    try {
+      final response =
+          await http.post(Uri.parse('${baseUrl}get_absen'), body: data);
+      switch (response.statusCode) {
+        case 200:
+          List<dynamic> result = json.decode(response.body)['data'];
+          List<Absen> dataUser = result.map((e) => Absen.fromJson(e)).toList();
           return dataUser;
         case 400:
         case 401:

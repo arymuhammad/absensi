@@ -39,16 +39,16 @@ void main() async {
   //  else {
   //   print(auth.isAuth.value);
   // }
-  await initializeDateFormatting('id_ID', "").then((_) =>
-  runApp(
-    GetMaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: "Absensi",
-      theme: ThemeData(primarySwatch: Colors.blueGrey),
-      home: Obx(() => auth.isAuth.value
-          ? HomeMenu(listDataUser: auth.logUser)
-          : const LoginView()),
-      getPages: AppPages.routes,
-    ),
-  ));
+  await initializeDateFormatting('id_ID', "").then((_) => runApp(
+        GetMaterialApp(
+          debugShowCheckedModeBanner: false,
+          title: "Absensi",
+          theme:
+              ThemeData(primarySwatch: Colors.blueGrey, fontFamily: 'Nunito', canvasColor: backgroundColor),
+          home: Obx(() => auth.isAuth.value
+              ? HomeMenu(listDataUser: auth.logUser)
+              : const LoginView()),
+          getPages: AppPages.routes,
+        ),
+      ));
 }

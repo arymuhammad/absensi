@@ -38,7 +38,8 @@ class AddPegawaiController extends GetxController {
   final ImagePicker picker = ImagePicker();
   XFile? image;
   FilePickerResult? fileResult;
-  // File file = File("zz");
+  File file = File("zz");
+  Map<String, dynamic> imgUpl = {};
   Uint8List webImage = Uint8List(0);
   String fileName = "";
 
@@ -90,12 +91,10 @@ class AddPegawaiController extends GetxController {
           withReadStream: true,
           // // this will return PlatformFile object with read stream
           allowCompression: true);
-      // File file = File(imageWeb!.files.single.toString());
+      // // File file = File(imageWeb!.files.single.toString());
       // if (fileResult != null) {
       //   fileName = fileResult!.files.first.name;
       //   webImage = fileResult!.files.single.bytes!;
-      //   // print(fileResult!);
-      //   // print(fileName);
       //   update();
       // }
       // final ImagePicker picker = ImagePicker();
@@ -103,6 +102,12 @@ class AddPegawaiController extends GetxController {
       // if (image != null) {
       //   var f = await image.readAsBytes();
       //   // setState(() {
+      //   imgUpl = {
+      //     "img": f,
+      //     "path": image.path.toString(),
+      //     // "name": image.name
+      //   };
+      //   // print(image.path.toString());
       //   file = File("a");
       //   webImage = f;
       //   update();
@@ -128,36 +133,67 @@ class AddPegawaiController extends GetxController {
     Random random = Random();
     int randomNumber = random.nextInt(100);
     if (mode == "add") {
-      // if (image != null && image!.name.split(".").last == "jpg" ||
-      //     image != null && image!.name.split(".").last == "jpeg" ||
-      //     image != null && image!.name.split(".").last == "png" ||
-      //     webImage.isNotEmpty) {
-      var data = {
-        "status": mode,
-        "id": '${selectedCabang.value}000$randomNumber',
-        "username": username.text,
-        "password": pass.text,
-        "nama": name.text,
-        "no_telp": telp.text,
-        "kode_cabang": selectedCabang.value,
-        "level": selectedLevel.value,
-        "foto": kIsWeb ? fileResult!.files.single : File(image!.path.toString())
-      };
-      // print(data);
-      dialogMsgScsUpd("Sukses", "Data berhasil disimpan");
-      await ServiceApi().addUpdatePegawai(data);
-      selectedCabang.value = "";
-      username.clear();
-      store.clear();
-      level.clear();
-      pass.clear();
-      name.clear();
-      telp.clear();
-      selectedLevel.value = "";
-      // } else {
-      //   dialogMsg("Terjadi Kesalahan",
-      //       "Ekstensi file tidak diizinkan.\nHarap memilih file dengan format\njpg, jpeg, png");
-      // }
+      if (selectedCabang.isNotEmpty &&
+          username.text != "" &&
+          pass.text != "" &&
+          name.text != "" &&
+          telp.text != "" &&
+          selectedCabang.isNotEmpty &&
+          selectedLevel.isNotEmpty) {
+        if (image != null && image!.name.split(".").last == "jpg" ||
+            image != null && image!.name.split(".").last == "jpeg" ||
+            image != null && image!.name.split(".").last == "png" ||
+            fileResult != null) {
+          var data = {
+            "status": mode,
+            "id": '${selectedCabang.value}000$randomNumber',
+            "username": username.text,
+            "password": pass.text,
+            "nama": name.text,
+            "no_telp": telp.text,
+            "kode_cabang": selectedCabang.value,
+            "level": selectedLevel.value,
+            "foto":
+                kIsWeb ? fileResult!.files.single : File(image!.path.toString())
+            // "foto": kIsWeb ? webImage : File(image!.path.toString())
+          };
+          // print(data);
+          dialogMsgScsUpd("Sukses", "Data berhasil disimpan");
+          await ServiceApi().addUpdatePegawai(data);
+          selectedCabang.value = "";
+          username.clear();
+          store.clear();
+          level.clear();
+          pass.clear();
+          name.clear();
+          telp.clear();
+          selectedLevel.value = "";
+        } else {
+          var data = {
+            "status": mode,
+            "id": '${selectedCabang.value}000$randomNumber',
+            "username": username.text,
+            "password": pass.text,
+            "nama": name.text,
+            "no_telp": telp.text,
+            "kode_cabang": selectedCabang.value,
+            "level": selectedLevel.value,
+          };
+          // print(data);
+          dialogMsgScsUpd("Sukses", "Data berhasil disimpan");
+          await ServiceApi().addUpdatePegawai(data);
+          selectedCabang.value = "";
+          username.clear();
+          store.clear();
+          level.clear();
+          pass.clear();
+          name.clear();
+          telp.clear();
+          selectedLevel.value = "";
+        }
+      } else {
+        dialogMsg("Kesalahan", "Harap mengisi data pada semua kolom");
+      }
     } else {
       if (image != null && image!.name.split(".").last == "jpg" ||
           image != null && image!.name.split(".").last == "jpeg" ||
@@ -166,6 +202,7 @@ class AddPegawaiController extends GetxController {
         var data = {
           "status": mode,
           "id": dataUser[0],
+          "username": dataUser[10],
           "nama": name.text != "" ? name.text : dataUser[1],
           "no_telp": telp.text != "" ? telp.text : dataUser[3],
           "kode_cabang":
@@ -174,6 +211,7 @@ class AddPegawaiController extends GetxController {
               selectedLevel.value != "" ? selectedLevel.value : dataUser[9],
           "foto":
               kIsWeb ? fileResult!.files.single : File(image!.path.toString())
+          // "foto": kIsWeb ? imgUpl : File(image!.path.toString())
         };
         // print(data);
         dialogMsgScsUpd("Sukses", "Data berhasil disimpan");
@@ -189,6 +227,7 @@ class AddPegawaiController extends GetxController {
               selectedCabang.value != "" ? selectedCabang.value : dataUser[8],
           "level": selectedLevel.value != "" ? selectedLevel.value : dataUser[9]
         };
+        print(data);
         dialogMsgScsUpd("Sukses", "Data berhasil disimpan");
         await ServiceApi().addUpdatePegawai(data);
         // Get.back();

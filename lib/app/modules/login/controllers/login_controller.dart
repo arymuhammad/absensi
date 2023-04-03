@@ -1,15 +1,8 @@
-import 'dart:convert';
-import 'dart:io';
-
 import 'package:absensi/app/helper/loading_dialog.dart';
-import 'package:absensi/app/routes/app_pages.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get_storage/get_storage.dart';
-import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../../Repo/app_exceptions.dart';
 import '../../../Repo/service_api.dart';
 import '../../../controllers/absen_controller.dart';
 import '../../../model/login_model.dart';
@@ -25,6 +18,7 @@ class LoginController extends GetxController {
   var isAuth = false.obs;
   var selected = 0.obs;
   var logUser = [].obs;
+  var isPassHide = true.obs;
   // var currUser =[];
   // final absen = Get.put(AbsenController());
 
@@ -48,9 +42,9 @@ class LoginController extends GetxController {
   login() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     var data = {"username": username.text, "password": password.text};
-    loadingDialog('Loading...',"");
+    loadingDialog('Loading...', "");
     var response = await ServiceApi().loginUser(data);
-     Get.back();
+    Get.back();
     dataUser.value = response;
     if (dataUser.value.success! == true) {
       // Get.offAllNamed(Routes.HOME);
@@ -69,7 +63,8 @@ class LoginController extends GetxController {
         '${dataUser.value.data!.lat}',
         '${dataUser.value.data!.long}',
         '${dataUser.value.data!.kodeCabang}',
-        '${dataUser.value.data!.level}'
+        '${dataUser.value.data!.level}',
+        '${dataUser.value.data!.username}'
       ]);
       //  pref.getStringList('userDataLogin');
       List<String>? tempUser = pref.getStringList('userDataLogin');
@@ -77,7 +72,7 @@ class LoginController extends GetxController {
       isAuth.value = await pref.setBool("is_login", true);
       // print(isAuth.value);
       // update();
-      
+
       // currUser.add(pref.getStringList('userDataLogin'));
       // print('${dataUser.value.data!}');
       // print('login');
@@ -87,7 +82,6 @@ class LoginController extends GetxController {
       showToast("Anda Berhasil Login");
       Get.back();
     } else {
-     
       showToast("User tidak ditemukan\nHarap periksa username dan password");
     }
   }
@@ -107,10 +101,11 @@ class LoginController extends GetxController {
     logUser.clear();
     // absen.dataAllAbsen.clear();
     // absen.dataLimitAbsen.clear();
-    
+
     isAuth.value = false;
     selected.value = 0;
     Get.delete<AbsenController>(force: true);
+    Get.back();
     // Get.offAllNamed(Routes.LOGIN);
     showToast("Logout Berhasil");
   }

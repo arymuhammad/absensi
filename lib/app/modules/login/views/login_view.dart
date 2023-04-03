@@ -2,6 +2,7 @@ import 'package:absensi/app/modules/profil/views/verifikasi_update_password.dart
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
+import 'package:ternav_icons/ternav_icons.dart';
 
 import '../controllers/login_controller.dart';
 
@@ -25,8 +26,9 @@ class LoginView extends GetView<LoginController> {
                     height: 150,
                     width: 150,
                     decoration: BoxDecoration(color: Colors.grey[300]),
-                    child:  Image.asset("assets/selfie.png",
-                    fit: BoxFit.contain,
+                    child: Image.asset(
+                      "assets/image/selfie.png",
+                      fit: BoxFit.contain,
                     ),
                   ),
                 ),
@@ -34,21 +36,29 @@ class LoginView extends GetView<LoginController> {
               const SizedBox(height: 20),
               TextField(
                 controller: controller.username,
-                decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                    border: const OutlineInputBorder(),
                     labelText: 'Username',
-                    prefixIcon: Icon(Icons.account_circle_sharp)),
+                    prefixIcon: Icon(TernavIcons.light.profile)),
               ),
               const SizedBox(
                 height: 20,
               ),
-              TextField(
-                controller: controller.password,
-                obscureText: true,
-                decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'Password',
-                    prefixIcon: Icon(Icons.lock)),
+              Obx(()=> TextField(
+                  controller: controller.password,
+                  obscureText: controller.isPassHide.value,
+                  decoration: InputDecoration(
+                      border: const OutlineInputBorder(),
+                      labelText: 'Password',
+                      prefixIcon: Icon(TernavIcons.bold.lock),
+                      suffixIcon: InkWell(
+                          onTap: () {
+                            controller.isPassHide.value =
+                                !controller.isPassHide.value;
+                          },
+                          child: Icon(controller.isPassHide.value?Icons.visibility:Icons.visibility_off))),
+                  onSubmitted: (v) => controller.login(),
+                ),
               ),
               const SizedBox(
                 height: 20,
