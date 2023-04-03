@@ -1,23 +1,15 @@
-import 'dart:developer';
 import 'dart:io';
 import 'dart:math';
 
 import 'package:absensi/app/Repo/service_api.dart';
 import 'package:absensi/app/model/level_model.dart';
-import 'package:absensi/app/modules/login/controllers/login_controller.dart';
-import 'package:absensi/app/modules/login/views/login_view.dart';
 import 'package:absensi/app/modules/profil/views/update_password.dart';
-import 'package:absensi/app/routes/app_pages.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
-import 'package:get_storage/get_storage.dart';
 // import 'package:file_picker/file_picker.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:permission_handler/permission_handler.dart';
 import '../../../helper/loading_dialog.dart';
 import '../../../model/cabang_model.dart';
 import '../../../model/cek_user_model.dart';
@@ -117,12 +109,9 @@ class AddPegawaiController extends GetxController {
       // }
     } else {
       image = await picker.pickImage(source: ImageSource.gallery);
-      print(image!.name);
-      print(image!.path);
       if (image != null) {
         update();
       } else {
-        print(image);
       }
     }
   }
@@ -227,7 +216,6 @@ class AddPegawaiController extends GetxController {
               selectedCabang.value != "" ? selectedCabang.value : dataUser[8],
           "level": selectedLevel.value != "" ? selectedLevel.value : dataUser[9]
         };
-        print(data);
         dialogMsgScsUpd("Sukses", "Data berhasil disimpan");
         await ServiceApi().addUpdatePegawai(data);
         // Get.back();

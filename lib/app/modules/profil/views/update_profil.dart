@@ -1,13 +1,10 @@
 import 'dart:io';
 
 import 'package:absensi/app/modules/add_pegawai/controllers/add_pegawai_controller.dart';
-import 'package:absensi/app/modules/profil/controllers/profil_controller.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:get/get.dart';
-import 'package:get/get_connect/http/src/request/request.dart';
 
 import '../../../Repo/service_api.dart';
 

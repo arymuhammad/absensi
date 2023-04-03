@@ -1,17 +1,13 @@
-import 'package:absensi/app/controllers/absen_controller.dart';
-import 'package:absensi/app/controllers/page_index_controller.dart';
 import 'package:absensi/app/helper/const.dart';
 import 'package:absensi/app/modules/login/controllers/login_controller.dart';
 import 'package:absensi/app/modules/profil/views/update_profil.dart';
 import 'package:absensi/app/modules/profil/views/verifikasi_update_password.dart';
 import 'package:absensi/app/routes/app_pages.dart';
-import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:full_screen_image_null_safe/full_screen_image_null_safe.dart';
 
 import 'package:get/get.dart';
 import 'package:photo_view/photo_view.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ternav_icons/ternav_icons.dart';
 
 import '../../../Repo/service_api.dart';

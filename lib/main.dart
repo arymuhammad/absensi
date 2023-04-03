@@ -1,17 +1,14 @@
 import 'package:absensi/app/helper/const.dart';
 import 'package:absensi/app/modules/home/views/home_menu.dart';
-import 'package:absensi/app/modules/home/views/home_view.dart';
 import 'package:absensi/app/modules/login/controllers/login_controller.dart';
 import 'package:absensi/app/modules/login/views/login_view.dart';
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
-import 'package:get_storage/get_storage.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_strategy/url_strategy.dart';
 
-import 'app/controllers/page_index_controller.dart';
 import 'app/routes/app_pages.dart';
 
 void main() async {

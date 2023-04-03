@@ -3,7 +3,6 @@ import 'package:absensi/app/helper/loading_dialog.dart';
 import 'package:absensi/app/modules/profil/views/profil_view.dart';
 import 'package:absensi/app/routes/app_pages.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
@@ -12,8 +11,6 @@ import 'package:shimmer/shimmer.dart';
 
 import '../../../Repo/service_api.dart';
 import '../../../controllers/absen_controller.dart';
-import '../../../controllers/page_index_controller.dart';
-import '../../../model/absen_model.dart';
 import '../controllers/home_controller.dart';
 
 class HomeView extends GetView<HomeController> {

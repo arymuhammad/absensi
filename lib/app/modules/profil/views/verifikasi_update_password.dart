@@ -1,6 +1,5 @@
 import 'package:absensi/app/modules/add_pegawai/controllers/add_pegawai_controller.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:get/get.dart';
 
 class VerifikasiUpdatePassword extends GetView {

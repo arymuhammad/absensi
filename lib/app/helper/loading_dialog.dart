@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
-import '../controllers/absen_controller.dart';
-import '../modules/login/controllers/login_controller.dart';
 
 void showToast(message) {
   Fluttertoast.showToast(

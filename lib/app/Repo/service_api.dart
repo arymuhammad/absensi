@@ -1,8 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:async/async.dart';
 
-import 'package:absensi/app/model/cabang_model.dart';
 import 'package:absensi/app/model/cabang_model.dart';
 import 'package:absensi/app/model/cek_absen_model.dart';
 import 'package:absensi/app/model/cek_user_model.dart';
@@ -12,8 +10,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
-import 'package:http_parser/http_parser.dart';
-import 'package:image_picker/image_picker.dart';
 import '../helper/loading_dialog.dart';
 import '../model/absen_model.dart';
 import '../model/login_model.dart';

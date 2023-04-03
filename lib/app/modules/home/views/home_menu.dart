@@ -3,11 +3,8 @@ import 'package:absensi/app/modules/home/controllers/home_controller.dart';
 import 'package:absensi/app/modules/home/views/home_view.dart';
 import 'package:absensi/app/modules/profil/views/profil_view.dart';
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:get/get.dart';
-import 'package:get_storage/get_storage.dart';
 import 'package:ternav_icons/ternav_icons.dart';
 
 import '../../../controllers/absen_controller.dart';

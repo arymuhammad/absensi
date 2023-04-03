@@ -1,12 +1,10 @@
-import 'dart:async';
-
 import 'package:absensi/app/helper/const.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
+// ignore: depend_on_referenced_packages
 import 'package:latlong2/latlong.dart';
 import 'package:ternav_icons/ternav_icons.dart';
 import '../../../Repo/service_api.dart';
@@ -14,6 +12,7 @@ import '../controllers/detail_absen_controller.dart';
 import 'package:flutter_map/flutter_map.dart'; // Suitable for most situations
 import 'package:flutter_map/plugin_api.dart'; // Only import if required functionality is not exposed by default
 
+// ignore: must_be_immutable
 class DetailAbsenView extends GetView<DetailAbsenController> {
   DetailAbsenView({Key? key}) : super(key: key);
   // late GoogleMapController mapsController;
@@ -301,15 +300,6 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
                                       ? Image.network(
                                           "${ServiceApi().baseUrl}${Get.arguments['foto_pulang']}",
                                           fit: BoxFit.cover,
-                                          // progressIndicatorBuilder:
-                                          //     (context, url, progress) {
-                                          //   print(
-                                          //       "${ServiceApi().baseUrl}${Get.arguments['foto_masuk']}");
-                                          //   return CircularProgressIndicator(
-                                          //     value: progress.progress,
-                                          //     strokeWidth: 5,
-                                          //   );
-                                          // },
                                         )
                                       : Icon(TernavIcons.lightOutline.image_4),
                                 ),

@@ -28,7 +28,7 @@ class AppPages {
         transition: Transition.fadeIn),
     GetPage(
         name: _Paths.ADD_PEGAWAI,
-        page: () => AddPegawaiView(),
+        page: () => const AddPegawaiView(),
         binding: AddPegawaiBinding(),
         transition: Transition.cupertino),
     GetPage(

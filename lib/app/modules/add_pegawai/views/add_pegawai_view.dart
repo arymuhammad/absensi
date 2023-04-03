@@ -1,18 +1,15 @@
 import 'dart:io';
 
-import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
-import 'package:get_storage/get_storage.dart';
 
 import '../controllers/add_pegawai_controller.dart';
-import '../../../controllers/page_index_controller.dart';
 
 class AddPegawaiView extends GetView<AddPegawaiController> {
-  AddPegawaiView({Key? key}) : super(key: key);
+  const AddPegawaiView({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

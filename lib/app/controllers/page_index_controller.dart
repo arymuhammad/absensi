@@ -14,7 +14,6 @@ class PageIndexController extends GetxController {
         Get.defaultDialog(
           title: 'Absen'
         );
-        print('Absen');
         Position position = await determinePosition();
         // print('${position.latitude} , ${position.longitude}');
         List<Placemark> placemarks = await placemarkFromCoordinates(
