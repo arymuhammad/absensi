@@ -52,7 +52,8 @@ class HomeView extends GetView<HomeController> {
                             width: 75,
                             color: Colors.grey[200],
                             child: listDataUser![5] != ""
-                                ? CachedNetworkImage(
+                                ? 
+                                CachedNetworkImage(
                                     imageUrl:
                                         "${ServiceApi().baseUrl}${listDataUser![5]}",
                                     fit: BoxFit.cover,

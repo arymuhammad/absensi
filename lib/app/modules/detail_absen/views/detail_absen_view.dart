@@ -60,10 +60,6 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
 
   @override
   Widget build(BuildContext context) {
-    // print(Get.arguments["lat_masuk"]);
-    // print(Get.arguments["long_masuk"]);
-    // print(Get.arguments["lat_pulang"]);
-    // print(Get.arguments["long_pulang"]);
     return Scaffold(
       appBar: AppBar(
         title: const Text('DETAIL ABSEN'),

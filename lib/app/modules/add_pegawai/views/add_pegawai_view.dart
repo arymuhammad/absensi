@@ -86,74 +86,77 @@ class AddPegawaiView extends GetView<AddPegawaiController> {
                   allStore.add(data.namaCabang!);
                 }).toList();
 
-                return RawAutocomplete(
-                  key: controller.autocompleteKey,
-                  focusNode: controller.focusNodecabang,
-                  textEditingController: controller.store,
-                  optionsBuilder: (TextEditingValue textValue) {
-                    if (textValue.text == '') {
-                      return const Iterable<String>.empty();
-                    } else {
-                      List<String> matches = <String>[];
-                      matches.addAll(allStore);
-
-                      matches.retainWhere((s) {
-                        return s
-                            .toLowerCase()
-                            .contains(textValue.text.toLowerCase());
-                      });
-                      return matches;
-                    }
-                  },
-                  onSelected: (String selection) {
-                    for (int i = 0; i < dataCabang.length; i++) {
-                      if (dataCabang[i].namaCabang == selection) {
-                        controller.selectedCabang.value =
-                            dataCabang[i].kodeCabang!;
+                return LayoutBuilder(
+                  builder:(context, constraints) =>  RawAutocomplete(
+                    key: controller.autocompleteKey,
+                    focusNode: controller.focusNodecabang,
+                    textEditingController: controller.store,
+                    optionsBuilder: (TextEditingValue textValue) {
+                      if (textValue.text == '') {
+                        return const Iterable<String>.empty();
+                      } else {
+                        List<String> matches = <String>[];
+                        matches.addAll(allStore);
+                
+                        matches.retainWhere((s) {
+                          return s
+                              .toLowerCase()
+                              .contains(textValue.text.toLowerCase());
+                        });
+                        return matches;
                       }
-                    }
-                  },
-                  fieldViewBuilder: (BuildContext context, cabang,
-                      FocusNode focusNode, VoidCallback onFieldSubmitted) {
-                    return TextField(
-                      decoration: const InputDecoration(
-                          labelText: 'Ketik Nama Cabang',
-                  filled: true,
-                  fillColor: Colors.white,
-                          border: OutlineInputBorder()),
-                      controller: cabang,
-                      focusNode: focusNode,
-                      onSubmitted: (String value) {},
-                    );
-                  },
-                  optionsViewBuilder: (BuildContext context,
-                      void Function(String) onSelected,
-                      Iterable<String> options) {
-                    return Align(
-                      alignment: Alignment.topLeft,
-                      child: Material(
-                          child: SizedBox(
-                        width: 210,
-                        height: 170,
-                        child: ListView.builder(
-                          itemCount: options.length,
-                          itemBuilder: (context, index) => Column(
-                            children: options.map((opt) {
-                              return InkWell(
-                                  onTap: () {
-                                    onSelected(opt);
-                                  },
-                                  child: Container(
-                                    width: double.infinity,
-                                    padding: const EdgeInsets.all(10),
-                                    child: Text(opt),
-                                  ));
-                            }).toList(),
+                    },
+                    onSelected: (String selection) {
+                      for (int i = 0; i < dataCabang.length; i++) {
+                        if (dataCabang[i].namaCabang == selection) {
+                          controller.selectedCabang.value =
+                              dataCabang[i].kodeCabang!;
+                        }
+                      }
+                    },
+                    fieldViewBuilder: (BuildContext context, cabang,
+                        FocusNode focusNode, VoidCallback onFieldSubmitted) {
+                      return TextField(
+                        decoration: const InputDecoration(
+                            labelText: 'Ketik Nama Cabang',
+                    filled: true,
+                    fillColor: Colors.white,
+                            border: OutlineInputBorder()),
+                        controller: cabang,
+                        focusNode: focusNode,
+                        onSubmitted: (String value) {},
+                      );
+                    },
+                    optionsViewBuilder: (BuildContext context,
+                        void Function(String) onSelected,
+                        Iterable<String> options) {
+                      return Align(
+                        alignment: Alignment.topLeft,
+                        child: Material(
+                            child: SizedBox(
+                          width: constraints.biggest.width,
+                          height: 250,
+                          child: ListView.builder(
+                            itemCount: options.length,
+                            itemBuilder: (context, index) => Column(
+                              children: options.map((opt) {
+                                return InkWell(
+                                    onTap: () {
+                                      onSelected(opt);
+                                    },
+                                    child: Container(
+                                      color: Colors.white,
+                                      width: double.infinity,
+                                      padding: const EdgeInsets.all(10),
+                                      child: Text(opt),
+                                    ));
+                              }).toList(),
+                            ),
                           ),
-                        ),
-                      )),
-                    );
-                  },
+                        )),
+                      );
+                    },
+                  ),
                 );
               } else if (snapshot.hasError) {
                 return Text('${snapshot.error}');
@@ -225,74 +228,77 @@ class AddPegawaiView extends GetView<AddPegawaiController> {
                   allLevel.add(data.namaLevel!);
                 }).toList();
 
-                return RawAutocomplete(
-                  key: controller.autocompleteKeyLevel,
-                  focusNode: controller.focusNodelevel,
-                  textEditingController: controller.level,
-                  optionsBuilder: (TextEditingValue textValue) {
-                    if (textValue.text == '') {
-                      return const Iterable<String>.empty();
-                    } else {
-                      List<String> matches = <String>[];
-                      matches.addAll(allLevel);
-
-                      matches.retainWhere((s) {
-                        return s
-                            .toLowerCase()
-                            .contains(textValue.text.toLowerCase());
-                      });
-                      return matches;
-                    }
-                  },
-                  onSelected: (String selection) {
-                    for (int i = 0; i < dataLevel.length; i++) {
-                      if (dataLevel[i].namaLevel == selection) {
-                        controller.selectedLevel.value = dataLevel[i].id!;
-                        // print(controller.selectedLevel);
+                return LayoutBuilder(
+                  builder:(context, constraints) => RawAutocomplete(
+                    key: controller.autocompleteKeyLevel,
+                    focusNode: controller.focusNodelevel,
+                    textEditingController: controller.level,
+                    optionsBuilder: (TextEditingValue textValue) {
+                      if (textValue.text == '') {
+                        return const Iterable<String>.empty();
+                      } else {
+                        List<String> matches = <String>[];
+                        matches.addAll(allLevel);
+                
+                        matches.retainWhere((s) {
+                          return s
+                              .toLowerCase()
+                              .contains(textValue.text.toLowerCase());
+                        });
+                        return matches;
                       }
-                    }
-                  },
-                  fieldViewBuilder: (BuildContext context, mk,
-                      FocusNode focusNode, VoidCallback onFieldSubmitted) {
-                    return TextField(
-                      decoration: const InputDecoration(
-                          labelText: 'Ketik Level User',
-                  filled: true,
-                  fillColor: Colors.white,
-                          border: OutlineInputBorder()),
-                      controller: mk,
-                      focusNode: focusNode,
-                      onSubmitted: (String value) {},
-                    );
-                  },
-                  optionsViewBuilder: (BuildContext context,
-                      void Function(String) onSelected,
-                      Iterable<String> options) {
-                    return Align(
-                      alignment: Alignment.topRight,
-                      child: Material(
-                          child: SizedBox(
-                        width: 210,
-                        height: 170,
-                        child: ListView.builder(
-                          itemCount: options.length,
-                          itemBuilder: (context, index) => Column(
-                            children: options.map((opt) {
-                              return InkWell(
-                                  onTap: () {
-                                    onSelected(opt);
-                                  },
-                                  child: Container(
-                                    width: double.infinity,
-                                    padding: const EdgeInsets.all(10),
-                                    child: Text(opt),
-                                  ));
-                            }).toList(),
+                    },
+                    onSelected: (String selection) {
+                      for (int i = 0; i < dataLevel.length; i++) {
+                        if (dataLevel[i].namaLevel == selection) {
+                          controller.selectedLevel.value = dataLevel[i].id!;
+                          // print(controller.selectedLevel);
+                        }
+                      }
+                    },
+                    fieldViewBuilder: (BuildContext context, mk,
+                        FocusNode focusNode, VoidCallback onFieldSubmitted) {
+                      return TextField(
+                        decoration: const InputDecoration(
+                            labelText: 'Ketik Level User',
+                    filled: true,
+                    fillColor: Colors.white,
+                            border: OutlineInputBorder()),
+                        controller: mk,
+                        focusNode: focusNode,
+                        onSubmitted: (String value) {},
+                      );
+                    },
+                    optionsViewBuilder: (BuildContext context,
+                        void Function(String) onSelected,
+                        Iterable<String> options) {
+                      return Align(
+                        alignment: Alignment.topLeft,
+                        child: Material(
+                            child: SizedBox(
+                          width: constraints.biggest.width,
+                          height: 250,
+                          child: ListView.builder(
+                            itemCount: options.length,
+                            itemBuilder: (context, index) => Column(
+                              children: options.map((opt) {
+                                return InkWell(
+                                    onTap: () {
+                                      onSelected(opt);
+                                    },
+                                    child: Container(
+                                      color: Colors.white,
+                                      width: double.infinity,
+                                      padding: const EdgeInsets.all(10),
+                                      child: Text(opt),
+                                    ));
+                              }).toList(),
+                            ),
                           ),
-                        ),
-                      )),
-                    );
-                  },
+                        )),
+                      );
+                    },
+                  ),
                 );
               } else if (snapshot.hasError) {
                 return Text('${snapshot.error}');

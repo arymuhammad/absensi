@@ -116,28 +116,13 @@ class AbsenController extends GetxController {
         await FlutterNativeTimezone.getLocalTimezone();
 
     await timeNetwork(currentTimeZone);
-    // AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-    // print('Running on ${androidInfo.brand}'); // e.g. "Moto G (4)"
-
-    // IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
-    // print('Running on ${iosInfo.utsname.machine}'); // e.g. "iPod7,1"
-
-    // WebBrowserInfo webBrowserInfo = await deviceInfo.webBrowserInfo;
-    // print('Running on  ${webBrowserInfo}');
-
-
     try {
       if (kIsWeb) {
-
         ClientInformation info = await ClientInformation.fetch();
         devInfo.value = '${info.deviceName} ${info.softwareName}';
-      } else {
-        
-      }
-    // ignore: empty_catches
-    } on PlatformException {
-      
-    }
+      } else {}
+      // ignore: empty_catches
+    } on PlatformException {}
 
     Position position = await determinePosition();
     if (!kIsWeb) {
@@ -273,6 +258,8 @@ class AbsenController extends GetxController {
               } else {
                 if (kIsWeb) {
                   imageWeb = await FilePicker.platform.pickFiles(
+                      type: FileType.custom,
+                      allowedExtensions: ['jpg', 'jpeg', 'png'],
                       withReadStream: true,
                       // this will return PlatformFile object with read stream
                       allowCompression: true);
@@ -327,7 +314,6 @@ class AbsenController extends GetxController {
                 selectedCabang.value = "";
               }
             }
-            // Get.back();
           },
           barrierDismissible: false);
     } else {
@@ -360,6 +346,8 @@ class AbsenController extends GetxController {
               } else {
                 if (kIsWeb) {
                   imageWeb = await FilePicker.platform.pickFiles(
+                      type: FileType.custom,
+                      allowedExtensions: ['jpg', 'jpeg', 'png'],
                       withReadStream: true,
 
                       // this will return PlatformFile object with read stream
@@ -417,7 +405,7 @@ class AbsenController extends GetxController {
   Future<CekAbsen> cekDataAbsen(String status, String id) async {
     var data = {"status": status, "id_user": id, "tanggal": dateNow};
     final response = await ServiceApi().cekDataAbsen(data);
-    
+
     return cekAbsen.value = response;
   }
 
@@ -427,12 +415,10 @@ class AbsenController extends GetxController {
         imageQuality: 70,
         maxHeight: 600,
         maxWidth: 600);
-  
+
     if (image != null) {
       update();
-    } else {
-      
-    }
+    } else {}
   }
 
   Future<Position> determinePosition() async {
@@ -450,7 +436,7 @@ class AbsenController extends GetxController {
         return Future.error('Location services are disabled.');
       }
 
-      // loadingDialog("Memindai posisi Anda...", "");
+      loadingDialog("Memindai posisi Anda...", "");
       permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
         loadingDialog("Memindai posisi Anda...", "");
@@ -469,6 +455,8 @@ class AbsenController extends GetxController {
         await Future.delayed(const Duration(milliseconds: 400));
         Get.back();
       }
+      await Future.delayed(const Duration(milliseconds: 400));
+      Get.back();
 
       if (permission == LocationPermission.deniedForever) {
         // Permissions are denied forever, handle appropriately.
@@ -482,7 +470,7 @@ class AbsenController extends GetxController {
       // continue accessing the position of the device.
 
       return await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.high,
+          desiredAccuracy: LocationAccuracy.bestForNavigation,
           // timeLimit: const Duration(seconds: 10),
           forceAndroidLocationManager: true);
     } on TimeoutException catch (e) {
@@ -555,10 +543,4 @@ class AbsenController extends GetxController {
     }
     return dataAllAbsen;
   }
-
-
-
-
-
-
 }
