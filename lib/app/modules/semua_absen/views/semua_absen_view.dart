@@ -12,6 +12,8 @@ import '../../../routes/app_pages.dart';
 import '../controllers/semua_absen_controller.dart';
 import 'package:intl/intl.dart';
 
+import 'print_absen.dart';
+
 class SemuaAbsenView extends GetView<SemuaAbsenController> {
   SemuaAbsenView({Key? key}) : super(key: key);
   final absenC = Get.put(AbsenController());
@@ -24,7 +26,11 @@ class SemuaAbsenView extends GetView<SemuaAbsenController> {
         centerTitle: true,
         actions: [
           IconButton(
-              onPressed: () {}, icon: const Icon(Icons.picture_as_pdf_rounded))
+              onPressed: () {
+                PrintKasirState(dataPrint: absenC.searchAbsen, item: null)
+                    .createPdf();
+              },
+              icon: const Icon(Icons.picture_as_pdf_rounded))
         ],
       ),
       body: Column(

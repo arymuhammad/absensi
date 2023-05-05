@@ -2,6 +2,7 @@ class Absen {
   String? idUser;
   String? tanggal;
   String? nama;
+  String? namaCabang;
   String? idShift;
   String? jamMasuk;
   String? jamPulang;
@@ -21,6 +22,7 @@ class Absen {
       {this.idUser,
       this.tanggal,
       this.nama,
+      this.namaCabang,
       this.idShift,
       this.jamMasuk,
       this.jamPulang,
@@ -41,6 +43,7 @@ class Absen {
     idUser = json['id_user'];
     tanggal = json['tanggal'];
     nama = json['nama'];
+    namaCabang = json['nama_cabang'];
     idShift = json['id_shift'];
     jamMasuk = json['jam_masuk'];
     jamPulang = json['jam_pulang'];
@@ -62,6 +65,7 @@ class Absen {
     data['id_user'] = idUser;
     data['tanggal'] = tanggal;
     data['nama'] = nama;
+    data['nama_cabang'] = namaCabang;
     data['id_shift'] = idShift;
     data['jam_masuk'] = jamMasuk;
     data['jam_pulang'] = jamPulang;
