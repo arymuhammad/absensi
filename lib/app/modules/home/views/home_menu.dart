@@ -17,9 +17,7 @@ class HomeMenu extends GetView {
   final homeC = Get.put(HomeController());
   final List? listDataUser;
 
-  selectedMenu(index) {
-    loginC.selected.value = index;
-  }
+  
 
   @override
   Widget build(BuildContext context) {
@@ -28,40 +26,39 @@ class HomeMenu extends GetView {
       Container(),
       ProfilView(listDataUser: listDataUser!)
     ];
-
     return Scaffold(
-      body:
-           Obx(() =>
-              IndexedStack(index: loginC.selected.value, children: widgetList)),
-          bottomNavigationBar: Obx(
-            () => ConvexAppBar(
-              items:  [
-                TabItem(icon: TernavIcons.light.home, title: 'Home'),
-                TabItem(icon: TernavIcons.lightOutline.camera),
-                TabItem(icon: TernavIcons.light.profile, title: 'Profile'),
-              ],
-              initialActiveIndex: loginC.selected.value,
-              activeColor: Colors.white,
-              style: TabStyle.fixedCircle,
-              backgroundColor: mainColor,
-              onTap: (i) {
-                if (i == 1) {
-                  // Get.defaultDialog(
-                  //     title: 'Absen',
-                  //     middleText:
-                  //         'Sedang memindai lokasi absen Anda\nHarap Menunggu selama proses berjalan');
-                  loc.getLoc(listDataUser!);
-                  // Future.delayed(const Duration(seconds: 2), () {
-                  //   Get.back();
-                  // });
-                } else {
-                  selectedMenu(i);
-                }
-                // print(i);
-              },
-            ),
-          ),
-    
+      body: Obx(() =>
+          IndexedStack(index: loginC.selected.value, children: widgetList)),
+      bottomNavigationBar: Obx(
+        () => ConvexAppBar(
+          items: [
+            TabItem(icon: TernavIcons.light.home, title: 'Home'),
+            TabItem(icon: TernavIcons.lightOutline.camera),
+            TabItem(icon: TernavIcons.light.profile, title: 'Profile'),
+          ],
+          initialActiveIndex: loginC.selected.value,
+          activeColor: Colors.white,
+          style: TabStyle.fixedCircle,
+          backgroundColor: mainColor,
+          onTap: (i) {
+            if (i == 1) {
+              // Get.defaultDialog(
+              //     title: 'Absen',
+              //     middleText:
+              //         'Sedang memindai lokasi absen Anda\nHarap Menunggu selama proses berjalan');
+              loc.getLoc(listDataUser!);
+              loginC.selectedMenu(0);
+              // loc.getTrustLocation();
+              // Future.delayed(const Duration(seconds: 2), () {
+              //   Get.back();
+              // });
+            } else {
+              loginC.selectedMenu(i);
+            }
+            // print(i);
+          },
+        ),
+      ),
     );
   }
 }

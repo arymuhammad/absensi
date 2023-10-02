@@ -2,82 +2,81 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 
-
 void showToast(message) {
   Fluttertoast.showToast(
       msg: message,
-      backgroundColor:
-         Colors.grey[700],
+      backgroundColor: Colors.grey[700],
       textColor: Colors.white,
       toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.TOP,
+      gravity: ToastGravity.BOTTOM,
       webBgColor: ' #979B999',
       timeInSecForIosWeb: 2,
-      webPosition: 'center'
-      );
+      webPosition: 'center');
 }
 
 void dialogMsg(code, msg) {
   Get.defaultDialog(
-    title: code,
-    middleText: msg,
-    confirmTextColor: Colors.white,
-    textConfirm: 'Tutup',
-    onConfirm: () => Get.back(),
-      barrierDismissible: false
-  );
+      title: code,
+      middleText: msg,
+      confirmTextColor: Colors.white,
+      textConfirm: 'Tutup',
+      onConfirm: () => Get.back(),
+      barrierDismissible: false);
 }
 
 void dialogMsgScsUpd(code, msg) {
   Get.defaultDialog(
-    title: code,
-    middleText: msg,
-    confirmTextColor: Colors.white,
-    textConfirm: 'Tutup',
-    onConfirm: (){
-      Get.back();
-      Get.back();
-    },
-      barrierDismissible: false
-  );
+      title: code,
+      middleText: msg,
+      confirmTextColor: Colors.white,
+      textConfirm: 'Tutup',
+      onConfirm: () {
+        Get.back();
+        Get.back();
+      },
+      barrierDismissible: false);
 }
 
 void dialogMsgCncl(code, msg) {
   Get.defaultDialog(
-    title: code,
-    middleText: msg,
-    confirmTextColor: Colors.white,
-    textCancel: 'Tutup',
-    onCancel: () => Get.back(),
-      barrierDismissible: false
-  );
+      title: code,
+      middleText: msg,
+      confirmTextColor: Colors.white,
+      textCancel: 'Tutup',
+      onCancel: () {
+        Get.back();
+        Get.back();
+      },
+      barrierDismissible: false);
 }
 
 void dialogMsgAbsen(code, msg) {
   Get.defaultDialog(
-    title: code,
-    middleText: msg,
-    confirmTextColor: Colors.white,
-    onConfirm: () {
-      Get.back();
-      Get.back();
-      Get.back();
-      Get.back();
-    },
-      barrierDismissible: false
-  );
+      title: code,
+      middleText: msg,
+      confirmTextColor: Colors.white,
+      onConfirm: () {
+        Get.back();
+        Get.back();
+        Get.back();
+        Get.back();
+      },
+      barrierDismissible: false);
 }
 
 void loadingDialog(msg, String? msg2) {
   Get.defaultDialog(
       title: '',
+      onWillPop: ()async {
+        return false;
+      },
       content: Center(
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-        children:  [
-         const CircularProgressIndicator(),
-         const SizedBox(
-            height:10,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const CircularProgressIndicator(),
+          const SizedBox(
+            height: 10,
           ),
           Text(msg),
           Text(msg2!),

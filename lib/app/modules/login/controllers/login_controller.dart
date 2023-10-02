@@ -109,4 +109,8 @@ class LoginController extends GetxController {
     // Get.offAllNamed(Routes.LOGIN);
     showToast("Logout Berhasil");
   }
+
+  selectedMenu(index) {
+    selected.value = index;
+  }
 }

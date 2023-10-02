@@ -9,6 +9,7 @@ abstract class Routes {
   static const PROFIL = _Paths.PROFIL;
   static const DETAIL_ABSEN = _Paths.DETAIL_ABSEN;
   static const SEMUA_ABSEN = _Paths.SEMUA_ABSEN;
+  static const CEK_STOK = _Paths.CEK_STOK;
 }
 
 abstract class _Paths {
@@ -19,4 +20,5 @@ abstract class _Paths {
   static const PROFIL = '/profil';
   static const DETAIL_ABSEN = '/detail-absen';
   static const SEMUA_ABSEN = '/semua-absen';
+  static const CEK_STOK = '/cek-stok';
 }

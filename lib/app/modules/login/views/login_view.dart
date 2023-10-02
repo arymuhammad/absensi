@@ -1,6 +1,8 @@
 import 'dart:ui';
 
+import 'package:absensi/app/helper/const.dart';
 import 'package:absensi/app/modules/profil/views/verifikasi_update_password.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
@@ -18,100 +20,98 @@ class LoginView extends GetView<LoginController> {
         //   centerTitle: true,
         // ),
         body: Padding(
-      padding: const EdgeInsets.symmetric(vertical: 35),
-      child: ListView(
-        padding: MediaQuery.of(context).size.width > 1100
-            ? const EdgeInsets.symmetric(horizontal: 500)
-            : const EdgeInsets.symmetric(horizontal: 50),
-        children: [
-          BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
-            child: Container(
-              decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomCenter,
-                      colors: [Colors.white60, Colors.white10]),
-                  borderRadius: BorderRadius.circular(10),
-                  color: Colors.white),
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 35),
-                    Center(
-                      child: ClipOval(
-                        child: Container(
-                          height: 150,
-                          width: 150,
-                          decoration: BoxDecoration(color: Colors.grey[300]),
-                          child: Image.asset(
-                            "assets/image/selfie.png",
-                            fit: BoxFit.contain,
-                          ),
-                        ),
-                      ),
+          padding: const EdgeInsets.all(15),
+          child: ListView(
+            // mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const SizedBox(height: 65),
+              Center(
+                child: ClipOval(
+                  child: Container(
+                    height: 150,
+                    width: 150,
+                    decoration: BoxDecoration(color: Colors.grey[300]),
+                    child: Image.asset(
+                      "assets/image/selfie.png",
+                      fit: BoxFit.contain,
                     ),
-                    const SizedBox(height: 10),
-                    const Center(
-                      child: Text(
-                        'LOGIN',
-                        style: TextStyle(fontSize: 22),
-                      ),
-                    ),
-                    const SizedBox(height: 15),
-                    TextField(
-                      controller: controller.username,
-                      decoration: InputDecoration(
-                          border: const OutlineInputBorder(),
-                          labelText: 'Username',
-                          prefixIcon: Icon(TernavIcons.light.profile)),
-                    ),
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    Obx(
-                      () => TextField(
-                        controller: controller.password,
-                        obscureText: controller.isPassHide.value,
-                        decoration: InputDecoration(
-                            border: const OutlineInputBorder(),
-                            labelText: 'Password',
-                            prefixIcon: Icon(TernavIcons.bold.lock),
-                            suffixIcon: InkWell(
-                                onTap: () {
-                                  controller.isPassHide.value =
-                                      !controller.isPassHide.value;
-                                },
-                                child: Icon(controller.isPassHide.value
-                                    ? Icons.visibility
-                                    : Icons.visibility_off))),
-                        onSubmitted: (v) => controller.login(),
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                            fixedSize: Size(Get.mediaQuery.size.width, 50)),
-                        onPressed: () => controller.login(),
-                        child: const Text('LOGIN')),
-                    const SizedBox(height: 20),
-                    TextButton(
-                        onPressed: () {
-                          Get.to(() => VerifikasiUpdatePassword(),
-                              transition: Transition.cupertino);
-                        },
-                        child: const Text('Lupas Password?')),
-                  ],
+                  ),
                 ),
               ),
-            ),
-          )
-        ],
-      ),
-    ));
+              const SizedBox(height: 10),
+              const Center(
+                child: Text(
+                  'LOGIN',
+                  style: TextStyle(fontSize: 22),
+                ),
+              ),
+              const SizedBox(height: 55),
+              TextField(
+                controller: controller.username,
+                decoration: InputDecoration(
+                    border: const OutlineInputBorder(),
+                    labelText: 'Username',
+                    prefixIcon: Icon(TernavIcons.light.profile)),
+              ),
+              const SizedBox(
+                height: 20,
+              ),
+              Obx(
+                () => TextField(
+                  controller: controller.password,
+                  obscureText: controller.isPassHide.value,
+                  decoration: InputDecoration(
+                      border: const OutlineInputBorder(),
+                      labelText: 'Password',
+                      prefixIcon: Icon(TernavIcons.bold.lock),
+                      suffixIcon: InkWell(
+                          onTap: () {
+                            controller.isPassHide.value =
+                                !controller.isPassHide.value;
+                          },
+                          child: Icon(controller.isPassHide.value
+                              ? Icons.visibility
+                              : Icons.visibility_off))),
+                  onSubmitted: (v) => controller.login(),
+                ),
+              ),
+              const SizedBox(
+                height: 20,
+              ),
+              ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                      fixedSize: Size(Get.mediaQuery.size.width, 50)),
+                  onPressed: () => controller.login(),
+                  child: const Text('LOGIN')),
+              const SizedBox(height: 20),
+              Center(
+                child: TextButton(
+                    onPressed: () {
+                      Get.to(() => VerifikasiUpdatePassword(),
+                          transition: Transition.cupertino);
+                    },
+                    child: const Text('Lupas Password?')),
+              ),
+              Center(
+                child: RichText(
+                    text: TextSpan(
+                        text: 'Belum punya akun? ',
+                        style: const TextStyle(
+                            color: Colors.black, fontFamily: 'Nunito'),
+                        children: [
+                      TextSpan(
+                          text: 'klik disini',
+                          style:
+                              TextStyle(color: mainColor, fontFamily: 'Nunito'),
+                          recognizer: TapGestureRecognizer()
+                            ..onTap = () {
+                              // Aksi yang dijalankan saat TextButton diklik
+                              Get.toNamed('/add-pegawai');
+                            })
+                    ])),
+              )
+            ],
+          ),
+        ));
   }
 }

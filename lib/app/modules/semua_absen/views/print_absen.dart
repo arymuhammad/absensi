@@ -67,8 +67,8 @@ class PrintKasirState extends State<PrintKasir> {
     /// for using an image from assets
     // final image = await imageFromAssetBundle('assets/logo.png');
 
+      // print(dataPrint![i].nama);
     for (int i = 0; i < dataPrint!.length; i++) {
-      print(dataPrint![i].nama);
       doc.addPage(
         pw.Page(
           pageFormat: PdfPageFormat.a4,

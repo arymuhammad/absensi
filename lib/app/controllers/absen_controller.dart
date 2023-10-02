@@ -1,7 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'package:client_information/client_information.dart';
+import 'dart:math';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:absensi/app/model/shift_kerja_model.dart';
@@ -15,7 +16,11 @@ import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:ota_update/ota_update.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:xml/xml.dart' as xml;
 import '../Repo/service_api.dart';
 import '../helper/loading_dialog.dart';
 import '../model/absen_model.dart';
@@ -42,6 +47,10 @@ class AbsenController extends GetxController {
   var jamMasuk = "".obs;
   var jamPulang = "".obs;
   var timeNow = "";
+  var downloadProgress = 0.0.obs;
+  var updateList = [];
+  var currVer = "";
+  var latestVer = "";
   RxList<Absen> searchAbsen = RxList<Absen>([]);
   late TextEditingController filterAbsen;
   late TextEditingController date1;
@@ -87,6 +96,32 @@ class AbsenController extends GetxController {
     getAbsenToday(paramSingle);
     getLimitAbsen(paramLimit);
     getCabang();
+
+    PackageInfo.fromPlatform().then((PackageInfo packageInfo) {
+      String appName = packageInfo.appName;
+      String packageName = packageInfo.packageName;
+      currVer = packageInfo.version;
+      String buildNumber = packageInfo.buildNumber;
+      // print(appName);
+      // print(packageName);
+      // print(currVer);
+      // print(buildNumber);
+    });
+
+    final readDoc = await http
+        .get(Uri.parse('http://103.156.15.60/update apk/updateLog.xml'));
+
+    if (readDoc.statusCode == 200) {
+      //parsing readDoc
+      final document = xml.XmlDocument.parse(readDoc.body);
+      final cLog = document.findElements('items').first;
+      latestVer = cLog.findElements('versi').first.text;
+      if (latestVer != currVer) {
+        checkForUpdates("onInit");
+      }
+    }
+    // Position position = await determinePosition();
+    // print(position.latitude);
   }
 
   @override
@@ -97,309 +132,336 @@ class AbsenController extends GetxController {
     date2.dispose();
   }
 
+  Future<List<Cabang>> getCabang() async {
+    final response = await ServiceApi().getCabang({});
+    return cabang.value = response;
+  }
+
   timeNetwork(String timeZone) async {
     try {
       final response = await http
-          .get(Uri.parse('https://worldtimeapi.org/api/timezone/$timeZone'))
+          .get(Uri.parse(
+              'https://timeapi.io/api/Time/current/zone?timeZone=$timeZone'))
           .then((data) => jsonDecode(data.body));
-      timeNow = response['datetime'];
-    } on SocketException catch (_) {}
-  }
-
-  Future<List<Cabang>> getCabang() async {
-    final response = await ServiceApi().getCabang();
-    return cabang.value = response;
+      timeNow = response['time'];
+    } on HandshakeException catch (_) {
+      // print(e.toString());
+    }
   }
 
   getLoc(List<dynamic>? dataUser) async {
     final String currentTimeZone =
         await FlutterNativeTimezone.getLocalTimezone();
 
-    await timeNetwork(currentTimeZone);
     try {
-      if (kIsWeb) {
-        ClientInformation info = await ClientInformation.fetch();
-        devInfo.value = '${info.deviceName} ${info.softwareName}';
-      } else {}
+      // if (kIsWeb) {
+      //   ClientInformation info = await ClientInformation.fetch();
+      //   devInfo.value = '${info.deviceName} ${info.softwareName}';
+      // } else {
+      // try {
+      // platformVersion = await DeviceInformation.platformVersion;
+      // imeiNo = await DeviceInformation.deviceIMEINumber;
+      // modelName = await DeviceInformation.deviceModel;
+      // manufacturer = await DeviceInformation.deviceManufacturer;
+      // apiLevel = await DeviceInformation.apiLevel;
+      // deviceName = await DeviceInformation.deviceName;
+      // productName = await DeviceInformation.productName;
+      // cpuType = await DeviceInformation.cpuName;
+      // hardware = await DeviceInformation.hardware;
+      // devInfo.value =
+      //     '${await DeviceInformation.deviceManufacturer} ${await DeviceInformation.productName}';
+      // } on PlatformException {
+      //   // platformVersion = 'Failed to get platform version.';
+      // }
+      DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+      AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+      devInfo.value = '${androidInfo.brand} ${androidInfo.model}';
+      // }
       // ignore: empty_catches
     } on PlatformException {}
 
     Position position = await determinePosition();
-    if (!kIsWeb) {
-      List<Placemark> placemarks =
-          await placemarkFromCoordinates(position.latitude, position.longitude);
-      lokasi.value =
-          '${placemarks[0].street!}, ${placemarks[0].subLocality!}\n${placemarks[0].subAdministrativeArea!}, ${placemarks[0].administrativeArea!}';
+    // if (!kIsWeb) {
+    //   List<Placemark> placemarks =
+    //       await placemarkFromCoordinates(position.latitude, position.longitude);
+    //   lokasi.value =
+    //       '${placemarks[0].street!}, ${placemarks[0].subLocality!}\n${placemarks[0].subAdministrativeArea!}, ${placemarks[0].administrativeArea!}';
+    // } else {
+    //   lokasi.value = '${position.latitude} , ${position.longitude}';
+    //   print(lokasi.value);
+    // }
+
+    if (position.isMocked == true) {
+      dialogMsgCncl('Peringatan',
+          'Anda terdeteksi menggunakan\nlokasi palsu\nHarap matikan lokasi palsu');
     } else {
-      lokasi.value = '${position.latitude} , ${position.longitude}';
-    }
+      timeNetwork(currentTimeZone);
+      await cekDataAbsen("masuk", dataUser![0]);
+      if (cekAbsen.value.total == "0") {
+        msg.value = "Absen masuk hari ini?";
+        await Get.defaultDialog(
+            title: 'Absen',
+            content: Column(
+              children: [
+                Text(msg.value),
+                const SizedBox(
+                  height: 15,
+                ),
+                FutureBuilder(
+                  future: getCabang(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      var dataCabang = snapshot.data!;
+                      return DropdownButtonFormField(
+                        decoration: InputDecoration(
+                            border: const OutlineInputBorder(),
+                            hintText: dataUser[2]),
+                        value: selectedCabang.value == ""
+                            ? null
+                            : selectedCabang.value,
+                        onChanged: (data) {
+                          selectedCabang.value = data!;
 
-    await cekDataAbsen("masuk", dataUser![0]);
-    if (cekAbsen.value.total == "0") {
-      msg.value = "Absen masuk hari ini?";
-      await Get.defaultDialog(
-          title: 'Absen',
-          content: Column(
-            children: [
-              Text(msg.value),
-              const SizedBox(
-                height: 15,
-              ),
-              FutureBuilder(
-                future: getCabang(),
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    var dataCabang = snapshot.data!;
-                    return DropdownButtonFormField(
-                      decoration: const InputDecoration(
-                          border: OutlineInputBorder(),
-                          hintText: 'Pilih Cabang'),
-                      value: selectedCabang.value == ""
-                          ? null
-                          : selectedCabang.value,
-                      onChanged: (data) {
-                        selectedCabang.value = data!;
-
-                        for (int i = 0; i < dataCabang.length; i++) {
-                          if (dataCabang[i].kodeCabang == data) {
-                            lat.value = dataCabang[i].lat!;
-                            long.value = dataCabang[i].long!;
-                          }
-                        }
-                      },
-                      items: dataCabang
-                          .map((e) => DropdownMenuItem(
-                              value: e.kodeCabang,
-                              child: Text(e.namaCabang.toString())))
-                          .toList(),
-                    );
-                  } else if (snapshot.hasError) {
-                    return Text('${snapshot.error}');
-                  }
-                  return const CupertinoActivityIndicator();
-                },
-              ),
-              const SizedBox(height: 5),
-              FutureBuilder(
-                future: getShift(),
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    var dataShift = snapshot.data!;
-                    return DropdownButtonFormField(
-                      decoration: const InputDecoration(
-                          border: OutlineInputBorder(),
-                          hintText: 'Pilih Shift Absen'),
-                      value: selectedShift.value == ""
-                          ? null
-                          : selectedShift.value,
-                      onChanged: (data) {
-                        selectedShift.value = data!;
-
-                        if (selectedShift.value == "4") {
-                          jamMasuk.value = DateFormat("HH:mm:ss")
-                              .format(DateTime.parse(timeNow).toLocal());
-                          jamPulang.value = DateFormat("HH:mm:ss").format(
-                              DateTime.parse(timeNow)
-                                  .toLocal()
-                                  .add(const Duration(hours: 8)));
-                        } else {
-                          for (int i = 0; i < dataShift.length; i++) {
-                            if (dataShift[i].id == data) {
-                              jamMasuk.value = dataShift[i].jamMasuk!;
-                              jamPulang.value = dataShift[i].jamPulang!;
+                          for (int i = 0; i < dataCabang.length; i++) {
+                            if (dataCabang[i].kodeCabang == data) {
+                              lat.value = dataCabang[i].lat!;
+                              long.value = dataCabang[i].long!;
                             }
                           }
-                        }
-                      },
-                      items: dataShift
-                          .map((e) => DropdownMenuItem(
-                              value: e.id, child: Text(e.namaShift.toString())))
-                          .toList(),
-                    );
-                  } else if (snapshot.hasError) {
-                    return Text('${snapshot.error}');
-                  }
-                  return const CupertinoActivityIndicator();
-                },
-              )
-            ],
-          ),
-          textCancel: 'Batal',
-          onCancel: () {
-            Get.back();
-            Get.back();
-            selectedShift.value = "";
-            selectedCabang.value = "";
-          },
-          textConfirm: 'Ambil Foto',
-          confirmTextColor: Colors.white,
-          onConfirm: () async {
-            if (selectedShift.isEmpty) {
-              showToast("Harap pilih Shift Absen");
-            } else {
-              SharedPreferences pref = await SharedPreferences.getInstance();
-              double distance = Geolocator.distanceBetween(
-                  double.parse(lat.isNotEmpty ? lat.value : dataUser[6]),
-                  double.parse(long.isNotEmpty ? long.value : dataUser[7]),
-                  position.latitude.toDouble(),
-                  position.longitude.toDouble());
-              await pref.setStringList('userLoc', <String>[
-                lat.isNotEmpty ? lat.value : dataUser[6],
-                long.isNotEmpty ? long.value : dataUser[7]
-              ]);
+                        },
+                        items: dataCabang
+                            .map((e) => DropdownMenuItem(
+                                value: e.kodeCabang,
+                                child: Text(e.namaCabang.toString())))
+                            .toList(),
+                      );
+                    } else if (snapshot.hasError) {
+                      return Text('${snapshot.error}');
+                    }
+                    return const CupertinoActivityIndicator();
+                  },
+                ),
+                const SizedBox(height: 5),
+                FutureBuilder(
+                  future: getShift(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      var dataShift = snapshot.data!;
+                      return DropdownButtonFormField(
+                        decoration: const InputDecoration(
+                            border: OutlineInputBorder(),
+                            hintText: 'Pilih Shift Absen'),
+                        value: selectedShift.value == ""
+                            ? null
+                            : selectedShift.value,
+                        onChanged: (data) {
+                          selectedShift.value = data!;
 
-              distanceStore.value = distance;
-
-              if (distanceStore.value > 200) {
-                dialogMsgCncl('Terjadi Kesalahan',
-                    'Posisi Anda berada diluar jangkauan area.\nHarap berpindah posisi ke area yang sudah ditentukan');
-                selectedShift.value = "";
-                selectedCabang.value = "";
-              } else {
-                if (kIsWeb) {
-                  imageWeb = await FilePicker.platform.pickFiles(
-                      type: FileType.custom,
-                      allowedExtensions: ['jpg', 'jpeg', 'png'],
-                      withReadStream: true,
-                      // this will return PlatformFile object with read stream
-                      allowCompression: true);
-                } else {
-                  await uploadFotoAbsen();
-                }
-                Get.back();
-                if (image != null || imageWeb != null) {
-                  var data = {
-                    "status": "add",
-                    "tanggal": dateNow,
-                    "kode_cabang": selectedCabang.isNotEmpty
-                        ? selectedCabang.value
-                        : dataUser[8],
-                    "id": dataUser[0],
-                    "nama": dataUser[1],
-                    "id_shift": selectedShift.value,
-                    "jam_masuk": jamMasuk.value,
-                    "jam_pulang": jamPulang.value,
-                    "jam_absen_masuk": DateFormat("HH:mm:ss")
-                        .format(DateTime.parse(timeNow).toLocal()),
-                    "foto_masuk": kIsWeb
-                        ? imageWeb!.files.single
-                        : File(image!.path.toString()),
-                    "lat_masuk": position.latitude.toString(),
-                    "long_masuk": position.longitude.toString(),
-                    "device_info": devInfo.value
-                  };
-
-                  loadingDialog("Sedang mengirim data...", "");
-                  await ServiceApi().submitAbsen(data);
-                  await Future.delayed(const Duration(milliseconds: 600));
-                  Get.back();
-                  dialogMsgAbsen("Sukses", "Anda berhasil Absen");
-                  imageWeb = null;
-                }
-                var paramAbsenToday = {
-                  "mode": "single",
-                  "id_user": dataUser[0],
-                  "tanggal": dateNow
-                };
-
-                var paramLimitAbsen = {
-                  "mode": "limit",
-                  "id_user": dataUser[0],
-                  "tanggal1": initDate1,
-                  "tanggal2": initDate2
-                };
-                getAbsenToday(paramAbsenToday);
-                getLimitAbsen(paramLimitAbsen);
-                selectedShift.value = "";
-                selectedCabang.value = "";
-              }
-            }
-          },
-          barrierDismissible: false);
-    } else {
-      await cekDataAbsen("pulang", dataUser[0]);
-      if (cekAbsen.value.total == "0") {
-        msg.value = "Anda yakin ingin absen pulang hari ini?";
-        Get.defaultDialog(
-            title: 'Absen',
-            middleText: msg.value,
+                          if (selectedShift.value == "4") {
+                            jamMasuk.value = timeNow.toString();
+                            jamPulang.value = DateFormat("HH:mm").format(
+                                DateTime.parse(timeNow)
+                                    .toLocal()
+                                    .add(const Duration(hours: 8)));
+                          } else {
+                            for (int i = 0; i < dataShift.length; i++) {
+                              if (dataShift[i].id == data) {
+                                jamMasuk.value = dataShift[i].jamMasuk!;
+                                jamPulang.value = dataShift[i].jamPulang!;
+                              }
+                            }
+                          }
+                        },
+                        items: dataShift
+                            .map((e) => DropdownMenuItem(
+                                value: e.id,
+                                child: Text(e.namaShift.toString())))
+                            .toList(),
+                      );
+                    } else if (snapshot.hasError) {
+                      return Text('${snapshot.error}');
+                    }
+                    return const CupertinoActivityIndicator();
+                  },
+                )
+              ],
+            ),
             textCancel: 'Batal',
             onCancel: () {
               Get.back();
               Get.back();
+              selectedShift.value = "";
+              selectedCabang.value = "";
             },
             textConfirm: 'Ambil Foto',
             confirmTextColor: Colors.white,
             onConfirm: () async {
-              SharedPreferences pref = await SharedPreferences.getInstance();
-              List<String> userLoc = pref.getStringList('userLoc') ?? [""];
-              double distance = Geolocator.distanceBetween(
-                  double.parse(userLoc[0]),
-                  double.parse(userLoc[1]),
-                  position.latitude.toDouble(),
-                  position.longitude.toDouble());
-
-              distanceStore.value = distance;
-              if (distanceStore.value > 200) {
-                dialogMsgCncl('Terjadi Kesalahan',
-                    'Posisi Anda berada diluar jangkauan area.\nHarap berpindah posisi ke area yang sudah ditentukan');
+              if (selectedShift.isEmpty) {
+                showToast("Harap pilih Shift Absen");
               } else {
-                if (kIsWeb) {
-                  imageWeb = await FilePicker.platform.pickFiles(
-                      type: FileType.custom,
-                      allowedExtensions: ['jpg', 'jpeg', 'png'],
-                      withReadStream: true,
+                SharedPreferences pref = await SharedPreferences.getInstance();
+                double distance = Geolocator.distanceBetween(
+                    double.parse(lat.isNotEmpty ? lat.value : dataUser[6]),
+                    double.parse(long.isNotEmpty ? long.value : dataUser[7]),
+                    position.latitude.toDouble(),
+                    position.longitude.toDouble());
+                await pref.setStringList('userLoc', <String>[
+                  lat.isNotEmpty ? lat.value : dataUser[6],
+                  long.isNotEmpty ? long.value : dataUser[7]
+                ]);
 
-                      // this will return PlatformFile object with read stream
-                      allowCompression: true);
+                distanceStore.value = distance;
+
+                if (distanceStore.value > 200) {
+                  dialogMsgCncl(
+                      'Terjadi Kesalahan', 'Anda berada diluar area absen');
+                  selectedShift.value = "";
+                  selectedCabang.value = "";
                 } else {
-                  await uploadFotoAbsen();
-                }
-                Get.back();
-                loadingDialog("Sedang mengirim data...", "");
+                  if (kIsWeb) {
+                    imageWeb = await FilePicker.platform.pickFiles(
+                        type: FileType.custom,
+                        allowedExtensions: ['jpg', 'jpeg', 'png'],
+                        withReadStream: true,
+                        // this will return PlatformFile object with read stream
+                        allowCompression: true);
+                  } else {
+                    await uploadFotoAbsen();
+                  }
+                  Get.back();
+                  if (image != null || imageWeb != null) {
+                    var data = {
+                      "status": "add",
+                      "tanggal": dateNow,
+                      "kode_cabang": selectedCabang.isNotEmpty
+                          ? selectedCabang.value
+                          : dataUser[8],
+                      "id": dataUser[0],
+                      "nama": dataUser[1],
+                      "id_shift": selectedShift.value,
+                      "jam_masuk": jamMasuk.value,
+                      "jam_pulang": jamPulang.value,
+                      "jam_absen_masuk": timeNow.toString(),
+                      "foto_masuk": kIsWeb
+                          ? imageWeb!.files.single
+                          : File(image!.path.toString()),
+                      "lat_masuk": position.latitude.toString(),
+                      "long_masuk": position.longitude.toString(),
+                      "device_info": devInfo.value
+                    };
+                    // print(data);
 
-                if (image != null || imageWeb != null) {
-                  var data = {
-                    "status": "update",
-                    "id": dataUser[0],
-                    "tanggal": dateNow,
-                    "nama": dataUser[1],
-                    "jam_absen_pulang": DateFormat("HH:mm:ss")
-                        .format(DateTime.parse(timeNow).toLocal()),
-                    "foto_pulang": kIsWeb
-                        ? imageWeb!.files.single
-                        : File(image!.path.toString()),
-                    "lat_pulang": position.latitude.toString(),
-                    "long_pulang": position.longitude.toString(),
-                    "device_info2": devInfo.value
+                    loadingDialog("Sedang mengirim data...", "");
+                    await ServiceApi().submitAbsen(data);
+                    await Future.delayed(const Duration(milliseconds: 600));
+                    Get.back();
+                    dialogMsgAbsen("Sukses", "Anda berhasil Absen");
+                    imageWeb = null;
+                  }
+                  var paramAbsenToday = {
+                    "mode": "single",
+                    "id_user": dataUser[0],
+                    "tanggal": dateNow
                   };
-                  await ServiceApi().submitAbsen(data);
-                }
-                var paramAbsenToday = {
-                  "mode": "single",
-                  "id_user": dataUser[0],
-                  "tanggal": dateNow
-                };
 
-                var paramLimitAbsen = {
-                  "mode": "limit",
-                  "id_user": dataUser[0],
-                  "tanggal1": initDate1,
-                  "tanggal2": initDate2
-                };
-                getAbsenToday(paramAbsenToday);
-                getLimitAbsen(paramLimitAbsen);
-                await Future.delayed(const Duration(milliseconds: 400));
-                Get.back();
-                dialogMsgAbsen("Sukses", "Anda berhasil Absen");
+                  var paramLimitAbsen = {
+                    "mode": "limit",
+                    "id_user": dataUser[0],
+                    "tanggal1": initDate1,
+                    "tanggal2": initDate2
+                  };
+                  getAbsenToday(paramAbsenToday);
+                  getLimitAbsen(paramLimitAbsen);
+                  selectedShift.value = "";
+                  selectedCabang.value = "";
+                }
               }
             },
             barrierDismissible: false);
       } else {
-        dialogMsgCncl("Terjadi Kesalahan", "Anda sudah Absen Pulang hari ini.");
+        await cekDataAbsen("pulang", dataUser[0]);
+        if (cekAbsen.value.total == "0") {
+          msg.value = "Anda yakin ingin absen pulang hari ini?";
+          Get.defaultDialog(
+              title: 'Absen',
+              middleText: msg.value,
+              textCancel: 'Batal',
+              onCancel: () {
+                Get.back();
+                Get.back();
+              },
+              textConfirm: 'Ambil Foto',
+              confirmTextColor: Colors.white,
+              onConfirm: () async {
+                SharedPreferences pref = await SharedPreferences.getInstance();
+                List<String> userLoc = pref.getStringList('userLoc') ?? [""];
+                double distance = Geolocator.distanceBetween(
+                    double.parse(userLoc[0]),
+                    double.parse(userLoc[1]),
+                    position.latitude.toDouble(),
+                    position.longitude.toDouble());
+
+                distanceStore.value = distance;
+                if (distanceStore.value > 200) {
+                  dialogMsgCncl('Terjadi Kesalahan',
+                      'Posisi Anda berada diluar jangkauan area.\nHarap berpindah posisi ke area yang sudah ditentukan');
+                } else {
+                  if (kIsWeb) {
+                    imageWeb = await FilePicker.platform.pickFiles(
+                        type: FileType.custom,
+                        allowedExtensions: ['jpg', 'jpeg', 'png'],
+                        withReadStream: true,
+
+                        // this will return PlatformFile object with read stream
+                        allowCompression: true);
+                  } else {
+                    await uploadFotoAbsen();
+                  }
+                  Get.back();
+                  loadingDialog("Sedang mengirim data...", "");
+
+                  if (image != null || imageWeb != null) {
+                    var data = {
+                      "status": "update",
+                      "id": dataUser[0],
+                      "tanggal": dateNow,
+                      "nama": dataUser[1],
+                      "jam_absen_pulang": timeNow.toString(),
+                      "foto_pulang": kIsWeb
+                          ? imageWeb!.files.single
+                          : File(image!.path.toString()),
+                      "lat_pulang": position.latitude.toString(),
+                      "long_pulang": position.longitude.toString(),
+                      "device_info2": devInfo.value
+                    };
+                    await ServiceApi().submitAbsen(data);
+                  }
+                  var paramAbsenToday = {
+                    "mode": "single",
+                    "id_user": dataUser[0],
+                    "tanggal": dateNow
+                  };
+
+                  var paramLimitAbsen = {
+                    "mode": "limit",
+                    "id_user": dataUser[0],
+                    "tanggal1": initDate1,
+                    "tanggal2": initDate2
+                  };
+                  getAbsenToday(paramAbsenToday);
+                  getLimitAbsen(paramLimitAbsen);
+                  await Future.delayed(const Duration(milliseconds: 400));
+                  Get.back();
+                  dialogMsgAbsen("Sukses", "Anda berhasil Absen");
+                }
+              },
+              barrierDismissible: false);
+        } else {
+          dialogMsgCncl(
+              "Terjadi Kesalahan", "Anda sudah Absen Pulang hari ini.");
+        }
       }
     }
-    // }
   }
 
   Future<CekAbsen> cekDataAbsen(String status, String id) async {
@@ -439,7 +501,7 @@ class AbsenController extends GetxController {
       loadingDialog("Memindai posisi Anda...", "");
       permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
-        loadingDialog("Memindai posisi Anda...", "");
+        // loadingDialog("Memindai posisi Anda...", "");
         permission = await Geolocator.requestPermission();
         if (permission == LocationPermission.denied) {
           // Permissions are denied, next time you could try
@@ -451,28 +513,38 @@ class AbsenController extends GetxController {
           // await Future.delayed(const Duration(milliseconds: 400));
           // Get.back();
           showToast("Izin Lokasi ditolak");
+          return Future.error('Location permissions are denied');
         }
         await Future.delayed(const Duration(milliseconds: 400));
         Get.back();
       }
-      await Future.delayed(const Duration(milliseconds: 400));
-      Get.back();
+      // await Future.delayed(const Duration(milliseconds: 400));
 
       if (permission == LocationPermission.deniedForever) {
         // Permissions are denied forever, handle appropriately.
         showToast(
             "Izin Lokasi ditolak.\nHarap berikan akses pada perizinan lokasi");
+        // Get.back();
         return Future.error(
             'Location permissions are permanently denied, we cannot request permissions.');
       }
 
       // When we reach here, permissions are granted and we can
       // continue accessing the position of the device.
+      // Get.back();
+      // loadingDialog("Memindai posisi Anda...", "");
+      var loc = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.bestForNavigation,
+        // timeLimit: const Duration(seconds: 10),
+        // forceAndroidLocationManager: true
+        //
+      );
+      loc.isMocked;
+      // print(loc.isMocked);
+      Get.back();
+      return loc;
 
-      return await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.bestForNavigation,
-          // timeLimit: const Duration(seconds: 10),
-          forceAndroidLocationManager: true);
+      // Get.back();
     } on TimeoutException catch (e) {
       // determinePosition();
       return Future.error(e.toString());
@@ -542,5 +614,190 @@ class AbsenController extends GetxController {
       showToast("Harap masukkan tanggal untuk mencari data");
     }
     return dataAllAbsen;
+  }
+
+  checkForUpdates(status) async {
+    if (status != "onInit") {
+      loadingDialog("Memeriksa pembaruan...", "");
+    }
+
+    try {
+      final readDoc = await http
+          .get(Uri.parse('http://103.156.15.60/update apk/updateLog.xml'));
+
+      final response = await http
+          .head(Uri.parse('http://103.156.15.60/update apk/absensiApp.apk'))
+          .timeout(const Duration(seconds: 3));
+      Get.back();
+      if (response.statusCode == 200) {
+        //parsing readDoc
+        final document = xml.XmlDocument.parse(readDoc.body);
+        final itemsNode = document.findElements('items').first;
+        final updates = itemsNode.findElements('update');
+        latestVer = itemsNode.findElements('versi').first.text;
+        //start looping item on readDoc
+        updateList.clear();
+        for (final listUpdates in updates) {
+          final name = listUpdates.findElements('name').first.text;
+          final desc = listUpdates.findElements('desc').first.text;
+          final icon = listUpdates.findElements('icon').first.text;
+          final color = listUpdates.findElements('color').first.text;
+
+          updateList
+              .add({'name': name, 'desc': desc, 'icon': icon, 'color': color});
+        }
+        //end loop item on readDoc
+        if (latestVer == currVer) {
+          if (status != "onInit") {
+            Get.back(closeOverlays: true);
+            dialogMsgScsUpd("", "Tidak ada pembaruan sistem");
+          }
+        } else {
+          Get.defaultDialog(
+              radius: 2,
+              onWillPop: () async {
+                return false;
+              },
+              title: 'Pembaruan Tersedia',
+              content: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Apa yang baru',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
+                  ),
+                  const SizedBox(
+                    height: 5,
+                  ),
+                  for (var i in updateList)
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              IconData(int.parse(i['icon']),
+                                  fontFamily: 'MaterialIcons'),
+                              color: Color(int.parse(i['color'])),
+                            ),
+                            const SizedBox(
+                              width: 5,
+                            ),
+                            Text('${i['name']}',
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 18)),
+                          ],
+                        ),
+                        Text(
+                          i['desc'],
+                          style: TextStyle(color: Colors.grey[500]),
+                        ),
+                        const SizedBox(
+                          height: 5,
+                        ),
+                      ],
+                    )
+                ],
+              ),
+              // middleText: 'Ditemukan pembaruan sistem terbaru.',
+              textCancel: 'Batal',
+              onCancel: () => Get.back(),
+              textConfirm: 'Unduh',
+              confirmTextColor: Colors.white,
+              onConfirm: () {
+                Get.back(closeOverlays: true);
+                try {
+                  Get.defaultDialog(
+                      title: 'Pembaruan perangkat lunak',
+                      radius: 2,
+                      barrierDismissible: false,
+                      onWillPop: () async {
+                        return false;
+                      },
+                      content: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Divider(),
+                          const Text('Mengunduh pembaruan...'),
+                          Obx(
+                            () => Text('${(downloadProgress.value).toInt()}%'),
+                          ),
+                          const SizedBox(
+                            height: 5,
+                          ),
+                          Obx(
+                            () => LinearPercentIndicator(
+                                lineHeight: 10.0,
+                                percent: downloadProgress.value / 100,
+                                backgroundColor: Colors.grey[220],
+                                progressColor: Colors.blue,
+                                barRadius: const Radius.circular(5)),
+                          ),
+                          const SizedBox(
+                            height: 5,
+                          ),
+                        ],
+                      ));
+                  //LINK CONTAINS APK OF FLUTTER HELLO WORLD FROM FLUTTER SDK EXAMPLES
+                  OtaUpdate()
+                      .execute(
+                    'http://103.156.15.60/update apk/absensiApp.apk',
+                    // OPTIONAL
+                    // destinationFilename: '/',
+                    //OPTIONAL, ANDROID ONLY - ABILITY TO VALIDATE CHECKSUM OF FILE:
+                    // sha256checksum:
+                    //     "d6da28451a1e15cf7a75f2c3f151befad3b80ad0bb232ab15c20897e54f21478",
+                  )
+                      .listen(
+                    (OtaEvent event) {
+                      downloadProgress.value = double.parse(event.value!);
+                    },
+                    // onError: errorHandle(Error()),
+                    onDone: () => Get.back(),
+                  );
+                } on http.ClientException catch (e) {
+                  print('Failed to make OTA update. Details: $e');
+                }
+              });
+        }
+      } else {
+        Get.defaultDialog(
+            title: 'Pesan',
+            middleText:
+                'Tidak ada pembaruan aplikasi. \nSistem anda sudah yang terbaru',
+            onCancel: () => Get.back(),
+            textCancel: 'Tutup');
+      }
+    } on SocketException catch (e) {
+      Get.back(closeOverlays: true);
+      Get.defaultDialog(
+        title: e.toString(),
+        middleText: 'Periksa koneksi internet anda',
+        textConfirm: 'Refresh',
+        confirmTextColor: Colors.white,
+        onConfirm: () {
+          checkForUpdates("");
+          Get.back(closeOverlays: true);
+        },
+      );
+    }
+  }
+
+  errorHandle(Error error) {
+    Get.back(closeOverlays: true);
+    Get.defaultDialog(
+      title: 'Error',
+      middleText:
+          'Kesalahan saat mengunduh pembaruan sistem\nHarap periksa koneksi internet anda',
+      textCancel: 'Refresh',
+      onCancel: () => Get.back(closeOverlays: true),
+      // onConfirm: () {
+      //   checkForUpdates();
+      //   Get.back(closeOverlays: true);
+      // },
+    );
+    print('Failed to make OTA update. Details: ${error.stackTrace} .');
   }
 }

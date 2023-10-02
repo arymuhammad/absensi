@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
+import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:get/get.dart';
 
 import '../controllers/add_pegawai_controller.dart';
@@ -15,11 +15,11 @@ class AddPegawaiView extends GetView<AddPegawaiController> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('ADD PEGAWAI'),
+        title: const Text('Register'),
         centerTitle: true,
       ),
       body: ListView(
-        // scrollDirection: Axis.vertical,
+        scrollDirection: Axis.vertical,
         // keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
         padding: const EdgeInsets.all(20),
         children: [
@@ -63,7 +63,10 @@ class AddPegawaiView extends GetView<AddPegawaiController> {
                               Icons.camera_alt_rounded,
                               size: 50,
                             ),
-                            Text('Choose File', style: TextStyle(color: Colors.blue),)
+                            Text(
+                              'Choose File',
+                              style: TextStyle(color: Colors.blue),
+                            )
                           ],
                         ),
                       );
@@ -76,87 +79,129 @@ class AddPegawaiView extends GetView<AddPegawaiController> {
           const SizedBox(
             height: 20,
           ),
-          FutureBuilder(
-            future: controller.getCabang(),
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                var dataCabang = snapshot.data;
-                List<String> allStore = <String>[];
-                dataCabang!.map((data) {
-                  allStore.add(data.namaCabang!);
-                }).toList();
-
-                return LayoutBuilder(
-                  builder:(context, constraints) =>  RawAutocomplete(
-                    key: controller.autocompleteKey,
-                    focusNode: controller.focusNodecabang,
-                    textEditingController: controller.store,
-                    optionsBuilder: (TextEditingValue textValue) {
-                      if (textValue.text == '') {
-                        return const Iterable<String>.empty();
-                      } else {
-                        List<String> matches = <String>[];
-                        matches.addAll(allStore);
-                
-                        matches.retainWhere((s) {
-                          return s
-                              .toLowerCase()
-                              .contains(textValue.text.toLowerCase());
-                        });
-                        return matches;
-                      }
+          Obx(
+            () => DropdownButtonFormField(
+              value: controller.brandCabang.value == ""
+                  ? null
+                  : controller.brandCabang.value,
+              onChanged: (data) {
+                controller.brandCabang.value = data!;
+                controller.selectedCabang.value = "";
+                controller.store.clear();
+              },
+              items: controller.listBrand
+                  .map((e) => DropdownMenuItem(
+                      value: e.brandCabang!.toString(),
+                      child: Text(e.brandCabang!)))
+                  .toList(),
+              decoration: const InputDecoration(
+                  labelText: 'Brand',
+                  filled: true,
+                  fillColor: Colors.white,
+                  border: OutlineInputBorder()),
+              dropdownColor: Colors.white,
+            ),
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          Obx(
+            () => FutureBuilder(
+              future: controller.getCabang(),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  var dataCabang = snapshot.data;
+                  List<String> allStore = <String>[];
+                  dataCabang!.map((data) {
+                    allStore.add(data.namaCabang!);
+                  }).toList();
+                  return TypeAheadFormField<String>(
+                    textFieldConfiguration: TextFieldConfiguration(
+                      controller: controller.store,
+                      decoration: const InputDecoration(
+                        labelText: 'Cabang',
+                        border: OutlineInputBorder(),
+                        filled: true,
+                        fillColor: Colors.white,
+                      ),
+                    ),
+                    suggestionsCallback: (pattern) {
+                      return allStore.where((option) =>
+                          option.toLowerCase().contains(pattern.toLowerCase()));
                     },
-                    onSelected: (String selection) {
+                    itemBuilder: (context, suggestion) {
+                      return ListTile(
+                        tileColor: Colors.white,
+                        title: Text(suggestion),
+                      );
+                    },
+                    onSuggestionSelected: (suggestion) {
+                      controller.store.text = suggestion;
                       for (int i = 0; i < dataCabang.length; i++) {
-                        if (dataCabang[i].namaCabang == selection) {
+                        if (dataCabang[i].namaCabang == suggestion) {
                           controller.selectedCabang.value =
                               dataCabang[i].kodeCabang!;
                         }
                       }
                     },
-                    fieldViewBuilder: (BuildContext context, cabang,
-                        FocusNode focusNode, VoidCallback onFieldSubmitted) {
-                      return TextField(
-                        decoration: const InputDecoration(
-                            labelText: 'Ketik Nama Cabang',
-                    filled: true,
-                    fillColor: Colors.white,
-                            border: OutlineInputBorder()),
-                        controller: cabang,
-                        focusNode: focusNode,
-                        onSubmitted: (String value) {},
-                      );
-                    },
-                    optionsViewBuilder: (BuildContext context,
-                        void Function(String) onSelected,
-                        Iterable<String> options) {
-                      return Align(
-                        alignment: Alignment.topLeft,
-                        child: Material(
-                            child: SizedBox(
-                          width: constraints.biggest.width,
-                          height: 250,
-                          child: ListView.builder(
-                            itemCount: options.length,
-                            itemBuilder: (context, index) => Column(
-                              children: options.map((opt) {
-                                return InkWell(
-                                    onTap: () {
-                                      onSelected(opt);
-                                    },
-                                    child: Container(
-                                      color: Colors.white,
-                                      width: double.infinity,
-                                      padding: const EdgeInsets.all(10),
-                                      child: Text(opt),
-                                    ));
-                              }).toList(),
-                            ),
-                          ),
-                        )),
-                      );
-                    },
+                  );
+                } else if (snapshot.hasError) {
+                  return Text('${snapshot.error}');
+                }
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: const [
+                    Center(
+                      child: CupertinoActivityIndicator(),
+                    ),
+                    SizedBox(width: 5),
+                    Text('Sedang memuat...'),
+                  ],
+                );
+              },
+            ),
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          FutureBuilder(
+            future: controller.getLevel(),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                var dataLevel = snapshot.data;
+                List<String> allLevel = <String>[];
+                dataLevel!.map((data) {
+                  allLevel.add(data.namaLevel!);
+                }).toList();
+
+                return TypeAheadFormField<String>(
+                  textFieldConfiguration: TextFieldConfiguration(
+                    controller: controller.level,
+                    decoration: const InputDecoration(
+                      labelText: 'Level User',
+                      border: OutlineInputBorder(),
+                      filled: true,
+                      fillColor: Colors.white,
+                    ),
                   ),
+                  suggestionsCallback: (pattern) {
+                    return allLevel.where((option) =>
+                        option.toLowerCase().contains(pattern.toLowerCase()));
+                  },
+                  itemBuilder: (context, suggestion) {
+                    return ListTile(
+                      tileColor: Colors.white,
+                      title: Text(suggestion),
+                    );
+                  },
+                  onSuggestionSelected: (suggestion) {
+                    controller.level.text = suggestion;
+                    for (int i = 0; i < dataLevel.length; i++) {
+                      if (dataLevel[i].namaLevel == suggestion) {
+                        controller.selectedLevel.value = dataLevel[i].id!;
+                      }
+                    }
+                  },
                 );
               } else if (snapshot.hasError) {
                 return Text('${snapshot.error}');
@@ -180,8 +225,9 @@ class AddPegawaiView extends GetView<AddPegawaiController> {
             controller: controller.username,
             decoration: const InputDecoration(
                 labelText: 'Username',
-                  filled: true,
-                  fillColor: Colors.white, border: OutlineInputBorder()),
+                filled: true,
+                fillColor: Colors.white,
+                border: OutlineInputBorder()),
           ),
           const SizedBox(
             height: 20,
@@ -191,8 +237,9 @@ class AddPegawaiView extends GetView<AddPegawaiController> {
             controller: controller.pass,
             decoration: const InputDecoration(
                 labelText: 'Password',
-                  filled: true,
-                  fillColor: Colors.white, border: OutlineInputBorder()),
+                filled: true,
+                fillColor: Colors.white,
+                border: OutlineInputBorder()),
           ),
           const SizedBox(
             height: 20,
@@ -200,9 +247,10 @@ class AddPegawaiView extends GetView<AddPegawaiController> {
           TextField(
             controller: controller.name,
             decoration: const InputDecoration(
-                labelText: 'Nama', 
-                  filled: true,
-                  fillColor: Colors.white,border: OutlineInputBorder()),
+                labelText: 'Nama',
+                filled: true,
+                fillColor: Colors.white,
+                border: OutlineInputBorder()),
           ),
           const SizedBox(
             height: 20,
@@ -211,109 +259,10 @@ class AddPegawaiView extends GetView<AddPegawaiController> {
             controller: controller.telp,
             decoration: const InputDecoration(
                 labelText: 'No Telp',
-                  filled: true,
-                  fillColor: Colors.white, border: OutlineInputBorder()),
+                filled: true,
+                fillColor: Colors.white,
+                border: OutlineInputBorder()),
             keyboardType: TextInputType.phone,
-          ),
-          const SizedBox(
-            height: 20,
-          ),
-          FutureBuilder(
-            future: controller.getLevel(),
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                var dataLevel = snapshot.data;
-                List<String> allLevel = <String>[];
-                dataLevel!.map((data) {
-                  allLevel.add(data.namaLevel!);
-                }).toList();
-
-                return LayoutBuilder(
-                  builder:(context, constraints) => RawAutocomplete(
-                    key: controller.autocompleteKeyLevel,
-                    focusNode: controller.focusNodelevel,
-                    textEditingController: controller.level,
-                    optionsBuilder: (TextEditingValue textValue) {
-                      if (textValue.text == '') {
-                        return const Iterable<String>.empty();
-                      } else {
-                        List<String> matches = <String>[];
-                        matches.addAll(allLevel);
-                
-                        matches.retainWhere((s) {
-                          return s
-                              .toLowerCase()
-                              .contains(textValue.text.toLowerCase());
-                        });
-                        return matches;
-                      }
-                    },
-                    onSelected: (String selection) {
-                      for (int i = 0; i < dataLevel.length; i++) {
-                        if (dataLevel[i].namaLevel == selection) {
-                          controller.selectedLevel.value = dataLevel[i].id!;
-                          // print(controller.selectedLevel);
-                        }
-                      }
-                    },
-                    fieldViewBuilder: (BuildContext context, mk,
-                        FocusNode focusNode, VoidCallback onFieldSubmitted) {
-                      return TextField(
-                        decoration: const InputDecoration(
-                            labelText: 'Ketik Level User',
-                    filled: true,
-                    fillColor: Colors.white,
-                            border: OutlineInputBorder()),
-                        controller: mk,
-                        focusNode: focusNode,
-                        onSubmitted: (String value) {},
-                      );
-                    },
-                    optionsViewBuilder: (BuildContext context,
-                        void Function(String) onSelected,
-                        Iterable<String> options) {
-                      return Align(
-                        alignment: Alignment.topLeft,
-                        child: Material(
-                            child: SizedBox(
-                          width: constraints.biggest.width,
-                          height: 250,
-                          child: ListView.builder(
-                            itemCount: options.length,
-                            itemBuilder: (context, index) => Column(
-                              children: options.map((opt) {
-                                return InkWell(
-                                    onTap: () {
-                                      onSelected(opt);
-                                    },
-                                    child: Container(
-                                      color: Colors.white,
-                                      width: double.infinity,
-                                      padding: const EdgeInsets.all(10),
-                                      child: Text(opt),
-                                    ));
-                              }).toList(),
-                            ),
-                          ),
-                        )),
-                      );
-                    },
-                  ),
-                );
-              } else if (snapshot.hasError) {
-                return Text('${snapshot.error}');
-              }
-              return Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
-                  Center(
-                    child: CupertinoActivityIndicator(),
-                  ),
-                  SizedBox(width: 5),
-                  Text('Sedang memuat...'),
-                ],
-              );
-            },
           ),
           const SizedBox(
             height: 20,
@@ -322,13 +271,13 @@ class AddPegawaiView extends GetView<AddPegawaiController> {
             padding: const EdgeInsets.symmetric(horizontal: 30),
             child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
-                  minimumSize:  Size(Get.size.width/2, 50)
-                ),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(50)),
+                    minimumSize: Size(Get.size.width / 2, 50)),
                 onPressed: () {
                   controller.addUpdatePegawai("add", [""]);
                 },
-                child: const Text('ADD PEGAWAI')),
+                child: const Text('Submit')),
           )
         ],
       ),

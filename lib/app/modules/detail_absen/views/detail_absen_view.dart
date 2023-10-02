@@ -112,10 +112,18 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
                                 width: 75,
                                 color: Colors.white,
                                 child: Center(
-                                  child: Image.network(
-                                    "${ServiceApi().baseUrl}${Get.arguments['foto_masuk']}",
-                                    fit: BoxFit.cover,
-                                  ),
+                                  child: Get.arguments['foto_profil']
+                                              .toString()
+                                              .substring(0, 5) ==
+                                          "profi"
+                                      ? Image.network(
+                                          "${ServiceApi().baseUrl}${Get.arguments['foto_profil']}",
+                                          fit: BoxFit.cover,
+                                        )
+                                      : Image.network(
+                                          "https://ui-avatars.com/api/?name=${Get.arguments['foto_profil']}",
+                                          fit: BoxFit.cover,
+                                        ),
                                 ),
                               ),
                             ),
@@ -228,9 +236,13 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
                         zoom: 15,
                       ),
                       nonRotatedChildren: [
-                        AttributionWidget.defaultWidget(
-                          source: 'OpenStreetMap contributors',
-                          onSourceTapped: () {},
+                        RichAttributionWidget(
+                          attributions: [
+                            TextSourceAttribution(
+                              'OpenStreetMap contributors',
+                              onTap: () {},
+                            )
+                          ],
                         ),
                       ],
                       children: [
@@ -292,12 +304,18 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
                                 width: 75,
                                 color: Colors.white,
                                 child: Center(
-                                  child: Get.arguments['foto_pulang'] != ""
+                                  child: Get.arguments['foto_profil']
+                                              .toString()
+                                              .substring(0, 5) ==
+                                          "profi"
                                       ? Image.network(
-                                          "${ServiceApi().baseUrl}${Get.arguments['foto_pulang']}",
+                                          "${ServiceApi().baseUrl}${Get.arguments['foto_profil']}",
                                           fit: BoxFit.cover,
                                         )
-                                      : Icon(TernavIcons.lightOutline.image_4),
+                                      : Image.network(
+                                          "https://ui-avatars.com/api/?name=${Get.arguments['foto_profil']}",
+                                          fit: BoxFit.cover,
+                                        ),
                                 ),
                               ),
                             ),
@@ -427,9 +445,13 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
                               zoom: 15,
                             ),
                             nonRotatedChildren: [
-                              AttributionWidget.defaultWidget(
-                                source: 'OpenStreetMap contributors',
-                                onSourceTapped: () {},
+                              RichAttributionWidget(
+                                attributions: [
+                                  TextSourceAttribution(
+                                    'OpenStreetMap contributors',
+                                    onTap: () {},
+                                  )
+                                ],
                               ),
                             ],
                             children: [

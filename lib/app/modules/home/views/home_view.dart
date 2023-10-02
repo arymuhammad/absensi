@@ -8,15 +8,18 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:ternav_icons/ternav_icons.dart';
 
 import '../../../Repo/service_api.dart';
 import '../../../controllers/absen_controller.dart';
+import '../../cek_stok/views/cek_stok_view.dart';
+import '../../login/controllers/login_controller.dart';
 import '../controllers/home_controller.dart';
 
 class HomeView extends GetView<HomeController> {
   HomeView({super.key, this.listDataUser});
   final absenC = Get.put(AbsenController());
-  // final loginC = Get.put(LoginController());
+  final loginC = Get.put(LoginController());
   final List? listDataUser;
 
   @override
@@ -28,7 +31,7 @@ class HomeView extends GetView<HomeController> {
           ClipPath(
             clipper: ClipPathClass(),
             child: Container(
-              height: 200,
+              height: 250,
               width: Get.width,
               color: mainColor,
             ),
@@ -38,63 +41,70 @@ class HomeView extends GetView<HomeController> {
             child: Column(
               children: [
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    InkWell(
-                      onTap: () {
-                        Get.to(() => ProfilView(listDataUser: listDataUser!));
-                      },
-                      child: ClipOval(
-                        child: Hero(
-                          tag: 'pro',
-                          transitionOnUserGestures: true,
-                          child: Container(
-                            height: 75,
-                            width: 75,
-                            color: Colors.grey[200],
-                            child: listDataUser![5] != ""
-                                ? 
-                                CachedNetworkImage(
-                                    imageUrl:
-                                        "${ServiceApi().baseUrl}${listDataUser![5]}",
-                                    fit: BoxFit.cover,
-                                    progressIndicatorBuilder:
-                                        (context, url, progress) =>
-                                            CircularProgressIndicator(
-                                      value: progress.progress,
-                                      strokeWidth: 15,
-                                    ),
-                                  )
-                                : Image.network(
-                                    "https://ui-avatars.com/api/?name=${listDataUser![1]}",
-                                    fit: BoxFit.cover,
-                                  ),
+                    Row(
+                      children: [
+                        InkWell(
+                          onTap: () {
+                            // loginC.selectedMenu(2);
+                            Get.to(
+                                () => ProfilView(listDataUser: listDataUser!));
+                          },
+                          child: ClipOval(
+                            child: Hero(
+                              tag: 'pro',
+                              transitionOnUserGestures: true,
+                              child: Container(
+                                height: 75,
+                                width: 75,
+                                color: Colors.grey[200],
+                                child: listDataUser![5] != ""
+                                    ? CachedNetworkImage(
+                                        imageUrl:
+                                            "${ServiceApi().baseUrl}${listDataUser![5]}",
+                                        fit: BoxFit.cover,
+                                        progressIndicatorBuilder:
+                                            (context, url, progress) =>
+                                                CircularProgressIndicator(
+                                          value: progress.progress,
+                                          strokeWidth: 15,
+                                        ),
+                                        cacheKey:
+                                            "${ServiceApi().baseUrl}${listDataUser![5]} + ${DateTime.now().day.toString()}",
+                                      )
+                                    : Image.network(
+                                        "https://ui-avatars.com/api/?name=${listDataUser![1]}",
+                                        fit: BoxFit.cover,
+                                      ),
+                              ),
+                            ),
                           ),
                         ),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          listDataUser![1].toString().toUpperCase(),
-                          style: const TextStyle(
-                              fontSize: 18, color: Colors.white),
-                        ),
-                        Obx(() => Text(
-                              absenC.lokasi.value.isNotEmpty
-                                  ? absenC.lokasi.value
-                                  : 'Belum ada lokasi',
-                              style: const TextStyle(color: Colors.white),
-                            )),
-                        // Obx(() => Text(
-                        //       absenC.devInfoAnd.value.isNotEmpty
-                        //           ? absenC.devInfoAnd.value
-                        //           : 'Belum ada info andr',
-                        //       style: const TextStyle(color: Colors.white),
-                        //     ))
+                        const SizedBox(width: 10),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Selamat Datang',
+                              style:
+                                  TextStyle(fontSize: 18, color: Colors.white),
+                            ),
+                            Text(
+                              listDataUser![1].toString().capitalize!,
+                              style: const TextStyle(
+                                  fontSize: 18, color: Colors.white),
+                            ),
+                            // Obx(() => Text(
+                            //       absenC.devInfoAnd.value.isNotEmpty
+                            //           ? absenC.devInfoAnd.value
+                            //           : 'Belum ada info andr',
+                            //       style: const TextStyle(color: Colors.white),
+                            //     ))
+                          ],
+                        )
                       ],
-                    )
+                    ),
                   ],
                 ),
                 const SizedBox(height: 20),
@@ -139,21 +149,43 @@ class HomeView extends GetView<HomeController> {
                               decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(15),
                                   color: Colors.white),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text(
-                                    '${listDataUser![4]}',
-                                    style: const TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold),
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        '${listDataUser![4]}',
+                                        style: const TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                      const SizedBox(height: 5),
+                                      Text('${listDataUser![0]}'),
+                                      const SizedBox(height: 5),
+                                      Text(listDataUser![2]
+                                          .toString()
+                                          .toUpperCase()),
+                                    ],
                                   ),
-                                  const SizedBox(height: 5),
-                                  Text('${listDataUser![0]}'),
-                                  const SizedBox(height: 5),
-                                  Text(listDataUser![2]
-                                      .toString()
-                                      .toUpperCase()),
+                                  Column(
+                                    children: [
+                                      IconButton(
+                                          onPressed: () {
+                                            Get.to(() => CekStokView(
+                                                kodeCabang: listDataUser![8]));
+                                          },
+                                          icon: const Icon(
+                                            Icons.content_paste_search,
+                                            size: 45,
+                                          )),
+                                      const SizedBox(height: 2),
+                                      const Text('Cek Stock'),
+                                    ],
+                                  )
                                 ],
                               ),
                             ),
@@ -237,11 +269,15 @@ class HomeView extends GetView<HomeController> {
                                       onPressed: () {
                                         Get.toNamed(Routes.SEMUA_ABSEN,
                                             arguments: {
+                                              "foto_profil":
+                                                  listDataUser![5] != ""
+                                                      ? listDataUser![5]
+                                                      : listDataUser![1],
                                               "id_user": listDataUser![0]
                                             });
                                         absenC.getAllAbsen(listDataUser![0]);
                                       },
-                                      child: const Text('Lihat Detail')),
+                                      child: const Text('Lihat Semua')),
                                   Icon(
                                     Icons.keyboard_arrow_right_rounded,
                                     color: mainColor,
@@ -385,6 +421,10 @@ class HomeView extends GetView<HomeController> {
                                             onTap: () => Get.toNamed(
                                                 Routes.DETAIL_ABSEN,
                                                 arguments: {
+                                                  "foto_profil":
+                                                      listDataUser![5] != ""
+                                                          ? listDataUser![5]
+                                                          : listDataUser![1],
                                                   "nama": absenC
                                                       .dataLimitAbsen[i].nama!,
                                                   "nama_shift": absenC
@@ -396,21 +436,21 @@ class HomeView extends GetView<HomeController> {
                                                   "tanggal": absenC
                                                       .dataLimitAbsen[i]
                                                       .tanggal!,
-                                                  "jam_masuk": DateFormat("HH:mm:ss")
+                                                  "jam_masuk": DateFormat("HH:mm")
                                                           .parse(absenC
                                                               .dataLimitAbsen[i]
                                                               .jamAbsenMasuk!)
-                                                          .isBefore(DateFormat("HH:mm:ss").parse(absenC
+                                                          .isBefore(DateFormat("HH:mm").parse(absenC
                                                               .dataLimitAbsen[i]
                                                               .jamMasuk!))
                                                       ? "Awal Waktu"
-                                                      : DateFormat("HH:mm:ss")
+                                                      : DateFormat("HH:mm")
                                                               .parse(absenC
                                                                   .dataLimitAbsen[
                                                                       i]
                                                                   .jamAbsenMasuk!)
                                                               .isAtSameMomentAs(
-                                                                  DateFormat("HH:mm:ss")
+                                                                  DateFormat("HH:mm")
                                                                       .parse(absenC
                                                                           .dataLimitAbsen[i]
                                                                           .jamMasuk!))
@@ -421,29 +461,24 @@ class HomeView extends GetView<HomeController> {
                                                               .jamAbsenPulang! ==
                                                           ""
                                                       ? "Belum Absen"
-                                                      : DateFormat("HH:mm:ss")
+                                                      : DateFormat("HH:mm")
                                                               .parse(absenC
                                                                   .dataLimitAbsen[
                                                                       i]
                                                                   .jamAbsenPulang!)
-                                                              .isBefore(DateFormat(
-                                                                      "HH:mm:ss")
+                                                              .isBefore(DateFormat("HH:mm")
                                                                   .parse(absenC
                                                                       .dataLimitAbsen[
                                                                           i]
                                                                       .jamPulang!))
-                                                          ? "Pulang Cepat": DateFormat("HH:mm:ss")
-                                                              .parse(absenC
-                                                                  .dataLimitAbsen[
-                                                                      i]
-                                                                  .jamAbsenPulang!)
-                                                              .isAtSameMomentAs(
-                                                                  DateFormat("HH:mm:ss")
-                                                                      .parse(absenC
-                                                                          .dataLimitAbsen[i]
-                                                                          .jamPulang!))
-                                                          ? "Tepat Waktu"
-                                                          : "Lembur",
+                                                          ? "Pulang Cepat"
+                                                          : DateFormat("HH:mm")
+                                                                  .parse(absenC
+                                                                      .dataLimitAbsen[i]
+                                                                      .jamAbsenPulang!)
+                                                                  .isAtSameMomentAs(DateFormat("HH:mm").parse(absenC.dataLimitAbsen[i].jamPulang!))
+                                                              ? "Tepat Waktu"
+                                                              : "Lembur",
                                                   "jam_absen_masuk": absenC
                                                       .dataLimitAbsen[i]
                                                       .jamAbsenMasuk!,

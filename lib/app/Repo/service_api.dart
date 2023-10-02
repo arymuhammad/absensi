@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:absensi/app/model/cabang_model.dart';
 import 'package:absensi/app/model/cek_absen_model.dart';
+import 'package:absensi/app/model/cek_stok_model.dart';
 import 'package:absensi/app/model/cek_user_model.dart';
 import 'package:absensi/app/model/level_model.dart';
 import 'package:absensi/app/model/shift_kerja_model.dart';
@@ -12,11 +12,12 @@ import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import '../helper/loading_dialog.dart';
 import '../model/absen_model.dart';
+import '../model/foto_profil_model.dart';
 import '../model/login_model.dart';
 import 'app_exceptions.dart';
 
 class ServiceApi {
-  var baseUrl = "https://api.attendance.urbanco.id/";
+  var baseUrl = "https://attendance.urbanco.id/api/";
   var isLoading = false.obs;
 
   loginUser(data) async {
@@ -90,9 +91,26 @@ class ServiceApi {
     isLoading.value = false;
   }
 
-  getCabang() async {
+  getBrandCabang() async {
     try {
-      final response = await http.get(Uri.parse('${baseUrl}cabang'));
+      final response = await http.get(Uri.parse('${baseUrl}brand_cabang'));
+      switch (response.statusCode) {
+        case 200:
+          List<dynamic> result = json.decode(response.body)['data'];
+          List<Cabang> data = result.map((e) => Cabang.fromJson(e)).toList();
+          return data;
+        default:
+          throw Exception(response.reasonPhrase);
+      }
+    } on SocketException catch (_) {
+      rethrow;
+    }
+  }
+
+  getCabang(Map<String, dynamic>? data) async {
+    try {
+      final response =
+          await http.post(Uri.parse('${baseUrl}cabang'), body: data);
       switch (response.statusCode) {
         case 200:
           List<dynamic> result = json.decode(response.body)['data'];
@@ -210,11 +228,11 @@ class ServiceApi {
       var responseString = utf8.decode(responseBytes);
 
       //debug
-      debugPrint("response code: ${res.statusCode}");
-      debugPrint("response: $responseString");
+      // debugPrint("response code: ${res.statusCode}");
+      // debugPrint("response: $responseString");
 
       final dataDecode = jsonDecode(responseString);
-      debugPrint(dataDecode.toString());
+      // debugPrint(dataDecode.toString());
 
       if (res.statusCode == 200) {
         // return showDialogSuccess('Sukses', 'Event Berhasil Dibuat');
@@ -356,6 +374,60 @@ class ServiceApi {
     }
   }
 
+  getFotoProfil(idUser) async {
+    try {
+      final response =
+          await http.post(Uri.parse('${baseUrl}get_foto_profil'), body: idUser);
+      switch (response.statusCode) {
+        case 200:
+          final result = json.decode(response.body)['data'];
+          // FotoProfil foto = result.map((e) =>
+          // print(result);
+          return FotoProfil.fromJson(result);
+        case 400:
+        case 401:
+        case 402:
+        case 404:
+          final result = json.decode(response.body);
+          throw FetchDataException(result["message"]);
+        default:
+          throw FetchDataException(
+            'Something went wrong.',
+          );
+      }
+    } on FetchDataException catch (e) {
+      // print('error caught: ${e.message}');
+      showToast("${e.message}");
+    }
+  }
+
+  getUser() async {
+    try {
+      final response = await http.get(Uri.parse('${baseUrl}get_user'));
+      switch (response.statusCode) {
+        case 200:
+          List<dynamic> result = json.decode(response.body)['data'];
+
+          List<CekUser> dataUser =
+              result.map((e) => CekUser.fromJson(e)).toList();
+          return dataUser;
+        case 400:
+        case 401:
+        case 402:
+        case 404:
+          final result = json.decode(response.body);
+          throw FetchDataException(result["message"]);
+        default:
+          throw FetchDataException(
+            'Something went wrong.',
+          );
+      }
+    } on FetchDataException catch (e) {
+      // print('error caught: ${e.message}');
+      showToast("${e.message}");
+    }
+  }
+
   cekUser(Map<String, String> data) async {
     try {
       final response =
@@ -429,6 +501,35 @@ class ServiceApi {
           throw FetchDataException(
             'Something went wrong.',
           );
+      }
+    } on FetchDataException catch (e) {
+      // print('error caught: ${e.message}');
+      showToast("${e.message}");
+    }
+  }
+
+  getDataStok(data) async {
+    try {
+      final response =
+          await http.post(Uri.parse('${baseUrl}cek_stok'), body: data);
+      switch (response.statusCode) {
+        case 200:
+          List<dynamic> result = json.decode(response.body)['data'];
+          // print(result);
+          // print(data);
+          // print('${baseUrl}cek_stok');
+          List<CekStok> dataUser =
+              result.map((e) => CekStok.fromJson(e)).toList();
+          return dataUser;
+        case 400:
+        case 401:
+        case 402:
+        case 404:
+          final result = json.decode(response.body);
+          throw FetchDataException(result["message"]);
+        default:
+          final result = json.decode(response.body);
+          throw FetchDataException(result["message"]);
       }
     } on FetchDataException catch (e) {
       // print('error caught: ${e.message}');

@@ -2,6 +2,8 @@ import 'package:get/get.dart';
 
 import '../modules/add_pegawai/bindings/add_pegawai_binding.dart';
 import '../modules/add_pegawai/views/add_pegawai_view.dart';
+import '../modules/cek_stok/bindings/cek_stok_binding.dart';
+import '../modules/cek_stok/views/cek_stok_view.dart';
 import '../modules/detail_absen/bindings/detail_absen_binding.dart';
 import '../modules/detail_absen/views/detail_absen_view.dart';
 import '../modules/home/bindings/home_binding.dart';
@@ -51,5 +53,10 @@ class AppPages {
         page: () => SemuaAbsenView(),
         binding: SemuaAbsenBinding(),
         transition: Transition.fadeIn),
+    GetPage(
+      name: _Paths.CEK_STOK,
+      page: () => CekStokView(),
+      binding: CekStokBinding(),
+    ),
   ];
 }

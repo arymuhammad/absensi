@@ -1,53 +1,80 @@
 name: absensi
-version: 1.0.0+1
+version: 1.0.10+10
 publish_to: none
-description: A new Flutter project.
-environment: 
+description: Absensi App
+environment:
   sdk: '>=2.19.2 <3.0.0'
 
-dependencies: 
-  cupertino_icons: ^1.0.2
-  get: 4.6.5
-  fluttertoast: 8.2.1
-  geolocator: 9.0.2
-  geocoding: 2.1.0
-  http: 0.13.5
-  shared_preferences: 2.0.16
-  permission_handler: ^10.2.0
-  image_picker: 0.8.7
+dependencies:
   cached_network_image: 3.2.3
-  intl: 0.18.0
-  shimmer: 2.0.0
-  full_screen_image_null_safe: 2.0.0
-  photo_view: 0.14.0
-  image_picker_web: 3.0.0+1
+  client_information: 2.0.3+1
+  convex_bottom_bar: 3.2.0
+  cupertino_icons: ^1.0.2
+  datetime_picker_formfield: 2.0.1
+  device_info_plus: ^8.2.2
+  excel: ^2.1.0
   file_picker: 5.2.6
-  url_strategy: 0.2.0
-  ternav_icons: 1.0.0
-  http_parser: 4.0.2
-  latlong: ^0.6.1
+  flutter:
+    sdk: flutter
+  flutter_barcode_scanner: 2.0.0
+  flutter_launcher_icons: ^0.13.1
   flutter_map: any
   flutter_map_marker_cluster: any
   flutter_native_timezone: 2.0.0
-  datetime_picker_formfield: 2.0.1
-  client_information: 2.0.3+1
-  convex_bottom_bar: 3.2.0
+  flutter_typeahead: ^4.6.2
+  fluttertoast: 8.2.1
+  full_screen_image_null_safe: 2.0.0
+  geocoding: 2.1.0
+  geolocator: 9.0.2
+  get: 4.6.5
+  http: 0.13.5
+  http_parser: 4.0.2
+  image_picker: 0.8.7
+  image_picker_web: 3.0.0+1
+  intl: 0.18.0
+  latlong: ^0.6.1
+  ota_update: ^5.1.0
+  package_info_plus: ^3.1.2
+  # pdf: ^3.10.4
+  percent_indicator: ^4.2.3
+  permission_handler: ^10.2.0
+  photo_view: 0.14.0
   printing: 5.10.3
-  pdf: 3.10.1
-  flutter: 
-    sdk: flutter
+  shared_preferences: 2.0.16
+  shimmer: 2.0.0
+  ternav_icons: 1.0.0
+  url_strategy: 0.2.0
+  xml: ^6.2.2
 
-dev_dependencies: 
+dev_dependencies:
   flutter_lints: 2.0.1
-  flutter_test: 
+  flutter_test:
     sdk: flutter
 
-flutter: 
-  assets: 
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/image/selfie.png"
+  min_sdk_android: 21 # android min sdk min:16, default 21
+  web:
+    generate: true
+    image_path: "assets/image/selfie.png"
+    background_color: "#hexcode"
+    theme_color: "#hexcode"
+  windows:
+    generate: true
+    image_path: "assets/image/selfie.png"
+    icon_size: 48 # min:48, max:256, default: 48
+  macos:
+    generate: true
+    image_path: "assets/image/selfie.png"
+
+flutter:
+  assets:
     - assets/image/
-  fonts: 
+  fonts:
     - family: Nunito
-      fonts: 
+      fonts:
         - asset: assets/fonts/Nunito-Black.ttf
         - asset: assets/fonts/Nunito-BlackItalic.ttf
         - asset: assets/fonts/Nunito-Bold.ttf
@@ -58,4 +85,3 @@ flutter:
         - asset: assets/fonts/Nunito-Medium.ttf
         - asset: assets/fonts/Nunito-Regular.ttf
   uses-material-design: true
-

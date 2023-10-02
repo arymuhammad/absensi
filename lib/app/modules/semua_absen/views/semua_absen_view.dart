@@ -24,14 +24,14 @@ class SemuaAbsenView extends GetView<SemuaAbsenController> {
       appBar: AppBar(
         title: const Text('RIWAYAT ABSENSI'),
         centerTitle: true,
-        actions: [
-          IconButton(
-              onPressed: () {
-                PrintKasirState(dataPrint: absenC.searchAbsen, item: null)
-                    .createPdf();
-              },
-              icon: const Icon(Icons.picture_as_pdf_rounded))
-        ],
+        // actions: [
+        //   IconButton(
+        //       onPressed: () {
+        //         PrintKasirState(dataPrint: absenC.searchAbsen, item: null)
+        //             .createPdf();
+        //       },
+        //       icon: const Icon(Icons.picture_as_pdf_rounded))
+        // ],
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -216,16 +216,17 @@ class SemuaAbsenView extends GetView<SemuaAbsenController> {
                                 onTap: () {
                                   absenC.searchAbsen;
                                   Get.toNamed(Routes.DETAIL_ABSEN, arguments: {
+                                    "foto_profil": Get.arguments['foto_profil'],
                                     "nama": absenC.searchAbsen[i].nama!,
                                     "nama_shift":
                                         absenC.searchAbsen[i].namaShift!,
                                     "id_user": absenC.searchAbsen[i].idUser!,
                                     "tanggal": absenC.searchAbsen[i].tanggal!,
-                                    "jam_masuk": DateFormat("HH:mm:ss")
+                                    "jam_masuk": DateFormat("HH:mm")
                                             .parse(absenC
                                                 .searchAbsen[i].jamAbsenMasuk!)
-                                            .isBefore(DateFormat("HH:mm:ss")
-                                                .parse(absenC
+                                            .isBefore(DateFormat("HH:mm").parse(
+                                                absenC
                                                     .searchAbsen[i].jamMasuk!))
                                         ? "Awal Waktu"
                                         : "Telat",
@@ -233,10 +234,10 @@ class SemuaAbsenView extends GetView<SemuaAbsenController> {
                                                 .jamAbsenPulang! ==
                                             ""
                                         ? "Belum Absen"
-                                        : DateFormat("HH:mm:ss")
+                                        : DateFormat("HH:mm")
                                                 .parse(absenC.searchAbsen[i]
                                                     .jamAbsenPulang!)
-                                                .isBefore(DateFormat("HH:mm:ss")
+                                                .isBefore(DateFormat("HH:mm")
                                                     .parse(absenC.searchAbsen[i]
                                                         .jamPulang!))
                                             ? "Pulang Cepat"
