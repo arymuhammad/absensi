@@ -7,7 +7,7 @@ class CekStok {
   String? merk;
   String? warna;
   String? ukuran;
-  String? sISA;
+  String? sisa;
 
   CekStok(
       {this.kodeBarang,
@@ -18,7 +18,7 @@ class CekStok {
       this.merk,
       this.warna,
       this.ukuran,
-      this.sISA});
+      this.sisa});
 
   CekStok.fromJson(Map<String, dynamic> json) {
     kodeBarang = json['Kode_Barang'];
@@ -29,7 +29,7 @@ class CekStok {
     merk = json['Merk'];
     warna = json['Warna'];
     ukuran = json['Ukuran'];
-    sISA = json['SISA'];
+    sisa = json['SISA'];
   }
 
   Map<String, dynamic> toJson() {
@@ -42,7 +42,7 @@ class CekStok {
     data['Merk'] = merk;
     data['Warna'] = warna;
     data['Ukuran'] = ukuran;
-    data['SISA'] = sISA;
+    data['SISA'] = sisa;
     return data;
   }
 }

@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'dart:math';
 import 'package:absensi/app/helper/const.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/services.dart';
@@ -104,14 +103,11 @@ class AbsenController extends GetxController {
     getCabang();
 
     PackageInfo.fromPlatform().then((PackageInfo packageInfo) {
-      String appName = packageInfo.appName;
-      String packageName = packageInfo.packageName;
+      // String appName = packageInfo.appName;
+      // String packageName = packageInfo.packageName;
       currVer = packageInfo.version;
-      String buildNumber = packageInfo.buildNumber;
-      // print(appName);
-      // print(packageName);
-      // print(currVer);
-      // print(buildNumber);
+      // String buildNumber = packageInfo.buildNumber;
+    
     });
 
     final readDoc = await http

@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 
 import 'package:get/get.dart';
-import 'package:ternav_icons/ternav_icons.dart';
 
 import '../controllers/cek_stok_controller.dart';
 
@@ -85,16 +84,15 @@ class CekStokView extends GetView<CekStokController> {
               thickness: 2,
             ),
           ),
-
           Obx(
             () => Visibility(
               visible: cekStokC.dataStok.isNotEmpty ? true : false,
-              child: Padding(
-                padding: const EdgeInsets.only(left: 20.0, right: 20.0),
+              child: const Padding(
+                padding: EdgeInsets.only(left: 20.0, right: 20.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   mainAxisSize: MainAxisSize.max,
-                  children: const [
+                  children: [
                     Text(
                       'Nama Barang',
                       style:
@@ -114,8 +112,8 @@ class CekStokView extends GetView<CekStokController> {
                     children: [
                       Padding(
                         padding: EdgeInsets.only(top: Get.size.height / 3),
-                        child: Column(
-                          children: const [
+                        child: const Column(
+                          children: [
                             Center(
                               child: Text('Tidak ada data'),
                             ),
@@ -130,260 +128,11 @@ class CekStokView extends GetView<CekStokController> {
                     itemBuilder: (ctx, i) {
                       return ListTile(
                         title: Text(cekStokC.dataStok[i].namaBarang!),
-                        trailing: Text(cekStokC.dataStok[i].sISA!),
+                        trailing: Text(cekStokC.dataStok[i].sisa!),
                       );
                     },
                   )),
           )
-          // Expanded(
-          //   child: Obx(
-          //     () => absenC.isLoading.value
-          //         ? ListView.builder(
-          //             padding: const EdgeInsets.only(
-          //                 bottom: 20.0, left: 20.0, right: 20.0),
-          //             itemCount: 3,
-          //             itemBuilder: (context, index) {
-          //               return Container(
-          //                 margin: const EdgeInsets.only(bottom: 20),
-          //                 padding: const EdgeInsets.all(10),
-          //                 decoration: BoxDecoration(
-          //                     color: Colors.grey[200],
-          //                     borderRadius: BorderRadius.circular(20)),
-          //                 child: Column(
-          //                   crossAxisAlignment: CrossAxisAlignment.start,
-          //                   children: [
-          //                     Row(
-          //                       mainAxisAlignment:
-          //                           MainAxisAlignment.spaceBetween,
-          //                       children: [
-          //                         Shimmer.fromColors(
-          //                           baseColor: Colors.grey,
-          //                           highlightColor: const Color.fromARGB(
-          //                               255, 238, 238, 238),
-          //                           child: Container(
-          //                             width: 60,
-          //                             height: 15,
-          //                             decoration: BoxDecoration(
-          //                                 color: Colors.white,
-          //                                 borderRadius:
-          //                                     BorderRadius.circular(10)),
-          //                           ),
-          //                         ),
-          //                         Shimmer.fromColors(
-          //                           baseColor: Colors.grey,
-          //                           highlightColor: const Color.fromARGB(
-          //                               255, 238, 238, 238),
-          //                           child: Container(
-          //                             width: 130,
-          //                             height: 15,
-          //                             decoration: BoxDecoration(
-          //                                 color: Colors.white,
-          //                                 borderRadius:
-          //                                     BorderRadius.circular(10)),
-          //                           ),
-          //                         )
-          //                       ],
-          //                     ),
-          //                     const SizedBox(
-          //                       height: 8,
-          //                     ),
-          //                     Shimmer.fromColors(
-          //                       baseColor: Colors.grey,
-          //                       highlightColor:
-          //                           const Color.fromARGB(255, 238, 238, 238),
-          //                       child: Container(
-          //                         width: 70,
-          //                         height: 15,
-          //                         decoration: BoxDecoration(
-          //                             color: Colors.white,
-          //                             borderRadius: BorderRadius.circular(10)),
-          //                       ),
-          //                     ),
-          //                     const SizedBox(
-          //                       height: 8,
-          //                     ),
-          //                     Shimmer.fromColors(
-          //                       baseColor: Colors.grey,
-          //                       highlightColor:
-          //                           const Color.fromARGB(255, 238, 238, 238),
-          //                       child: Container(
-          //                         width: 60,
-          //                         height: 15,
-          //                         decoration: BoxDecoration(
-          //                             color: Colors.white,
-          //                             borderRadius: BorderRadius.circular(10)),
-          //                       ),
-          //                     ),
-          //                     const SizedBox(
-          //                       height: 8,
-          //                     ),
-          //                     Shimmer.fromColors(
-          //                       baseColor: Colors.grey,
-          //                       highlightColor:
-          //                           const Color.fromARGB(255, 238, 238, 238),
-          //                       child: Container(
-          //                         width: 70,
-          //                         height: 15,
-          //                         decoration: BoxDecoration(
-          //                             color: Colors.white,
-          //                             borderRadius: BorderRadius.circular(10)),
-          //                       ),
-          //                     ),
-          //                   ],
-          //                 ),
-          //               );
-          //             },
-          //           )
-          //         : absenC.searchAbsen.isEmpty
-          //             ? RefreshIndicator(
-          //                 onRefresh: () {
-          //                   return Future.delayed(const Duration(seconds: 1),
-          //                       () async {
-          //                     // await absenC
-          //                     //     .getAllAbsen(Get.arguments["id_user"]);
-          //                     // showToast("Halaman Disegarkan.");
-          //                   });
-          //                 },
-          //                 child: ListView(
-          //                   physics: const AlwaysScrollableScrollPhysics(),
-          //                   children: [
-          //                     Padding(
-          //                       padding:
-          //                           EdgeInsets.only(top: Get.size.height / 3),
-          //                       child: Column(
-          //                         children: const [
-          //                           Center(
-          //                             child: Text('Belum ada data absen'),
-          //                           ),
-          //                         ],
-          //                       ),
-          //                     ),
-          //                   ],
-          //                 ),
-          //               )
-          //             : RefreshIndicator(
-          //                 onRefresh: () {
-          //                   return Future.delayed(const Duration(seconds: 1),
-          //                       () async {
-          //                     // await absenC
-          //                     //     .getAllAbsen(absenC.searchAbsen[0].idUser!);
-          //                     // showToast("Halaman Disegarkan.");
-          //                   });
-          //                 },
-          //                 child: Container(),
-          //                 // child: ListView.builder(
-          //                 //   shrinkWrap: true,
-          //                 //   padding: const EdgeInsets.only(
-          //                 //       bottom: 20.0, left: 20.0, right: 20.0),
-          //                 //   itemCount: absenC.searchAbsen.length,
-          //                 //   itemBuilder: (c, i) {
-          //                 //     return InkWell(
-          //                 //       onTap: () {
-          //                 //         absenC.searchAbsen;
-          //                 //         Get.toNamed(Routes.DETAIL_ABSEN, arguments: {
-          //                 //           "nama": absenC.searchAbsen[i].nama!,
-          //                 //           "nama_shift":
-          //                 //               absenC.searchAbsen[i].namaShift!,
-          //                 //           "id_user": absenC.searchAbsen[i].idUser!,
-          //                 //           "tanggal": absenC.searchAbsen[i].tanggal!,
-          //                 //           "jam_masuk": DateFormat("HH:mm:ss")
-          //                 //                   .parse(absenC
-          //                 //                       .searchAbsen[i].jamAbsenMasuk!)
-          //                 //                   .isBefore(DateFormat("HH:mm:ss")
-          //                 //                       .parse(absenC
-          //                 //                           .searchAbsen[i].jamMasuk!))
-          //                 //               ? "Awal Waktu"
-          //                 //               : "Telat",
-          //                 //           "jam_pulang": absenC.searchAbsen[i]
-          //                 //                       .jamAbsenPulang! ==
-          //                 //                   ""
-          //                 //               ? "Belum Absen"
-          //                 //               : DateFormat("HH:mm:ss")
-          //                 //                       .parse(absenC.searchAbsen[i]
-          //                 //                           .jamAbsenPulang!)
-          //                 //                       .isBefore(DateFormat("HH:mm:ss")
-          //                 //                           .parse(absenC.searchAbsen[i]
-          //                 //                               .jamPulang!))
-          //                 //                   ? "Pulang Cepat"
-          //                 //                   : "Lembur",
-          //                 //           "jam_absen_masuk":
-          //                 //               absenC.searchAbsen[i].jamAbsenMasuk!,
-          //                 //           "jam_absen_pulang":
-          //                 //               absenC.searchAbsen[i].jamAbsenPulang!,
-          //                 //           "foto_masuk":
-          //                 //               absenC.searchAbsen[i].fotoMasuk!,
-          //                 //           "foto_pulang":
-          //                 //               absenC.searchAbsen[i].fotoPulang!,
-          //                 //           "lat_masuk":
-          //                 //               absenC.searchAbsen[i].latMasuk!,
-          //                 //           "long_masuk":
-          //                 //               absenC.searchAbsen[i].longMasuk!,
-          //                 //           "lat_pulang":
-          //                 //               absenC.searchAbsen[i].latPulang!,
-          //                 //           "long_pulang":
-          //                 //               absenC.searchAbsen[i].longPulang!,
-          //                 //           "device_info":
-          //                 //               absenC.searchAbsen[i].devInfo!,
-          //                 //           "device_info2":
-          //                 //               absenC.searchAbsen[i].devInfo2!,
-          //                 //         });
-          //                 //         absenC.filterAbsen.clear();
-          //                 //         absenC.filterDataAbsen("");
-          //                 //       },
-          //                 //       child: Container(
-          //                 //         margin: const EdgeInsets.only(bottom: 20),
-          //                 //         padding: const EdgeInsets.all(10),
-          //                 //         decoration: BoxDecoration(
-          //                 //             color: Colors.white,
-          //                 //             borderRadius: BorderRadius.circular(20)),
-          //                 //         child: Column(
-          //                 //           crossAxisAlignment:
-          //                 //               CrossAxisAlignment.start,
-          //                 //           children: [
-          //                 //             Row(
-          //                 //               mainAxisAlignment:
-          //                 //                   MainAxisAlignment.spaceBetween,
-          //                 //               children: [
-          //                 //                 const Text(
-          //                 //                   'Masuk',
-          //                 //                   style: TextStyle(
-          //                 //                       fontWeight: FontWeight.bold),
-          //                 //                 ),
-          //                 //                 Text(
-          //                 //                     DateFormat("EEEE, d MMMM yyyy",
-          //                 //                             "id_ID")
-          //                 //                         .format(DateTime.parse(absenC
-          //                 //                             .searchAbsen[i]
-          //                 //                             .tanggal!)),
-          //                 //                     style: const TextStyle(
-          //                 //                         fontWeight: FontWeight.bold)),
-          //                 //               ],
-          //                 //             ),
-          //                 //             Text(
-          //                 //                 absenC.searchAbsen[i].jamAbsenMasuk!),
-          //                 //             const SizedBox(
-          //                 //               height: 8,
-          //                 //             ),
-          //                 //             const Text(
-          //                 //               'Keluar',
-          //                 //               style: TextStyle(
-          //                 //                   fontWeight: FontWeight.bold),
-          //                 //             ),
-          //                 //             Text(absenC.searchAbsen[i]
-          //                 //                         .jamAbsenPulang !=
-          //                 //                     ""
-          //                 //                 ? absenC
-          //                 //                     .searchAbsen[i].jamAbsenPulang!
-          //                 //                 : "-"),
-          //                 //           ],
-          //                 //         ),
-          //                 //       ),
-          //                 //     );
-          //                 //   },
-          //                 // ),
-          //               ),
-          //   ),
-          // ),
         ],
       ),
     );

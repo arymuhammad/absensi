@@ -1,7 +1,5 @@
 import 'package:absensi/app/Repo/service_api.dart';
-import 'package:absensi/app/helper/loading_dialog.dart';
 import 'package:absensi/app/model/cek_stok_model.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -28,15 +26,15 @@ class CekStokController extends GetxController {
     // loadingDialog("Loading data ...", "");
     Get.defaultDialog(
         title: '',
-        content: Center(
+        content: const Center(
             child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const CircularProgressIndicator(),
-            const SizedBox(
+            CircularProgressIndicator(),
+            SizedBox(
               height: 10,
             ),
-            const Text("Loading data ..."),
+            Text("Loading data ..."),
             // StreamBuilder(
             //   stream: getElapsed(),
             //   builder: (context, snapshot) {

@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:absensi/app/model/cabang_model.dart';
@@ -213,6 +212,7 @@ class ServiceApi {
       // debugPrint("response code: ${res.statusCode}");
       // debugPrint("response: $responseString");
 
+      // ignore: unused_local_variable
       final dataDecode = jsonDecode(responseString);
       // debugPrint(dataDecode.toString());
 

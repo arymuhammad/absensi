@@ -6,7 +6,6 @@ import 'package:intl/intl.dart';
 
 // ignore: depend_on_referenced_packages
 import 'package:latlong2/latlong.dart';
-import 'package:ternav_icons/ternav_icons.dart';
 import '../../../Repo/service_api.dart';
 import '../controllers/detail_absen_controller.dart';
 import 'package:flutter_map/flutter_map.dart'; // Suitable for most situations

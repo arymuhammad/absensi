@@ -1,6 +1,5 @@
 import 'package:absensi/app/helper/const.dart';
 import 'package:absensi/app/helper/loading_dialog.dart';
-import 'package:absensi/app/modules/absen/views/absen_view.dart';
 import 'package:absensi/app/modules/profil/views/profil_view.dart';
 import 'package:absensi/app/modules/semua_absen/views/semua_absen_view.dart';
 import 'package:absensi/app/routes/app_pages.dart';
@@ -11,7 +10,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:shimmer/shimmer.dart';
-import 'package:ternav_icons/ternav_icons.dart';
 
 import '../../../Repo/service_api.dart';
 import '../../../controllers/absen_controller.dart';
@@ -238,14 +236,6 @@ class HomeView extends GetView<HomeController> {
                                   children: [
                                     Column(
                                       children: [
-                                        // OutlinedButton(
-                                        //     onPressed: () {
-                                        //       Get.to(() =>
-                                        //           AbsenView(data: listDataUser));
-                                        //       absenC.determinePosition();
-                                        // absenC.getLoc(listDataUser!);
-                                        //     },
-                                        //     child: const Text('Masuk')),
                                         const Text(
                                           'Masuk',
                                           style: TextStyle(

@@ -13,7 +13,6 @@ import '../../../routes/app_pages.dart';
 import '../controllers/semua_absen_controller.dart';
 import 'package:intl/intl.dart';
 
-import 'print_absen.dart';
 
 class SemuaAbsenView extends GetView<SemuaAbsenController> {
   SemuaAbsenView({Key? key}) : super(key: key);
@@ -227,8 +226,8 @@ class SemuaAbsenView extends GetView<SemuaAbsenController> {
                                 Padding(
                                   padding:
                                       EdgeInsets.only(top: Get.size.height / 3),
-                                  child: Column(
-                                    children: const [
+                                  child: const Column(
+                                    children: [
                                       Center(
                                         child: Text('Belum ada data absen'),
                                       ),
@@ -269,25 +268,24 @@ class SemuaAbsenView extends GetView<SemuaAbsenController> {
                                           "tanggal":
                                               absenC.searchAbsen[i].tanggal!,
                                           "jam_masuk": DateFormat("HH:mm")
-                                                          .parse(absenC
-                                                              .searchAbsen[i]
-                                                              .jamAbsenMasuk!)
-                                                          .isBefore(
-                                                              DateFormat("HH:mm")
-                                                                  .parse(absenC
-                                                                      .searchAbsen[
-                                                                          i]
-                                                                      .jamMasuk!))
-                                                      ? "Awal Waktu"
-                                                      : DateFormat("HH:mm")
+                                                  .parse(absenC.searchAbsen[i]
+                                                      .jamAbsenMasuk!)
+                                                  .isBefore(DateFormat("HH:mm")
+                                                      .parse(absenC
+                                                          .searchAbsen[i]
+                                                          .jamMasuk!))
+                                              ? "Awal Waktu"
+                                              : DateFormat("HH:mm")
+                                                      .parse(absenC
+                                                          .searchAbsen[i]
+                                                          .jamAbsenMasuk!)
+                                                      .isAtSameMomentAs(
+                                                          DateFormat("HH:mm")
                                                               .parse(absenC
-                                                                  .searchAbsen[
-                                                                      i]
-                                                                  .jamAbsenMasuk!)
-                                                              .isAtSameMomentAs(
-                                                                  DateFormat("HH:mm").parse(absenC.searchAbsen[i].jamMasuk!))
-                                                          ? "Tepat Waktu"
-                                                          : "Telat",
+                                                                  .searchAbsen[i]
+                                                                  .jamMasuk!))
+                                                  ? "Tepat Waktu"
+                                                  : "Telat",
                                           "jam_pulang": absenC.searchAbsen[i]
                                                       .jamAbsenPulang! ==
                                                   ""
@@ -339,27 +337,23 @@ class SemuaAbsenView extends GetView<SemuaAbsenController> {
                                             padding: const EdgeInsets.all(10),
                                             decoration: BoxDecoration(
                                                 color: DateFormat("HH:mm")
-                                                          .parse(absenC
-                                                              .searchAbsen[i]
-                                                              .jamAbsenMasuk!)
-                                                          .isBefore(
-                                                              DateFormat("HH:mm")
-                                                                  .parse(absenC
-                                                                      .searchAbsen[
-                                                                          i]
-                                                                      .jamMasuk!))
-                                                      ? Colors.greenAccent[700]
-                                                      : DateFormat("HH:mm")
-                                                              .parse(absenC
-                                                                  .searchAbsen[
-                                                                      i]
-                                                                  .jamAbsenMasuk!)
-                                                              .isAtSameMomentAs(
-                                                                  DateFormat("HH:mm").parse(absenC.searchAbsen[i].jamMasuk!))
-                                                          ? Colors.greenAccent[700]
-                                                          : Colors.redAccent[700],
-                                                borderRadius:
-                                                    const BorderRadius.only(
+                                                        .parse(absenC
+                                                            .searchAbsen[i]
+                                                            .jamAbsenMasuk!)
+                                                        .isBefore(DateFormat("HH:mm")
+                                                            .parse(absenC
+                                                                .searchAbsen[i]
+                                                                .jamMasuk!))
+                                                    ? Colors.greenAccent[700]
+                                                    : DateFormat("HH:mm")
+                                                            .parse(absenC
+                                                                .searchAbsen[i]
+                                                                .jamAbsenMasuk!)
+                                                            .isAtSameMomentAs(DateFormat("HH:mm")
+                                                                .parse(absenC.searchAbsen[i].jamMasuk!))
+                                                        ? Colors.greenAccent[700]
+                                                        : Colors.redAccent[700],
+                                                borderRadius: const BorderRadius.only(
                                                   topLeft: Radius.circular(5),
                                                   bottomLeft:
                                                       Radius.circular(5),

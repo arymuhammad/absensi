@@ -10,8 +10,6 @@ import 'package:flutter/material.dart';
 import 'package:full_screen_image_null_safe/full_screen_image_null_safe.dart';
 
 import 'package:get/get.dart';
-import 'package:photo_view/photo_view.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ternav_icons/ternav_icons.dart';
 
 import '../../../Repo/service_api.dart';
@@ -212,22 +210,6 @@ class ProfilView extends GetView<ProfilController> {
                 ListTile(
                   onTap: () {
                     promptDialog(context, 'Anda yakin ingin keluar?');
-                    // Get.defaultDialog(
-                    //   barrierDismissible: false,
-                    //   radius: 5,
-                    //   title: 'Peringatan',
-                    //   middleText: 'Anda yakin ingin keluar?',
-                    //   onConfirm: () {
-                    //     auth.logout();
-                    //     Get.back();
-                    //   },
-                    //   textConfirm: 'Keluar',
-                    //   confirmTextColor: Colors.white,
-                    //   onCancel: () {
-                    //     Get.back();
-                    //   },
-                    //   textCancel: 'Batal',
-                    // );
                   },
                   leading: Icon(
                     TernavIcons.lightOutline.logout,
