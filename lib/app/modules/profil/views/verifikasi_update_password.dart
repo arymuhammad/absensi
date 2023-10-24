@@ -11,6 +11,15 @@ class VerifikasiUpdatePassword extends GetView {
       appBar: AppBar(
         title: const Text('VERIFIKASI USER'),
         centerTitle: true,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage(
+                  'assets/image/bgapp.jpg'), // Gantilah dengan path gambar Anda
+              fit: BoxFit.cover,
+            ),
+          ),
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
@@ -38,12 +47,12 @@ class VerifikasiUpdatePassword extends GetView {
               padding: const EdgeInsets.symmetric(horizontal: 60),
               child: ElevatedButton(
                 onPressed: () {
-                  pegawaiC.cekUser();
+                  pegawaiC.cekUser(context);
                 },
-               style: ElevatedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(50)),
-                      minimumSize: Size(Get.size.width / 2, 50)),
+                style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(50)),
+                    minimumSize: Size(Get.size.width / 2, 50)),
                 child: const Text(
                   'VALIDASI',
                   style: TextStyle(fontSize: 18),

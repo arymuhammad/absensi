@@ -75,7 +75,6 @@ class AddPegawaiController extends GetxController {
       currVer = packageInfo.version;
       // String buildNumber = packageInfo.buildNumber;
     });
-    
   }
 
   @override
@@ -311,14 +310,14 @@ class AddPegawaiController extends GetxController {
     }
   }
 
-  addUpdatePegawai(String mode, List<dynamic> dataUser) async {
+  addUpdatePegawai(context, String mode, List<dynamic> dataUser) async {
     // image = File(image!.path);
     // print('add pegawai');
     Random random = Random();
     int randomNumber = random.nextInt(100);
     final response = await ServiceApi().getUser();
     cekDataUser.value = response;
-    
+
     var lstUser = [];
     cekDataUser.map((e) {
       lstUser.add(e.username!);
@@ -363,8 +362,9 @@ class AddPegawaiController extends GetxController {
             dialogMsg("",
                 "No Telp ini sudah terdaftar pada akun lain\nSilahkan masukkan No Telp lain");
           } else {
-            dialogMsgScsUpd(
-                "Sukses", "Data berhasil disimpan. Silahkan login untuk masuk");
+            succesDialog(context, "Data berhasil disimpan");
+            // dialogMsgScsUpd(
+            //     "Sukses", "Data berhasil disimpan. Silahkan login untuk masuk");
             await ServiceApi().addUpdatePegawai(data);
             selectedCabang.value = "";
             username.clear();
@@ -496,7 +496,7 @@ class AddPegawaiController extends GetxController {
     }
   }
 
-  void cekUser() async {
+  void cekUser(context) async {
     var data = {"no_telp": telp.text};
     if (telp.text != "") {
       loadingDialog("Sedang mencari data user", "");
@@ -514,22 +514,30 @@ class AddPegawaiController extends GetxController {
           "foto": cekDataUser[0].foto,
         });
       } else {
-        dialogMsg("Terjadi Kesalahan",
+        failedDialog(context,
             "Tidak ditemukan user dengan No Telp ${telp.text}. Pastikan No Telp yang diinput sudah sesuai");
+        // dialogMsg("Terjadi Kesalahan",
+        //     "Tidak ditemukan user dengan No Telp ${telp.text}. Pastikan No Telp yang diinput sudah sesuai");
       }
     } else {
       showToast("Anda harus mengisi kolom No Telp");
     }
   }
 
-  updatePassword(String id, String username) async {
+  updatePassword(context, String id, String username) async {
     var data = {"id": id, "username": username, "password": pass.text};
     if (pass.text != "") {
-      dialogMsgAbsen("Sukses",
-          "Password berhasil diperbarui\nSilahkan melakukan login ulang");
+      // dialogMsgAbsen("Sukses",
+      //     "Password berhasil diperbarui\nSilahkan melakukan login ulang");
+
       loadingDialog("Memperbarui data user...", "");
       final response = await ServiceApi().updatePasswordUser(data);
+      Future.delayed(Duration.zero, () {
+        succesDialog(context,
+            "Password berhasil diperbarui\nSilahkan melakukan login ulang");
+      });
       cekDataUser.value = response;
+      pass.clear();
       Get.back();
       if (cekDataUser.isNotEmpty) {
         // print(cekDataUser.length);

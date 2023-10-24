@@ -13,6 +13,15 @@ class AboutView extends GetView {
       appBar: AppBar(
         title: const Text('Tentang'),
         centerTitle: true,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage(
+                  'assets/image/bgapp.jpg'), // Gantilah dengan path gambar Anda
+              fit: BoxFit.cover,
+            ),
+          ),
+        ),
       ),
       body: ListView(children: [
         ListTile(

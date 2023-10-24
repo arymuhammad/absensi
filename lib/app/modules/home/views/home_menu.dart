@@ -1,4 +1,5 @@
 import 'package:absensi/app/helper/const.dart';
+import 'package:absensi/app/modules/absen/views/absen_view.dart';
 import 'package:absensi/app/modules/home/controllers/home_controller.dart';
 import 'package:absensi/app/modules/home/views/home_view.dart';
 import 'package:absensi/app/modules/profil/views/profil_view.dart';
@@ -17,13 +18,11 @@ class HomeMenu extends GetView {
   final homeC = Get.put(HomeController());
   final List? listDataUser;
 
-  
-
   @override
   Widget build(BuildContext context) {
     final List<Widget> widgetList = <Widget>[
       HomeView(listDataUser: listDataUser!),
-      Container(),
+      AbsenView(data: listDataUser!),
       ProfilView(listDataUser: listDataUser!)
     ];
     return Scaffold(
@@ -42,20 +41,11 @@ class HomeMenu extends GetView {
           backgroundColor: mainColor,
           onTap: (i) {
             if (i == 1) {
-              // Get.defaultDialog(
-              //     title: 'Absen',
-              //     middleText:
-              //         'Sedang memindai lokasi absen Anda\nHarap Menunggu selama proses berjalan');
-              loc.getLoc(listDataUser!);
-              loginC.selectedMenu(0);
-              // loc.getTrustLocation();
-              // Future.delayed(const Duration(seconds: 2), () {
-              //   Get.back();
-              // });
+              loginC.selectedMenu(i);
+              loc.getLoc(listDataUser);
             } else {
               loginC.selectedMenu(i);
             }
-            // print(i);
           },
         ),
       ),

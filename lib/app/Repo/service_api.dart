@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:absensi/app/model/cabang_model.dart';
@@ -24,11 +25,13 @@ class ServiceApi {
     try {
       final response =
           await http.post(Uri.parse('${baseUrl}auth'), body: data).timeout(
-        const Duration(seconds: 10),
+        const Duration(seconds: 5),
         onTimeout: () {
-          return timeOut(data);
+          Get.back();
+          return dialogMsg("Time Out", "Koneksi server timeout");
         },
       );
+
       switch (response.statusCode) {
         case 200:
           final result = json.decode(response.body);
@@ -68,27 +71,6 @@ class ServiceApi {
           ));
       isLoading.value = false;
     }
-  }
-
-  timeOut(data) {
-    Get.defaultDialog(
-        radius: 5,
-        title: 'Koneksi Terputus',
-        content: Column(
-          children: [
-            const Center(
-              child: Text('Server tidak merespon'),
-            ),
-            ElevatedButton(
-                onPressed: () async {
-                  loginUser(data);
-                  isLoading.value = true;
-                  Get.back();
-                },
-                child: const Text('Refresh'))
-          ],
-        ));
-    isLoading.value = false;
   }
 
   getBrandCabang() async {
@@ -308,8 +290,8 @@ class ServiceApi {
       var responseString = utf8.decode(responseBytes);
 
       //debug
-      debugPrint("response code: ${res.statusCode}");
-      debugPrint("response: $responseString");
+      // debugPrint("response code: ${res.statusCode}");
+      // debugPrint("response: $responseString");
 
       final dataDecode = jsonDecode(responseString);
       debugPrint(dataDecode.toString());

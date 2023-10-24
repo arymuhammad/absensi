@@ -20,6 +20,15 @@ class UpdateProfil extends GetView {
       appBar: AppBar(
         title: const Text('UPDATE PROFILE'),
         centerTitle: true,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage(
+                  'assets/image/bgapp.jpg'), // Gantilah dengan path gambar Anda
+              fit: BoxFit.cover,
+            ),
+          ),
+        ),
       ),
       body: ListView(
         // scrollDirection: Axis.vertical,
@@ -248,7 +257,7 @@ class UpdateProfil extends GetView {
                         borderRadius: BorderRadius.circular(50)),
                     minimumSize: Size(Get.size.width / 2, 50)),
                 onPressed: () {
-                  ctr.addUpdatePegawai("update", userData!);
+                  ctr.addUpdatePegawai(context,"update", userData!);
                 },
                 child: const Text('UPDATE PROFILE')),
           )

@@ -1,6 +1,10 @@
+import 'package:absensi/app/modules/login/controllers/login_controller.dart';
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
+
+final auth = Get.put(LoginController());
 
 void showToast(message) {
   Fluttertoast.showToast(
@@ -14,7 +18,7 @@ void showToast(message) {
       webPosition: 'center');
 }
 
-void dialogMsg(code, msg) {
+dialogMsg(code, msg) {
   Get.defaultDialog(
       title: code,
       middleText: msg,
@@ -64,10 +68,79 @@ void dialogMsgAbsen(code, msg) {
       barrierDismissible: false);
 }
 
+void succesDialog(context, desc) {
+  AwesomeDialog(
+    context: context,
+    animType: AnimType.scale,
+    headerAnimationLoop: false,
+    dialogType: DialogType.success,
+    dismissOnTouchOutside: false,
+    dismissOnBackKeyPress: false,
+    title: 'Succes',
+    desc: desc,
+    btnOkOnPress: () {
+      Get.back();
+      Get.back();
+    },
+    btnOkIcon: Icons.check_circle,
+    onDismissCallback: (type) {
+      debugPrint('Dialog Dissmiss from callback $type');
+    },
+  ).show();
+}
+
+void failedDialog(context, desc) {
+  AwesomeDialog(
+    context: context,
+    animType: AnimType.scale,
+    headerAnimationLoop: false,
+    dialogType: DialogType.error,
+    dismissOnTouchOutside: false,
+    dismissOnBackKeyPress: false,
+    title: 'Error',
+    desc: desc,
+    btnOkOnPress: () {},
+    btnOkIcon: Icons.cancel,
+    btnOkText: 'Tutup',
+    btnOkColor: Colors.redAccent[700],
+    onDismissCallback: (type) {
+      debugPrint('Dialog Dissmiss from callback $type');
+    },
+  ).show();
+}
+
+void promptDialog(context, desc) {
+  AwesomeDialog(
+          context: context,
+          dialogType: DialogType.info,
+          dismissOnTouchOutside: false,
+          dismissOnBackKeyPress: false,
+          // onDismissCallback: (type) {
+          //   ScaffoldMessenger.of(context).showSnackBar(
+          //     SnackBar(
+          //       content: Text('Dismissed by $type'),
+          //     ),
+          //   );
+          // },
+          headerAnimationLoop: false,
+          animType: AnimType.bottomSlide,
+          title: 'INFO',
+          desc: desc,
+          btnCancelOnPress: () {},
+          btnOkOnPress: () {
+            auth.logout();
+          },
+          btnCancelColor: Colors.redAccent[700],
+          btnCancelIcon: Icons.cancel,
+          btnOkColor: Colors.blueAccent[700],
+          btnOkIcon: Icons.check_circle_rounded)
+      .show();
+}
+
 void loadingDialog(msg, String? msg2) {
   Get.defaultDialog(
       title: '',
-      onWillPop: ()async {
+      onWillPop: () async {
         return false;
       },
       content: Center(

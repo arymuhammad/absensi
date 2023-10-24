@@ -64,6 +64,15 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
       appBar: AppBar(
         title: const Text('DETAIL ABSEN'),
         centerTitle: true,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage(
+                  'assets/image/bgapp.jpg'),
+              fit: BoxFit.cover,
+            ),
+          ),
+        ),
       ),
       backgroundColor: backgroundColor,
       body: ListView(

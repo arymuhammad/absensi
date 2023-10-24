@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 
+import '../modules/absen/views/absen_view.dart';
 import '../modules/add_pegawai/bindings/add_pegawai_binding.dart';
 import '../modules/add_pegawai/views/add_pegawai_view.dart';
 import '../modules/cek_stok/bindings/cek_stok_binding.dart';
@@ -57,6 +58,11 @@ class AppPages {
       name: _Paths.CEK_STOK,
       page: () => CekStokView(),
       binding: CekStokBinding(),
+    ),
+    GetPage(
+      name: _Paths.ABSEN,
+      page: () => AbsenView(),
+      
     ),
   ];
 }

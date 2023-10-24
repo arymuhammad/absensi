@@ -26,7 +26,6 @@ void main() async {
   if (auth.logUser.isEmpty) {
     auth.logUser.value = userDataLogin;
   }
-  
 
   await initializeDateFormatting('id_ID', "").then((_) => runApp(
         FutureBuilder(
@@ -40,6 +39,7 @@ void main() async {
                   title: "Absensi",
                   theme: ThemeData(
                       primarySwatch: mainColor,
+                      primaryColor: Colors.white,
                       fontFamily: 'Nunito',
                       canvasColor: backgroundColor),
                   home: Obx(() => auth.isAuth.value

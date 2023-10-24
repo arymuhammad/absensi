@@ -17,6 +17,15 @@ class AddPegawaiView extends GetView<AddPegawaiController> {
       appBar: AppBar(
         title: const Text('Register'),
         centerTitle: true,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage(
+                  'assets/image/bgapp.jpg'), // Gantilah dengan path gambar Anda
+              fit: BoxFit.cover,
+            ),
+          ),
+        ),
       ),
       body: ListView(
         scrollDirection: Axis.vertical,
@@ -275,7 +284,7 @@ class AddPegawaiView extends GetView<AddPegawaiController> {
                         borderRadius: BorderRadius.circular(50)),
                     minimumSize: Size(Get.size.width / 2, 50)),
                 onPressed: () {
-                  controller.addUpdatePegawai("add", [""]);
+                  controller.addUpdatePegawai(context,"add", [""]);
                 },
                 child: const Text('Submit')),
           )

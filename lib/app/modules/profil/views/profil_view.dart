@@ -1,4 +1,5 @@
 import 'package:absensi/app/helper/const.dart';
+import 'package:absensi/app/helper/loading_dialog.dart';
 import 'package:absensi/app/modules/login/controllers/login_controller.dart';
 import 'package:absensi/app/modules/profil/views/about_view.dart';
 import 'package:absensi/app/modules/profil/views/update_profil.dart';
@@ -38,7 +39,10 @@ class ProfilView extends GetView<ProfilController> {
               child: Container(
                 height: 320,
                 width: Get.width,
-                color: mainColor,
+                decoration: const BoxDecoration(
+                    image: DecorationImage(
+                        image: AssetImage('assets/image/bgapp.jpg'),
+                        fit: BoxFit.fill)),
               ),
             ),
             ListView(
@@ -207,22 +211,23 @@ class ProfilView extends GetView<ProfilController> {
                 ),
                 ListTile(
                   onTap: () {
-                    Get.defaultDialog(
-                      barrierDismissible: false,
-                      radius: 5,
-                      title: 'Peringatan',
-                      middleText: 'Anda yakin ingin keluar?',
-                      onConfirm: () {
-                        auth.logout();
-                        Get.back();
-                      },
-                      textConfirm: 'Keluar',
-                      confirmTextColor: Colors.white,
-                      onCancel: () {
-                        Get.back();
-                      },
-                      textCancel: 'Batal',
-                    );
+                    promptDialog(context, 'Anda yakin ingin keluar?');
+                    // Get.defaultDialog(
+                    //   barrierDismissible: false,
+                    //   radius: 5,
+                    //   title: 'Peringatan',
+                    //   middleText: 'Anda yakin ingin keluar?',
+                    //   onConfirm: () {
+                    //     auth.logout();
+                    //     Get.back();
+                    //   },
+                    //   textConfirm: 'Keluar',
+                    //   confirmTextColor: Colors.white,
+                    //   onCancel: () {
+                    //     Get.back();
+                    //   },
+                    //   textCancel: 'Batal',
+                    // );
                   },
                   leading: Icon(
                     TernavIcons.lightOutline.logout,

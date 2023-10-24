@@ -10,6 +10,7 @@ abstract class Routes {
   static const DETAIL_ABSEN = _Paths.DETAIL_ABSEN;
   static const SEMUA_ABSEN = _Paths.SEMUA_ABSEN;
   static const CEK_STOK = _Paths.CEK_STOK;
+  static const ABSEN = _Paths.ABSEN;
 }
 
 abstract class _Paths {
@@ -21,4 +22,5 @@ abstract class _Paths {
   static const DETAIL_ABSEN = '/detail-absen';
   static const SEMUA_ABSEN = '/semua-absen';
   static const CEK_STOK = '/cek-stok';
+  static const ABSEN = '/absen';
 }

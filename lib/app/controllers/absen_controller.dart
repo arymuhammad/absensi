@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
+import 'package:absensi/app/helper/const.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
@@ -29,6 +30,7 @@ import '../model/cek_absen_model.dart';
 
 class AbsenController extends GetxController {
   var isLoading = true.obs;
+  var ascending = true.obs;
   var lokasi = "".obs;
   // var devInfoWeb = "".obs;
   var devInfo = "".obs;
@@ -44,9 +46,13 @@ class AbsenController extends GetxController {
   var distanceStore = 0.0.obs;
   var lat = "".obs;
   var long = "".obs;
+  var userPostLat = 0.0.obs;
+  var userPostLong = 0.0.obs;
   var jamMasuk = "".obs;
   var jamPulang = "".obs;
   var timeNow = "";
+  var dateNowServer = "";
+  var dateAbsen = "";
   var downloadProgress = 0.0.obs;
   var updateList = [];
   var currVer = "";
@@ -144,6 +150,7 @@ class AbsenController extends GetxController {
               'https://timeapi.io/api/Time/current/zone?timeZone=$timeZone'))
           .then((data) => jsonDecode(data.body));
       timeNow = response['time'];
+      dateNowServer = response['dateTime'];
     } on HandshakeException catch (_) {
       // print(e.toString());
     }
@@ -154,42 +161,20 @@ class AbsenController extends GetxController {
         await FlutterNativeTimezone.getLocalTimezone();
 
     try {
-      // if (kIsWeb) {
-      //   ClientInformation info = await ClientInformation.fetch();
-      //   devInfo.value = '${info.deviceName} ${info.softwareName}';
-      // } else {
-      // try {
-      // platformVersion = await DeviceInformation.platformVersion;
-      // imeiNo = await DeviceInformation.deviceIMEINumber;
-      // modelName = await DeviceInformation.deviceModel;
-      // manufacturer = await DeviceInformation.deviceManufacturer;
-      // apiLevel = await DeviceInformation.apiLevel;
-      // deviceName = await DeviceInformation.deviceName;
-      // productName = await DeviceInformation.productName;
-      // cpuType = await DeviceInformation.cpuName;
-      // hardware = await DeviceInformation.hardware;
-      // devInfo.value =
-      //     '${await DeviceInformation.deviceManufacturer} ${await DeviceInformation.productName}';
-      // } on PlatformException {
-      //   // platformVersion = 'Failed to get platform version.';
-      // }
       DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
       AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
       devInfo.value = '${androidInfo.brand} ${androidInfo.model}';
-      // }
       // ignore: empty_catches
     } on PlatformException {}
 
     Position position = await determinePosition();
-    // if (!kIsWeb) {
-    //   List<Placemark> placemarks =
-    //       await placemarkFromCoordinates(position.latitude, position.longitude);
-    //   lokasi.value =
-    //       '${placemarks[0].street!}, ${placemarks[0].subLocality!}\n${placemarks[0].subAdministrativeArea!}, ${placemarks[0].administrativeArea!}';
-    // } else {
-    //   lokasi.value = '${position.latitude} , ${position.longitude}';
-    //   print(lokasi.value);
-    // }
+
+    List<Placemark> placemarks =
+        await placemarkFromCoordinates(position.latitude, position.longitude);
+    lokasi.value =
+        '${placemarks[0].street!}, ${placemarks[0].subLocality!}\n${placemarks[0].subAdministrativeArea!}, ${placemarks[0].administrativeArea!}';
+    userPostLat.value = position.latitude;
+    userPostLong.value = position.longitude;
 
     if (position.isMocked == true) {
       dialogMsgCncl('Peringatan',
@@ -258,10 +243,9 @@ class AbsenController extends GetxController {
                           selectedShift.value = data!;
 
                           if (selectedShift.value == "4") {
-                            jamMasuk.value = timeNow.toString();
+                            jamMasuk.value = timeNow;
                             jamPulang.value = DateFormat("HH:mm").format(
-                                DateTime.parse(timeNow)
-                                    .toLocal()
+                                DateTime.parse(dateNowServer)
                                     .add(const Duration(hours: 8)));
                           } else {
                             for (int i = 0; i < dataShift.length; i++) {
@@ -465,10 +449,17 @@ class AbsenController extends GetxController {
   }
 
   Future<CekAbsen> cekDataAbsen(String status, String id) async {
-    var data = {"status": status, "id_user": id, "tanggal": dateNow};
+    var data = {
+      "status": status,
+      "id_user": id,
+      "tanggal": dateAbsen != "" ? dateAbsen : dateNow
+    };
     final response = await ServiceApi().cekDataAbsen(data);
-
-    return cekAbsen.value = response;
+    cekAbsen.value = response;
+    dateAbsen =
+        cekAbsen.value.tanggal != null ? cekAbsen.value.tanggal! : dateNow;
+    // print(cekAbsen.value.tanggal);
+    return cekAbsen.value;
   }
 
   Future<void> uploadFotoAbsen() async {
@@ -575,8 +566,9 @@ class AbsenController extends GetxController {
       "tanggal2": initDate2
     };
     final response = await ServiceApi().getAbsen(param);
+    dataAllAbsen.value = response;
     isLoading.value = false;
-    return dataAllAbsen.value = response;
+    return dataAllAbsen;
   }
 
   filterDataAbsen(String data) {
@@ -591,7 +583,6 @@ class AbsenController extends GetxController {
           .toList();
     }
     searchAbsen.value = result;
-    isLoading.value = false;
   }
 
   Future<List<Absen>> getFilteredAbsen(idUser) async {
@@ -604,10 +595,10 @@ class AbsenController extends GetxController {
       };
       loadingDialog("Sedang memuat data...", "");
       final response = await ServiceApi().getFilteredAbsen(data);
-      isLoading.value = false;
       dataAllAbsen.value = response;
+      isLoading.value = false;
       searchDate.value =
-          '${DateFormat("d MMMM yyyy", "id_ID").format(DateTime.parse(date1.text))} - ${DateFormat("d MMMM yyyy", "id_ID").format(DateTime.parse(date2.text))} ';
+          '${DateFormat("d MMM yyyy", "id_ID").format(DateTime.parse(date1.text))} - ${DateFormat("d MMM yyyy", "id_ID").format(DateTime.parse(date2.text))} ';
       Get.back();
       Get.back();
     } else {
@@ -665,8 +656,13 @@ class AbsenController extends GetxController {
                 children: [
                   const Text(
                     'Apa yang baru',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
                   ),
+                  const SizedBox(
+                    height: 5,
+                  ),
+                  Text('versi $latestVer',
+                      style: TextStyle(color: subTitleColor)),
                   const SizedBox(
                     height: 5,
                   ),

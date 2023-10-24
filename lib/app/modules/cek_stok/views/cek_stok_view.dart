@@ -19,6 +19,15 @@ class CekStokView extends GetView<CekStokController> {
       appBar: AppBar(
         title: const Text('Cek Stok'),
         centerTitle: true,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage(
+                  'assets/image/bgapp.jpg'), // Gantilah dengan path gambar Anda
+              fit: BoxFit.cover,
+            ),
+          ),
+        ),
       ),
       body: Column(
         children: [

@@ -1,8 +1,11 @@
 import 'package:absensi/app/helper/const.dart';
 import 'package:absensi/app/helper/loading_dialog.dart';
+import 'package:absensi/app/modules/absen/views/absen_view.dart';
 import 'package:absensi/app/modules/profil/views/profil_view.dart';
+import 'package:absensi/app/modules/semua_absen/views/semua_absen_view.dart';
 import 'package:absensi/app/routes/app_pages.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
@@ -33,7 +36,10 @@ class HomeView extends GetView<HomeController> {
             child: Container(
               height: 250,
               width: Get.width,
-              color: mainColor,
+              decoration: const BoxDecoration(
+                  image: DecorationImage(
+                      image: AssetImage('assets/image/bgapp.jpg'),
+                      fit: BoxFit.fill)),
             ),
           ),
           Padding(
@@ -127,6 +133,7 @@ class HomeView extends GetView<HomeController> {
                             "tanggal": absenC.dateNow
                           };
                           // loadingDialog("Memuat halaman...", "");
+                          absenC.isLoading.value = true;
                           await absenC.getAbsenToday(paramSingle);
                           await absenC.getLimitAbsen(paramLimit);
                           // await Future.delayed(
@@ -145,106 +152,146 @@ class HomeView extends GetView<HomeController> {
                             elevation: 10,
                             child: Container(
                               width: Get.mediaQuery.size.width,
-                              padding: const EdgeInsets.all(20),
                               decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(15),
                                   color: Colors.white),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        '${listDataUser![4]}',
-                                        style: const TextStyle(
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                      const SizedBox(height: 5),
-                                      Text('${listDataUser![0]}'),
-                                      const SizedBox(height: 5),
-                                      Text(listDataUser![2]
-                                          .toString()
-                                          .toUpperCase()),
-                                    ],
+                                  Padding(
+                                    padding: const EdgeInsets.all(12.0),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              '${listDataUser![4]}',
+                                              style: const TextStyle(
+                                                  fontSize: 15,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                            const SizedBox(height: 5),
+                                            Text('${listDataUser![0]}'),
+                                            const SizedBox(height: 5),
+                                            Text(listDataUser![2]
+                                                .toString()
+                                                .toUpperCase()),
+                                          ],
+                                        ),
+                                        Column(
+                                          children: [
+                                            IconButton(
+                                                onPressed: () {
+                                                  Get.to(() => CekStokView(
+                                                      kodeCabang:
+                                                          listDataUser![8]));
+                                                },
+                                                icon: const Icon(
+                                                  CupertinoIcons
+                                                      .doc_text_search,
+                                                  size: 45,
+                                                )),
+                                            const SizedBox(height: 2),
+                                            const Text(
+                                              'Cek Stock',
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          ],
+                                        )
+                                      ],
+                                    ),
                                   ),
-                                  Column(
-                                    children: [
-                                      IconButton(
-                                          onPressed: () {
-                                            Get.to(() => CekStokView(
-                                                kodeCabang: listDataUser![8]));
-                                          },
-                                          icon: const Icon(
-                                            Icons.content_paste_search,
-                                            size: 45,
-                                          )),
-                                      const SizedBox(height: 2),
-                                      const Text('Cek Stock'),
-                                    ],
-                                  )
                                 ],
                               ),
                             ),
                           ),
                           const SizedBox(height: 10),
                           Container(
-                            padding: const EdgeInsets.all(20),
+                            padding: const EdgeInsets.all(10),
                             decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(15),
                                 color: Colors.white),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Column(
-                                  children: [
-                                    const Text(
-                                      'Masuk',
-                                      style: TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold),
+                                Padding(
+                                    padding: const EdgeInsets.only(
+                                      left: 8.0
                                     ),
-                                    Obx(
-                                      () => Text(
-                                        absenC.dataAbsen.isNotEmpty &&
-                                                absenC.dataAbsen[0]
-                                                        .jamAbsenMasuk! !=
-                                                    ""
-                                            ? absenC.dataAbsen[0].jamAbsenMasuk!
-                                            : '-',
-                                        style: const TextStyle(fontSize: 18),
-                                      ),
-                                    )
-                                  ],
-                                ),
-                                Container(
-                                  width: 2,
-                                  height: 40,
-                                  color: Colors.grey,
-                                ),
-                                Column(
+                                    child: Text(
+                                        DateFormat("EEEE, d MMMM yyyy", "id_ID")
+                                            .format(
+                                                DateTime.parse(absenC.dateNow)),
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.bold)),
+                                  ),
+                                  const Divider(
+                                    thickness: 1,
+                                  ),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceAround,
                                   children: [
-                                    const Text(
-                                      'Keluar',
-                                      style: TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold),
+                                    Column(
+                                      children: [
+                                        // OutlinedButton(
+                                        //     onPressed: () {
+                                        //       Get.to(() =>
+                                        //           AbsenView(data: listDataUser));
+                                        //       absenC.determinePosition();
+                                        // absenC.getLoc(listDataUser!);
+                                        //     },
+                                        //     child: const Text('Masuk')),
+                                        const Text(
+                                          'Masuk',
+                                          style: TextStyle(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        Obx(
+                                          () => Text(
+                                            absenC.dataAbsen.isNotEmpty &&
+                                                    absenC.dataAbsen[0]
+                                                            .jamAbsenMasuk! !=
+                                                        ""
+                                                ? absenC.dataAbsen[0].jamAbsenMasuk!
+                                                : '-',
+                                            style: const TextStyle(fontSize: 18),
+                                          ),
+                                        )
+                                      ],
                                     ),
-                                    Obx(
-                                      () => Text(
-                                        absenC.dataAbsen.isNotEmpty &&
-                                                absenC.dataAbsen[0]
-                                                        .jamAbsenPulang! !=
-                                                    ""
-                                            ? absenC
-                                                .dataAbsen[0].jamAbsenPulang!
-                                            : '-',
-                                        style: const TextStyle(fontSize: 18),
-                                      ),
-                                    )
+                                    Container(
+                                      width: 2,
+                                      height: 40,
+                                      color: Colors.grey,
+                                    ),
+                                    Column(
+                                      children: [
+                                        const Text(
+                                          'Pulang',
+                                          style: TextStyle(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        Obx(
+                                          () => Text(
+                                            absenC.dataAbsen.isNotEmpty &&
+                                                    absenC.dataAbsen[0]
+                                                            .jamAbsenPulang! !=
+                                                        ""
+                                                ? absenC
+                                                    .dataAbsen[0].jamAbsenPulang!
+                                                : '-',
+                                            style: const TextStyle(fontSize: 18),
+                                          ),
+                                        )
+                                      ],
+                                    ),
                                   ],
                                 ),
                               ],
@@ -267,14 +314,17 @@ class HomeView extends GetView<HomeController> {
                                 children: [
                                   TextButton(
                                       onPressed: () {
-                                        Get.toNamed(Routes.SEMUA_ABSEN,
+                                        absenC.isLoading.value = true;
+                                        absenC.searchDate.value = "";
+                                        Get.to(() => SemuaAbsenView(),
                                             arguments: {
                                               "foto_profil":
                                                   listDataUser![5] != ""
                                                       ? listDataUser![5]
                                                       : listDataUser![1],
                                               "id_user": listDataUser![0]
-                                            });
+                                            },
+                                            transition: Transition.cupertino);
                                         absenC.getAllAbsen(listDataUser![0]);
                                       },
                                       child: const Text('Lihat Semua')),
@@ -510,81 +560,233 @@ class HomeView extends GetView<HomeController> {
                                                       .dataLimitAbsen[i]
                                                       .devInfo2!,
                                                 }),
-                                            child: Container(
-                                              margin: const EdgeInsets.only(
-                                                  bottom: 20),
-                                              padding: const EdgeInsets.all(10),
-                                              decoration: BoxDecoration(
-                                                  color: Colors.white,
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          20)),
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceBetween,
-                                                    children: [
-                                                      Row(
-                                                        children: const [
-                                                          Text(
-                                                            'Masuk',
-                                                            style: TextStyle(
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold),
-                                                          ),
-                                                          SizedBox(width: 5),
-                                                        ],
-                                                      ),
-                                                      Text(
-                                                          DateFormat(
-                                                                  "d MMMM yyyy",
-                                                                  "id_ID")
-                                                              .format(DateTime
+                                            child: Card(
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(6)),
+                                    child: Row(
+                                      children: [
+                                        Container(
+                                            width: 10,
+                                            height:
+                                                Get.mediaQuery.size.height / 12,
+                                            padding: const EdgeInsets.all(10),
+                                            decoration: BoxDecoration(
+                                                color: DateFormat("HH:mm")
+                                                          .parse(absenC
+                                                              .dataLimitAbsen[i]
+                                                              .jamAbsenMasuk!)
+                                                          .isBefore(
+                                                              DateFormat("HH:mm")
                                                                   .parse(absenC
                                                                       .dataLimitAbsen[
                                                                           i]
-                                                                      .tanggal!)),
-                                                          style: const TextStyle(
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold)),
-                                                    ],
+                                                                      .jamMasuk!))
+                                                      ? Colors.greenAccent[700]
+                                                      : DateFormat("HH:mm")
+                                                              .parse(absenC
+                                                                  .dataLimitAbsen[
+                                                                      i]
+                                                                  .jamAbsenMasuk!)
+                                                              .isAtSameMomentAs(
+                                                                  DateFormat("HH:mm").parse(absenC.dataLimitAbsen[i].jamMasuk!))
+                                                          ? Colors.greenAccent[700]
+                                                          : Colors.redAccent[700],
+                                                borderRadius:
+                                                    const BorderRadius.only(
+                                                  topLeft: Radius.circular(5),
+                                                  bottomLeft:
+                                                      Radius.circular(5),
+                                                ))),
+                                        const SizedBox(
+                                          width: 20,
+                                        ),
+                                        Column(
+                                          children: [
+                                            Text(
+                                              DateFormat('MMM')
+                                                  .format(DateTime.parse(absenC
+                                                      .dataLimitAbsen[i].tanggal!))
+                                                  .toUpperCase(),
+                                              style: TextStyle(
+                                                  color: subTitleColor),
+                                            ),
+                                            Text(
+                                              DateFormat('dd').format(
+                                                  DateTime.parse(absenC
+                                                      .dataLimitAbsen[i]
+                                                      .tanggal!)),
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 16,
+                                                  color: titleColor),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(
+                                          width: 20,
+                                        ),
+                                        Column(
+                                          children: [
+                                            Text(
+                                                DateFormat("EEEE", "id_ID")
+                                                    .format(DateTime.parse(
+                                                        absenC.dataLimitAbsen[i]
+                                                            .tanggal!)),
+                                                style: TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 18,
+                                                    color: titleColor)),
+                                            const SizedBox(
+                                              width: 10,
+                                            ),
+                                            Text(
+                                              DateFormat("HH:mm")
+                                                      .parse(absenC
+                                                          .dataLimitAbsen[i]
+                                                          .jamAbsenMasuk!)
+                                                      .isBefore(DateFormat(
+                                                              "HH:mm")
+                                                          .parse(absenC
+                                                              .dataLimitAbsen[i]
+                                                              .jamMasuk!))
+                                                  ? "Awal Waktu"
+                                                  : DateFormat("HH:mm")
+                                                          .parse(absenC
+                                                              .dataLimitAbsen[i]
+                                                              .jamAbsenMasuk!)
+                                                          .isAtSameMomentAs(
+                                                              DateFormat("HH:mm")
+                                                                  .parse(absenC
+                                                                      .dataLimitAbsen[
+                                                                          i]
+                                                                      .jamMasuk!))
+                                                      ? "Tepat Waktu"
+                                                      : "Telat",
+                                              style: TextStyle(
+                                                  color: DateFormat("HH:mm")
+                                                          .parse(absenC
+                                                              .dataLimitAbsen[i]
+                                                              .jamAbsenMasuk!)
+                                                          .isBefore(
+                                                              DateFormat("HH:mm")
+                                                                  .parse(absenC
+                                                                      .dataLimitAbsen[
+                                                                          i]
+                                                                      .jamMasuk!))
+                                                      ? Colors.greenAccent[700]
+                                                      : DateFormat("HH:mm")
+                                                              .parse(absenC
+                                                                  .dataLimitAbsen[
+                                                                      i]
+                                                                  .jamAbsenMasuk!)
+                                                              .isAtSameMomentAs(
+                                                                  DateFormat("HH:mm").parse(absenC.dataLimitAbsen[i].jamMasuk!))
+                                                          ? Colors.greenAccent[700]
+                                                          : Colors.redAccent[700]),
+                                            )
+                                          ],
+                                        ),
+                                        const Spacer(),
+                                        Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Row(
+                                            children: [
+                                              Column(
+                                                children: [
+                                                  const Text('Masuk'),
+                                                  Text(
+                                                    absenC.dataLimitAbsen[i]
+                                                        .jamAbsenMasuk!,
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: titleColor),
                                                   ),
-                                                  Text(absenC.dataLimitAbsen[i]
-                                                              .jamAbsenMasuk !=
-                                                          ""
-                                                      ? absenC.dataLimitAbsen[i]
-                                                          .jamAbsenMasuk!
-                                                      : "-"),
-                                                  const SizedBox(
-                                                    height: 8,
-                                                  ),
-                                                  Row(
-                                                    children: const [
-                                                      Text(
-                                                        'Keluar',
-                                                        style: TextStyle(
-                                                            fontWeight:
-                                                                FontWeight
-                                                                    .bold),
-                                                      ),
-                                                      SizedBox(width: 5),
-                                                    ],
-                                                  ),
-                                                  Text(absenC.dataLimitAbsen[i]
-                                                              .jamAbsenPulang !=
-                                                          ""
-                                                      ? absenC.dataLimitAbsen[i]
-                                                          .jamAbsenPulang!
-                                                      : "-"),
                                                 ],
                                               ),
-                                            ),
+                                              const SizedBox(
+                                                width: 15,
+                                              ),
+                                              Column(
+                                                children: [
+                                                  const Text('Pulang'),
+                                                  Text(
+                                                    ' - ',
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: titleColor),
+                                                  ),
+                                                ],
+                                              ),
+                                              Text(
+                                                absenC.dataLimitAbsen[i]
+                                                    .jamAbsenPulang!,
+                                                style: TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                    color: titleColor),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        // Container(
+                                        //   // margin: const EdgeInsets.only(bottom: 20),
+                                        //   padding: const EdgeInsets.all(10),
+                                        //   decoration: const BoxDecoration(
+                                        //     color: Colors.white,
+                                        //     // borderRadius:
+                                        //     //     BorderRadius.circular(20)
+                                        //   ),
+                                        //   child: Column(
+                                        //     crossAxisAlignment:
+                                        //         CrossAxisAlignment.start,
+                                        //     children: [
+                                        //       Row(
+                                        //         mainAxisAlignment:
+                                        //             MainAxisAlignment
+                                        //                 .spaceBetween,
+                                        //         children: [
+                                        //           const Text(
+                                        //             'Masuk',
+                                        //             style: TextStyle(
+                                        //                 fontWeight:
+                                        //                     FontWeight.bold),
+                                        //           ),
+                                        //           // Text(
+                                        //           //     DateFormat(
+                                        //           //             "EEEE, d MMMM yyyy",
+                                        //           //             "id_ID")
+                                        //           //         .format(DateTime.parse(
+                                        //           //             absenC
+                                        //           //                 .dataLimitAbsen[i]
+                                        //           //                 .tanggal!)),
+                                        //           //     style: const TextStyle(
+                                        //           //         fontWeight:
+                                        //           //             FontWeight.bold)),
+                                        //         ],
+                                        //       ),
+                                        //       Text(absenC
+                                        //           .dataLimitAbsen[i].jamAbsenMasuk!),
+                                        //       const SizedBox(
+                                        //         height: 8,
+                                        //       ),
+                                        //       const Text(
+                                        //         'Keluar',
+                                        //         style: TextStyle(
+                                        //             fontWeight: FontWeight.bold),
+                                        //       ),
+                                        //       Text(absenC.dataLimitAbsen[i]
+                                        //                   .jamAbsenPulang !=
+                                        //               ""
+                                        //           ? absenC.dataLimitAbsen[i]
+                                        //               .jamAbsenPulang!
+                                        //           : "-"),
+                                        //     ],
+                                        //   ),
+                                        // ),
+                                      ],
+                                    ),
+                                  ),
                                           );
                                         },
                                       ),

@@ -13,6 +13,15 @@ class UpdatePassword extends GetView {
       appBar: AppBar(
         title: const Text('UPDATE PASSWORD'),
         centerTitle: true,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage(
+                  'assets/image/bgapp.jpg'), // Gantilah dengan path gambar Anda
+              fit: BoxFit.cover,
+            ),
+          ),
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
@@ -30,13 +39,14 @@ class UpdatePassword extends GetView {
                   child: Container(
                     height: 100,
                     width: 100,
-                    decoration: const BoxDecoration(
-                      color: Colors.grey
-                    ),
-                    child: Get.arguments["foto"] == "" ? Image.network(
-                                        "https://ui-avatars.com/api/?name=${Get.arguments["nama"]}",
-                                        fit: BoxFit.cover,
-                                      ):Image.network( "${ServiceApi().baseUrl}${Get.arguments["foto"]}"),
+                    decoration: const BoxDecoration(color: Colors.grey),
+                    child: Get.arguments["foto"] == ""
+                        ? Image.network(
+                            "https://ui-avatars.com/api/?name=${Get.arguments["nama"]}",
+                            fit: BoxFit.cover,
+                          )
+                        : Image.network(
+                            "${ServiceApi().baseUrl}${Get.arguments["foto"]}"),
                   ),
                 ),
               ],
@@ -63,14 +73,14 @@ class UpdatePassword extends GetView {
               padding: const EdgeInsets.symmetric(horizontal: 80),
               child: ElevatedButton(
                 onPressed: () async {
-                  await pegawaiC.updatePassword(
+                  await pegawaiC.updatePassword(context,
                       Get.arguments["id_user"], Get.arguments["username"]);
                   //  Restart.restartApp();
                 },
-               style: ElevatedButton.styleFrom(
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(50)),
-                        minimumSize: Size(Get.size.width / 2, 50)),
+                style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(50)),
+                    minimumSize: Size(Get.size.width / 2, 50)),
                 child: const Text(
                   'SIMPAN',
                   style: TextStyle(fontSize: 18),
