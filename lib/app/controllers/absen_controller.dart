@@ -21,7 +21,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:xml/xml.dart' as xml;
-import '../Repo/service_api.dart';
+import '../services/service_api.dart';
 import '../helper/loading_dialog.dart';
 import '../model/absen_model.dart';
 import '../model/cabang_model.dart';
@@ -76,6 +76,7 @@ class AbsenController extends GetxController {
           DateTime(DateTime.now().year, DateTime.now().month + 1, 0)
               .toString()))
       .toString();
+  DateTime? lastTime;
 
   @override
   void onInit() async {
@@ -107,7 +108,6 @@ class AbsenController extends GetxController {
       // String packageName = packageInfo.packageName;
       currVer = packageInfo.version;
       // String buildNumber = packageInfo.buildNumber;
-    
     });
 
     final readDoc = await http
@@ -292,7 +292,7 @@ class AbsenController extends GetxController {
 
                 distanceStore.value = distance;
 
-                if (distanceStore.value > 200) {
+                if (distanceStore.value > 100) {
                   dialogMsgCncl(
                       'Terjadi Kesalahan', 'Anda berada diluar area absen');
                   selectedShift.value = "";
@@ -382,9 +382,9 @@ class AbsenController extends GetxController {
                     position.longitude.toDouble());
 
                 distanceStore.value = distance;
-                if (distanceStore.value > 200) {
+                if (distanceStore.value > 100) {
                   dialogMsgCncl('Terjadi Kesalahan',
-                      'Posisi Anda berada diluar jangkauan area.\nHarap berpindah posisi ke area yang sudah ditentukan');
+                      'Anda berada diluar area absen');
                 } else {
                   if (kIsWeb) {
                     imageWeb = await FilePicker.platform.pickFiles(
@@ -415,24 +415,27 @@ class AbsenController extends GetxController {
                       "device_info2": devInfo.value
                     };
                     await ServiceApi().submitAbsen(data);
-                  }
-                  var paramAbsenToday = {
-                    "mode": "single",
-                    "id_user": dataUser[0],
-                    "tanggal": dateNow
-                  };
+                    var paramAbsenToday = {
+                      "mode": "single",
+                      "id_user": dataUser[0],
+                      "tanggal": dateNow
+                    };
 
-                  var paramLimitAbsen = {
-                    "mode": "limit",
-                    "id_user": dataUser[0],
-                    "tanggal1": initDate1,
-                    "tanggal2": initDate2
-                  };
-                  getAbsenToday(paramAbsenToday);
-                  getLimitAbsen(paramLimitAbsen);
-                  await Future.delayed(const Duration(milliseconds: 400));
-                  Get.back();
-                  dialogMsgAbsen("Sukses", "Anda berhasil Absen");
+                    var paramLimitAbsen = {
+                      "mode": "limit",
+                      "id_user": dataUser[0],
+                      "tanggal1": initDate1,
+                      "tanggal2": initDate2
+                    };
+                    getAbsenToday(paramAbsenToday);
+                    getLimitAbsen(paramLimitAbsen);
+                    await Future.delayed(const Duration(milliseconds: 400));
+                    Get.back();
+                    dialogMsgAbsen("Sukses", "Anda berhasil Absen");
+                  } else {
+                    Get.back();
+                    dialogMsgAbsen("Peringatan", "Absen Pulang dibatalkan");
+                  }
                 }
               },
               barrierDismissible: false);
@@ -482,6 +485,7 @@ class AbsenController extends GetxController {
         // accessing the position and request users of the
         // App to enable the location services.
         showToast("Lokasi belum diaktifkan");
+        lokasi.value = "Lokasi Anda tidak diketahui";
         return Future.error('Location services are disabled.');
       }
 

@@ -4,8 +4,10 @@ import 'package:absensi/app/modules/home/controllers/home_controller.dart';
 import 'package:absensi/app/modules/home/views/home_view.dart';
 import 'package:absensi/app/modules/profil/views/profil_view.dart';
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:icons_plus/icons_plus.dart';
 import 'package:ternav_icons/ternav_icons.dart';
 
 import '../../../controllers/absen_controller.dart';
@@ -31,9 +33,9 @@ class HomeMenu extends GetView {
       bottomNavigationBar: Obx(
         () => ConvexAppBar(
           items: [
-            TabItem(icon: TernavIcons.light.home, title: 'Home'),
+            TabItem(icon: HeroIcons.home, title: 'Home'),
             TabItem(icon: TernavIcons.lightOutline.camera),
-            TabItem(icon: TernavIcons.light.profile, title: 'Profile'),
+            TabItem(icon: CupertinoIcons.person_crop_circle_fill, title: 'Profile'),
           ],
           initialActiveIndex: loginC.selected.value,
           activeColor: Colors.white,

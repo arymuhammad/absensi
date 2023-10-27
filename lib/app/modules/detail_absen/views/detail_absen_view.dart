@@ -6,10 +6,9 @@ import 'package:intl/intl.dart';
 
 // ignore: depend_on_referenced_packages
 import 'package:latlong2/latlong.dart';
-import '../../../Repo/service_api.dart';
+import '../../../services/service_api.dart';
 import '../controllers/detail_absen_controller.dart';
 import 'package:flutter_map/flutter_map.dart'; // Suitable for most situations
-import 'package:flutter_map/plugin_api.dart'; // Only import if required functionality is not exposed by default
 
 // ignore: must_be_immutable
 class DetailAbsenView extends GetView<DetailAbsenController> {
@@ -26,7 +25,7 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
       height: 80,
       point: LatLng(double.parse(Get.arguments["lat_masuk"]),
           double.parse(Get.arguments["long_masuk"])),
-      builder: (ctx) => Card(
+      child: Card(
         elevation: 10,
         child: Image.network(
           "${ServiceApi().baseUrl}${Get.arguments['foto_masuk']}",
@@ -47,7 +46,7 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
           double.parse(Get.arguments["long_pulang"] != ""
               ? Get.arguments["long_pulang"]
               : "0.0")),
-      builder: (ctx) => Card(
+      child: Card(
         elevation: 10,
         child: Image.network(
           "${ServiceApi().baseUrl}${Get.arguments['foto_pulang']}",
@@ -66,8 +65,7 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             image: DecorationImage(
-              image: AssetImage(
-                  'assets/image/bgapp.jpg'),
+              image: AssetImage('assets/image/bgapp.jpg'),
               fit: BoxFit.cover,
             ),
           ),

@@ -3,6 +3,8 @@ import 'package:get/get.dart';
 import '../modules/absen/views/absen_view.dart';
 import '../modules/add_pegawai/bindings/add_pegawai_binding.dart';
 import '../modules/add_pegawai/views/add_pegawai_view.dart';
+import '../modules/report_sales/bindings/report_sales_binding.dart';
+import '../modules/report_sales/views/report_sales_view.dart';
 import '../modules/cek_stok/bindings/cek_stok_binding.dart';
 import '../modules/cek_stok/views/cek_stok_view.dart';
 import '../modules/detail_absen/bindings/detail_absen_binding.dart';
@@ -62,7 +64,11 @@ class AppPages {
     GetPage(
       name: _Paths.ABSEN,
       page: () => AbsenView(),
-      
     ),
+    GetPage(
+        name: _Paths.CEK_SALES,
+        page: () => const ReportSalesView(),
+        binding: ReportSalesBinding(),
+        transition: Transition.cupertino),
   ];
 }

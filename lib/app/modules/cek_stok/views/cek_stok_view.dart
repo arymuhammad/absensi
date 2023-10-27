@@ -16,7 +16,7 @@ class CekStokView extends GetView<CekStokController> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Cek Stok'),
+        title: const Text('CEK STOK'),
         centerTitle: true,
         flexibleSpace: Container(
           decoration: const BoxDecoration(

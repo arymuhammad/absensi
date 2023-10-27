@@ -9,7 +9,7 @@ final auth = Get.put(LoginController());
 void showToast(message) {
   Fluttertoast.showToast(
       msg: message,
-      backgroundColor: Colors.grey[700],
+      // backgroundColor: Colors.grey[700],
       textColor: Colors.white,
       toastLength: Toast.LENGTH_SHORT,
       gravity: ToastGravity.BOTTOM,

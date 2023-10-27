@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:get/get.dart';
 
-import '../../../Repo/service_api.dart';
+import '../../../services/service_api.dart';
 
 class UpdateProfil extends GetView {
   UpdateProfil({super.key, this.userData});

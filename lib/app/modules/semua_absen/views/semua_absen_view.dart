@@ -471,22 +471,17 @@ class SemuaAbsenView extends GetView<SemuaAbsenController> {
                                               Column(
                                                 children: [
                                                   const Text('Pulang'),
-                                                  Text(
-                                                    ' - ',
-                                                    style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        color: titleColor),
-                                                  ),
-                                                ],
-                                              ),
-                                              Text(
+                                                 Text(
                                                 absenC.searchAbsen[i]
-                                                    .jamAbsenPulang!,
+                                                    .jamAbsenPulang! !=""? absenC.searchAbsen[i]
+                                                    .jamAbsenPulang!:"-",
                                                 style: TextStyle(
                                                     fontWeight: FontWeight.bold,
                                                     color: titleColor),
                                               ),
+                                                ],
+                                              ),
+                                              
                                             ],
                                           ),
                                         ),
@@ -571,7 +566,7 @@ class SemuaAbsenView extends GetView<SemuaAbsenController> {
       isScrollControlled: true,
       backgroundColor: Colors.white,
       SizedBox(
-        height: 120,
+        height: 140,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
           child: Column(

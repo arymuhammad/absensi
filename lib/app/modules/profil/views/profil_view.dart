@@ -12,7 +12,7 @@ import 'package:full_screen_image_null_safe/full_screen_image_null_safe.dart';
 import 'package:get/get.dart';
 import 'package:ternav_icons/ternav_icons.dart';
 
-import '../../../Repo/service_api.dart';
+import '../../../services/service_api.dart';
 import '../../add_pegawai/controllers/add_pegawai_controller.dart';
 import '../controllers/profil_controller.dart';
 
