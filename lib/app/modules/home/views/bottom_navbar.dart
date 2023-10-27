@@ -13,8 +13,8 @@ import 'package:ternav_icons/ternav_icons.dart';
 import '../../../controllers/absen_controller.dart';
 import '../../login/controllers/login_controller.dart';
 
-class HomeMenu extends GetView {
-  HomeMenu({super.key, this.listDataUser});
+class BottomNavBar extends GetView {
+  BottomNavBar({super.key, this.listDataUser});
   final loginC = Get.put(LoginController());
   final loc = Get.put(AbsenController());
   final homeC = Get.put(HomeController());

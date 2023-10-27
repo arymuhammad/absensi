@@ -1,5 +1,5 @@
 import 'package:absensi/app/helper/const.dart';
-import 'package:absensi/app/modules/home/views/home_menu.dart';
+import 'package:absensi/app/modules/home/views/bottom_navbar.dart';
 import 'package:absensi/app/modules/login/controllers/login_controller.dart';
 import 'package:absensi/app/modules/login/views/login_view.dart';
 import 'package:flutter/material.dart';
@@ -37,7 +37,7 @@ void main() async {
                       canvasColor: backgroundColor),
                   home: SplashScreenView(
                     navigateRoute: Obx(() => auth.isAuth.value
-                        ? HomeMenu(listDataUser: auth.logUser)
+                        ? BottomNavBar(listDataUser: auth.logUser)
                         : const LoginView()),
                     duration: 2700,
                     imageSize: 140,
