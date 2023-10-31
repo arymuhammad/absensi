@@ -33,9 +33,9 @@ class BottomNavBar extends GetView {
       bottomNavigationBar: Obx(
         () => ConvexAppBar(
           items: [
-            TabItem(icon: HeroIcons.home, title: 'Home'),
+            const TabItem(icon: HeroIcons.home, title: 'Home'),
             TabItem(icon: TernavIcons.lightOutline.camera),
-            TabItem(icon: CupertinoIcons.person_crop_circle_fill, title: 'Profile'),
+            const TabItem(icon: CupertinoIcons.person_crop_circle_fill, title: 'Profile'),
           ],
           initialActiveIndex: loginC.selected.value,
           activeColor: Colors.white,

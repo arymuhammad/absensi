@@ -51,20 +51,19 @@ class AbsenController extends GetxController {
   var jamPulang = "".obs;
   var timeNow = "";
   var dateNowServer = "";
+  var tglStream = DateTime.now().obs;
   var dateAbsen = "";
   var downloadProgress = 0.0.obs;
   var updateList = [];
   var currVer = "";
   var latestVer = "";
   RxList<Absen> searchAbsen = RxList<Absen>([]);
-  late TextEditingController filterAbsen;
-  late TextEditingController date1;
-  late TextEditingController date2;
+  late TextEditingController filterAbsen, date1, date2;
   final ImagePicker picker = ImagePicker();
   XFile? image;
   FilePickerResult? imageWeb;
   var searchDate = "".obs;
-  var dateNow = DateFormat('yyyy-MM-dd').format(DateTime.now()).toString();
+  var dateNow = DateFormat('yyyy-MM-dd').format(DateTime.now());
   var thisMonth =
       DateFormat('MMMM yyyy', 'id_ID').format(DateTime.now()).toString();
   var initDate1 = DateFormat('yyyy-MM-dd')
@@ -77,6 +76,9 @@ class AbsenController extends GetxController {
               .toString()))
       .toString();
   DateTime? lastTime;
+  final _dateStream = Rx<DateTime?>(null);
+
+  // Stream<DateTime?> get dateStream => _dateStream.stream;
 
   @override
   void onInit() async {
@@ -93,7 +95,7 @@ class AbsenController extends GetxController {
     var paramSingle = {
       "mode": "single",
       "id_user": dataUserLogin[0],
-      "tanggal": dateNow
+      "tanggal_masuk": dateNow
     };
     filterAbsen = TextEditingController();
     date1 = TextEditingController();
@@ -117,13 +119,26 @@ class AbsenController extends GetxController {
       //parsing readDoc
       final document = xml.XmlDocument.parse(readDoc.body);
       final cLog = document.findElements('items').first;
-      latestVer = cLog.findElements('versi').first.text;
+      latestVer = cLog.findElements('versi').first.innerText;
       if (latestVer != currVer) {
         checkForUpdates("onInit");
       }
     }
-    // Position position = await determinePosition();
-    // print(position.latitude);
+
+    _startDateStream();
+  }
+
+  void _startDateStream() {
+    // Buat Stream yang mengeluarkan tanggal setiap detik
+    final dateStream =
+        Stream.periodic(const Duration(seconds: 1), (_) => DateTime.now());
+
+    // Perbarui nilai tanggal di _dateStream setiap kali Stream mengeluarkan nilai baru
+    dateStream.listen((date) {
+      _dateStream.value = date;
+      tglStream.value = date;
+      // print(DateFormat('yyyy-MM-dd').format(tglStream.value));
+    });
   }
 
   @override
@@ -132,6 +147,7 @@ class AbsenController extends GetxController {
     filterAbsen.dispose();
     date1.dispose();
     date2.dispose();
+    _dateStream.close();
   }
 
   Future<List<Cabang>> getCabang() async {
@@ -146,6 +162,8 @@ class AbsenController extends GetxController {
               'https://timeapi.io/api/Time/current/zone?timeZone=$timeZone'))
           .then((data) => jsonDecode(data.body));
       timeNow = response['time'];
+      // timeNow = DateFormat('HH:mm').format(DateTime.now()).toString();
+
       dateNowServer = response['dateTime'];
     } on HandshakeException catch (_) {
       // print(e.toString());
@@ -177,189 +195,14 @@ class AbsenController extends GetxController {
           'Anda terdeteksi menggunakan\nlokasi palsu\nHarap matikan lokasi palsu');
     } else {
       timeNetwork(currentTimeZone);
-      await cekDataAbsen("masuk", dataUser![0]);
-      if (cekAbsen.value.total == "0") {
-        msg.value = "Absen masuk hari ini?";
-        await Get.defaultDialog(
-            title: 'Absen',
-            content: Column(
-              children: [
-                Text(msg.value),
-                const SizedBox(
-                  height: 15,
-                ),
-                FutureBuilder(
-                  future: getCabang(),
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData) {
-                      var dataCabang = snapshot.data!;
-                      return DropdownButtonFormField(
-                        decoration: InputDecoration(
-                            border: const OutlineInputBorder(),
-                            hintText: dataUser[2]),
-                        value: selectedCabang.value == ""
-                            ? null
-                            : selectedCabang.value,
-                        onChanged: (data) {
-                          selectedCabang.value = data!;
+      if (DateFormat('HH:mm')
+              .parse(DateFormat('HH:mm').format(tglStream.value))
+              .isBefore(DateFormat('HH:mm').parse("08:00")) &&
+          DateTime.parse(dateNow).isBefore(DateTime.parse(
+              DateFormat('yyyy-MM-dd').format(tglStream.value)))) {
+        // CEK ABSEN PULANG DITANGGAL H+1
 
-                          for (int i = 0; i < dataCabang.length; i++) {
-                            if (dataCabang[i].kodeCabang == data) {
-                              lat.value = dataCabang[i].lat!;
-                              long.value = dataCabang[i].long!;
-                            }
-                          }
-                        },
-                        items: dataCabang
-                            .map((e) => DropdownMenuItem(
-                                value: e.kodeCabang,
-                                child: Text(e.namaCabang.toString())))
-                            .toList(),
-                      );
-                    } else if (snapshot.hasError) {
-                      return Text('${snapshot.error}');
-                    }
-                    return const CupertinoActivityIndicator();
-                  },
-                ),
-                const SizedBox(height: 5),
-                FutureBuilder(
-                  future: getShift(),
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData) {
-                      var dataShift = snapshot.data!;
-                      return DropdownButtonFormField(
-                        decoration: const InputDecoration(
-                            border: OutlineInputBorder(),
-                            hintText: 'Pilih Shift Absen'),
-                        value: selectedShift.value == ""
-                            ? null
-                            : selectedShift.value,
-                        onChanged: (data) {
-                          selectedShift.value = data!;
-
-                          if (selectedShift.value == "4") {
-                            jamMasuk.value = timeNow;
-                            jamPulang.value = DateFormat("HH:mm").format(
-                                DateTime.parse(dateNowServer)
-                                    .add(const Duration(hours: 8)));
-                          } else {
-                            for (int i = 0; i < dataShift.length; i++) {
-                              if (dataShift[i].id == data) {
-                                jamMasuk.value = dataShift[i].jamMasuk!;
-                                jamPulang.value = dataShift[i].jamPulang!;
-                              }
-                            }
-                          }
-                        },
-                        items: dataShift
-                            .map((e) => DropdownMenuItem(
-                                value: e.id,
-                                child: Text(e.namaShift.toString())))
-                            .toList(),
-                      );
-                    } else if (snapshot.hasError) {
-                      return Text('${snapshot.error}');
-                    }
-                    return const CupertinoActivityIndicator();
-                  },
-                )
-              ],
-            ),
-            textCancel: 'Batal',
-            onCancel: () {
-              Get.back();
-              Get.back();
-              selectedShift.value = "";
-              selectedCabang.value = "";
-            },
-            textConfirm: 'Ambil Foto',
-            confirmTextColor: Colors.white,
-            onConfirm: () async {
-              if (selectedShift.isEmpty) {
-                showToast("Harap pilih Shift Absen");
-              } else {
-                SharedPreferences pref = await SharedPreferences.getInstance();
-                double distance = Geolocator.distanceBetween(
-                    double.parse(lat.isNotEmpty ? lat.value : dataUser[6]),
-                    double.parse(long.isNotEmpty ? long.value : dataUser[7]),
-                    position.latitude.toDouble(),
-                    position.longitude.toDouble());
-                await pref.setStringList('userLoc', <String>[
-                  lat.isNotEmpty ? lat.value : dataUser[6],
-                  long.isNotEmpty ? long.value : dataUser[7]
-                ]);
-
-                distanceStore.value = distance;
-
-                if (distanceStore.value > 100) {
-                  dialogMsgCncl(
-                      'Terjadi Kesalahan', 'Anda berada diluar area absen');
-                  selectedShift.value = "";
-                  selectedCabang.value = "";
-                } else {
-                  if (kIsWeb) {
-                    imageWeb = await FilePicker.platform.pickFiles(
-                        type: FileType.custom,
-                        allowedExtensions: ['jpg', 'jpeg', 'png'],
-                        withReadStream: true,
-                        // this will return PlatformFile object with read stream
-                        allowCompression: true);
-                  } else {
-                    await uploadFotoAbsen();
-                  }
-                  Get.back();
-                  if (image != null || imageWeb != null) {
-                    var data = {
-                      "status": "add",
-                      "tanggal": dateNow,
-                      "kode_cabang": selectedCabang.isNotEmpty
-                          ? selectedCabang.value
-                          : dataUser[8],
-                      "id": dataUser[0],
-                      "nama": dataUser[1],
-                      "id_shift": selectedShift.value,
-                      "jam_masuk": jamMasuk.value,
-                      "jam_pulang": jamPulang.value,
-                      "jam_absen_masuk": timeNow.toString(),
-                      "foto_masuk": kIsWeb
-                          ? imageWeb!.files.single
-                          : File(image!.path.toString()),
-                      "lat_masuk": position.latitude.toString(),
-                      "long_masuk": position.longitude.toString(),
-                      "device_info": devInfo.value
-                    };
-                    // print(data);
-
-                    loadingDialog("Sedang mengirim data...", "");
-                    await ServiceApi().submitAbsen(data);
-                    await Future.delayed(const Duration(milliseconds: 600));
-                    Get.back();
-                    dialogMsgAbsen("Sukses", "Anda berhasil Absen");
-                    imageWeb = null;
-                  }
-                  var paramAbsenToday = {
-                    "mode": "single",
-                    "id_user": dataUser[0],
-                    "tanggal": dateNow
-                  };
-
-                  var paramLimitAbsen = {
-                    "mode": "limit",
-                    "id_user": dataUser[0],
-                    "tanggal1": initDate1,
-                    "tanggal2": initDate2
-                  };
-                  getAbsenToday(paramAbsenToday);
-                  getLimitAbsen(paramLimitAbsen);
-                  selectedShift.value = "";
-                  selectedCabang.value = "";
-                }
-              }
-            },
-            barrierDismissible: false);
-      } else {
-        await cekDataAbsen("pulang", dataUser[0]);
+        await cekDataAbsen("pulang", dataUser![0], dateAbsen);
         if (cekAbsen.value.total == "0") {
           msg.value = "Anda yakin ingin absen pulang hari ini?";
           Get.defaultDialog(
@@ -373,18 +216,20 @@ class AbsenController extends GetxController {
               textConfirm: 'Ambil Foto',
               confirmTextColor: Colors.white,
               onConfirm: () async {
-                SharedPreferences pref = await SharedPreferences.getInstance();
-                List<String> userLoc = pref.getStringList('userLoc') ?? [""];
+                // SharedPreferences pref = await SharedPreferences.getInstance();
+                // List<String> userLoc = pref.getStringList('userLoc') ?? [""];
+                // print(userLoc);
                 double distance = Geolocator.distanceBetween(
-                    double.parse(userLoc[0]),
-                    double.parse(userLoc[1]),
+                    double.parse(lat.isNotEmpty ? lat.value : dataUser[6]),
+                    double.parse(long.isNotEmpty ? long.value : dataUser[7]),
                     position.latitude.toDouble(),
                     position.longitude.toDouble());
 
                 distanceStore.value = distance;
+               
                 if (distanceStore.value > 100) {
-                  dialogMsgCncl('Terjadi Kesalahan',
-                      'Anda berada diluar area absen');
+                  dialogMsgCncl(
+                      'Terjadi Kesalahan', 'Anda berada diluar area absen');
                 } else {
                   if (kIsWeb) {
                     imageWeb = await FilePicker.platform.pickFiles(
@@ -404,7 +249,11 @@ class AbsenController extends GetxController {
                     var data = {
                       "status": "update",
                       "id": dataUser[0],
-                      "tanggal": dateNow,
+                      "tanggal_masuk": dateAbsen,
+                      "tanggal_pulang":
+                          tglStream.value.isAfter(DateTime.parse(dateNow))
+                              ? DateFormat('yyyy-MM-dd').format(tglStream.value)
+                              : dateNow,
                       "nama": dataUser[1],
                       "jam_absen_pulang": timeNow.toString(),
                       "foto_pulang": kIsWeb
@@ -415,10 +264,14 @@ class AbsenController extends GetxController {
                       "device_info2": devInfo.value
                     };
                     await ServiceApi().submitAbsen(data);
+
                     var paramAbsenToday = {
                       "mode": "single",
                       "id_user": dataUser[0],
-                      "tanggal": dateNow
+                      "tanggal_masuk":
+                          tglStream.value.isAfter(DateTime.parse(dateNow))
+                              ? DateFormat('yyyy-MM-dd').format(tglStream.value)
+                              : dateNow
                     };
 
                     var paramLimitAbsen = {
@@ -427,8 +280,12 @@ class AbsenController extends GetxController {
                       "tanggal1": initDate1,
                       "tanggal2": initDate2
                     };
+
                     getAbsenToday(paramAbsenToday);
                     getLimitAbsen(paramLimitAbsen);
+                    dateNow = DateFormat('yyyy-MM-dd').format(
+                        DateTime.parse(dateNow).add(const Duration(days: 1)));
+
                     await Future.delayed(const Duration(milliseconds: 400));
                     Get.back();
                     dialogMsgAbsen("Sukses", "Anda berhasil Absen");
@@ -443,21 +300,310 @@ class AbsenController extends GetxController {
           dialogMsgCncl(
               "Terjadi Kesalahan", "Anda sudah Absen Pulang hari ini.");
         }
+        // JIKA TIDAK ADA ABSEN PULANG MENGGANTUNG, LANJUT KE TAHAP SELANJUTNYA
+      } else {
+        await cekDataAbsen("masuk", dataUser![0],
+            DateFormat('yyyy-MM-dd').format(tglStream.value));
+        // CEK ABSEN MASUK TODAY, JIKA HASIL 0 ABSEN MASUK
+        if (cekAbsen.value.total == "0") {
+          msg.value = "Absen masuk hari ini?";
+          await Get.defaultDialog(
+              title: 'Absen',
+              content: Column(
+                children: [
+                  Text(msg.value),
+                  const SizedBox(
+                    height: 15,
+                  ),
+                  FutureBuilder(
+                    future: getCabang(),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        var dataCabang = snapshot.data!;
+                        return DropdownButtonFormField(
+                          decoration: InputDecoration(
+                              border: const OutlineInputBorder(),
+                              hintText: dataUser[2]),
+                          value: selectedCabang.value == ""
+                              ? null
+                              : selectedCabang.value,
+                          onChanged: (data) {
+                            selectedCabang.value = data!;
+
+                            for (int i = 0; i < dataCabang.length; i++) {
+                              if (dataCabang[i].kodeCabang == data) {
+                                lat.value = dataCabang[i].lat!;
+                                long.value = dataCabang[i].long!;
+                              }
+                            }
+                          },
+                          items: dataCabang
+                              .map((e) => DropdownMenuItem(
+                                  value: e.kodeCabang,
+                                  child: Text(e.namaCabang.toString())))
+                              .toList(),
+                        );
+                      } else if (snapshot.hasError) {
+                        return Text('${snapshot.error}');
+                      }
+                      return const CupertinoActivityIndicator();
+                    },
+                  ),
+                  const SizedBox(height: 5),
+                  FutureBuilder(
+                    future: getShift(),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        var dataShift = snapshot.data!;
+                        return DropdownButtonFormField(
+                          decoration: const InputDecoration(
+                              border: OutlineInputBorder(),
+                              hintText: 'Pilih Shift Absen'),
+                          value: selectedShift.value == ""
+                              ? null
+                              : selectedShift.value,
+                          onChanged: (data) {
+                            selectedShift.value = data!;
+
+                            if (selectedShift.value == "4") {
+                              jamMasuk.value = timeNow;
+                              jamPulang.value = DateFormat("HH:mm").format(
+                                  DateTime.parse(dateNowServer)
+                                      .add(const Duration(hours: 8)));
+                            } else {
+                              for (int i = 0; i < dataShift.length; i++) {
+                                if (dataShift[i].id == data) {
+                                  jamMasuk.value = dataShift[i].jamMasuk!;
+                                  jamPulang.value = dataShift[i].jamPulang!;
+                                }
+                              }
+                            }
+                          },
+                          items: dataShift
+                              .map((e) => DropdownMenuItem(
+                                  value: e.id,
+                                  child: Text(e.namaShift.toString())))
+                              .toList(),
+                        );
+                      } else if (snapshot.hasError) {
+                        return Text('${snapshot.error}');
+                      }
+                      return const CupertinoActivityIndicator();
+                    },
+                  )
+                ],
+              ),
+              textCancel: 'Batal',
+              onCancel: () {
+                Get.back();
+                Get.back();
+                selectedShift.value = "";
+                selectedCabang.value = "";
+              },
+              textConfirm: 'Ambil Foto',
+              confirmTextColor: Colors.white,
+              onConfirm: () async {
+                if (selectedShift.isEmpty) {
+                  showToast("Harap pilih Shift Absen");
+                } else {
+                  SharedPreferences pref =
+                      await SharedPreferences.getInstance();
+                  double distance = Geolocator.distanceBetween(
+                      double.parse(lat.isNotEmpty ? lat.value : dataUser[6]),
+                      double.parse(long.isNotEmpty ? long.value : dataUser[7]),
+                      position.latitude.toDouble(),
+                      position.longitude.toDouble());
+                  await pref.setStringList('userLoc', <String>[
+                    lat.isNotEmpty ? lat.value : dataUser[6],
+                    long.isNotEmpty ? long.value : dataUser[7]
+                  ]);
+
+                  distanceStore.value = distance;
+
+                  if (distanceStore.value > 100) {
+                    dialogMsgCncl(
+                        'Terjadi Kesalahan', 'Anda berada diluar area absen');
+                    selectedShift.value = "";
+                    selectedCabang.value = "";
+                  } else {
+                    if (kIsWeb) {
+                      imageWeb = await FilePicker.platform.pickFiles(
+                          type: FileType.custom,
+                          allowedExtensions: ['jpg', 'jpeg', 'png'],
+                          withReadStream: true,
+                          // this will return PlatformFile object with read stream
+                          allowCompression: true);
+                    } else {
+                      await uploadFotoAbsen();
+                    }
+                    Get.back();
+                    if (image != null || imageWeb != null) {
+                      var data = {
+                        "status": "add",
+                        "id": dataUser[0],
+                        "tanggal_masuk":
+                            DateFormat('yyyy-MM-dd').format(tglStream.value),
+                        "kode_cabang": selectedCabang.isNotEmpty
+                            ? selectedCabang.value
+                            : dataUser[8],
+                        "nama": dataUser[1],
+                        "id_shift": selectedShift.value,
+                        "jam_masuk": jamMasuk.value,
+                        "jam_pulang": jamPulang.value,
+                        "jam_absen_masuk": timeNow.toString(),
+                        "foto_masuk": kIsWeb
+                            ? imageWeb!.files.single
+                            : File(image!.path.toString()),
+                        "lat_masuk": position.latitude.toString(),
+                        "long_masuk": position.longitude.toString(),
+                        "device_info": devInfo.value
+                      };
+
+                      loadingDialog("Sedang mengirim data...", "");
+                      await ServiceApi().submitAbsen(data);
+                      await Future.delayed(const Duration(milliseconds: 600));
+                      Get.back();
+                      dialogMsgAbsen("Sukses", "Anda berhasil Absen");
+                      imageWeb = null;
+                    }
+                    var paramAbsenToday = {
+                      "mode": "single",
+                      "id_user": dataUser[0],
+                      "tanggal_masuk":
+                          DateFormat('yyyy-MM-dd').format(tglStream.value)
+                    };
+
+                    var paramLimitAbsen = {
+                      "mode": "limit",
+                      "id_user": dataUser[0],
+                      "tanggal1": initDate1,
+                      "tanggal2": initDate2
+                    };
+                    getAbsenToday(paramAbsenToday);
+                    getLimitAbsen(paramLimitAbsen);
+                    selectedShift.value = "";
+                    selectedCabang.value = "";
+                  }
+                }
+              },
+              barrierDismissible: false);
+        } else {
+          // PROSES ABSEN PULANG
+          await cekDataAbsen("pulang", dataUser[0],
+              DateFormat('yyyy-MM-dd').format(tglStream.value));
+          if (cekAbsen.value.total == "0") {
+            msg.value = "Anda yakin ingin absen pulang hari ini?";
+            Get.defaultDialog(
+                title: 'Absen',
+                middleText: msg.value,
+                textCancel: 'Batal',
+                onCancel: () {
+                  Get.back();
+                  Get.back();
+                },
+                textConfirm: 'Ambil Foto',
+                confirmTextColor: Colors.white,
+                onConfirm: () async {
+                  // SharedPreferences pref = await SharedPreferences.getInstance();
+                  // List<String> userLoc = pref.getStringList('userLoc') ?? [""];
+                  // print(userLoc);
+                  double distance = Geolocator.distanceBetween(
+                      double.parse(lat.isNotEmpty ? lat.value : dataUser[6]),
+                      double.parse(long.isNotEmpty ? long.value : dataUser[7]),
+                      position.latitude.toDouble(),
+                      position.longitude.toDouble());
+
+                  distanceStore.value = distance;
+                 
+                  if (distanceStore.value > 100) {
+                    dialogMsgCncl(
+                        'Terjadi Kesalahan', 'Anda berada diluar area absen');
+                  } else {
+                    if (kIsWeb) {
+                      imageWeb = await FilePicker.platform.pickFiles(
+                          type: FileType.custom,
+                          allowedExtensions: ['jpg', 'jpeg', 'png'],
+                          withReadStream: true,
+
+                          // this will return PlatformFile object with read stream
+                          allowCompression: true);
+                    } else {
+                      await uploadFotoAbsen();
+                    }
+                    Get.back();
+                    loadingDialog("Sedang mengirim data...", "");
+
+                    if (image != null || imageWeb != null) {
+                      var data = {
+                        "status": "update",
+                        "id": dataUser[0],
+                        "tanggal_masuk":
+                            DateFormat('yyyy-MM-dd').format(tglStream.value),
+                        "tanggal_pulang":
+                            DateFormat('yyyy-MM-dd').format(tglStream.value),
+                        "nama": dataUser[1],
+                        "jam_absen_pulang": timeNow.toString(),
+                        "foto_pulang": kIsWeb
+                            ? imageWeb!.files.single
+                            : File(image!.path.toString()),
+                        "lat_pulang": position.latitude.toString(),
+                        "long_pulang": position.longitude.toString(),
+                        "device_info2": devInfo.value
+                      };
+                      await ServiceApi().submitAbsen(data);
+
+                      var paramAbsenToday = {
+                        "mode": "single",
+                        "id_user": dataUser[0],
+                        "tanggal_masuk":
+                            DateFormat('yyyy-MM-dd').format(tglStream.value)
+                      };
+
+                      var paramLimitAbsen = {
+                        "mode": "limit",
+                        "id_user": dataUser[0],
+                        "tanggal1": initDate1,
+                        "tanggal2": initDate2
+                      };
+                      getAbsenToday(paramAbsenToday);
+                      getLimitAbsen(paramLimitAbsen);
+                      // dateNow.value = DateFormat('yyyy-MM-dd')
+                      //     .format(DateTime.now().add(const Duration(days: 1)))
+                      //     .toString();
+                      await Future.delayed(const Duration(milliseconds: 400));
+                      Get.back();
+                      dialogMsgAbsen("Sukses", "Anda berhasil Absen");
+                    } else {
+                      Get.back();
+                      dialogMsgAbsen("Peringatan", "Absen Pulang dibatalkan");
+                    }
+                  }
+                },
+                barrierDismissible: false);
+          } else {
+            dialogMsgCncl(
+                "Terjadi Kesalahan", "Anda sudah Absen Pulang hari ini.");
+          }
+        }
       }
     }
   }
 
-  Future<CekAbsen> cekDataAbsen(String status, String id) async {
+  Future<CekAbsen> cekDataAbsen(
+      String status, String id, String tglAbsen) async {
     var data = {
       "status": status,
       "id_user": id,
-      "tanggal": dateAbsen != "" ? dateAbsen : dateNow
+      "tanggal_masuk": tglAbsen,
+      "tanggal_pulang": DateFormat('yyyy-MM-dd').format(tglStream.value)
     };
+    // print(dateAbsen);
+    // print('$dateNow date');
     final response = await ServiceApi().cekDataAbsen(data);
     cekAbsen.value = response;
-    dateAbsen =
-        cekAbsen.value.tanggal != null ? cekAbsen.value.tanggal! : dateNow;
-    // print(cekAbsen.value.tanggal);
+    dateAbsen = cekAbsen.value.tanggalMasuk != null
+        ? cekAbsen.value.tanggalMasuk!
+        : dateNow;
     return cekAbsen.value;
   }
 
@@ -578,8 +724,10 @@ class AbsenController extends GetxController {
       result = dataAllAbsen;
     } else {
       result = dataAllAbsen
-          .where((e) =>
-              e.tanggal.toString().toLowerCase().contains(data.toLowerCase()))
+          .where((e) => e.tanggalMasuk
+              .toString()
+              .toLowerCase()
+              .contains(data.toLowerCase()))
           .toList();
     }
     searchAbsen.value = result;
@@ -625,14 +773,14 @@ class AbsenController extends GetxController {
         final document = xml.XmlDocument.parse(readDoc.body);
         final itemsNode = document.findElements('items').first;
         final updates = itemsNode.findElements('update');
-        latestVer = itemsNode.findElements('versi').first.text;
+        latestVer = itemsNode.findElements('versi').first.innerText;
         //start looping item on readDoc
         updateList.clear();
         for (final listUpdates in updates) {
-          final name = listUpdates.findElements('name').first.text;
-          final desc = listUpdates.findElements('desc').first.text;
-          final icon = listUpdates.findElements('icon').first.text;
-          final color = listUpdates.findElements('color').first.text;
+          final name = listUpdates.findElements('name').first.innerText;
+          final desc = listUpdates.findElements('desc').first.innerText;
+          final icon = listUpdates.findElements('icon').first.innerText;
+          final color = listUpdates.findElements('color').first.innerText;
 
           updateList
               .add({'name': name, 'desc': desc, 'icon': icon, 'color': color});

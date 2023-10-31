@@ -12,7 +12,7 @@ class SummaryAbsen extends GetView {
   SummaryAbsen({super.key, this.userData});
   final List? userData;
   final absenC = Get.put(AbsenController());
-  
+
   @override
   Widget build(BuildContext context) {
     return Expanded(
@@ -29,15 +29,12 @@ class SummaryAbsen extends GetView {
             var paramSingle = {
               "mode": "single",
               "id_user": userData![0],
-              "tanggal": absenC.dateNow
+              "tanggal_masuk": DateFormat('yyyy-MM-dd').format(absenC.tglStream.value)
             };
-            // loadingDialog("Memuat halaman...", "");
+
             absenC.isLoading.value = true;
             await absenC.getAbsenToday(paramSingle);
             await absenC.getLimitAbsen(paramLimit);
-            // await Future.delayed(
-            //     const Duration(milliseconds: 400));
-            // Get.back();
 
             showToast("Halaman Disegarkan.");
           });
@@ -55,10 +52,12 @@ class SummaryAbsen extends GetView {
                 children: [
                   Padding(
                     padding: const EdgeInsets.only(left: 8.0),
-                    child: Text(
-                        DateFormat("EEEE, d MMMM yyyy", "id_ID")
-                            .format(DateTime.parse(absenC.dateNow)),
-                        style: const TextStyle(fontWeight: FontWeight.bold)),
+                    child: Obx(()=>Text(
+                          DateFormat("EEEE, d MMMM yyyy", "id_ID")
+                              .format(absenC.tglStream.value)
+                              .toString(),
+                          style: const TextStyle(fontWeight: FontWeight.bold)),
+                    ),
                   ),
                   const Divider(
                     thickness: 1,
@@ -261,7 +260,7 @@ class SummaryAbsen extends GetView {
                           itemBuilder: (c, i) {
                             return InkWell(
                               onTap: () =>
-                                  Get.to(()=>DetailAbsenView(), arguments: {
+                                  Get.to(() => DetailAbsenView(), arguments: {
                                 "foto_profil": userData![5] != ""
                                     ? userData![5]
                                     : userData![1],
@@ -269,7 +268,8 @@ class SummaryAbsen extends GetView {
                                 "nama_shift":
                                     absenC.dataLimitAbsen[i].namaShift!,
                                 "id_user": absenC.dataLimitAbsen[i].idUser!,
-                                "tanggal": absenC.dataLimitAbsen[i].tanggal!,
+                                "tanggal_masuk": absenC.dataLimitAbsen[i].tanggalMasuk!,
+                                "tanggal_pulang": absenC.dataLimitAbsen[i].tanggalPulang !=null?absenC.dataLimitAbsen[i].tanggalPulang!:"",
                                 "jam_masuk": DateFormat("HH:mm")
                                         .parse(absenC
                                             .dataLimitAbsen[i].jamAbsenMasuk!)
@@ -366,7 +366,7 @@ class SummaryAbsen extends GetView {
                                         Text(
                                           DateFormat('MMM')
                                               .format(DateTime.parse(absenC
-                                                  .dataLimitAbsen[i].tanggal!))
+                                                  .dataLimitAbsen[i].tanggalMasuk!))
                                               .toUpperCase(),
                                           style:
                                               TextStyle(color: subTitleColor),
@@ -374,7 +374,7 @@ class SummaryAbsen extends GetView {
                                         Text(
                                           DateFormat('dd').format(
                                               DateTime.parse(absenC
-                                                  .dataLimitAbsen[i].tanggal!)),
+                                                  .dataLimitAbsen[i].tanggalMasuk!)),
                                           style: TextStyle(
                                               fontWeight: FontWeight.bold,
                                               fontSize: 16,
@@ -386,12 +386,14 @@ class SummaryAbsen extends GetView {
                                       width: 20,
                                     ),
                                     Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                             DateFormat("EEEE", "id_ID").format(
                                                 DateTime.parse(absenC
                                                     .dataLimitAbsen[i]
-                                                    .tanggal!)),
+                                                    .tanggalMasuk!)),
                                             style: TextStyle(
                                                 fontWeight: FontWeight.bold,
                                                 fontSize: 18,

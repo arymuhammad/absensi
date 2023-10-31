@@ -1,10 +1,12 @@
 class CekAbsen {
   String? total;
-  String? tanggal;
+  String? tanggalMasuk;
+  String? tanggalPulang;
 
-  CekAbsen({this.total, this.tanggal});
+  CekAbsen({this.total, this.tanggalMasuk, this.tanggalPulang});
   CekAbsen.fromJson(Map<String, dynamic> json) {
     total = json['total'];
-    tanggal = json['tanggal'];
+    tanggalMasuk = json['tanggal_masuk'];
+    tanggalPulang = json['tanggal_pulang'];
   }
 }

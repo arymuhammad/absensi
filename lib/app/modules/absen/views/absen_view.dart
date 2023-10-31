@@ -65,24 +65,7 @@ class AbsenView extends GetView<AbsenController> {
                           'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                       userAgentPackageName: 'dev.fleaflet.flutter_map.example',
                     ),
-                    // MarkerLayer(markers: [
-                    //   Marker(
-                    //       // width: 80,
-                    //       // height: 80,
-                    //       point: LatLng(
-                    //           absenC.userPostLat.value != 0.0
-                    //               ? absenC.userPostLat.value
-                    //               : 0.0,
-                    //           absenC.userPostLong.value != 0.0
-                    //               ? absenC.userPostLong.value
-                    //               : 0.0),
-                    //       child: Icon(
-                    //         Icons.location_pin,
-                    //         color: Colors.redAccent[700],
-                    //         size: 50,
-                    //       ),
-                    //       rotate: true),
-                    // ]),
+
                     CircleLayer(
                       circles: [
                         CircleMarker(
@@ -126,7 +109,7 @@ class AbsenView extends GetView<AbsenController> {
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Card(
-                      child: Container(
+                      child: SizedBox(
                         height: 100,
                         child: Row(
                           children: [

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class AboutView extends GetView {
-  AboutView({Key? key}) : super(key: key);
+  AboutView({super.key});
   final ctr = Get.put(AddPegawaiController());
 
   @override

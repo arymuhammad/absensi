@@ -13,9 +13,8 @@ import '../../../routes/app_pages.dart';
 import '../controllers/semua_absen_controller.dart';
 import 'package:intl/intl.dart';
 
-
 class SemuaAbsenView extends GetView<SemuaAbsenController> {
-  SemuaAbsenView({Key? key}) : super(key: key);
+  SemuaAbsenView({super.key});
   final absenC = Get.put(AbsenController());
 
   @override
@@ -45,15 +44,15 @@ class SemuaAbsenView extends GetView<SemuaAbsenController> {
             () => absenC.ascending.value
                 ? IconButton(
                     onPressed: () {
-                      absenC.searchAbsen
-                          .sort((a, b) => a.tanggal!.compareTo(b.tanggal!));
+                      absenC.searchAbsen.sort(
+                          (a, b) => a.tanggalMasuk!.compareTo(b.tanggalMasuk!));
                       absenC.ascending.value = false;
                     },
                     icon: const Icon(CupertinoIcons.line_horizontal_3_decrease))
                 : IconButton(
                     onPressed: () {
-                      absenC.searchAbsen
-                          .sort((a, b) => b.tanggal!.compareTo(a.tanggal!));
+                      absenC.searchAbsen.sort(
+                          (a, b) => b.tanggalMasuk!.compareTo(a.tanggalMasuk!));
                       absenC.ascending.value = true;
                     },
                     icon:
@@ -76,7 +75,7 @@ class SemuaAbsenView extends GetView<SemuaAbsenController> {
                 onChanged: (data) => absenC.filterDataAbsen(data),
                 decoration: InputDecoration(
                     prefixIcon: const Icon(Icons.search),
-                    hintText: 'Cari berdasarkan tanggal (Cth : 2023-01-01)',
+                    hintText: '2023-01-01',
                     labelText: 'Cari Absen',
                     border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10))),
@@ -265,8 +264,15 @@ class SemuaAbsenView extends GetView<SemuaAbsenController> {
                                               absenC.searchAbsen[i].namaShift!,
                                           "id_user":
                                               absenC.searchAbsen[i].idUser!,
-                                          "tanggal":
-                                              absenC.searchAbsen[i].tanggal!,
+                                          "tanggal_masuk": absenC
+                                              .searchAbsen[i].tanggalMasuk!,
+                                          "tanggal_pulang": absenC
+                                                      .searchAbsen[i]
+                                                      .tanggalPulang !=
+                                                  null
+                                              ? absenC
+                                                  .searchAbsen[i].tanggalPulang!
+                                              : "",
                                           "jam_masuk": DateFormat("HH:mm")
                                                   .parse(absenC.searchAbsen[i]
                                                       .jamAbsenMasuk!)
@@ -294,13 +300,20 @@ class SemuaAbsenView extends GetView<SemuaAbsenController> {
                                                       .parse(absenC
                                                           .searchAbsen[i]
                                                           .jamAbsenPulang!)
-                                                      .isBefore(DateFormat(
-                                                              "HH:mm")
+                                                      .isBefore(
+                                                          DateFormat("HH:mm")
+                                                              .parse("07:00"))
+                                                  ? "Lembur"
+                                                  : DateFormat("HH:mm")
                                                           .parse(absenC
                                                               .searchAbsen[i]
-                                                              .jamPulang!))
-                                                  ? "Pulang Cepat"
-                                                  : "Lembur",
+                                                              .jamAbsenPulang!)
+                                                          .isBefore(DateFormat("HH:mm")
+                                                              .parse(absenC
+                                                                  .searchAbsen[i]
+                                                                  .jamPulang!))
+                                                      ? "Pulang Cepat"
+                                                      : "Lembur",
                                           "jam_absen_masuk": absenC
                                               .searchAbsen[i].jamAbsenMasuk!,
                                           "jam_absen_pulang": absenC
@@ -366,7 +379,8 @@ class SemuaAbsenView extends GetView<SemuaAbsenController> {
                                             Text(
                                               DateFormat('MMM')
                                                   .format(DateTime.parse(absenC
-                                                      .searchAbsen[i].tanggal!))
+                                                      .searchAbsen[i]
+                                                      .tanggalMasuk!))
                                                   .toUpperCase(),
                                               style: TextStyle(
                                                   color: subTitleColor),
@@ -375,7 +389,7 @@ class SemuaAbsenView extends GetView<SemuaAbsenController> {
                                               DateFormat('dd').format(
                                                   DateTime.parse(absenC
                                                       .searchAbsen[i]
-                                                      .tanggal!)),
+                                                      .tanggalMasuk!)),
                                               style: TextStyle(
                                                   fontWeight: FontWeight.bold,
                                                   fontSize: 16,
@@ -392,7 +406,7 @@ class SemuaAbsenView extends GetView<SemuaAbsenController> {
                                                 DateFormat("EEEE", "id_ID")
                                                     .format(DateTime.parse(
                                                         absenC.searchAbsen[i]
-                                                            .tanggal!)),
+                                                            .tanggalMasuk!)),
                                                 style: TextStyle(
                                                     fontWeight: FontWeight.bold,
                                                     fontSize: 18,
@@ -471,75 +485,23 @@ class SemuaAbsenView extends GetView<SemuaAbsenController> {
                                               Column(
                                                 children: [
                                                   const Text('Pulang'),
-                                                 Text(
-                                                absenC.searchAbsen[i]
-                                                    .jamAbsenPulang! !=""? absenC.searchAbsen[i]
-                                                    .jamAbsenPulang!:"-",
-                                                style: TextStyle(
-                                                    fontWeight: FontWeight.bold,
-                                                    color: titleColor),
-                                              ),
+                                                  Text(
+                                                    absenC.searchAbsen[i]
+                                                                .jamAbsenPulang! !=
+                                                            ""
+                                                        ? absenC.searchAbsen[i]
+                                                            .jamAbsenPulang!
+                                                        : "-",
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: titleColor),
+                                                  ),
                                                 ],
                                               ),
-                                              
                                             ],
                                           ),
                                         ),
-                                        // Container(
-                                        //   // margin: const EdgeInsets.only(bottom: 20),
-                                        //   padding: const EdgeInsets.all(10),
-                                        //   decoration: const BoxDecoration(
-                                        //     color: Colors.white,
-                                        //     // borderRadius:
-                                        //     //     BorderRadius.circular(20)
-                                        //   ),
-                                        //   child: Column(
-                                        //     crossAxisAlignment:
-                                        //         CrossAxisAlignment.start,
-                                        //     children: [
-                                        //       Row(
-                                        //         mainAxisAlignment:
-                                        //             MainAxisAlignment
-                                        //                 .spaceBetween,
-                                        //         children: [
-                                        //           const Text(
-                                        //             'Masuk',
-                                        //             style: TextStyle(
-                                        //                 fontWeight:
-                                        //                     FontWeight.bold),
-                                        //           ),
-                                        //           // Text(
-                                        //           //     DateFormat(
-                                        //           //             "EEEE, d MMMM yyyy",
-                                        //           //             "id_ID")
-                                        //           //         .format(DateTime.parse(
-                                        //           //             absenC
-                                        //           //                 .searchAbsen[i]
-                                        //           //                 .tanggal!)),
-                                        //           //     style: const TextStyle(
-                                        //           //         fontWeight:
-                                        //           //             FontWeight.bold)),
-                                        //         ],
-                                        //       ),
-                                        //       Text(absenC
-                                        //           .searchAbsen[i].jamAbsenMasuk!),
-                                        //       const SizedBox(
-                                        //         height: 8,
-                                        //       ),
-                                        //       const Text(
-                                        //         'Keluar',
-                                        //         style: TextStyle(
-                                        //             fontWeight: FontWeight.bold),
-                                        //       ),
-                                        //       Text(absenC.searchAbsen[i]
-                                        //                   .jamAbsenPulang !=
-                                        //               ""
-                                        //           ? absenC.searchAbsen[i]
-                                        //               .jamAbsenPulang!
-                                        //           : "-"),
-                                        //     ],
-                                        //   ),
-                                        // ),
                                       ],
                                     ),
                                   ),

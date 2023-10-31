@@ -60,6 +60,7 @@ void dialogMsgAbsen(code, msg) {
       middleText: msg,
       confirmTextColor: Colors.white,
       onConfirm: () {
+        // Get.to(() => HomeView());
         Get.back();
         Get.back();
         Get.back();

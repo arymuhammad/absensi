@@ -11,7 +11,7 @@ import '../../../services/service_api.dart';
 import '../controllers/home_controller.dart';
 
 class HomeView extends GetView<HomeController> {
-  HomeView({super.key, this.listDataUser});
+  const HomeView({super.key, this.listDataUser});
   final List? listDataUser;
 
   @override

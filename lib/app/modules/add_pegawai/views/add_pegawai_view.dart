@@ -9,7 +9,7 @@ import 'package:get/get.dart';
 import '../controllers/add_pegawai_controller.dart';
 
 class AddPegawaiView extends GetView<AddPegawaiController> {
-  const AddPegawaiView({Key? key}) : super(key: key);
+  const AddPegawaiView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -65,9 +65,9 @@ class AddPegawaiView extends GetView<AddPegawaiController> {
                         height: 150,
                         width: 150,
                         decoration: BoxDecoration(color: Colors.grey[300]),
-                        child: Column(
+                        child: const Column(
                           mainAxisAlignment: MainAxisAlignment.center,
-                          children: const [
+                          children: [
                             Icon(
                               Icons.camera_alt_rounded,
                               size: 50,
@@ -157,9 +157,9 @@ class AddPegawaiView extends GetView<AddPegawaiController> {
                 } else if (snapshot.hasError) {
                   return Text('${snapshot.error}');
                 }
-                return Row(
+                return const Row(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
+                  children: [
                     Center(
                       child: CupertinoActivityIndicator(),
                     ),
@@ -215,9 +215,9 @@ class AddPegawaiView extends GetView<AddPegawaiController> {
               } else if (snapshot.hasError) {
                 return Text('${snapshot.error}');
               }
-              return Row(
+              return const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
+                children: [
                   Center(
                     child: CupertinoActivityIndicator(),
                   ),

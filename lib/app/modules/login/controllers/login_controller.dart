@@ -8,23 +8,18 @@ import '../../../controllers/absen_controller.dart';
 import '../../../model/login_model.dart';
 
 class LoginController extends GetxController {
-  late TextEditingController email;
-  late TextEditingController username;
-  late TextEditingController password;
-
-  // FirebaseAuth auth = FirebaseAuth.instance;
+  late TextEditingController email,username,password;
   var isLoading = false.obs;
   var dataUser = Login().obs;
   var isAuth = false.obs;
   var selected = 0.obs;
   var logUser = [].obs;
   var isPassHide = true.obs;
-  // var currUser =[];
-  // final absen = Get.put(AbsenController());
+
 
   @override
   void onInit() async {
-    // await GetStorage.init();
+
     super.onInit();
     email = TextEditingController();
     username = TextEditingController();
@@ -47,12 +42,7 @@ class LoginController extends GetxController {
     Get.back();
     dataUser.value = response;
     if (dataUser.value.success! == true) {
-      // Get.offAllNamed(Routes.HOME);
 
-      // final box = GetStorage();
-      // box.write('login', true);
-      // print(box.read('login'));
-      // isAuth.value = box.read('login');
       await pref.setStringList('userDataLogin', <String>[
         '${dataUser.value.data!.id}',
         '${dataUser.value.data!.nama}',
@@ -66,17 +56,11 @@ class LoginController extends GetxController {
         '${dataUser.value.data!.level}',
         '${dataUser.value.data!.username}'
       ]);
-      //  pref.getStringList('userDataLogin');
+
       List<String>? tempUser = pref.getStringList('userDataLogin');
       logUser.value = tempUser!;
       isAuth.value = await pref.setBool("is_login", true);
-      // print(isAuth.value);
-      // update();
 
-      // currUser.add(pref.getStringList('userDataLogin'));
-      // print('${dataUser.value.data!}');
-      // print('login');
-      // print(pref.getStringList('userDataLogin'));
       username.clear();
       password.clear();
       showToast("Anda Berhasil Login");
@@ -87,26 +71,21 @@ class LoginController extends GetxController {
   }
 
   logout() async {
-    // // await GetStorage.init();
-    // final box = GetStorage();
-    // box.erase();
-    // isAuth.value = false;
-    // print(isAuth.value);
-    // print(box.read('login'));
+
     SharedPreferences pref = await SharedPreferences.getInstance();
-    // await pref.remove("kode_event");
+
     await pref.setBool("is_login", false);
     await pref.remove('userDataLogin');
-    // print(pref.getStringList('userDataLogin'));
+    await pref.remove('userLoc');
+
     logUser.clear();
-    // absen.dataAllAbsen.clear();
-    // absen.dataLimitAbsen.clear();
+
 
     isAuth.value = false;
     selected.value = 0;
     Get.delete<AbsenController>(force: true);
     Get.back();
-    // Get.offAllNamed(Routes.LOGIN);
+
     showToast("Logout Berhasil");
   }
 

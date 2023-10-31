@@ -22,14 +22,7 @@ import '../../../model/cek_user_model.dart';
 import '../../../model/foto_profil_model.dart';
 
 class AddPegawaiController extends GetxController {
-  late TextEditingController nip;
-  late TextEditingController name;
-  late TextEditingController username;
-  late TextEditingController pass;
-  late TextEditingController store;
-  late TextEditingController telp;
-  late TextEditingController level;
-
+  late TextEditingController nip,name,username,pass,store,telp,level;
   final FocusNode focusNodecabang = FocusNode();
   final FocusNode focusNodelevel = FocusNode();
   final GlobalKey autocompleteKeyBrand = GlobalKey();
@@ -112,14 +105,14 @@ class AddPegawaiController extends GetxController {
         final document = xml.XmlDocument.parse(readDoc.body);
         final itemsNode = document.findElements('items').first;
         final updates = itemsNode.findElements('update');
-        latestVer = itemsNode.findElements('versi').first.text;
+        latestVer = itemsNode.findElements('versi').first.innerText;
         //start looping item on readDoc
         updateList.clear();
         for (final listUpdates in updates) {
-          final name = listUpdates.findElements('name').first.text;
-          final desc = listUpdates.findElements('desc').first.text;
-          final icon = listUpdates.findElements('icon').first.text;
-          final color = listUpdates.findElements('color').first.text;
+          final name = listUpdates.findElements('name').first.innerText;
+          final desc = listUpdates.findElements('desc').first.innerText;
+          final icon = listUpdates.findElements('icon').first.innerText;
+          final color = listUpdates.findElements('color').first.innerText;
 
           updateList
               .add({'name': name, 'desc': desc, 'icon': icon, 'color': color});
@@ -176,7 +169,7 @@ class AddPegawaiController extends GetxController {
                     )
                 ],
               ),
-              // middleText: 'Ditemukan pembaruan sistem terbaru.',
+
               textCancel: 'Batal',
               onCancel: () => Get.back(),
               textConfirm: 'Unduh',
@@ -278,30 +271,6 @@ class AddPegawaiController extends GetxController {
           withReadStream: true,
           // // this will return PlatformFile object with read stream
           allowCompression: true);
-      // // File file = File(imageWeb!.files.single.toString());
-      // if (fileResult != null) {
-      //   fileName = fileResult!.files.first.name;
-      //   webImage = fileResult!.files.single.bytes!;
-      //   update();
-      // }
-      // final ImagePicker picker = ImagePicker();
-      // XFile? image = await picker.pickImage(source: ImageSource.gallery);
-      // if (image != null) {
-      //   var f = await image.readAsBytes();
-      //   // setState(() {
-      //   imgUpl = {
-      //     "img": f,
-      //     "path": image.path.toString(),
-      //     // "name": image.name
-      //   };
-      //   // print(image.path.toString());
-      //   file = File("a");
-      //   webImage = f;
-      //   update();
-      //   // });
-      // } else {
-      //   showToast("No file selected");
-      // }
     } else {
       image = await picker.pickImage(source: ImageSource.gallery);
       if (image != null) {
@@ -311,8 +280,6 @@ class AddPegawaiController extends GetxController {
   }
 
   addUpdatePegawai(context, String mode, List<dynamic> dataUser) async {
-    // image = File(image!.path);
-    // print('add pegawai');
     Random random = Random();
     int randomNumber = random.nextInt(100);
     final response = await ServiceApi().getUser();
@@ -349,9 +316,9 @@ class AddPegawaiController extends GetxController {
             "level": selectedLevel.value,
             "foto":
                 kIsWeb ? fileResult!.files.single : File(image!.path.toString())
-            // "foto": kIsWeb ? webImage : File(image!.path.toString())
+
           };
-          // print(data);
+
           if (lstUser.contains(username.text) && lstPhone.contains(telp.text)) {
             dialogMsg("",
                 "Username dan No Telp sudah terdaftar\nSilahkan ubah Username dan No Telp ");
@@ -363,8 +330,7 @@ class AddPegawaiController extends GetxController {
                 "No Telp ini sudah terdaftar pada akun lain\nSilahkan masukkan No Telp lain");
           } else {
             succesDialog(context, "Data berhasil disimpan");
-            // dialogMsgScsUpd(
-            //     "Sukses", "Data berhasil disimpan. Silahkan login untuk masuk");
+
             await ServiceApi().addUpdatePegawai(data);
             selectedCabang.value = "";
             username.clear();
@@ -435,9 +401,9 @@ class AddPegawaiController extends GetxController {
               selectedLevel.value != "" ? selectedLevel.value : dataUser[9],
           "foto":
               kIsWeb ? fileResult!.files.single : File(image!.path.toString())
-          // "foto": kIsWeb ? imgUpl : File(image!.path.toString())
+
         };
-        // print(data);
+
         if (lstPhone.contains(telp.text)) {
           dialogMsg("",
               "No Telp ini sudah terdaftar\nSilahkan masukkan No Telp lain");
@@ -505,7 +471,7 @@ class AddPegawaiController extends GetxController {
       Get.back();
       if (cekDataUser.isNotEmpty) {
         telp.clear();
-        // print(cekDataUser.length);
+ 
         Get.to(() => UpdatePassword(), arguments: {
           "id_user": cekDataUser[0].id,
           "username": cekDataUser[0].username,
@@ -516,8 +482,7 @@ class AddPegawaiController extends GetxController {
       } else {
         failedDialog(context,
             "Tidak ditemukan user dengan No Telp ${telp.text}. Pastikan No Telp yang diinput sudah sesuai");
-        // dialogMsg("Terjadi Kesalahan",
-        //     "Tidak ditemukan user dengan No Telp ${telp.text}. Pastikan No Telp yang diinput sudah sesuai");
+
       }
     } else {
       showToast("Anda harus mengisi kolom No Telp");
@@ -527,8 +492,7 @@ class AddPegawaiController extends GetxController {
   updatePassword(context, String id, String username) async {
     var data = {"id": id, "username": username, "password": pass.text};
     if (pass.text != "") {
-      // dialogMsgAbsen("Sukses",
-      //     "Password berhasil diperbarui\nSilahkan melakukan login ulang");
+
 
       loadingDialog("Memperbarui data user...", "");
       final response = await ServiceApi().updatePasswordUser(data);
@@ -540,7 +504,7 @@ class AddPegawaiController extends GetxController {
       pass.clear();
       Get.back();
       if (cekDataUser.isNotEmpty) {
-        // print(cekDataUser.length);
+
       } else {
         dialogMsg(
             "Terjadi Kesalahan", "Tidak dapat memperbarui password. Coba lagi");

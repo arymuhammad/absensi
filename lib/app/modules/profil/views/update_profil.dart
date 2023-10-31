@@ -152,9 +152,9 @@ class UpdateProfil extends GetView {
                 } else if (snapshot.hasError) {
                   return Text('${snapshot.error}');
                 }
-                return Row(
+                return const Row(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
+                  children: [
                     Center(
                       child: CupertinoActivityIndicator(),
                     ),
@@ -168,59 +168,62 @@ class UpdateProfil extends GetView {
           const SizedBox(
             height: 20,
           ),
-          FutureBuilder(
-            future: ctr.getLevel(),
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                var dataLevel = snapshot.data;
-                List<String> allLevel = <String>[];
-                dataLevel!.map((data) {
-                  allLevel.add(data.namaLevel!);
-                }).toList();
+          Visibility(
+            visible: userData![9] == "1" ? true : false,
+            child: FutureBuilder(
+              future: ctr.getLevel(),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  var dataLevel = snapshot.data;
+                  List<String> allLevel = <String>[];
+                  dataLevel!.map((data) {
+                    allLevel.add(data.namaLevel!);
+                  }).toList();
 
-                return TypeAheadFormField<String>(
-                  textFieldConfiguration: TextFieldConfiguration(
-                    controller: ctr.level,
-                    decoration: const InputDecoration(
-                      labelText: 'Level User',
-                      border: OutlineInputBorder(),
-                      filled: true,
-                      fillColor: Colors.white,
+                  return TypeAheadFormField<String>(
+                    textFieldConfiguration: TextFieldConfiguration(
+                      controller: ctr.level,
+                      decoration: const InputDecoration(
+                        labelText: 'Level User',
+                        border: OutlineInputBorder(),
+                        filled: true,
+                        fillColor: Colors.white,
+                      ),
                     ),
-                  ),
-                  suggestionsCallback: (pattern) {
-                    return allLevel.where((option) =>
-                        option.toLowerCase().contains(pattern.toLowerCase()));
-                  },
-                  itemBuilder: (context, suggestion) {
-                    return ListTile(
-                      tileColor: Colors.white,
-                      title: Text(suggestion),
-                    );
-                  },
-                  onSuggestionSelected: (suggestion) {
-                    ctr.level.text = suggestion;
-                    for (int i = 0; i < dataLevel.length; i++) {
-                      if (dataLevel[i].namaLevel == suggestion) {
-                        ctr.selectedLevel.value = dataLevel[i].id!;
+                    suggestionsCallback: (pattern) {
+                      return allLevel.where((option) =>
+                          option.toLowerCase().contains(pattern.toLowerCase()));
+                    },
+                    itemBuilder: (context, suggestion) {
+                      return ListTile(
+                        tileColor: Colors.white,
+                        title: Text(suggestion),
+                      );
+                    },
+                    onSuggestionSelected: (suggestion) {
+                      ctr.level.text = suggestion;
+                      for (int i = 0; i < dataLevel.length; i++) {
+                        if (dataLevel[i].namaLevel == suggestion) {
+                          ctr.selectedLevel.value = dataLevel[i].id!;
+                        }
                       }
-                    }
-                  },
+                    },
+                  );
+                } else if (snapshot.hasError) {
+                  return Text('${snapshot.error}');
+                }
+                return const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Center(
+                      child: CupertinoActivityIndicator(),
+                    ),
+                    SizedBox(width: 5),
+                    Text('Sedang memuat...'),
+                  ],
                 );
-              } else if (snapshot.hasError) {
-                return Text('${snapshot.error}');
-              }
-              return Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
-                  Center(
-                    child: CupertinoActivityIndicator(),
-                  ),
-                  SizedBox(width: 5),
-                  Text('Sedang memuat...'),
-                ],
-              );
-            },
+              },
+            ),
           ),
           const SizedBox(
             height: 20,
@@ -257,7 +260,7 @@ class UpdateProfil extends GetView {
                         borderRadius: BorderRadius.circular(50)),
                     minimumSize: Size(Get.size.width / 2, 50)),
                 onPressed: () {
-                  ctr.addUpdatePegawai(context,"update", userData!);
+                  ctr.addUpdatePegawai(context, "update", userData!);
                 },
                 child: const Text('UPDATE PROFILE')),
           )

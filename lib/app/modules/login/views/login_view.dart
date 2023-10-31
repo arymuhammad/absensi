@@ -1,4 +1,3 @@
-import 'dart:ui';
 
 import 'package:absensi/app/helper/const.dart';
 import 'package:absensi/app/modules/profil/views/verifikasi_update_password.dart';
@@ -11,7 +10,7 @@ import 'package:ternav_icons/ternav_icons.dart';
 import '../controllers/login_controller.dart';
 
 class LoginView extends GetView<LoginController> {
-  const LoginView({Key? key}) : super(key: key);
+  const LoginView({super.key});
   @override
   Widget build(BuildContext context) {
     return Scaffold(

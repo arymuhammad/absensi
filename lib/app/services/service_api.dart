@@ -235,9 +235,9 @@ class ServiceApi {
       // request.headers.addAll(headers);
       request.fields['status'] = data["status"];
       request.fields['id'] = data["id"];
-      request.fields['tanggal'] = data["tanggal"];
       request.fields['nama'] = data["nama"];
       if (data["status"] == "add") {
+        request.fields['tanggal_masuk'] = data["tanggal_masuk"];
         request.fields['kode_cabang'] = data["kode_cabang"];
         request.fields['id_shift'] = data["id_shift"];
         request.fields['jam_masuk'] = data["jam_masuk"];
@@ -247,6 +247,8 @@ class ServiceApi {
         request.fields['long_masuk'] = data["long_masuk"];
         request.fields['device_info'] = data["device_info"];
       } else {
+        request.fields['tanggal_masuk'] = data["tanggal_masuk"];
+        request.fields['tanggal_pulang'] = data["tanggal_pulang"];
         request.fields['jam_absen_pulang'] = data["jam_absen_pulang"];
         request.fields['lat_pulang'] = data["lat_pulang"];
         request.fields['long_pulang'] = data["long_pulang"];
@@ -290,8 +292,8 @@ class ServiceApi {
       var responseString = utf8.decode(responseBytes);
 
       //debug
-      // debugPrint("response code: ${res.statusCode}");
-      // debugPrint("response: $responseString");
+      debugPrint("response code: ${res.statusCode}");
+      debugPrint("response: $responseString");
 
       final dataDecode = jsonDecode(responseString);
       debugPrint(dataDecode.toString());

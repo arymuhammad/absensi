@@ -1,6 +1,7 @@
 class Absen {
   String? idUser;
-  String? tanggal;
+  String? tanggalMasuk;
+  String? tanggalPulang;
   String? nama;
   String? namaCabang;
   String? idShift;
@@ -20,7 +21,8 @@ class Absen {
 
   Absen(
       {this.idUser,
-      this.tanggal,
+      this.tanggalMasuk,
+      this.tanggalPulang,
       this.nama,
       this.namaCabang,
       this.idShift,
@@ -41,7 +43,8 @@ class Absen {
 
   Absen.fromJson(Map<String, dynamic> json) {
     idUser = json['id_user'];
-    tanggal = json['tanggal'];
+    tanggalMasuk = json['tanggal_masuk'];
+    tanggalPulang = json['tanggal_pulang'];
     nama = json['nama'];
     namaCabang = json['nama_cabang'];
     idShift = json['id_shift'];
@@ -63,7 +66,8 @@ class Absen {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['id_user'] = idUser;
-    data['tanggal'] = tanggal;
+    data['tanggal_masuk'] = tanggalMasuk;
+    data['tanggal_pulang'] = tanggalPulang;
     data['nama'] = nama;
     data['nama_cabang'] = namaCabang;
     data['id_shift'] = idShift;

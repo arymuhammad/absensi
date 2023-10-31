@@ -362,9 +362,9 @@ class PreviewScreen extends StatelessWidget {
   final pw.Document doc;
 
   const PreviewScreen({
-    Key? key,
+    super.key,
     required this.doc,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
