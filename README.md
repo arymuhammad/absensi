@@ -1,6 +1,6 @@
 # absensi
 
-A new Flutter project.
+Absensi app (presensi) berbasis flutter
 
 ## Getting Started
 
