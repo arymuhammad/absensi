@@ -5,6 +5,7 @@ import 'package:absensi/app/model/cek_absen_model.dart';
 import 'package:absensi/app/model/cek_stok_model.dart';
 import 'package:absensi/app/model/cek_user_model.dart';
 import 'package:absensi/app/model/level_model.dart';
+import 'package:absensi/app/model/report_sales_model.dart';
 import 'package:absensi/app/model/shift_kerja_model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -505,6 +506,34 @@ class ServiceApi {
           List<CekStok> dataUser =
               result.map((e) => CekStok.fromJson(e)).toList();
           return dataUser;
+        case 400:
+        case 401:
+        case 402:
+        case 404:
+          final result = json.decode(response.body);
+          throw FetchDataException(result["message"]);
+        default:
+          final result = json.decode(response.body);
+          throw FetchDataException(result["message"]);
+      }
+    } on FetchDataException catch (e) {
+      // print('error caught: ${e.message}');
+      showToast("${e.message}");
+    }
+  }
+
+  fetchSalesReport(data)async {
+    try {
+      final response =
+          await http.post(Uri.parse('${baseUrl}report_sales'), body: data);
+      switch (response.statusCode) {
+        case 200:
+          List<dynamic> result = json.decode(response.body)['data'];
+          // print(result);
+
+          List<ReportSales> dataSales =
+              result.map((e) => ReportSales.fromJson(e)).toList();
+          return dataSales;
         case 400:
         case 401:
         case 402:

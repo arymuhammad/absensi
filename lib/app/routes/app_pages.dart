@@ -67,7 +67,7 @@ class AppPages {
     ),
     GetPage(
         name: _Paths.CEK_SALES,
-        page: () => const ReportSalesView(),
+        page: () => ReportSalesView(),
         binding: ReportSalesBinding(),
         transition: Transition.cupertino),
   ];

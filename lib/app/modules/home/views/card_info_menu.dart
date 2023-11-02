@@ -1,6 +1,7 @@
 import 'package:absensi/app/helper/const.dart';
 import 'package:absensi/app/helper/loading_dialog.dart';
 import 'package:absensi/app/modules/cek_stok/views/cek_stok_view.dart';
+import 'package:absensi/app/modules/report_sales/views/report_sales_view.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icons_plus/icons_plus.dart';
@@ -79,9 +80,9 @@ class CardInfoMenu extends GetView {
                     children: [
                       IconButton(
                           onPressed: () {
-                            showToast('Dalam tahap pengembangan');
-                            // Get.to(() => ReportSalesView(),
-                            //     transition: Transition.cupertino);
+                            // showToast('Dalam tahap pengembangan');
+                            Get.to(() => ReportSalesView(),
+                                transition: Transition.cupertino);
                           },
                           icon: Icon(
                             FontAwesome.circle_dollar_to_slot,
