@@ -1,3 +1,7 @@
+import 'dart:io';
+
+import 'package:absensi/app/helper/app_colors.dart';
+import 'package:absensi/app/helper/loading_dialog.dart';
 import 'package:absensi/app/modules/add_pegawai/controllers/add_pegawai_controller.dart';
 import 'package:flutter/material.dart';
 
@@ -11,7 +15,11 @@ class AboutView extends GetView {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Tentang'),
+        iconTheme: const IconThemeData(color: Colors.white),
+        title: const Text(
+          'Tentang',
+          style: TextStyle(color: AppColors.mainTextColor1),
+        ),
         centerTitle: true,
         flexibleSpace: Container(
           decoration: const BoxDecoration(
@@ -27,7 +35,11 @@ class AboutView extends GetView {
         ListTile(
           title: const Text('Check pembaruan aplikasi'),
           onTap: () {
-            ctr.checkForUpdate("");
+            if (Platform.isAndroid) {
+              ctr.checkForUpdate(context, "");
+            } else {
+              showToast("Fitur ini hanya untuk Android");
+            }
           },
         ),
         const Divider(),

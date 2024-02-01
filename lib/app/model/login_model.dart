@@ -32,6 +32,7 @@ class Data {
   String? noTelp;
   String? level;
   String? levelUser;
+  String? areaCover;
 
   Data({
     this.id,
@@ -46,6 +47,7 @@ class Data {
     this.noTelp,
     this.level,
     this.levelUser,
+    this.areaCover,
   });
 
   Data.fromJson(Map<String, dynamic> json) {
@@ -61,6 +63,7 @@ class Data {
     noTelp = json['no_telp'];
     level = json['level'];
     levelUser = json['level_user'];
+    areaCover = json['area_coverage'];
   }
 
   Map<String, dynamic> toJson() {

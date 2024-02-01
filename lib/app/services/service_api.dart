@@ -1,12 +1,16 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:absensi/app/model/cabang_model.dart';
 import 'package:absensi/app/model/cek_absen_model.dart';
 import 'package:absensi/app/model/cek_stok_model.dart';
 import 'package:absensi/app/model/cek_user_model.dart';
+import 'package:absensi/app/model/cek_visit_model.dart';
 import 'package:absensi/app/model/level_model.dart';
 import 'package:absensi/app/model/report_sales_model.dart';
 import 'package:absensi/app/model/shift_kerja_model.dart';
+import 'package:absensi/app/model/user_model.dart';
+import 'package:absensi/app/model/visit_model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -141,10 +145,6 @@ class ServiceApi {
 
   addUpdatePegawai(data) async {
     try {
-      //post date
-      // Map<String, String> headers = {
-      //   'Content-Type': 'application/json; charset=UTF-8',
-      // };
       var request =
           http.MultipartRequest('POST', Uri.parse('${baseUrl}add_user'));
 
@@ -227,10 +227,6 @@ class ServiceApi {
 
   submitAbsen(data) async {
     try {
-      //post date
-      // Map<String, String> headers = {
-      //   'Content-Type': 'application/json; charset=UTF-8',
-      // };
       var request = http.MultipartRequest('POST', Uri.parse('${baseUrl}absen'));
 
       // request.headers.addAll(headers);
@@ -500,9 +496,6 @@ class ServiceApi {
       switch (response.statusCode) {
         case 200:
           List<dynamic> result = json.decode(response.body)['data'];
-          // print(result);
-          // print(data);
-          // print('${baseUrl}cek_stok');
           List<CekStok> dataUser =
               result.map((e) => CekStok.fromJson(e)).toList();
           return dataUser;
@@ -522,18 +515,20 @@ class ServiceApi {
     }
   }
 
-  fetchSalesReport(data)async {
+  Future<List<ReportSales>> fetchSalesReport(data) async {
+    var dataSales = <ReportSales>[];
     try {
-      final response =
-          await http.post(Uri.parse('${baseUrl}report_sales'), body: data);
+      final response = await http
+          .post(Uri.parse('${baseUrl}report_sales'), body: data)
+          .timeout(const Duration(minutes: 5));
       switch (response.statusCode) {
         case 200:
           List<dynamic> result = json.decode(response.body)['data'];
           // print(result);
 
-          List<ReportSales> dataSales =
-              result.map((e) => ReportSales.fromJson(e)).toList();
-          return dataSales;
+          dataSales = result.map((e) => ReportSales.fromJson(e)).toList();
+          break;
+
         case 400:
         case 401:
         case 402:
@@ -543,6 +538,198 @@ class ServiceApi {
         default:
           final result = json.decode(response.body);
           throw FetchDataException(result["message"]);
+      }
+    } on FetchDataException catch (e) {
+      // print('error caught: ${e.message}');
+      showToast("${e.message}");
+    } on TimeoutException catch (_) {
+      Get.defaultDialog(
+        title: 'Connection Time Out',
+        middleText: 'Server tidak merespon',
+        textCancel: 'Tutup',
+        onCancel: () {
+          Get.back();
+          Get.back();
+        },
+      );
+    }
+    return dataSales;
+  }
+
+  cekDataVisit(Map<String, String> data) async {
+    try {
+      final response =
+          await http.post(Uri.parse('${baseUrl}cek_visit'), body: data);
+      switch (response.statusCode) {
+        case 200:
+          final result = json.decode(response.body)['data'];
+          return CekVisit.fromJson(result);
+        case 400:
+        case 401:
+        case 402:
+        case 404:
+          final result = json.decode(response.body);
+          throw FetchDataException(result["message"]);
+        default:
+          throw FetchDataException(
+            'Something went wrong.',
+          );
+      }
+    } on FetchDataException catch (e) {
+      // print('error caught: ${e.message}');
+      showToast("${e.message}");
+    }
+  }
+
+  submitVisit(Map<String, dynamic> data) async {
+    try {
+      var request = http.MultipartRequest('POST', Uri.parse('${baseUrl}visit'));
+      // request.headers.addAll(headers);
+      request.fields['status'] = data["status"];
+      request.fields['id'] = data["id"];
+      request.fields['nama'] = data["nama"];
+      if (data["status"] == "add") {
+        request.fields['tgl_visit'] = data["tgl_visit"];
+        request.fields['visit_in'] = data["visit_in"];
+        request.fields['jam_in'] = data["jam_in"];
+        request.fields['lat_in'] = data["lat_in"];
+        request.fields['long_in'] = data["long_in"];
+        request.fields['device_info'] = data["device_info"];
+      } else {
+        request.fields['visit_in'] = data["visit_in"];
+        request.fields['tgl_visit'] = data["tgl_visit"];
+        request.fields['visit_out'] = data["visit_out"];
+        request.fields['jam_out'] = data["jam_out"];
+        request.fields['lat_out'] = data["lat_out"];
+        request.fields['long_out'] = data["long_out"];
+        request.fields['device_info2'] = data["device_info2"];
+      }
+
+      if (data["status"] == "add") {
+        // if (kIsWeb) {
+        //   // print(data["foto_masuk"]);
+        //   request.files.add(http.MultipartFile("foto_masuk",
+        //       data["foto_masuk"].readStream, data["foto_masuk"].size,
+        //       filename: data["foto_masuk"].name));
+        // } else {
+        request.files.add(http.MultipartFile(
+            'foto_in',
+            data["foto_in"].readAsBytes().asStream(),
+            data["foto_in"].lengthSync(),
+            filename: data["foto_in"].path.split("/").last));
+        // }
+      } else {
+        // if (kIsWeb) {
+        //   request.files.add(http.MultipartFile("foto_pulang",
+        //       data["foto_pulang"].readStream, data["foto_pulang"].size,
+        //       filename: data["foto_pulang"].name));
+        // } else {
+        request.files.add(http.MultipartFile(
+            'foto_out',
+            data["foto_out"].readAsBytes().asStream(),
+            data["foto_out"].lengthSync(),
+            filename: data["foto_out"].path.split("/").last));
+        // }
+      }
+      // request.files.add(http.MultipartFile(
+      //     'proposal',
+      //     data["proposal"].readAsBytes().asStream(),
+      //     data["proposal"].lengthSync(),
+      //     filename: data["proposal"].path.split("/").last));
+
+      var res = await request.send();
+      var responseBytes = await res.stream.toBytes();
+      var responseString = utf8.decode(responseBytes);
+
+      //debug
+      debugPrint("response code: ${res.statusCode}");
+      debugPrint("response: $responseString");
+
+      final dataDecode = jsonDecode(responseString);
+      debugPrint(dataDecode.toString());
+
+      if (res.statusCode == 200) {
+        // return showDialogSuccess('Sukses', 'Event Berhasil Dibuat');
+      } else {}
+    } catch (e) {
+      debugPrint('$e');
+    }
+  }
+
+  getVisit(Map<String, dynamic> paramSingleVisit) async {
+    try {
+      final response = await http.post(Uri.parse('${baseUrl}get_visit'),
+          body: paramSingleVisit);
+      switch (response.statusCode) {
+        case 200:
+          List<dynamic> result = json.decode(response.body)['data'];
+          List<Visit> dataVisit = result.map((e) => Visit.fromJson(e)).toList();
+          return dataVisit;
+        case 400:
+        case 401:
+        case 402:
+        case 404:
+          final result = json.decode(response.body);
+          throw FetchDataException(result["message"]);
+        default:
+          throw FetchDataException(
+            'Something went wrong.',
+          );
+      }
+    } on FetchDataException catch (e) {
+      // print('error caught: ${e.message}');
+      showToast("${e.message}");
+    }
+  }
+
+  getLimitVisit(Map<String, dynamic> paramLimitVisit) async {
+    try {
+      final response = await http.post(Uri.parse('${baseUrl}get_visit'),
+          body: paramLimitVisit);
+      switch (response.statusCode) {
+        case 200:
+          List<dynamic> result = json.decode(response.body)['data'];
+          List<Visit> dataAbsen = result.map((e) => Visit.fromJson(e)).toList();
+          // print(result);
+          return dataAbsen;
+        case 400:
+        case 401:
+        case 402:
+        case 404:
+          final result = json.decode(response.body);
+          throw FetchDataException(result["message"]);
+        default:
+          throw FetchDataException(
+            'Something went wrong.',
+          );
+      }
+    } on FetchDataException catch (e) {
+      // print('error caught: ${e.message}');
+      showToast("${e.message}");
+    }
+  }
+
+  getUserCabang(idStore) async {
+    var param = {"idCabang": idStore};
+    try {
+      final response = await http.post(Uri.parse('${baseUrl}get_user_cabang'),
+          body: param);
+      switch (response.statusCode) {
+        case 200:
+          List<dynamic> result = json.decode(response.body)['data'];
+          List<User> dataAbsen = result.map((e) => User.fromJson(e)).toList();
+          // print(result);
+          return dataAbsen;
+        case 400:
+        case 401:
+        case 402:
+        case 404:
+          final result = json.decode(response.body);
+          throw FetchDataException(result["message"]);
+        default:
+          throw FetchDataException(
+            'Something went wrong.',
+          );
       }
     } on FetchDataException catch (e) {
       // print('error caught: ${e.message}');

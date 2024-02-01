@@ -1,5 +1,6 @@
 import 'package:absensi/app/helper/loading_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -8,7 +9,7 @@ import '../../../controllers/absen_controller.dart';
 import '../../../model/login_model.dart';
 
 class LoginController extends GetxController {
-  late TextEditingController email,username,password;
+  late TextEditingController email, username, password;
   var isLoading = false.obs;
   var dataUser = Login().obs;
   var isAuth = false.obs;
@@ -16,10 +17,8 @@ class LoginController extends GetxController {
   var logUser = [].obs;
   var isPassHide = true.obs;
 
-
   @override
   void onInit() async {
-
     super.onInit();
     email = TextEditingController();
     username = TextEditingController();
@@ -37,12 +36,11 @@ class LoginController extends GetxController {
   login() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     var data = {"username": username.text, "password": password.text};
-    loadingDialog('Loading...', "");
+    loadingWithIcon();
     var response = await ServiceApi().loginUser(data);
-    Get.back();
+    SmartDialog.dismiss();
     dataUser.value = response;
     if (dataUser.value.success! == true) {
-
       await pref.setStringList('userDataLogin', <String>[
         '${dataUser.value.data!.id}',
         '${dataUser.value.data!.nama}',
@@ -54,7 +52,8 @@ class LoginController extends GetxController {
         '${dataUser.value.data!.long}',
         '${dataUser.value.data!.kodeCabang}',
         '${dataUser.value.data!.level}',
-        '${dataUser.value.data!.username}'
+        '${dataUser.value.data!.username}',
+        '${dataUser.value.data!.areaCover}'
       ]);
 
       List<String>? tempUser = pref.getStringList('userDataLogin');
@@ -71,7 +70,6 @@ class LoginController extends GetxController {
   }
 
   logout() async {
-
     SharedPreferences pref = await SharedPreferences.getInstance();
 
     await pref.setBool("is_login", false);
@@ -79,7 +77,6 @@ class LoginController extends GetxController {
     await pref.remove('userLoc');
 
     logUser.clear();
-
 
     isAuth.value = false;
     selected.value = 0;

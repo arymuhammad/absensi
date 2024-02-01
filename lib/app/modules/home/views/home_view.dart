@@ -1,6 +1,7 @@
 import 'package:absensi/app/helper/loading_dialog.dart';
 import 'package:absensi/app/modules/home/views/card_info_menu.dart';
 import 'package:absensi/app/modules/home/views/summary_absen.dart';
+import 'package:absensi/app/modules/home/views/summary_absen_area.dart';
 import 'package:absensi/app/modules/profil/views/profil_view.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -17,7 +18,6 @@ class HomeView extends GetView<HomeController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(centerTitle: true, elevation: 0, toolbarHeight: 0),
       body: Stack(
         children: [
           ClipPath(
@@ -32,7 +32,7 @@ class HomeView extends GetView<HomeController> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.only(left: 20.0, top: 20.0, right: 20.0),
+            padding: const EdgeInsets.only(left: 20.0, top: 60.0, right: 20.0),
             child: Column(
               children: [
                 Row(
@@ -42,7 +42,7 @@ class HomeView extends GetView<HomeController> {
                       children: [
                         InkWell(
                           onTap: () {
-                            // loginC.selectedMenu(2);
+                          
                             Get.to(
                                 () => ProfilView(listDataUser: listDataUser!));
                           },
@@ -90,12 +90,6 @@ class HomeView extends GetView<HomeController> {
                               style: const TextStyle(
                                   fontSize: 18, color: Colors.white),
                             ),
-                            // Obx(() => Text(
-                            //       absenC.devInfoAnd.value.isNotEmpty
-                            //           ? absenC.devInfoAnd.value
-                            //           : 'Belum ada info andr',
-                            //       style: const TextStyle(color: Colors.white),
-                            //     ))
                           ],
                         )
                       ],
@@ -118,7 +112,9 @@ class HomeView extends GetView<HomeController> {
                       children: [
                         CardInfoMenu(userData: listDataUser!),
                         const SizedBox(height: 10),
-                        SummaryAbsen(userData: listDataUser!)
+                        listDataUser![9] == "26" || listDataUser![9] == "28" || listDataUser![9] == "10"
+                            ? SummaryAbsenArea(userData: listDataUser!)
+                            : SummaryAbsen(userData: listDataUser!)
                       ],
                     )),
               ],

@@ -1,3 +1,4 @@
+import 'package:absensi/app/helper/app_colors.dart';
 import 'package:absensi/app/helper/loading_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -37,7 +38,10 @@ class AbsenView extends GetView<AbsenController> {
         },
         child: Scaffold(
             appBar: AppBar(
-              title: const Text('ABSEN'),
+              title: Text(
+                data![9] == "26" ? 'VISIT' : 'ABSEN',
+                style: const TextStyle(color: AppColors.mainTextColor1),
+              ),
               automaticallyImplyLeading: false,
               centerTitle: true,
               flexibleSpace: Container(
@@ -65,7 +69,6 @@ class AbsenView extends GetView<AbsenController> {
                           'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                       userAgentPackageName: 'dev.fleaflet.flutter_map.example',
                     ),
-
                     CircleLayer(
                       circles: [
                         CircleMarker(

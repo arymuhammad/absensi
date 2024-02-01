@@ -287,23 +287,25 @@ class SummaryAbsen extends GetView {
                                         : "Telat",
                                 "jam_pulang": absenC.dataLimitAbsen[i]
                                             .jamAbsenPulang! ==
-                                        ""
-                                    ? "Belum Absen"
-                                    : DateFormat("HH:mm")
-                                            .parse(absenC.dataLimitAbsen[i]
-                                                .jamAbsenPulang!)
-                                            .isBefore(DateFormat("HH:mm").parse(
-                                                absenC.dataLimitAbsen[i]
-                                                    .jamPulang!))
-                                        ? "Pulang Cepat"
-                                        : DateFormat("HH:mm")
-                                                .parse(absenC.dataLimitAbsen[i]
-                                                    .jamAbsenPulang!)
-                                                .isAtSameMomentAs(
-                                                    DateFormat("HH:mm").parse(
-                                                        absenC.dataLimitAbsen[i].jamPulang!))
-                                            ? "Tepat Waktu"
-                                            : "Lembur",
+                                        ""? "Belum Absen"
+                                              : DateFormat("HH:mm")
+                                                      .parse(absenC
+                                                          .dataLimitAbsen[i]
+                                                          .jamAbsenPulang!)
+                                                      .isBefore(
+                                                          DateFormat("HH:mm")
+                                                              .parse("06:00"))
+                                                  ? "Lembur"
+                                                  : DateFormat("HH:mm")
+                                                          .parse(absenC
+                                                              .dataLimitAbsen[i]
+                                                              .jamAbsenPulang!)
+                                                          .isBefore(DateFormat("HH:mm")
+                                                              .parse(absenC
+                                                                  .dataLimitAbsen[i]
+                                                                  .jamPulang!))
+                                                      ? "Pulang Cepat"
+                                                      : "Lembur",
                                 "jam_absen_masuk":
                                     absenC.dataLimitAbsen[i].jamAbsenMasuk!,
                                 "jam_absen_pulang":
@@ -323,7 +325,7 @@ class SummaryAbsen extends GetView {
                                     absenC.dataLimitAbsen[i].devInfo!,
                                 "device_info2":
                                     absenC.dataLimitAbsen[i].devInfo2!,
-                              }),
+                              }, transition: Transition.cupertino),
                               child: Card(
                                 shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(6)),
@@ -486,61 +488,6 @@ class SummaryAbsen extends GetView {
                                         ],
                                       ),
                                     ),
-                                    // Container(
-                                    //   // margin: const EdgeInsets.only(bottom: 20),
-                                    //   padding: const EdgeInsets.all(10),
-                                    //   decoration: const BoxDecoration(
-                                    //     color: Colors.white,
-                                    //     // borderRadius:
-                                    //     //     BorderRadius.circular(20)
-                                    //   ),
-                                    //   child: Column(
-                                    //     crossAxisAlignment:
-                                    //         CrossAxisAlignment.start,
-                                    //     children: [
-                                    //       Row(
-                                    //         mainAxisAlignment:
-                                    //             MainAxisAlignment
-                                    //                 .spaceBetween,
-                                    //         children: [
-                                    //           const Text(
-                                    //             'Masuk',
-                                    //             style: TextStyle(
-                                    //                 fontWeight:
-                                    //                     FontWeight.bold),
-                                    //           ),
-                                    //           // Text(
-                                    //           //     DateFormat(
-                                    //           //             "EEEE, d MMMM yyyy",
-                                    //           //             "id_ID")
-                                    //           //         .format(DateTime.parse(
-                                    //           //             absenC
-                                    //           //                 .dataLimitAbsen[i]
-                                    //           //                 .tanggal!)),
-                                    //           //     style: const TextStyle(
-                                    //           //         fontWeight:
-                                    //           //             FontWeight.bold)),
-                                    //         ],
-                                    //       ),
-                                    //       Text(absenC
-                                    //           .dataLimitAbsen[i].jamAbsenMasuk!),
-                                    //       const SizedBox(
-                                    //         height: 8,
-                                    //       ),
-                                    //       const Text(
-                                    //         'Keluar',
-                                    //         style: TextStyle(
-                                    //             fontWeight: FontWeight.bold),
-                                    //       ),
-                                    //       Text(absenC.dataLimitAbsen[i]
-                                    //                   .jamAbsenPulang !=
-                                    //               ""
-                                    //           ? absenC.dataLimitAbsen[i]
-                                    //               .jamAbsenPulang!
-                                    //           : "-"),
-                                    //     ],
-                                    //   ),
-                                    // ),
                                   ],
                                 ),
                               ),

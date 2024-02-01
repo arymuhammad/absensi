@@ -25,17 +25,17 @@ class ProfilView extends GetView<ProfilController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-            title: const Text('PROFILE'),
-            centerTitle: true,
-            elevation: 0,
-            toolbarHeight: 0),
+        // appBar: AppBar(
+        //     title: const Text('PROFILE'),
+        //     centerTitle: true,
+        //     elevation: 0,
+        //     toolbarHeight: 0),
         body: Stack(
           children: [
             ClipPath(
               clipper: ClipPathClass(),
               child: Container(
-                height: 320,
+                height: 380,
                 width: Get.width,
                 decoration: const BoxDecoration(
                     image: DecorationImage(
@@ -47,7 +47,7 @@ class ProfilView extends GetView<ProfilController> {
               padding: const EdgeInsets.all(10),
               children: [
                 const SizedBox(
-                  height: 15,
+                  height: 65,
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,

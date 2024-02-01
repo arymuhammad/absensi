@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:absensi/app/helper/app_colors.dart';
 import 'package:absensi/app/modules/add_pegawai/controllers/add_pegawai_controller.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -18,7 +19,9 @@ class UpdateProfil extends GetView {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('UPDATE PROFILE'),
+        iconTheme: const IconThemeData(color: Colors.white),
+        title: const Text('UPDATE PROFILE',
+            style: TextStyle(color: AppColors.mainTextColor1)),
         centerTitle: true,
         flexibleSpace: Container(
           decoration: const BoxDecoration(
@@ -256,13 +259,14 @@ class UpdateProfil extends GetView {
             padding: const EdgeInsets.symmetric(horizontal: 30),
             child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.contentDefBtn,
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(50)),
                     minimumSize: Size(Get.size.width / 2, 50)),
                 onPressed: () {
                   ctr.addUpdatePegawai(context, "update", userData!);
                 },
-                child: const Text('UPDATE PROFILE')),
+                child: const Text('UPDATE PROFILE', style: TextStyle(color: AppColors.mainTextColor1),)),
           )
         ],
       ),

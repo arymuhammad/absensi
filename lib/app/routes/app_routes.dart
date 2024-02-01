@@ -12,6 +12,7 @@ abstract class Routes {
   static const CEK_STOK = _Paths.CEK_STOK;
   static const ABSEN = _Paths.ABSEN;
   static const CEK_SALES = _Paths.CEK_SALES;
+  static const MONITORING_ABSEN = _Paths.MONITORING_ABSEN;
 }
 
 abstract class _Paths {
@@ -25,4 +26,5 @@ abstract class _Paths {
   static const CEK_STOK = '/cek-stok';
   static const ABSEN = '/absen';
   static const CEK_SALES = '/report-sales';
+  static const MONITORING_ABSEN = '/monitoring-absen';
 }

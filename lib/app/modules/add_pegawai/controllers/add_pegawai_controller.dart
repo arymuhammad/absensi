@@ -22,7 +22,7 @@ import '../../../model/cek_user_model.dart';
 import '../../../model/foto_profil_model.dart';
 
 class AddPegawaiController extends GetxController {
-  late TextEditingController nip,name,username,pass,store,telp,level;
+  late TextEditingController nip, name, username, pass, store, telp, level;
   final FocusNode focusNodecabang = FocusNode();
   final FocusNode focusNodelevel = FocusNode();
   final GlobalKey autocompleteKeyBrand = GlobalKey();
@@ -87,7 +87,7 @@ class AddPegawaiController extends GetxController {
     return listBrand.value = response;
   }
 
-  checkForUpdate(status) async {
+  checkForUpdate(context, status) async {
     if (status != "onInit") {
       loadingDialog("Memeriksa pembaruan...", "");
     }
@@ -120,7 +120,8 @@ class AddPegawaiController extends GetxController {
         //end loop item on readDoc
         if (latestVer == currVer) {
           // Get.back();
-          dialogMsgScsUpd("", "Tidak ada pembaruan sistem");
+          succesDialog(context, "N", "Tidak ada pembaruan sistem");
+          // dialogMsgScsUpd("", "Tidak ada pembaruan sistem");
         } else {
           Get.defaultDialog(
               radius: 2,
@@ -169,10 +170,8 @@ class AddPegawaiController extends GetxController {
                     )
                 ],
               ),
-
-              textCancel: 'Batal',
-              onCancel: () => Get.back(),
-              textConfirm: 'Unduh',
+              
+              textConfirm: 'Unduh Pembaruan',
               confirmTextColor: Colors.white,
               onConfirm: () {
                 Get.back(closeOverlays: true);
@@ -247,7 +246,7 @@ class AddPegawaiController extends GetxController {
         textConfirm: 'Refresh',
         confirmTextColor: Colors.white,
         onConfirm: () {
-          checkForUpdate("");
+          checkForUpdate(context, "");
           Get.back(closeOverlays: true);
         },
       );
@@ -316,7 +315,6 @@ class AddPegawaiController extends GetxController {
             "level": selectedLevel.value,
             "foto":
                 kIsWeb ? fileResult!.files.single : File(image!.path.toString())
-
           };
 
           if (lstUser.contains(username.text) && lstPhone.contains(telp.text)) {
@@ -329,7 +327,7 @@ class AddPegawaiController extends GetxController {
             dialogMsg("",
                 "No Telp ini sudah terdaftar pada akun lain\nSilahkan masukkan No Telp lain");
           } else {
-            succesDialog(context, "Data berhasil disimpan");
+            succesDialog(context, "N", "Data berhasil disimpan");
 
             await ServiceApi().addUpdatePegawai(data);
             selectedCabang.value = "";
@@ -401,7 +399,6 @@ class AddPegawaiController extends GetxController {
               selectedLevel.value != "" ? selectedLevel.value : dataUser[9],
           "foto":
               kIsWeb ? fileResult!.files.single : File(image!.path.toString())
-
         };
 
         if (lstPhone.contains(telp.text)) {
@@ -471,7 +468,7 @@ class AddPegawaiController extends GetxController {
       Get.back();
       if (cekDataUser.isNotEmpty) {
         telp.clear();
- 
+
         Get.to(() => UpdatePassword(), arguments: {
           "id_user": cekDataUser[0].id,
           "username": cekDataUser[0].username,
@@ -480,9 +477,8 @@ class AddPegawaiController extends GetxController {
           "foto": cekDataUser[0].foto,
         });
       } else {
-        failedDialog(context,
+        failedDialog(context, "Peringatan",
             "Tidak ditemukan user dengan No Telp ${telp.text}. Pastikan No Telp yang diinput sudah sesuai");
-
       }
     } else {
       showToast("Anda harus mengisi kolom No Telp");
@@ -492,19 +488,16 @@ class AddPegawaiController extends GetxController {
   updatePassword(context, String id, String username) async {
     var data = {"id": id, "username": username, "password": pass.text};
     if (pass.text != "") {
-
-
       loadingDialog("Memperbarui data user...", "");
       final response = await ServiceApi().updatePasswordUser(data);
       Future.delayed(Duration.zero, () {
-        succesDialog(context,
+        succesDialog(context, "N",
             "Password berhasil diperbarui\nSilahkan melakukan login ulang");
       });
       cekDataUser.value = response;
       pass.clear();
       Get.back();
       if (cekDataUser.isNotEmpty) {
-
       } else {
         dialogMsg(
             "Terjadi Kesalahan", "Tidak dapat memperbarui password. Coba lagi");

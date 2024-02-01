@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:absensi/app/helper/app_colors.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -15,7 +16,8 @@ class AddPegawaiView extends GetView<AddPegawaiController> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Register'),
+        iconTheme: const IconThemeData(color: Colors.white),
+        title: const Text('Register', style: TextStyle(color: AppColors.mainTextColor1),),
         centerTitle: true,
         flexibleSpace: Container(
           decoration: const BoxDecoration(
@@ -280,27 +282,17 @@ class AddPegawaiView extends GetView<AddPegawaiController> {
             padding: const EdgeInsets.symmetric(horizontal: 30),
             child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.contentDefBtn,
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(50)),
                     minimumSize: Size(Get.size.width / 2, 50)),
                 onPressed: () {
-                  controller.addUpdatePegawai(context,"add", [""]);
+                  controller.addUpdatePegawai(context, "add", [""]);
                 },
-                child: const Text('Submit')),
+                child: const Text('SUBMIT', style: TextStyle(color: AppColors.mainTextColor1),)),
           )
         ],
       ),
-      // bottomNavigationBar: ConvexAppBar(
-      //   items: const [
-      //     TabItem(icon: Icons.home, title: 'Home'),
-      //     TabItem(icon: Icons.camera_outlined),
-      //     TabItem(icon: Icons.person, title: 'Profile'),
-      //   ],
-      //   initialActiveIndex: pageC.pageIndex.value,
-      //   activeColor: Colors.white,
-      //   style: TabStyle.fixedCircle,
-      //   onTap: (i) => pageC.changePage(i),
-      // )
     );
   }
 }

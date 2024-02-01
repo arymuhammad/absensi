@@ -1,6 +1,8 @@
+import 'package:absensi/app/helper/loading_dialog.dart';
 import 'package:absensi/app/services/service_api.dart';
 import 'package:absensi/app/model/cek_stok_model.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
@@ -23,32 +25,7 @@ class CekStokController extends GetxController {
   }
 
   Future<List<CekStok>> fetchDataStok(cabang) async {
-    // loadingDialog("Loading data ...", "");
-    Get.defaultDialog(
-        title: '',
-        content: const Center(
-            child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            CircularProgressIndicator(),
-            SizedBox(
-              height: 10,
-            ),
-            Text("Loading data ..."),
-            // StreamBuilder(
-            //   stream: getElapsed(),
-            //   builder: (context, snapshot) {
-            //     if (snapshot.hasData) {
-            //       return Obx(() => Text(elapsedTime.value.toString()));
-            //     }
-            //     return const Center(
-            //       child: CupertinoActivityIndicator(),
-            //     );
-            //   },
-            // )
-          ],
-        )),
-        barrierDismissible: false);
+    loadingWithIcon();
     var tgl1 = DateFormat('yyyy-MM-dd')
         .format(DateTime(DateTime.now().year, DateTime.now().month, 1));
     var tgl2 = DateFormat('yyyy-MM-dd')
@@ -62,18 +39,8 @@ class CekStokController extends GetxController {
     // print(data);
     final response = await ServiceApi().getDataStok(data);
     dataStok.value = response;
-    Get.back();
+    SmartDialog.dismiss();
     return dataStok;
   }
 
-  // Stream getElapsed() async* {
-  //   final Stopwatch stopwatch = Stopwatch()..start();
-  //   while (running) {
-  //     // await Future.delayed(const Duration(seconds: 1));
-  //     elapsedTime.value = stopwatch.elapsed.inSeconds;
-  //     print(stopwatch.elapsed.inSeconds);
-  //     stopwatch.stop();
-  //     yield elapsedTime.value = stopwatch.elapsed.inSeconds;
-  //   }
-  // }
 }

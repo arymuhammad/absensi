@@ -1,4 +1,5 @@
 import 'package:absensi/app/controllers/absen_controller.dart';
+import 'package:absensi/app/helper/app_colors.dart';
 import 'package:absensi/app/helper/const.dart';
 import 'package:absensi/app/helper/loading_dialog.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
@@ -22,13 +23,19 @@ class SemuaAbsenView extends GetView<SemuaAbsenController> {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          icon: const Icon(CupertinoIcons.arrow_left),
+          icon: const Icon(
+            CupertinoIcons.arrow_left,
+            color: AppColors.mainTextColor1,
+          ),
           onPressed: () {
             absenC.searchDate.value = "";
             Get.back();
           },
         ),
-        title: const Text('RIWAYAT ABSENSI'),
+        title: const Text(
+          'RIWAYAT ABSENSI',
+          style: TextStyle(color: AppColors.mainTextColor1),
+        ),
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             image: DecorationImage(
@@ -48,15 +55,20 @@ class SemuaAbsenView extends GetView<SemuaAbsenController> {
                           (a, b) => a.tanggalMasuk!.compareTo(b.tanggalMasuk!));
                       absenC.ascending.value = false;
                     },
-                    icon: const Icon(CupertinoIcons.line_horizontal_3_decrease))
+                    icon: const Icon(
+                      CupertinoIcons.line_horizontal_3_decrease,
+                      color: AppColors.mainTextColor1,
+                    ))
                 : IconButton(
                     onPressed: () {
                       absenC.searchAbsen.sort(
                           (a, b) => b.tanggalMasuk!.compareTo(a.tanggalMasuk!));
                       absenC.ascending.value = true;
                     },
-                    icon:
-                        const Icon(CupertinoIcons.line_horizontal_3_decrease)),
+                    icon: const Icon(
+                      CupertinoIcons.line_horizontal_3_decrease,
+                      color: AppColors.mainTextColor1,
+                    )),
           )
         ],
       ),
@@ -302,7 +314,7 @@ class SemuaAbsenView extends GetView<SemuaAbsenController> {
                                                           .jamAbsenPulang!)
                                                       .isBefore(
                                                           DateFormat("HH:mm")
-                                                              .parse("07:00"))
+                                                              .parse("06:00"))
                                                   ? "Lembur"
                                                   : DateFormat("HH:mm")
                                                           .parse(absenC
@@ -515,15 +527,20 @@ class SemuaAbsenView extends GetView<SemuaAbsenController> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
+          backgroundColor: AppColors.contentDefBtn,
           onPressed: () {
             formFilter(Get.arguments["id_user"]);
           },
-          child: Icon(TernavIcons.lightOutline.calender_3)),
+          child: Icon(
+            TernavIcons.lightOutline.calender_3,
+            color: AppColors.mainTextColor1,
+          )),
     );
   }
 
   void formFilter(idUser) {
     Get.bottomSheet(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
       elevation: 10,
       isScrollControlled: true,
       backgroundColor: Colors.white,
@@ -589,12 +606,14 @@ class SemuaAbsenView extends GetView<SemuaAbsenController> {
                     //  Restart.restartApp();
                   },
                   style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.contentDefBtn,
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(50)),
                       minimumSize: Size(Get.size.width / 2, 50)),
                   child: const Text(
                     'SIMPAN',
-                    style: TextStyle(fontSize: 15),
+                    style: TextStyle(
+                        fontSize: 15, color: AppColors.mainTextColor1),
                   ),
                 ),
               )

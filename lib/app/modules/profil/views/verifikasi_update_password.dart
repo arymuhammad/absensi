@@ -1,3 +1,4 @@
+import 'package:absensi/app/helper/app_colors.dart';
 import 'package:absensi/app/modules/add_pegawai/controllers/add_pegawai_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -9,7 +10,8 @@ class VerifikasiUpdatePassword extends GetView {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('VERIFIKASI USER'),
+        iconTheme: const IconThemeData(color: Colors.white),
+        title: const Text('VERIFIKASI USER', style: TextStyle(color: AppColors.mainTextColor1),),
         centerTitle: true,
         flexibleSpace: Container(
           decoration: const BoxDecoration(
@@ -50,12 +52,13 @@ class VerifikasiUpdatePassword extends GetView {
                   pegawaiC.cekUser(context);
                 },
                 style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.contentDefBtn,
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(50)),
                     minimumSize: Size(Get.size.width / 2, 50)),
                 child: const Text(
                   'VALIDASI',
-                  style: TextStyle(fontSize: 18),
+                  style: TextStyle(fontSize: 18, color: AppColors.mainTextColor1),
                 ),
               ),
             )

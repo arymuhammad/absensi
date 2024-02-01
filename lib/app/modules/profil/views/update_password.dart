@@ -1,3 +1,4 @@
+import 'package:absensi/app/helper/app_colors.dart';
 import 'package:absensi/app/services/service_api.dart';
 import 'package:absensi/app/modules/add_pegawai/controllers/add_pegawai_controller.dart';
 import 'package:flutter/material.dart';
@@ -11,7 +12,8 @@ class UpdatePassword extends GetView {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('UPDATE PASSWORD'),
+         iconTheme: const IconThemeData(color: Colors.white),
+        title: const Text('UPDATE PASSWORD', style: TextStyle(color: AppColors.mainTextColor1),),
         centerTitle: true,
         flexibleSpace: Container(
           decoration: const BoxDecoration(
@@ -78,12 +80,13 @@ class UpdatePassword extends GetView {
                   //  Restart.restartApp();
                 },
                 style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.contentDefBtn,
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(50)),
                     minimumSize: Size(Get.size.width / 2, 50)),
                 child: const Text(
                   'SIMPAN',
-                  style: TextStyle(fontSize: 18),
+                  style: TextStyle(fontSize: 18, color: AppColors.mainTextColor1),
                 ),
               ),
             )

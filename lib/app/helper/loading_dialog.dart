@@ -1,10 +1,26 @@
 import 'package:absensi/app/modules/login/controllers/login_controller.dart';
+import 'package:absensi/app/modules/report_sales/controllers/report_sales_controller.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 
 final auth = Get.put(LoginController());
+final salesCtr = Get.put(ReportSalesController());
+
+defaultSnackBar(context, message) {
+  var snackBar = SnackBar(
+    content: Text(message),
+    // backgroundColor:
+    //     status == "E" ? Colors.redAccent[700] : Colors.greenAccent[700],
+    duration: const Duration(milliseconds: 2000),
+  );
+
+// Find the ScaffoldMessenger in the widget tree
+// and use it to show a SnackBar.
+  ScaffoldMessenger.of(context).showSnackBar(snackBar);
+}
 
 void showToast(message) {
   Fluttertoast.showToast(
@@ -48,7 +64,8 @@ void dialogMsgCncl(code, msg) {
       confirmTextColor: Colors.white,
       textCancel: 'Tutup',
       onCancel: () {
-        Get.back();
+        auth.selectedMenu(0);
+        Future.delayed(const Duration(milliseconds: 300));
         Get.back();
       },
       barrierDismissible: false);
@@ -61,15 +78,17 @@ void dialogMsgAbsen(code, msg) {
       confirmTextColor: Colors.white,
       onConfirm: () {
         // Get.to(() => HomeView());
+        auth.selectedMenu(0);
+        Future.delayed(const Duration(milliseconds: 300));
         Get.back();
-        Get.back();
-        Get.back();
-        Get.back();
+        // Get.back();
+        // Get.back();
+        // Get.back();
       },
       barrierDismissible: false);
 }
 
-void succesDialog(context, desc) {
+void succesDialog(context, pageAbsen, desc) {
   AwesomeDialog(
     context: context,
     animType: AnimType.scale,
@@ -80,8 +99,14 @@ void succesDialog(context, desc) {
     title: 'Succes',
     desc: desc,
     btnOkOnPress: () {
-      Get.back();
-      Get.back();
+      if (pageAbsen == "Y") {
+        auth.selectedMenu(0);
+        Future.delayed(const Duration(milliseconds: 300));
+        Get.back();
+      } else {
+        Get.back();
+        Get.back();
+      }
     },
     btnOkIcon: Icons.check_circle,
     onDismissCallback: (type) {
@@ -90,7 +115,7 @@ void succesDialog(context, desc) {
   ).show();
 }
 
-void failedDialog(context, desc) {
+void failedDialog(context, title, desc) {
   AwesomeDialog(
     context: context,
     animType: AnimType.scale,
@@ -98,7 +123,7 @@ void failedDialog(context, desc) {
     dialogType: DialogType.error,
     dismissOnTouchOutside: false,
     dismissOnBackKeyPress: false,
-    title: 'Error',
+    title: title,
     desc: desc,
     btnOkOnPress: () {},
     btnOkIcon: Icons.cancel,
@@ -157,4 +182,28 @@ void loadingDialog(msg, String? msg2) {
         ],
       )),
       barrierDismissible: false);
+}
+
+loadingWithIcon() {
+  SmartDialog.showLoading(
+    backDismiss: false,
+    animationType: SmartAnimationType.scale,
+    builder: (_) => Stack(alignment: Alignment.center, children: [
+      Image.asset(
+        'assets/image/selfie.png',
+        height: 50,
+        width: 50,
+      ),
+      // Lottie.asset('assets/image/loader.json', repeat: true)
+      RotationTransition(
+        alignment: Alignment.center,
+        turns: salesCtr.ctrAnimated,
+        child: Image.asset(
+          'assets/image/circle_loading.png',
+          height: 80,
+          width: 80,
+        ),
+      ),
+    ]),
+  );
 }

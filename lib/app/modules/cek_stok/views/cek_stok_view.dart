@@ -1,3 +1,4 @@
+import 'package:absensi/app/helper/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
@@ -16,7 +17,8 @@ class CekStokView extends GetView<CekStokController> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('CEK STOK'),
+        iconTheme: const IconThemeData(color: AppColors.mainTextColor1),
+        title: const Text('CEK STOK', style: TextStyle(color: AppColors.mainTextColor1),),
         centerTitle: true,
         flexibleSpace: Container(
           decoration: const BoxDecoration(

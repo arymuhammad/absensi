@@ -1,4 +1,4 @@
-
+import 'package:absensi/app/helper/app_colors.dart';
 import 'package:absensi/app/helper/const.dart';
 import 'package:absensi/app/modules/profil/views/verifikasi_update_password.dart';
 import 'package:flutter/gestures.dart';
@@ -65,7 +65,8 @@ class LoginView extends GetView<LoginController> {
                         TextField(
                           controller: controller.username,
                           decoration: InputDecoration(
-                              // border: const OutlineInputBorder(),
+                              border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10)),
                               labelText: 'Username',
                               prefixIcon: Icon(TernavIcons.light.profile)),
                         ),
@@ -77,7 +78,8 @@ class LoginView extends GetView<LoginController> {
                             controller: controller.password,
                             obscureText: controller.isPassHide.value,
                             decoration: InputDecoration(
-                                // border: const OutlineInputBorder(),
+                                border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10)),
                                 labelText: 'Password',
                                 prefixIcon: Icon(TernavIcons.bold.lock),
                                 suffixIcon: InkWell(
@@ -96,9 +98,15 @@ class LoginView extends GetView<LoginController> {
                         ),
                         ElevatedButton(
                             style: ElevatedButton.styleFrom(
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(30)),
+                                backgroundColor: AppColors.contentDefBtn,
                                 fixedSize: Size(Get.mediaQuery.size.width, 50)),
                             onPressed: () => controller.login(),
-                            child: const Text('LOGIN')),
+                            child: const Text(
+                              'LOGIN',
+                              style: TextStyle(color: AppColors.mainTextColor1),
+                            )),
                         const SizedBox(height: 20),
                         Center(
                           child: TextButton(
@@ -106,7 +114,10 @@ class LoginView extends GetView<LoginController> {
                                 Get.to(() => VerifikasiUpdatePassword(),
                                     transition: Transition.cupertino);
                               },
-                              child: const Text('Lupas Password?')),
+                              child: Text(
+                                'Lupas Password?',
+                                style: TextStyle(color: mainColor),
+                              )),
                         ),
                         Center(
                           child: RichText(
