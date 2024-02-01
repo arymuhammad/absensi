@@ -1,16 +1,11 @@
-# absensi
+# Absensi app
 
-Absensi app (presensi) berbasis flutter
+Absensi app berbasis geolokasi. 
+aplikasi ini dibuat untuk kebutuhan absensi karyawan perusahaan baik di toko cabang maupun kantor pusat. terdapat beberapa fitur tambahan selain fitur utama (Absensi), yaitu cek stok barang, laporan sales, monitoring absensi(khusus untuk Area Manager).
 
-## Getting Started
+Aplikasi absesi ini juga tersedia veri web nya untuk kebutuhan HRD mengelola data absensi karyawan.
 
-This project is a starting point for a Flutter application.
+Saat ini, versi aplikasi yang sedang berjalan yaitu V 2.3.5. Aplikasi ini masih terus dikembangkan hingga saat ini
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+untuk info lebih lanjut, kontak developer kami di
+ademuhammad12@gmail.com
