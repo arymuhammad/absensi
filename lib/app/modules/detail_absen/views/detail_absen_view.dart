@@ -8,7 +8,6 @@ import '../../../services/service_api.dart';
 import '../controllers/detail_absen_controller.dart';
 import 'package:flutter_map/flutter_map.dart'; // Suitable for most situations
 
-
 class DetailAbsenView extends GetView<DetailAbsenController> {
   DetailAbsenView({super.key});
 
@@ -66,7 +65,7 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
       ),
       backgroundColor: backgroundColor,
       body: ListView(
-        padding: const EdgeInsets.all(10),
+        padding: const EdgeInsets.only(left:5, top: 10, right: 5, bottom: 10),
         children: [
           Card(
             elevation: 10,
@@ -126,7 +125,7 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
                                 ),
                               ),
                             ),
-                            const SizedBox(width: 10),
+                            const SizedBox(width: 5),
                             Row(
                               children: [
                                 Column(
@@ -145,11 +144,23 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
                                       ],
                                     ),
                                     Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         const Text('Shift'),
                                         const SizedBox(width: 57),
-                                        Text(
-                                          ': ${Get.arguments['nama_shift']}',
+                                        SizedBox(
+                                          width:
+                                              Get.mediaQuery.size.width * 0.35,
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                ': ${Get.arguments['nama_shift']}',
+                                              ),
+                                            ],
+                                          ),
                                         ),
                                       ],
                                     ),
@@ -263,10 +274,11 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
           const SizedBox(height: 20),
           Visibility(
               visible: Get.arguments['tanggal_pulang'] == "" ? true : false,
-              child: const Center(child: Padding(
+              child: const Center(
+                  child: Padding(
                 padding: EdgeInsets.all(8.0),
-                child: Text('Tidak ada data absen pulang',style:
-                             TextStyle(fontSize: 18)),
+                child: Text('Tidak ada data absen pulang',
+                    style: TextStyle(fontSize: 18)),
               ))),
           Visibility(
             visible: Get.arguments['tanggal_pulang'] != "" ? true : false,
@@ -331,7 +343,7 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
                                   ),
                                 ),
                               ),
-                              const SizedBox(width: 10),
+                              const SizedBox(width: 5),
                               Row(
                                 children: [
                                   Column(
@@ -351,14 +363,26 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
                                         ],
                                       ),
                                       Row(
-                                        children: [
-                                          const Text('Shift'),
-                                          const SizedBox(width: 57),
-                                          Text(
-                                            ': ${Get.arguments['nama_shift']}',
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        const Text('Shift'),
+                                        const SizedBox(width: 57),
+                                        SizedBox(
+                                          width:
+                                              Get.mediaQuery.size.width * 0.35,
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                ': ${Get.arguments['nama_shift']}',
+                                              ),
+                                            ],
                                           ),
-                                        ],
-                                      ),
+                                        ),
+                                      ],
+                                    ),
                                       Row(
                                         children: [
                                           const Text('Pulang'),

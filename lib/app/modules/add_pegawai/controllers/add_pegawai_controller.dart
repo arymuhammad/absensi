@@ -170,7 +170,6 @@ class AddPegawaiController extends GetxController {
                     )
                 ],
               ),
-              
               textConfirm: 'Unduh Pembaruan',
               confirmTextColor: Colors.white,
               onConfirm: () {
@@ -223,7 +222,7 @@ class AddPegawaiController extends GetxController {
                       downloadProgress.value = double.parse(event.value!);
                     },
                     // onError: errorHandle(Error()),
-                    onDone: () => Get.back(),
+                    // onDone: logC.logout,
                   );
                 } on http.ClientException catch (e) {
                   print('Failed to make OTA update. Details: $e');

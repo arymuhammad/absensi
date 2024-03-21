@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:absensi/app/controllers/absen_controller.dart';
 import 'package:absensi/app/helper/app_colors.dart';
 import 'package:absensi/app/helper/loading_dialog.dart';
 import 'package:absensi/app/modules/add_pegawai/controllers/add_pegawai_controller.dart';
@@ -9,7 +10,7 @@ import 'package:get/get.dart';
 
 class AboutView extends GetView {
   AboutView({super.key});
-  final ctr = Get.put(AddPegawaiController());
+  final absC = Get.put(AbsenController());
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +37,7 @@ class AboutView extends GetView {
           title: const Text('Check pembaruan aplikasi'),
           onTap: () {
             if (Platform.isAndroid) {
-              ctr.checkForUpdate(context, "");
+              absC.checkForUpdates("about");
             } else {
               showToast("Fitur ini hanya untuk Android");
             }
@@ -45,7 +46,7 @@ class AboutView extends GetView {
         const Divider(),
         ListTile(
           title: const Text('Versi aplikasi'),
-          subtitle: Text(ctr.currVer),
+          subtitle: Text(absC.currVer),
         ),
         const Divider(),
       ]),

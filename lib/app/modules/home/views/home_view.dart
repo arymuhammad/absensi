@@ -42,7 +42,6 @@ class HomeView extends GetView<HomeController> {
                       children: [
                         InkWell(
                           onTap: () {
-                          
                             Get.to(
                                 () => ProfilView(listDataUser: listDataUser!));
                           },
@@ -111,8 +110,7 @@ class HomeView extends GetView<HomeController> {
                     child: Column(
                       children: [
                         CardInfoMenu(userData: listDataUser!),
-                        const SizedBox(height: 10),
-                        listDataUser![9] == "26" || listDataUser![9] == "28" || listDataUser![9] == "10"
+                        listDataUser![12] == "1"
                             ? SummaryAbsenArea(userData: listDataUser!)
                             : SummaryAbsen(userData: listDataUser!)
                       ],

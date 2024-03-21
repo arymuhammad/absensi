@@ -13,6 +13,7 @@ import 'package:absensi/app/model/user_model.dart';
 import 'package:absensi/app/model/visit_model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import '../helper/loading_dialog.dart';
@@ -27,14 +28,18 @@ class ServiceApi {
 
   loginUser(data) async {
     try {
+      loadingWithIcon();
+
       final response =
           await http.post(Uri.parse('${baseUrl}auth'), body: data).timeout(
-        const Duration(seconds: 5),
+        const Duration(seconds: 30),
         onTimeout: () {
+          SmartDialog.dismiss();
           Get.back();
           return dialogMsg("Time Out", "Koneksi server timeout");
         },
       );
+      SmartDialog.dismiss();
 
       switch (response.statusCode) {
         case 200:
@@ -51,28 +56,25 @@ class ServiceApi {
             'Something went wrong.',
           );
       }
-    } on FetchDataException catch (e) {
-      // print('error caught: ${e.message}');
-      showToast("${e.message}\nUsername atau Password salah!");
+    } on FetchDataException catch (_) {
+      showToast("Username atau Password salah");
       isLoading.value = false;
     } on SocketException catch (_) {
+      SmartDialog.dismiss();
       Get.defaultDialog(
-          barrierDismissible: false,
           radius: 5,
           title: 'Peringatan',
-          content: Column(
+          content: const Column(
             children: [
-              const Text('Periksa Koneksi Internet Anda '),
-              const SizedBox(height: 15),
-              ElevatedButton(
-                  onPressed: () {
-                    loginUser(data);
-                    isLoading.value = true;
-                    Get.back();
-                  },
-                  child: const Text('Refresh'))
+              Text(
+                'Terjadi kesalahan saat menghubungkan\n ke server. Silahkan mencoba kembali',
+                textAlign: TextAlign.center,
+              ),
             ],
-          ));
+          ),
+          onCancel: () => Get.back(),
+          textCancel: 'Tutup',
+         );
       isLoading.value = false;
     }
   }
@@ -278,28 +280,36 @@ class ServiceApi {
               filename: data["foto_pulang"].path.split("/").last));
         }
       }
-      // request.files.add(http.MultipartFile(
-      //     'proposal',
-      //     data["proposal"].readAsBytes().asStream(),
-      //     data["proposal"].lengthSync(),
-      //     filename: data["proposal"].path.split("/").last));
 
       var res = await request.send();
       var responseBytes = await res.stream.toBytes();
       var responseString = utf8.decode(responseBytes);
 
       //debug
-      debugPrint("response code: ${res.statusCode}");
-      debugPrint("response: $responseString");
+      // debugPrint("response code: ${res.statusCode}");
+      // debugPrint("response: $responseString");
 
       final dataDecode = jsonDecode(responseString);
       debugPrint(dataDecode.toString());
 
-      if (res.statusCode == 200) {
-        // return showDialogSuccess('Sukses', 'Event Berhasil Dibuat');
-      } else {}
+      // if (res.statusCode == 200) {
+      //   // return showDialogSuccess('Sukses', 'Event Berhasil Dibuat');
+      // } else {
+      //   // return print('error koneksi');
+      // }
+      // loadingDialog("Sedang mengirim data...", "");
+      Get.back();
+      auth.selectedMenu(0);
+      // succesDialog(Get.context, "Y", "Anda berhasil Absen");
+    } on SocketException {
+      Get.back();
+      failedDialog(Get.context, 'ERROR',
+          'Tidak ada koneksi internet\nHarap mencoba kembali');
     } catch (e) {
-      debugPrint('$e');
+      Get.back();
+      failedDialog(Get.context, 'ERROR',
+          'Tidak ada koneksi internet\nHarap mencoba kembali');
+      // debugPrint('$e');
     }
   }
 
@@ -489,6 +499,33 @@ class ServiceApi {
     }
   }
 
+  getFilteredVisit(Map<String, dynamic> data) async {
+    try {
+      final response =
+          await http.post(Uri.parse('${baseUrl}get_visit'), body: data);
+      // print(data);
+      switch (response.statusCode) {
+        case 200:
+          List<dynamic> result = json.decode(response.body)['data'];
+          List<Visit> dataUser = result.map((e) => Visit.fromJson(e)).toList();
+          return dataUser;
+        case 400:
+        case 401:
+        case 402:
+        case 404:
+          final result = json.decode(response.body);
+          throw FetchDataException(result["message"]);
+        default:
+          throw FetchDataException(
+            'Something went wrong.',
+          );
+      }
+    } on FetchDataException catch (e) {
+      // print('error caught: ${e.message}');
+      showToast("${e.message}");
+    }
+  }
+
   getDataStok(data) async {
     try {
       final response =
@@ -606,38 +643,21 @@ class ServiceApi {
       }
 
       if (data["status"] == "add") {
-        // if (kIsWeb) {
-        //   // print(data["foto_masuk"]);
-        //   request.files.add(http.MultipartFile("foto_masuk",
-        //       data["foto_masuk"].readStream, data["foto_masuk"].size,
-        //       filename: data["foto_masuk"].name));
-        // } else {
         request.files.add(http.MultipartFile(
             'foto_in',
             data["foto_in"].readAsBytes().asStream(),
             data["foto_in"].lengthSync(),
             filename: data["foto_in"].path.split("/").last));
-        // }
       } else {
-        // if (kIsWeb) {
-        //   request.files.add(http.MultipartFile("foto_pulang",
-        //       data["foto_pulang"].readStream, data["foto_pulang"].size,
-        //       filename: data["foto_pulang"].name));
-        // } else {
         request.files.add(http.MultipartFile(
             'foto_out',
             data["foto_out"].readAsBytes().asStream(),
             data["foto_out"].lengthSync(),
             filename: data["foto_out"].path.split("/").last));
-        // }
       }
-      // request.files.add(http.MultipartFile(
-      //     'proposal',
-      //     data["proposal"].readAsBytes().asStream(),
-      //     data["proposal"].lengthSync(),
-      //     filename: data["proposal"].path.split("/").last));
 
       var res = await request.send();
+
       var responseBytes = await res.stream.toBytes();
       var responseString = utf8.decode(responseBytes);
 
@@ -647,12 +667,17 @@ class ServiceApi {
 
       final dataDecode = jsonDecode(responseString);
       debugPrint(dataDecode.toString());
-
-      if (res.statusCode == 200) {
-        // return showDialogSuccess('Sukses', 'Event Berhasil Dibuat');
-      } else {}
+      Get.back();
+      succesDialog(Get.context, "Y", "Anda berhasil Absen");
+    } on SocketException {
+      Get.back();
+      failedDialog(Get.context, 'ERROR',
+          'Tidak ada koneksi internet\nHarap mencoba kembali');
     } catch (e) {
-      debugPrint('$e');
+      Get.back();
+      failedDialog(Get.context, 'ERROR',
+          'Tidak ada koneksi internet\nHarap mencoba kembali');
+      // debugPrint('$e');
     }
   }
 
@@ -712,8 +737,8 @@ class ServiceApi {
   getUserCabang(idStore) async {
     var param = {"idCabang": idStore};
     try {
-      final response = await http.post(Uri.parse('${baseUrl}get_user_cabang'),
-          body: param);
+      final response =
+          await http.post(Uri.parse('${baseUrl}get_user_cabang'), body: param);
       switch (response.statusCode) {
         case 200:
           List<dynamic> result = json.decode(response.body)['data'];

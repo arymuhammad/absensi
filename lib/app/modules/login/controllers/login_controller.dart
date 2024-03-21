@@ -36,9 +36,9 @@ class LoginController extends GetxController {
   login() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     var data = {"username": username.text, "password": password.text};
-    loadingWithIcon();
+    
     var response = await ServiceApi().loginUser(data);
-    SmartDialog.dismiss();
+    
     dataUser.value = response;
     if (dataUser.value.success! == true) {
       await pref.setStringList('userDataLogin', <String>[
@@ -53,7 +53,9 @@ class LoginController extends GetxController {
         '${dataUser.value.data!.kodeCabang}',
         '${dataUser.value.data!.level}',
         '${dataUser.value.data!.username}',
-        '${dataUser.value.data!.areaCover}'
+        '${dataUser.value.data!.areaCover}',
+        '${dataUser.value.data!.visit}',
+        '${dataUser.value.data!.cekStok}'
       ]);
 
       List<String>? tempUser = pref.getStringList('userDataLogin');

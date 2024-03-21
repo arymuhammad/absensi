@@ -40,6 +40,7 @@ class SummaryAbsenArea extends GetView {
           });
         },
         child: ListView(
+          padding: const EdgeInsets.only(top: 20),
           shrinkWrap: true,
           physics: const AlwaysScrollableScrollPhysics(),
           children: [
@@ -182,10 +183,11 @@ class SummaryAbsenArea extends GetView {
                 )
               ],
             ),
-            const SizedBox(height: 5),
+            // const SizedBox(height: 5),
             Obx(
               () => absenC.isLoading.value
                   ? ListView.builder(
+                    padding: const EdgeInsets.only(bottom: 8),
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
                       itemCount: 3,
@@ -289,6 +291,7 @@ class SummaryAbsenArea extends GetView {
                           ),
                         )
                       : ListView.builder(
+                        padding: const EdgeInsets.only(bottom: 8),
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
                           itemCount: absenC.dataLimitVisit.length,

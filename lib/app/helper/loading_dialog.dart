@@ -115,7 +115,7 @@ void succesDialog(context, pageAbsen, desc) {
   ).show();
 }
 
-void failedDialog(context, title, desc) {
+ failedDialog(context, title, desc) {
   AwesomeDialog(
     context: context,
     animType: AnimType.scale,

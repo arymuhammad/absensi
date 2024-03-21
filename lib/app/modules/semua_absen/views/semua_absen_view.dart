@@ -308,22 +308,20 @@ class SemuaAbsenView extends GetView<SemuaAbsenController> {
                                                       .jamAbsenPulang! ==
                                                   ""
                                               ? "Belum Absen"
-                                              : DateFormat("HH:mm")
-                                                      .parse(absenC
-                                                          .searchAbsen[i]
-                                                          .jamAbsenPulang!)
-                                                      .isBefore(
-                                                          DateFormat("HH:mm")
-                                                              .parse("06:00"))
-                                                  ? "Lembur"
-                                                  : DateFormat("HH:mm")
+                                              : DateTime.parse(absenC.searchAbsen[i].tanggalPulang!)
+                                                          .isAfter(DateTime.parse(absenC
+                                                              .searchAbsen[i]
+                                                              .tanggalMasuk!)) &&
+                                                      DateFormat("HH:mm")
                                                           .parse(absenC
                                                               .searchAbsen[i]
                                                               .jamAbsenPulang!)
                                                           .isBefore(DateFormat("HH:mm")
-                                                              .parse(absenC
-                                                                  .searchAbsen[i]
-                                                                  .jamPulang!))
+                                                              .parse("08:01"))
+                                                  ? "Lembur"
+                                                  : DateFormat("HH:mm")
+                                                          .parse(absenC.searchAbsen[i].jamAbsenPulang!)
+                                                          .isBefore(DateFormat("HH:mm").parse(absenC.searchAbsen[i].jamPulang!))
                                                       ? "Pulang Cepat"
                                                       : "Lembur",
                                           "jam_absen_masuk": absenC

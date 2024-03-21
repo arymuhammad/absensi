@@ -29,7 +29,8 @@ class SummaryAbsen extends GetView {
             var paramSingle = {
               "mode": "single",
               "id_user": userData![0],
-              "tanggal_masuk": DateFormat('yyyy-MM-dd').format(absenC.tglStream.value)
+              "tanggal_masuk":
+                  DateFormat('yyyy-MM-dd').format(absenC.tglStream.value)
             };
 
             absenC.isLoading.value = true;
@@ -40,6 +41,7 @@ class SummaryAbsen extends GetView {
           });
         },
         child: ListView(
+          padding: const EdgeInsets.only(top: 20),
           shrinkWrap: true,
           physics: const AlwaysScrollableScrollPhysics(),
           children: [
@@ -52,7 +54,8 @@ class SummaryAbsen extends GetView {
                 children: [
                   Padding(
                     padding: const EdgeInsets.only(left: 8.0),
-                    child: Obx(()=>Text(
+                    child: Obx(
+                      () => Text(
                           DateFormat("EEEE, d MMMM yyyy", "id_ID")
                               .format(absenC.tglStream.value)
                               .toString(),
@@ -147,10 +150,11 @@ class SummaryAbsen extends GetView {
                 )
               ],
             ),
-            const SizedBox(height: 5),
+            // const SizedBox(height: 5),
             Obx(
               () => absenC.isLoading.value
                   ? ListView.builder(
+                      padding: const EdgeInsets.only(bottom: 8),
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
                       itemCount: 3,
@@ -254,78 +258,87 @@ class SummaryAbsen extends GetView {
                           ),
                         )
                       : ListView.builder(
+                          padding: const EdgeInsets.only(bottom: 8),
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
                           itemCount: absenC.dataLimitAbsen.length,
                           itemBuilder: (c, i) {
                             return InkWell(
-                              onTap: () =>
-                                  Get.to(() => DetailAbsenView(), arguments: {
-                                "foto_profil": userData![5] != ""
-                                    ? userData![5]
-                                    : userData![1],
-                                "nama": absenC.dataLimitAbsen[i].nama!,
-                                "nama_shift":
-                                    absenC.dataLimitAbsen[i].namaShift!,
-                                "id_user": absenC.dataLimitAbsen[i].idUser!,
-                                "tanggal_masuk": absenC.dataLimitAbsen[i].tanggalMasuk!,
-                                "tanggal_pulang": absenC.dataLimitAbsen[i].tanggalPulang !=null?absenC.dataLimitAbsen[i].tanggalPulang!:"",
-                                "jam_masuk": DateFormat("HH:mm")
-                                        .parse(absenC
-                                            .dataLimitAbsen[i].jamAbsenMasuk!)
-                                        .isBefore(DateFormat("HH:mm").parse(
-                                            absenC.dataLimitAbsen[i].jamMasuk!))
-                                    ? "Awal Waktu"
-                                    : DateFormat("HH:mm")
+                              onTap: () => Get.to(() => DetailAbsenView(),
+                                  arguments: {
+                                    "foto_profil": userData![5] != ""
+                                        ? userData![5]
+                                        : userData![1],
+                                    "nama": absenC.dataLimitAbsen[i].nama!,
+                                    "nama_shift":
+                                        absenC.dataLimitAbsen[i].namaShift!,
+                                    "id_user": absenC.dataLimitAbsen[i].idUser!,
+                                    "tanggal_masuk":
+                                        absenC.dataLimitAbsen[i].tanggalMasuk!,
+                                    "tanggal_pulang": absenC.dataLimitAbsen[i]
+                                                .tanggalPulang !=
+                                            null
+                                        ? absenC
+                                            .dataLimitAbsen[i].tanggalPulang!
+                                        : "",
+                                    "jam_masuk": DateFormat("HH:mm")
                                             .parse(absenC.dataLimitAbsen[i]
                                                 .jamAbsenMasuk!)
-                                            .isAtSameMomentAs(
-                                                DateFormat("HH:mm").parse(absenC
-                                                    .dataLimitAbsen[i]
+                                            .isBefore(DateFormat("HH:mm").parse(
+                                                absenC.dataLimitAbsen[i]
                                                     .jamMasuk!))
-                                        ? "Tepat Waktu"
-                                        : "Telat",
-                                "jam_pulang": absenC.dataLimitAbsen[i]
-                                            .jamAbsenPulang! ==
-                                        ""? "Belum Absen"
-                                              : DateFormat("HH:mm")
-                                                      .parse(absenC
-                                                          .dataLimitAbsen[i]
-                                                          .jamAbsenPulang!)
-                                                      .isBefore(
-                                                          DateFormat("HH:mm")
-                                                              .parse("06:00"))
-                                                  ? "Lembur"
-                                                  : DateFormat("HH:mm")
-                                                          .parse(absenC
-                                                              .dataLimitAbsen[i]
-                                                              .jamAbsenPulang!)
-                                                          .isBefore(DateFormat("HH:mm")
-                                                              .parse(absenC
-                                                                  .dataLimitAbsen[i]
-                                                                  .jamPulang!))
-                                                      ? "Pulang Cepat"
-                                                      : "Lembur",
-                                "jam_absen_masuk":
-                                    absenC.dataLimitAbsen[i].jamAbsenMasuk!,
-                                "jam_absen_pulang":
-                                    absenC.dataLimitAbsen[i].jamAbsenPulang!,
-                                "foto_masuk":
-                                    absenC.dataLimitAbsen[i].fotoMasuk!,
-                                "foto_pulang":
-                                    absenC.dataLimitAbsen[i].fotoPulang!,
-                                "lat_masuk": absenC.dataLimitAbsen[i].latMasuk!,
-                                "long_masuk":
-                                    absenC.dataLimitAbsen[i].longMasuk!,
-                                "lat_pulang":
-                                    absenC.dataLimitAbsen[i].latPulang!,
-                                "long_pulang":
-                                    absenC.dataLimitAbsen[i].longPulang!,
-                                "device_info":
-                                    absenC.dataLimitAbsen[i].devInfo!,
-                                "device_info2":
-                                    absenC.dataLimitAbsen[i].devInfo2!,
-                              }, transition: Transition.cupertino),
+                                        ? "Awal Waktu"
+                                        : DateFormat("HH:mm")
+                                                .parse(absenC.dataLimitAbsen[i]
+                                                    .jamAbsenMasuk!)
+                                                .isAtSameMomentAs(
+                                                    DateFormat("HH:mm").parse(
+                                                        absenC.dataLimitAbsen[i]
+                                                            .jamMasuk!))
+                                            ? "Tepat Waktu"
+                                            : "Telat",
+                                    "jam_pulang": absenC.dataLimitAbsen[i]
+                                                .jamAbsenPulang! ==
+                                            ""
+                                        ? "Belum Absen"
+                                        : DateTime.parse(absenC.dataLimitAbsen[i].tanggalPulang!)
+                                                    .isAfter(DateTime.parse(absenC
+                                                        .dataLimitAbsen[i]
+                                                        .tanggalMasuk!)) &&
+                                                DateFormat("HH:mm")
+                                                    .parse(absenC
+                                                        .dataLimitAbsen[i]
+                                                        .jamAbsenPulang!)
+                                                    .isBefore(DateFormat("HH:mm")
+                                                        .parse("08:01"))
+                                            ? "Lembur"
+                                            : DateFormat("HH:mm")
+                                                    .parse(absenC.dataLimitAbsen[i].jamAbsenPulang!)
+                                                    .isBefore(DateFormat("HH:mm").parse(absenC.dataLimitAbsen[i].jamPulang!))
+                                                ? "Pulang Cepat"
+                                                : "Lembur",
+                                    "jam_absen_masuk":
+                                        absenC.dataLimitAbsen[i].jamAbsenMasuk!,
+                                    "jam_absen_pulang": absenC
+                                        .dataLimitAbsen[i].jamAbsenPulang!,
+                                    "foto_masuk":
+                                        absenC.dataLimitAbsen[i].fotoMasuk!,
+                                    "foto_pulang":
+                                        absenC.dataLimitAbsen[i].fotoPulang!,
+                                    "lat_masuk":
+                                        absenC.dataLimitAbsen[i].latMasuk!,
+                                    "long_masuk":
+                                        absenC.dataLimitAbsen[i].longMasuk!,
+                                    "lat_pulang":
+                                        absenC.dataLimitAbsen[i].latPulang!,
+                                    "long_pulang":
+                                        absenC.dataLimitAbsen[i].longPulang!,
+                                    "device_info":
+                                        absenC.dataLimitAbsen[i].devInfo!,
+                                    "device_info2":
+                                        absenC.dataLimitAbsen[i].devInfo2!,
+                                  },
+                                  transition: Transition.cupertino),
                               child: Card(
                                 shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(6)),
@@ -368,7 +381,8 @@ class SummaryAbsen extends GetView {
                                         Text(
                                           DateFormat('MMM')
                                               .format(DateTime.parse(absenC
-                                                  .dataLimitAbsen[i].tanggalMasuk!))
+                                                  .dataLimitAbsen[i]
+                                                  .tanggalMasuk!))
                                               .toUpperCase(),
                                           style:
                                               TextStyle(color: subTitleColor),
@@ -376,7 +390,8 @@ class SummaryAbsen extends GetView {
                                         Text(
                                           DateFormat('dd').format(
                                               DateTime.parse(absenC
-                                                  .dataLimitAbsen[i].tanggalMasuk!)),
+                                                  .dataLimitAbsen[i]
+                                                  .tanggalMasuk!)),
                                           style: TextStyle(
                                               fontWeight: FontWeight.bold,
                                               fontSize: 16,

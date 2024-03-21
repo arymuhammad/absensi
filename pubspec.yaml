@@ -1,5 +1,5 @@
 name: absensi
-version: 2.3.6+60
+version: 2.3.12+102
 publish_to: none
 description: URBAN&CO SPOT
 environment: 
@@ -12,7 +12,6 @@ dependencies:
   convex_bottom_bar: 3.2.0
   cupertino_icons: ^1.0.2
   datetime_picker_formfield: 2.0.1
-  device_info_plus: ^9.1.0
   excel: ^2.1.0
   file_picker: ^6.0.0
   flutter_barcode_scanner: 2.0.0
@@ -39,7 +38,7 @@ dependencies:
   percent_indicator: ^4.2.3
   permission_handler: ^11.0.1
   photo_view: 0.14.0
-  printing: ^5.11.0
+  # printing: ^5.11.0
   shared_preferences: ^2.2.2
   shimmer: ^3.0.0
   splash_screen_view: any
@@ -48,6 +47,8 @@ dependencies:
   xml: ^6.2.2
   sliding_up_panel2: 3.3.0+1
   syncfusion_flutter_charts: 23.1.44
+  device_marketing_names: 0.8.1
+  local_auth: 2.2.0
   flutter: 
     sdk: flutter
 

@@ -193,6 +193,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "7.0.0"
+  device_marketing_names:
+    dependency: "direct main"
+    description:
+      name: device_marketing_names
+      sha256: "92563e71a030ef9a88976e33b9e0f703d4115fe1ed13de3acd1b52795a194d4d"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.8.1"
   equatable:
     dependency: transitive
     description:
@@ -1197,6 +1205,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.3.1"
+  universal_platform:
+    dependency: transitive
+    description:
+      name: universal_platform
+      sha256: d315be0f6641898b280ffa34e2ddb14f3d12b1a37882557869646e0cc363d0cc
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.0+1"
   url_strategy:
     dependency: "direct main"
     description:

@@ -17,6 +17,7 @@ class CardInfoMenu extends GetView {
 
   @override
   Widget build(BuildContext context) {
+  var listIdLevel = ["1", "8", "9", "10", "19", "20",""];
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       elevation: 10,
@@ -61,25 +62,30 @@ class CardInfoMenu extends GetView {
                 scrollDirection: Axis.horizontal,
                 child: Row(
                   children: [
-                    Column(
-                      children: [
-                        IconButton(
-                            onPressed: () {
-                              Get.to(
-                                  () => CekStokView(kodeCabang: userData![8]),
-                                  transition: Transition.cupertino);
-                            },
-                            icon: Icon(
-                              // CupertinoIcons.doc_text_search,
-                              FontAwesome.box_open,
-                              color: mainColor,
-                              size: 30,
-                            )),
-                        const Text(
-                          'Cek Stok\n',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        )
-                      ],
+                    Visibility(
+                      visible: userData![13] =="1"
+                          ? true
+                          : false,
+                      child: Column(
+                        children: [
+                          IconButton(
+                              onPressed: () {
+                                Get.to(
+                                    () => CekStokView(kodeCabang: userData![8]),
+                                    transition: Transition.cupertino);
+                              },
+                              icon: Icon(
+                                // CupertinoIcons.doc_text_search,
+                                FontAwesome.box_open,
+                                color: mainColor,
+                                size: 30,
+                              )),
+                          const Text(
+                            'Cek Stok\n',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          )
+                        ],
+                      ),
                     ),
                     const SizedBox(
                       width: 12,
@@ -120,7 +126,7 @@ class CardInfoMenu extends GetView {
                     ),
                     Visibility(
                       visible: userData!.elementAt(9) == "1" ||
-                              userData!.elementAt(9) == "26" 
+                              userData!.elementAt(9) == "26"
                           ? true
                           : false,
                       child: Column(
@@ -130,7 +136,7 @@ class CardInfoMenu extends GetView {
                                 Get.to(() => MonitoringAbsenView(),
                                     transition: Transition.cupertino);
                                 absC.searchAbsen.clear();
-                                absC.userMonitor.value="";
+                                absC.userMonitor.value = "";
                               },
                               icon: Icon(
                                 FontAwesome.user_tie,
