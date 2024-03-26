@@ -1,25 +1,26 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'package:absensi/app/model/cabang_model.dart';
-import 'package:absensi/app/model/cek_absen_model.dart';
-import 'package:absensi/app/model/cek_stok_model.dart';
-import 'package:absensi/app/model/cek_user_model.dart';
-import 'package:absensi/app/model/cek_visit_model.dart';
-import 'package:absensi/app/model/level_model.dart';
-import 'package:absensi/app/model/report_sales_model.dart';
-import 'package:absensi/app/model/shift_kerja_model.dart';
-import 'package:absensi/app/model/user_model.dart';
-import 'package:absensi/app/model/visit_model.dart';
+import 'package:absensi/app/data/model/cabang_model.dart';
+import 'package:absensi/app/data/model/cek_absen_model.dart';
+import 'package:absensi/app/data/model/cek_stok_model.dart';
+import 'package:absensi/app/data/model/cek_user_model.dart';
+import 'package:absensi/app/data/model/cek_visit_model.dart';
+import 'package:absensi/app/data/model/level_model.dart';
+import 'package:absensi/app/data/model/report_sales_model.dart';
+import 'package:absensi/app/data/model/shift_kerja_model.dart';
+import 'package:absensi/app/data/model/user_model.dart';
+import 'package:absensi/app/data/model/visit_model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
-import '../helper/loading_dialog.dart';
-import '../model/absen_model.dart';
-import '../model/foto_profil_model.dart';
-import '../model/login_model.dart';
+
+import '../data/helper/loading_dialog.dart';
+import '../data/model/absen_model.dart';
+import '../data/model/foto_profil_model.dart';
+import '../data/model/login_model.dart';
 import 'app_exceptions.dart';
 
 class ServiceApi {
@@ -62,19 +63,19 @@ class ServiceApi {
     } on SocketException catch (_) {
       SmartDialog.dismiss();
       Get.defaultDialog(
-          radius: 5,
-          title: 'Peringatan',
-          content: const Column(
-            children: [
-              Text(
-                'Terjadi kesalahan saat menghubungkan\n ke server. Silahkan mencoba kembali',
-                textAlign: TextAlign.center,
-              ),
-            ],
-          ),
-          onCancel: () => Get.back(),
-          textCancel: 'Tutup',
-         );
+        radius: 5,
+        title: 'Peringatan',
+        content: const Column(
+          children: [
+            Text(
+              'Terjadi kesalahan saat menghubungkan\n ke server. Silahkan mencoba kembali',
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+        onCancel: () => Get.back(),
+        textCancel: 'Tutup',
+      );
       isLoading.value = false;
     }
   }

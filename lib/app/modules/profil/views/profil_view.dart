@@ -1,5 +1,5 @@
-import 'package:absensi/app/helper/const.dart';
-import 'package:absensi/app/helper/loading_dialog.dart';
+import 'package:absensi/app/data/helper/const.dart';
+import 'package:absensi/app/data/helper/loading_dialog.dart';
 import 'package:absensi/app/modules/login/controllers/login_controller.dart';
 import 'package:absensi/app/modules/profil/views/about_view.dart';
 import 'package:absensi/app/modules/profil/views/update_profil.dart';

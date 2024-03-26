@@ -1,5 +1,5 @@
-import 'package:absensi/app/helper/app_colors.dart';
-import 'package:absensi/app/helper/currency_format.dart';
+import 'package:absensi/app/data/helper/app_colors.dart';
+import 'package:absensi/app/data/helper/currency_format.dart';
 import 'package:absensi/app/modules/report_sales/views/chart_sales.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -180,7 +180,7 @@ class ReportSalesView extends GetView<ReportSalesController> {
       floatingActionButton: FloatingActionButton(
         backgroundColor: AppColors.contentDefBtn,
         onPressed: () => dateFilter(),
-        child: const Icon(Iconsax.calendar, color: AppColors.mainTextColor1,),
+        child: const Icon(Iconsax.calendar_1_bold, color: AppColors.mainTextColor1,),
       ),
     );
   }

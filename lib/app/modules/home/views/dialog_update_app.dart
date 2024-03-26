@@ -1,6 +1,6 @@
 
 import 'package:absensi/app/controllers/absen_controller.dart';
-import 'package:absensi/app/helper/const.dart';
+import 'package:absensi/app/data/helper/const.dart';
 import 'package:absensi/app/modules/login/controllers/login_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';

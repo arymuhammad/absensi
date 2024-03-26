@@ -2,7 +2,7 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:absensi/app/services/service_api.dart';
-import 'package:absensi/app/model/level_model.dart';
+import 'package:absensi/app/data/model/level_model.dart';
 import 'package:absensi/app/modules/profil/views/update_password.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
@@ -16,10 +16,10 @@ import 'package:xml/xml.dart' as xml;
 import 'package:image_picker/image_picker.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../../helper/loading_dialog.dart';
-import '../../../model/cabang_model.dart';
-import '../../../model/cek_user_model.dart';
-import '../../../model/foto_profil_model.dart';
+import '../../../data/helper/loading_dialog.dart';
+import '../../../data/model/cabang_model.dart';
+import '../../../data/model/cek_user_model.dart';
+import '../../../data/model/foto_profil_model.dart';
 
 class AddPegawaiController extends GetxController {
   late TextEditingController nip, name, username, pass, store, telp, level;

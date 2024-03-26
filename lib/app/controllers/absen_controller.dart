@@ -1,15 +1,15 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'package:absensi/app/model/cek_visit_model.dart';
-import 'package:absensi/app/model/user_model.dart';
-import 'package:absensi/app/model/visit_model.dart';
+import 'package:absensi/app/data/model/cek_visit_model.dart';
+import 'package:absensi/app/data/model/user_model.dart';
+import 'package:absensi/app/data/model/visit_model.dart';
 import 'package:absensi/app/modules/home/views/dialog_absen.dart';
 import 'package:absensi/app/modules/home/views/dialog_update_app.dart';
 import 'package:device_marketing_names/device_marketing_names.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
-import 'package:absensi/app/model/shift_kerja_model.dart';
+import 'package:absensi/app/data/model/shift_kerja_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_timezone/flutter_native_timezone.dart';
 import 'package:geocoding/geocoding.dart';
@@ -21,10 +21,13 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:xml/xml.dart' as xml;
 import '../services/service_api.dart';
-import '../helper/loading_dialog.dart';
-import '../model/absen_model.dart';
-import '../model/cabang_model.dart';
-import '../model/cek_absen_model.dart';
+import '../data/helper/loading_dialog.dart';
+import '../data/model/absen_model.dart';
+import '../data/model/cabang_model.dart';
+import '../data/model/cek_absen_model.dart';
+import 'package:pdf/pdf.dart';
+import 'package:printing/printing.dart';
+import 'package:pdf/widgets.dart' as pw;
 
 class AbsenController extends GetxController {
   var isLoading = true.obs;
@@ -222,9 +225,9 @@ class AbsenController extends GetxController {
       final deviceNames = DeviceMarketingNames();
       // DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
       // if (Platform.isAndroid) {
-         devInfo.value = await deviceNames.getSingleName();
-        // AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-        // devInfo.value = '${androidInfo.brand} ${androidInfo.model}';
+      devInfo.value = await deviceNames.getSingleName();
+      // AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+      // devInfo.value = '${androidInfo.brand} ${androidInfo.model}';
       // } else {
       //   IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
       //   devInfo.value = '${iosInfo.name} ${iosInfo.model}';
@@ -278,6 +281,142 @@ class AbsenController extends GetxController {
     final response = await ServiceApi().cekDataVisit(data);
     cekVisit.value = response;
     return cekVisit.value;
+  }
+
+  exportPdf() async {
+    final doc = pw.Document(version: PdfVersion.pdf_1_5, compress: true);
+    final List<pw.TableRow> rows = await _loadData();
+
+    doc.addPage(pw.MultiPage(
+        pageFormat: PdfPageFormat.a4,
+        orientation: pw.PageOrientation.landscape,
+        build: (context) => [
+              pw.Center(
+                child: pw.Table(
+                  border: pw.TableBorder.all(),
+                  children: rows,
+                ),
+              )
+            ]));
+
+    await Printing.layoutPdf(
+        onLayout: (PdfPageFormat format) async => doc.save());
+  }
+
+  Future<List<pw.TableRow>> _loadData() async {
+    List<pw.TableRow> rows = [];
+    final font = await PdfGoogleFonts.nunitoRegular();
+
+    rows.add(pw.TableRow(
+      decoration: const pw.BoxDecoration(color: PdfColors.blue700),
+      children: [
+        pw.Text('TANGGAL',
+            textAlign: pw.TextAlign.center,
+            style: pw.TextStyle(color: PdfColors.white, font: font)),
+        pw.Text('CABANG',
+            textAlign: pw.TextAlign.center,
+            style: pw.TextStyle(color: PdfColors.white, font: font)),
+        pw.Text('NAMA',
+            textAlign: pw.TextAlign.center,
+            style: pw.TextStyle(color: PdfColors.white, font: font)),
+        pw.Text('SHIFT',
+            textAlign: pw.TextAlign.center,
+            style: pw.TextStyle(color: PdfColors.white, font: font)),
+        pw.Text('MASUK',
+            textAlign: pw.TextAlign.center,
+            style: pw.TextStyle(color: PdfColors.white, font: font)),
+        pw.Text('FOTO',
+            textAlign: pw.TextAlign.center,
+            style: pw.TextStyle(color: PdfColors.white, font: font)),
+        pw.Text('STATUS MASUK',
+            textAlign: pw.TextAlign.center,
+            style: pw.TextStyle(color: PdfColors.white, font: font)),
+        pw.Text('KELUAR',
+            textAlign: pw.TextAlign.center,
+            style: pw.TextStyle(color: PdfColors.white, font: font)),
+        pw.Text('FOTO',
+            textAlign: pw.TextAlign.center,
+            style: pw.TextStyle(color: PdfColors.white, font: font)),
+        pw.Text('STATUS KELUAR',
+            textAlign: pw.TextAlign.center,
+            style: pw.TextStyle(color: PdfColors.white, font: font)),
+      ],
+    ));
+
+    for (var data in searchAbsen) {
+      var img1 = await http
+          .get(
+            Uri.parse('${ServiceApi().baseUrl}${data.fotoMasuk!}'),
+          )
+          .then((value) => value.bodyBytes);
+      // print(img1.statusCode);
+      pw.MemoryImage imageMasuk = pw.MemoryImage(img1);
+      // // print('${img1.bodyBytes}');
+      pw.MemoryImage? imageKeluar;
+      if (data.fotoPulang! != "") {
+        final img2 = await http.get(
+          Uri.parse('${ServiceApi().baseUrl}${data.fotoPulang!}'),
+        );
+
+        imageKeluar = pw.MemoryImage(img2.bodyBytes);
+      }
+
+      rows.add(pw.TableRow(
+        decoration: const pw.BoxDecoration(color: PdfColors.grey200),
+        children: [
+          pw.Text(
+              DateFormat('dd/MM/yyyy')
+                  .format(DateTime.parse(data.tanggalMasuk!)),
+              textAlign: pw.TextAlign.center,
+              style: pw.TextStyle(font: font)),
+          pw.Text(data.namaCabang!,
+              textAlign: pw.TextAlign.center, style: pw.TextStyle(font: font)),
+          pw.Text(data.nama!,
+              textAlign: pw.TextAlign.center, style: pw.TextStyle(font: font)),
+          pw.Text(data.namaShift!,
+              textAlign: pw.TextAlign.center, style: pw.TextStyle(font: font)),
+          pw.Text(data.jamAbsenMasuk!,
+              textAlign: pw.TextAlign.center, style: pw.TextStyle(font: font)),
+          pw.Container(
+            width: 30,
+            height: 30,
+            child: pw.Center(child: pw.Image(imageMasuk)),
+          ),
+          pw.Text(
+              DateFormat("HH:mm")
+                      .parse(data.jamAbsenMasuk!)
+                      .isBefore(DateFormat("HH:mm").parse(data.jamMasuk!))
+                  ? "Awal Waktu"
+                  : "Telat",
+              textAlign: pw.TextAlign.center,
+              style: pw.TextStyle(font: font)),
+          pw.Text(data.jamAbsenPulang!,
+              textAlign: pw.TextAlign.center, style: pw.TextStyle(font: font)),
+          data.fotoPulang! != ""
+              ? pw.Container(
+                  width: 30,
+                  height: 30,
+                  child: pw.Center(child: pw.Image(imageKeluar!)),
+                )
+              : pw.Container(
+                  width: 30,
+                  height: 30,
+                ),
+          pw.Text(
+              data.jamAbsenPulang! == ""
+                  ? "Belum Absen"
+                  : DateFormat("HH:mm")
+                          .parse(data.jamAbsenPulang!)
+                          .isBefore(DateFormat("HH:mm").parse(data.jamPulang!))
+                      ? "Pulang Cepat"
+                      : "Lembur",
+              textAlign: pw.TextAlign.center,
+              style: pw.TextStyle(font: font)),
+        ],
+      ));
+    }
+
+    return rows;
   }
 
   Future<void> uploadFotoAbsen() async {

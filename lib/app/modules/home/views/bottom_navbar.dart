@@ -1,4 +1,4 @@
-import 'package:absensi/app/helper/const.dart';
+import 'package:absensi/app/data/helper/const.dart';
 import 'package:absensi/app/modules/absen/views/absen_view.dart';
 import 'package:absensi/app/modules/home/controllers/home_controller.dart';
 import 'package:absensi/app/modules/home/views/home_view.dart';

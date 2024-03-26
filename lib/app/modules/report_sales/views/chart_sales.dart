@@ -1,4 +1,4 @@
-import 'package:absensi/app/model/report_sales_model.dart';
+import 'package:absensi/app/data/model/report_sales_model.dart';
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 

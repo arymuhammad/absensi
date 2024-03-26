@@ -1,6 +1,6 @@
 import 'package:absensi/app/controllers/absen_controller.dart';
-import 'package:absensi/app/helper/const.dart';
-import 'package:absensi/app/helper/loading_dialog.dart';
+import 'package:absensi/app/data/helper/const.dart';
+import 'package:absensi/app/data/helper/loading_dialog.dart';
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
@@ -479,7 +479,7 @@ class MonitoringAbsenView extends GetView {
         onPressed: () {
           searchForm();
         },
-        child: const Icon(FontAwesome.searchengin),
+        child: const Icon(FontAwesome.searchengin_brand),
       ),
     );
   }

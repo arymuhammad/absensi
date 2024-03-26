@@ -1,4 +1,4 @@
-package com.muhammadary.absensi
+package com.absensi.urbanco
 
 import io.flutter.embedding.android.FlutterActivity
 

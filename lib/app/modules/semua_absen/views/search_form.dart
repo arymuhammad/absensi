@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:absensi/app/controllers/absen_controller.dart';
-import 'package:absensi/app/helper/loading_dialog.dart';
+import 'package:absensi/app/data/helper/loading_dialog.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';

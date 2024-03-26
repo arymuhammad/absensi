@@ -1,5 +1,5 @@
-import 'package:absensi/app/helper/app_colors.dart';
-import 'package:absensi/app/helper/loading_dialog.dart';
+import 'package:absensi/app/data/helper/app_colors.dart';
+import 'package:absensi/app/data/helper/loading_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
@@ -117,7 +117,7 @@ class AbsenView extends GetView<AbsenController> {
                         child: Row(
                           children: [
                             Icon(
-                              Iconsax.map,
+                              Iconsax.map_1_bold,
                               color: Colors.blueAccent[700],
                               size: 80,
                             ),

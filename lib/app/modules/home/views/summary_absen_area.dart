@@ -1,6 +1,6 @@
 import 'package:absensi/app/controllers/absen_controller.dart';
-import 'package:absensi/app/helper/const.dart';
-import 'package:absensi/app/helper/loading_dialog.dart';
+import 'package:absensi/app/data/helper/const.dart';
+import 'package:absensi/app/data/helper/loading_dialog.dart';
 import 'package:absensi/app/modules/detail_absen/views/detail_visit_view.dart';
 import 'package:absensi/app/modules/semua_absen/views/riwayat_visit_view.dart';
 import 'package:flutter/material.dart';
@@ -74,7 +74,7 @@ class SummaryAbsenArea extends GetView {
                         Row(
                           children: [
                             Icon(
-                              FontAwesome.map_location_dot,
+                              FontAwesome.map_location_dot_solid,
                               size: 17,
                               color: mainColor,
                             ),

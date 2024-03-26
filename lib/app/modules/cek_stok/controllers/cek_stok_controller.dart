@@ -1,6 +1,6 @@
-import 'package:absensi/app/helper/loading_dialog.dart';
+import 'package:absensi/app/data/helper/loading_dialog.dart';
 import 'package:absensi/app/services/service_api.dart';
-import 'package:absensi/app/model/cek_stok_model.dart';
+import 'package:absensi/app/data/model/cek_stok_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';

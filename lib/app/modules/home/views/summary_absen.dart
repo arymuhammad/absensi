@@ -1,6 +1,6 @@
 import 'package:absensi/app/controllers/absen_controller.dart';
-import 'package:absensi/app/helper/const.dart';
-import 'package:absensi/app/helper/loading_dialog.dart';
+import 'package:absensi/app/data/helper/const.dart';
+import 'package:absensi/app/data/helper/loading_dialog.dart';
 import 'package:absensi/app/modules/detail_absen/views/detail_absen_view.dart';
 import 'package:absensi/app/modules/semua_absen/views/semua_absen_view.dart';
 import 'package:flutter/material.dart';

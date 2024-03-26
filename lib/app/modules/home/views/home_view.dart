@@ -1,4 +1,4 @@
-import 'package:absensi/app/helper/loading_dialog.dart';
+import 'package:absensi/app/data/helper/loading_dialog.dart';
 import 'package:absensi/app/modules/home/views/card_info_menu.dart';
 import 'package:absensi/app/modules/home/views/summary_absen.dart';
 import 'package:absensi/app/modules/home/views/summary_absen_area.dart';

@@ -1,5 +1,5 @@
-import 'package:absensi/app/helper/app_colors.dart';
-import 'package:absensi/app/helper/loading_dialog.dart';
+import 'package:absensi/app/data/helper/app_colors.dart';
+import 'package:absensi/app/data/helper/loading_dialog.dart';
 import 'package:absensi/app/modules/report_sales/controllers/report_sales_controller.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/material.dart';
@@ -30,7 +30,7 @@ dateFilter() {
                     style: const TextStyle(fontSize: 14),
                     decoration: const InputDecoration(
                         contentPadding: EdgeInsets.all(0.5),
-                        prefixIcon: Icon(Iconsax.calendar),
+                        prefixIcon: Icon(Iconsax.calendar_1_bold),
                         hintText: 'Pilih Tanggal',
                         border: OutlineInputBorder()),
                     format: DateFormat("yyyy-MM-dd"),

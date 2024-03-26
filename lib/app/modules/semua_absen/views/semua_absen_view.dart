@@ -1,12 +1,14 @@
 import 'package:absensi/app/controllers/absen_controller.dart';
-import 'package:absensi/app/helper/app_colors.dart';
-import 'package:absensi/app/helper/const.dart';
-import 'package:absensi/app/helper/loading_dialog.dart';
+import 'package:absensi/app/data/helper/app_colors.dart';
+import 'package:absensi/app/data/helper/const.dart';
+import 'package:absensi/app/data/helper/loading_dialog.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
+import 'package:flutter/widgets.dart';
+import 'dart:math' as math;
 import 'package:get/get.dart';
+import 'package:icons_plus/icons_plus.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:ternav_icons/ternav_icons.dart';
 
@@ -50,6 +52,7 @@ class SemuaAbsenView extends GetView<SemuaAbsenController> {
           Obx(
             () => absenC.ascending.value
                 ? IconButton(
+                    tooltip: 'Sort ASC',
                     onPressed: () {
                       absenC.searchAbsen.sort(
                           (a, b) => a.tanggalMasuk!.compareTo(b.tanggalMasuk!));
@@ -60,14 +63,18 @@ class SemuaAbsenView extends GetView<SemuaAbsenController> {
                       color: AppColors.mainTextColor1,
                     ))
                 : IconButton(
+                    tooltip: 'Sort DESC',
                     onPressed: () {
                       absenC.searchAbsen.sort(
                           (a, b) => b.tanggalMasuk!.compareTo(a.tanggalMasuk!));
                       absenC.ascending.value = true;
                     },
-                    icon: const Icon(
-                      CupertinoIcons.line_horizontal_3_decrease,
-                      color: AppColors.mainTextColor1,
+                    icon: Transform.rotate(
+                      angle: 180 * math.pi / 180,
+                      child: const Icon(
+                        CupertinoIcons.line_horizontal_3_decrease,
+                        color: AppColors.mainTextColor1,
+                      ),
                     )),
           )
         ],
@@ -411,6 +418,8 @@ class SemuaAbsenView extends GetView<SemuaAbsenController> {
                                           width: 20,
                                         ),
                                         Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
                                             Text(
                                                 DateFormat("EEEE", "id_ID")
@@ -524,15 +533,40 @@ class SemuaAbsenView extends GetView<SemuaAbsenController> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-          backgroundColor: AppColors.contentDefBtn,
-          onPressed: () {
-            formFilter(Get.arguments["id_user"]);
-          },
-          child: Icon(
-            TernavIcons.lightOutline.calender_3,
-            color: AppColors.mainTextColor1,
-          )),
+      floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          Obx(()=> Visibility(
+              visible: absenC.searchAbsen.isNotEmpty?true:false,
+              child: FloatingActionButton(heroTag: 'pdf',
+                  backgroundColor: Colors.redAccent[700],
+                  onPressed: () {
+                    absenC.searchAbsen.isNotEmpty?
+
+                      absenC.exportPdf():showToast('Data absensi kosong');
+                  
+                    // formFilter(Get.arguments["id_user"]);
+                  },
+                  child: const Icon(
+                    FontAwesome.file_pdf_solid,
+                    color: AppColors.mainTextColor1,
+                  )),
+            ),
+          ), 
+              const SizedBox(height: 10,
+      ),
+          FloatingActionButton(
+            heroTag: 'form-filter',
+              backgroundColor: AppColors.contentDefBtn,
+              onPressed: () {
+                formFilter(Get.arguments["id_user"]);
+              },
+              child: Icon(
+                TernavIcons.lightOutline.calender_3,
+                color: AppColors.mainTextColor1,
+              )),
+        ],
+      ),
     );
   }
 
@@ -543,11 +577,23 @@ class SemuaAbsenView extends GetView<SemuaAbsenController> {
       isScrollControlled: true,
       backgroundColor: Colors.white,
       SizedBox(
-        height: 140,
+        height: 185,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              const Text(
+                'Cari Data Absensi',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              ),
+              const Divider(
+                thickness: 1,
+                color: Colors.grey,
+              ),
+              const SizedBox(
+                height: 15,
+              ),
               Row(
                 children: [
                   Expanded(
@@ -609,7 +655,7 @@ class SemuaAbsenView extends GetView<SemuaAbsenController> {
                           borderRadius: BorderRadius.circular(50)),
                       minimumSize: Size(Get.size.width / 2, 50)),
                   child: const Text(
-                    'SIMPAN',
+                    'CARI',
                     style: TextStyle(
                         fontSize: 15, color: AppColors.mainTextColor1),
                   ),

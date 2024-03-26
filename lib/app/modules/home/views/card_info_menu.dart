@@ -1,5 +1,5 @@
-import 'package:absensi/app/helper/const.dart';
-import 'package:absensi/app/helper/loading_dialog.dart';
+import 'package:absensi/app/data/helper/const.dart';
+import 'package:absensi/app/data/helper/loading_dialog.dart';
 import 'package:absensi/app/modules/cek_stok/views/cek_stok_view.dart';
 import 'package:absensi/app/modules/report_sales/controllers/report_sales_controller.dart';
 import 'package:absensi/app/modules/report_sales/views/report_sales_view.dart';
@@ -17,7 +17,6 @@ class CardInfoMenu extends GetView {
 
   @override
   Widget build(BuildContext context) {
-  var listIdLevel = ["1", "8", "9", "10", "19", "20",""];
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       elevation: 10,
@@ -76,7 +75,7 @@ class CardInfoMenu extends GetView {
                               },
                               icon: Icon(
                                 // CupertinoIcons.doc_text_search,
-                                FontAwesome.box_open,
+                                FontAwesome.box_open_solid,
                                 color: mainColor,
                                 size: 30,
                               )),
@@ -109,7 +108,7 @@ class CardInfoMenu extends GetView {
                                 SmartDialog.dismiss();
                               },
                               icon: Icon(
-                                FontAwesome.circle_dollar_to_slot,
+                                FontAwesome.circle_dollar_to_slot_solid,
                                 color: mainColor,
                                 size: 30,
                               )),
@@ -139,7 +138,7 @@ class CardInfoMenu extends GetView {
                                 absC.userMonitor.value = "";
                               },
                               icon: Icon(
-                                FontAwesome.user_tie,
+                                FontAwesome.user_tie_solid,
                                 color: mainColor,
                                 size: 30,
                               )),
