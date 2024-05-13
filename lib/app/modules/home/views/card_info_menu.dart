@@ -52,7 +52,7 @@ class CardInfoMenu extends GetView {
             const SizedBox(
               height: 1,
               child: Divider(
-                thickness: 2,
+                thickness: 1,
               ),
             ),
             Padding(

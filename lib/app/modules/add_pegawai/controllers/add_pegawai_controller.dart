@@ -1,6 +1,8 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
-
+import 'package:crypto/crypto.dart';
+import 'package:absensi/app/data/helper/db_helper.dart';
 import 'package:absensi/app/services/service_api.dart';
 import 'package:absensi/app/data/model/level_model.dart';
 import 'package:absensi/app/modules/profil/views/update_password.dart';
@@ -39,7 +41,14 @@ class AddPegawaiController extends GetxController {
   var cabang = <Cabang>[].obs;
   var levelUser = <Level>[].obs;
   var selectedCabang = "".obs;
+  var cabangName = "".obs;
   var selectedLevel = "".obs;
+  var levelName = "".obs;
+  var vst = "".obs;
+  var cvrArea = "".obs;
+  var lat = "".obs;
+  var long = "".obs;
+  var cekStok = "".obs;
   var cekDataUser = <CekUser>[].obs;
   var fotoProfil = "".obs;
   var newPhone = "".obs;
@@ -49,6 +58,9 @@ class AddPegawaiController extends GetxController {
   var updateList = [];
   var currVer = "";
   var latestVer = "";
+  var backup = false.obs;
+  var restore = false.obs;
+
   @override
   void onInit() async {
     super.onInit();
@@ -225,7 +237,7 @@ class AddPegawaiController extends GetxController {
                     // onDone: logC.logout,
                   );
                 } on http.ClientException catch (e) {
-                  print('Failed to make OTA update. Details: $e');
+                  showToast('Failed to make OTA update. Details: $e');
                 }
               });
         }
@@ -404,6 +416,26 @@ class AddPegawaiController extends GetxController {
           dialogMsg("",
               "No Telp ini sudah terdaftar\nSilahkan masukkan No Telp lain");
         } else {
+          //start update local db for tbl_user
+          SQLHelper.instance.updateDataUser({
+            "nama": name.text != "" ? name.text : dataUser[1],
+            "no_telp": telp.text != "" ? telp.text : dataUser[3],
+            "kode_cabang":
+                selectedCabang.value != "" ? selectedCabang.value : dataUser[8],
+            "nama_cabang": cabangName.value != "" ? cabangName.value : dataUser[2],
+            "lat": lat.value != "" ? lat.value : dataUser[6],
+            "long": long.value != "" ? long.value : dataUser[7],
+            "area_coverage": cvrArea.value != "" ? cvrArea.value : dataUser[11],
+            "level":
+                selectedLevel.value != "" ? selectedLevel.value : dataUser[9],
+            "level_user":
+            levelName.value != "" ? levelName.value : dataUser[4],
+            "foto": image!.path.toString(),
+            "visit": vst.value != "" ? vst.value : dataUser[12],
+            "cek_stok": cekStok.value != "" ? cekStok.value : dataUser[13]
+          }, dataUser[0], dataUser[10]);
+          //end of update
+
           dialogMsgScsUpd("Sukses", "Data berhasil disimpan");
           await ServiceApi().addUpdatePegawai(data);
           newPhone.value = telp.text;
@@ -414,6 +446,12 @@ class AddPegawaiController extends GetxController {
           await pref.setString("fotoProfil", foto.foto!);
           fotoProfil.value = pref.getString("fotoProfil")!;
           selectedCabang.value = "";
+          cvrArea.value = "";
+          lat.value = "";
+          long.value = "";
+          cabangName.value = "";
+          levelName.value = "";
+          cekStok.value = "";
           username.clear();
           store.clear();
           level.clear();
@@ -439,11 +477,36 @@ class AddPegawaiController extends GetxController {
           dialogMsg("",
               "No Telp ini sudah terdaftar\nSilahkan masukkan No Telp lain");
         } else {
+          //start update local db for tbl_user
+          SQLHelper.instance.updateDataUser({
+            "nama": name.text != "" ? name.text : dataUser[1],
+            "no_telp": telp.text != "" ? telp.text : dataUser[3],
+            "kode_cabang":
+            selectedCabang.value != "" ? selectedCabang.value : dataUser[8],
+            "nama_cabang": cabangName.value != "" ? cabangName.value : dataUser[2],
+            "lat": lat.value != "" ? lat.value : dataUser[6],
+            "long": long.value != "" ? long.value : dataUser[7],
+            "area_coverage": cvrArea.value != "" ? cvrArea.value : dataUser[11],
+            "level":
+            selectedLevel.value != "" ? selectedLevel.value : dataUser[9],
+            "level_user":
+            levelName.value != "" ? levelName.value : dataUser[4],
+            "visit": vst.value != "" ? vst.value : dataUser[12],
+            "cek_stok": cekStok.value != "" ? cekStok.value : dataUser[13]
+          }, dataUser[0], dataUser[10]);
+          //end of update
+
           dialogMsgScsUpd("Sukses", "Data berhasil disimpan");
           await ServiceApi().addUpdatePegawai(data);
           newPhone.value = telp.text;
 
           selectedCabang.value = "";
+          cvrArea.value = "";
+          lat.value = "";
+          long.value = "";
+          cabangName.value = "";
+          levelName.value = "";
+          cekStok.value = "";
           username.clear();
           store.clear();
           level.clear();
@@ -458,7 +521,7 @@ class AddPegawaiController extends GetxController {
     }
   }
 
-  void cekUser(context) async {
+  void cekUser(context, List<dynamic> userData) async {
     var data = {"no_telp": telp.text};
     if (telp.text != "") {
       loadingDialog("Sedang mencari data user", "");
@@ -468,7 +531,7 @@ class AddPegawaiController extends GetxController {
       if (cekDataUser.isNotEmpty) {
         telp.clear();
 
-        Get.to(() => UpdatePassword(), arguments: {
+        Get.to(() => UpdatePassword(dataUser: userData), arguments: {
           "id_user": cekDataUser[0].id,
           "username": cekDataUser[0].username,
           "nama": cekDataUser[0].nama,
@@ -484,16 +547,22 @@ class AddPegawaiController extends GetxController {
     }
   }
 
-  updatePassword(context, String id, String username) async {
+  updatePassword(context, String id, String username, List<dynamic> dataUser) async {
     var data = {"id": id, "username": username, "password": pass.text};
     if (pass.text != "") {
       loadingDialog("Memperbarui data user...", "");
+
+      SQLHelper.instance.updateDataUser({
+        "password" : md5.convert(utf8.encode(pass.text)).toString()
+      }, dataUser[0], dataUser[10]);
+
       final response = await ServiceApi().updatePasswordUser(data);
       Future.delayed(Duration.zero, () {
         succesDialog(context, "N",
             "Password berhasil diperbarui\nSilahkan melakukan login ulang");
       });
       cekDataUser.value = response;
+
       pass.clear();
       Get.back();
       if (cekDataUser.isNotEmpty) {

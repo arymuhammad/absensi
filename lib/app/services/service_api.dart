@@ -299,8 +299,9 @@ class ServiceApi {
       //   // return print('error koneksi');
       // }
       // loadingDialog("Sedang mengirim data...", "");
-      Get.back();
       auth.selectedMenu(0);
+      Get.back();
+
       // succesDialog(Get.context, "Y", "Anda berhasil Absen");
     } on SocketException {
       Get.back();
@@ -339,16 +340,17 @@ class ServiceApi {
     }
   }
 
-  getAbsen(paramAbsen) async {
+  Future<List<Absen>> getAbsen(paramAbsen) async {
+    List<Absen> dataAbsen = [];
     try {
       final response =
           await http.post(Uri.parse('${baseUrl}get_absen'), body: paramAbsen);
       switch (response.statusCode) {
         case 200:
           List<dynamic> result = json.decode(response.body)['data'];
-          List<Absen> dataAbsen = result.map((e) => Absen.fromJson(e)).toList();
+          dataAbsen = result.map((e) => Absen.fromJson(e)).toList();
           // print(result);
-          return dataAbsen;
+          
         case 400:
         case 401:
         case 402:
@@ -364,6 +366,7 @@ class ServiceApi {
       // print('error caught: ${e.message}');
       showToast("${e.message}");
     }
+    return dataAbsen;
   }
 
   getFotoProfil(idUser) async {
@@ -601,6 +604,7 @@ class ServiceApi {
       switch (response.statusCode) {
         case 200:
           final result = json.decode(response.body)['data'];
+          // print(result);
           return CekVisit.fromJson(result);
         case 400:
         case 401:
@@ -633,6 +637,7 @@ class ServiceApi {
         request.fields['lat_in'] = data["lat_in"];
         request.fields['long_in'] = data["long_in"];
         request.fields['device_info'] = data["device_info"];
+        request.fields['is_rnd'] = data["is_rnd"];
       } else {
         request.fields['visit_in'] = data["visit_in"];
         request.fields['tgl_visit'] = data["tgl_visit"];
@@ -689,6 +694,7 @@ class ServiceApi {
       switch (response.statusCode) {
         case 200:
           List<dynamic> result = json.decode(response.body)['data'];
+          // print(result);
           List<Visit> dataVisit = result.map((e) => Visit.fromJson(e)).toList();
           return dataVisit;
         case 400:

@@ -148,6 +148,10 @@ class UpdateProfil extends GetView {
                       for (int i = 0; i < dataCabang.length; i++) {
                         if (dataCabang[i].namaCabang == suggestion) {
                           ctr.selectedCabang.value = dataCabang[i].kodeCabang!;
+                          ctr.cabangName.value = dataCabang[i].namaCabang!;
+                          ctr.lat.value = dataCabang[i].lat!;
+                          ctr.long.value = dataCabang[i].long!;
+                          ctr.cvrArea.value = dataCabang[i].cvrArea!;
                         }
                       }
                     },
@@ -171,62 +175,62 @@ class UpdateProfil extends GetView {
           const SizedBox(
             height: 20,
           ),
-          Visibility(
-            visible: userData![9] == "1" ? true : false,
-            child: FutureBuilder(
-              future: ctr.getLevel(),
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  var dataLevel = snapshot.data;
-                  List<String> allLevel = <String>[];
-                  dataLevel!.map((data) {
-                    allLevel.add(data.namaLevel!);
-                  }).toList();
+          FutureBuilder(
+            future: ctr.getLevel(),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                var dataLevel = snapshot.data;
+                List<String> allLevel = <String>[];
+                dataLevel!.map((data) {
+                  allLevel.add(data.namaLevel!);
+                }).toList();
 
-                  return TypeAheadFormField<String>(
-                    textFieldConfiguration: TextFieldConfiguration(
-                      controller: ctr.level,
-                      decoration: const InputDecoration(
-                        labelText: 'Level User',
-                        border: OutlineInputBorder(),
-                        filled: true,
-                        fillColor: Colors.white,
-                      ),
+                return TypeAheadFormField<String>(
+                  textFieldConfiguration: TextFieldConfiguration(
+                    controller: ctr.level,
+                    decoration: const InputDecoration(
+                      labelText: 'Level User',
+                      border: OutlineInputBorder(),
+                      filled: true,
+                      fillColor: Colors.white,
                     ),
-                    suggestionsCallback: (pattern) {
-                      return allLevel.where((option) =>
-                          option.toLowerCase().contains(pattern.toLowerCase()));
-                    },
-                    itemBuilder: (context, suggestion) {
-                      return ListTile(
-                        tileColor: Colors.white,
-                        title: Text(suggestion),
-                      );
-                    },
-                    onSuggestionSelected: (suggestion) {
-                      ctr.level.text = suggestion;
-                      for (int i = 0; i < dataLevel.length; i++) {
-                        if (dataLevel[i].namaLevel == suggestion) {
-                          ctr.selectedLevel.value = dataLevel[i].id!;
-                        }
+                  ),
+                  suggestionsCallback: (pattern) {
+                    return allLevel.where((option) =>
+                        option.toLowerCase().contains(pattern.toLowerCase()));
+                  },
+                  itemBuilder: (context, suggestion) {
+                    return ListTile(
+                      tileColor: Colors.white,
+                      title: Text(suggestion),
+                    );
+                  },
+                  onSuggestionSelected: (suggestion) {
+                    ctr.level.text = suggestion;
+                    for (int i = 0; i < dataLevel.length; i++) {
+                      if (dataLevel[i].namaLevel == suggestion) {
+                        ctr.selectedLevel.value = dataLevel[i].id!;
+                        ctr.levelName.value = dataLevel[i].namaLevel!;
+                        ctr.vst.value = dataLevel[i].visit!;
+                        ctr.cekStok.value = dataLevel[i].cekStok!;
                       }
-                    },
-                  );
-                } else if (snapshot.hasError) {
-                  return Text('${snapshot.error}');
-                }
-                return const Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Center(
-                      child: CupertinoActivityIndicator(),
-                    ),
-                    SizedBox(width: 5),
-                    Text('Sedang memuat...'),
-                  ],
+                    }
+                  },
                 );
-              },
-            ),
+              } else if (snapshot.hasError) {
+                return Text('${snapshot.error}');
+              }
+              return const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Center(
+                    child: CupertinoActivityIndicator(),
+                  ),
+                  SizedBox(width: 5),
+                  Text('Sedang memuat...'),
+                ],
+              );
+            },
           ),
           const SizedBox(
             height: 20,
@@ -259,14 +263,17 @@ class UpdateProfil extends GetView {
             padding: const EdgeInsets.symmetric(horizontal: 30),
             child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.contentDefBtn,
+                    backgroundColor: AppColors.contentDefBtn,
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(50)),
                     minimumSize: Size(Get.size.width / 2, 50)),
                 onPressed: () {
                   ctr.addUpdatePegawai(context, "update", userData!);
                 },
-                child: const Text('UPDATE PROFILE', style: TextStyle(color: AppColors.mainTextColor1),)),
+                child: const Text(
+                  'UPDATE PROFILE',
+                  style: TextStyle(color: AppColors.mainTextColor1),
+                )),
           )
         ],
       ),

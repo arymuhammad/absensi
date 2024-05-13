@@ -45,32 +45,39 @@ class HomeView extends GetView<HomeController> {
                             Get.to(
                                 () => ProfilView(listDataUser: listDataUser!));
                           },
-                          child: ClipOval(
-                            child: Hero(
-                              tag: 'pro',
-                              transitionOnUserGestures: true,
-                              child: Container(
-                                height: 75,
-                                width: 75,
-                                color: Colors.grey[200],
-                                child: listDataUser![5] != ""
-                                    ? CachedNetworkImage(
-                                        imageUrl:
-                                            "${ServiceApi().baseUrl}${listDataUser![5]}",
-                                        fit: BoxFit.cover,
-                                        progressIndicatorBuilder:
-                                            (context, url, progress) =>
-                                                CircularProgressIndicator(
-                                          value: progress.progress,
-                                          strokeWidth: 15,
+                          child: Card(
+                            elevation: 4,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(100),
+                                side: const BorderSide(
+                                    width: 3, color: Colors.white)),
+                            child: ClipOval(
+                              child: Hero(
+                                tag: 'pro',
+                                transitionOnUserGestures: true,
+                                child: Container(
+                                  height: 80,
+                                  width: 80,
+                                  color: Colors.grey[200],
+                                  child: listDataUser![5] != ""
+                                      ? CachedNetworkImage(
+                                          imageUrl:
+                                              "${ServiceApi().baseUrl}${listDataUser![5]}",
+                                          fit: BoxFit.cover,
+                                          progressIndicatorBuilder:
+                                              (context, url, progress) =>
+                                                  CircularProgressIndicator(
+                                            value: progress.progress,
+                                            strokeWidth: 15,
+                                          ),
+                                          cacheKey:
+                                              "${ServiceApi().baseUrl}${listDataUser![5]} + ${DateTime.now().day.toString()}",
+                                        )
+                                      : Image.network(
+                                          "https://ui-avatars.com/api/?name=${listDataUser![1]}",
+                                          fit: BoxFit.cover,
                                         ),
-                                        cacheKey:
-                                            "${ServiceApi().baseUrl}${listDataUser![5]} + ${DateTime.now().day.toString()}",
-                                      )
-                                    : Image.network(
-                                        "https://ui-avatars.com/api/?name=${listDataUser![1]}",
-                                        fit: BoxFit.cover,
-                                      ),
+                                ),
                               ),
                             ),
                           ),

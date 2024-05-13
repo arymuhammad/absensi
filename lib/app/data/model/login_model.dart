@@ -81,6 +81,14 @@ class Data {
     data['kode_cabang'] = kodeCabang;
     data['nama_cabang'] = namaCabang;
     data['foto'] = foto;
+    data['lat'] = lat;
+    data['long'] = long;
+    data['no_telp'] = noTelp;
+    data['level'] = level;
+    data['level_user'] = levelUser;
+    data['area_coverage'] = areaCover;
+    data['visit'] = visit;
+    data['cek_stok'] = cekStok;
     return data;
   }
 }

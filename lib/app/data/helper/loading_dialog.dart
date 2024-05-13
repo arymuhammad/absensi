@@ -163,7 +163,7 @@ void promptDialog(context, desc) {
       .show();
 }
 
-void loadingDialog(msg, String? msg2) {
+loadingDialog(msg, String? msg2) {
   Get.defaultDialog(
       title: '',
       onWillPop: () async {

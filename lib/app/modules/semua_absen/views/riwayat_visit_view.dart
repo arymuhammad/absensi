@@ -216,7 +216,7 @@ class RiwayatVisitView extends GetView {
                                   () async {
                                 visitC.isLoading.value = true;
                                 await visitC
-                                    .getAllVisited(Get.arguments["id_user"]);
+                                    .getAllVisited(userData![0]);
                                 visitC.searchDate.value = "";
                                 showToast("Halaman Disegarkan.");
                               });
@@ -288,7 +288,8 @@ class RiwayatVisitView extends GetView {
                                                   .searchVisit[i].deviceInfo2
                                               : ""
                                         }),
-                                    child: Card(
+                                    child: Card(color: bgContainer,
+                                              elevation: 8,
                                       shape: RoundedRectangleBorder(
                                           borderRadius:
                                               BorderRadius.circular(6)),
@@ -441,7 +442,7 @@ class RiwayatVisitView extends GetView {
       floatingActionButton: FloatingActionButton(
           backgroundColor: AppColors.contentDefBtn,
           onPressed: () {
-            formFilter(Get.arguments["id_user"]);
+            formFilter(userData![0]);
           },
           child: Icon(
             TernavIcons.lightOutline.calender_3,

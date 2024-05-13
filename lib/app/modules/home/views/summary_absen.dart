@@ -2,9 +2,9 @@ import 'package:absensi/app/controllers/absen_controller.dart';
 import 'package:absensi/app/data/helper/const.dart';
 import 'package:absensi/app/data/helper/loading_dialog.dart';
 import 'package:absensi/app/modules/detail_absen/views/detail_absen_view.dart';
-import 'package:absensi/app/modules/semua_absen/views/semua_absen_view.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:icons_plus/icons_plus.dart';
 import 'package:intl/intl.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -70,43 +70,125 @@ class SummaryAbsen extends GetView {
                     children: [
                       Column(
                         children: [
-                          const Text(
-                            'Masuk',
-                            style: TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.bold),
+                          const Icon(Bootstrap.clock, size: 20),
+                          const SizedBox(
+                            height: 10,
                           ),
                           Obx(
                             () => Text(
                               absenC.dataAbsen.isNotEmpty &&
                                       absenC.dataAbsen[0].jamAbsenMasuk! != ""
                                   ? absenC.dataAbsen[0].jamAbsenMasuk!
-                                  : '-',
-                              style: const TextStyle(fontSize: 18),
+                                  : '-:-',
+                              style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: absenC.dataAbsen.isNotEmpty &&
+                                          absenC.dataAbsen[0].jamAbsenMasuk! !=
+                                              ""
+                                      ? timeColor
+                                      : defaultColor),
                             ),
-                          )
+                          ),
+                          Text(
+                            'Masuk',
+                            style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.bold,
+                                color: subTitleColor),
+                          ),
                         ],
-                      ),
-                      Container(
-                        width: 2,
-                        height: 40,
-                        color: Colors.grey,
                       ),
                       Column(
                         children: [
-                          const Text(
-                            'Pulang',
-                            style: TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.bold),
+                          Transform.flip(
+                              flipX: true,
+                              flipY: true,
+                              child: const Icon(Bootstrap.clock, size: 20)),
+                          const SizedBox(
+                            height: 10,
                           ),
                           Obx(
                             () => Text(
                               absenC.dataAbsen.isNotEmpty &&
                                       absenC.dataAbsen[0].jamAbsenPulang! != ""
                                   ? absenC.dataAbsen[0].jamAbsenPulang!
-                                  : '-',
-                              style: const TextStyle(fontSize: 18),
+                                  : '-:-',
+                              style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: absenC.dataAbsen.isNotEmpty &&
+                                          absenC.dataAbsen[0].jamAbsenPulang! !=
+                                              ""
+                                      ? timeColor
+                                      : defaultColor),
                             ),
-                          )
+                          ),
+                          Text(
+                            'Keluar',
+                            style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.bold,
+                                color: subTitleColor),
+                          ),
+                        ],
+                      ),
+                      Column(
+                        children: [
+                          const Icon(Bootstrap.clock_history, size: 20),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          Obx(
+                            () {
+                              var diffHours = const Duration();
+                              if (absenC.dataAbsen.isNotEmpty &&
+                                  absenC.dataAbsen[0].jamAbsenPulang != "") {
+                                if (DateTime.parse(
+                                        absenC.dataAbsen[0].tanggalPulang!)
+                                    .isAfter(DateTime.parse(
+                                        absenC.dataAbsen[0].tanggalMasuk!))) {
+                                  diffHours = DateTime.parse(
+                                          '${absenC.dataAbsen[0].tanggalMasuk!} ${absenC.dataAbsen[0].jamAbsenPulang!}')
+                                      .add(const Duration(hours: -1))
+                                      .difference(DateTime.parse(
+                                          '${absenC.dataAbsen[0].tanggalPulang!} ${absenC.dataAbsen[0].jamAbsenMasuk!}'));
+                                } else {
+                                  diffHours = DateTime.parse(
+                                          '${absenC.dataAbsen[0].tanggalMasuk!} ${absenC.dataAbsen[0].jamAbsenPulang!}')
+                                      .difference(DateTime.parse(
+                                          '${absenC.dataAbsen[0].tanggalPulang!} ${absenC.dataAbsen[0].jamAbsenMasuk!}'));
+                                }
+                              } else {
+                                diffHours = const Duration();
+                              }
+                              return Text(
+                                absenC.dataAbsen.isNotEmpty &&
+                                        absenC.dataAbsen[0].jamAbsenMasuk! != ""
+                                    ? '${absenC.dataAbsen[0].jamAbsenPulang != "" ? diffHours.inHours % 24 : '-'} j ${absenC.dataAbsen[0].jamAbsenPulang != "" ? diffHours.inMinutes % 60 : '-'} m'
+                                    : '-:-',
+                                style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: absenC.dataAbsen.isNotEmpty &&
+                                            absenC.dataAbsen[0]
+                                                    .jamAbsenMasuk! !=
+                                                "" &&
+                                            absenC.dataAbsen[0]
+                                                    .jamAbsenPulang! !=
+                                                ""
+                                        ? timeColor
+                                        : defaultColor),
+                              );
+                            },
+                          ),
+                          Text(
+                            'Durasi Kerja',
+                            style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.bold,
+                                color: subTitleColor),
+                          ),
                         ],
                       ),
                     ],
@@ -119,38 +201,16 @@ class SummaryAbsen extends GetView {
               color: Colors.white,
               thickness: 2,
             ),
-            Row(
+            const Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  'Riwayat absen',
+                Text(
+                  'Riwayat absen minggu ini',
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                 ),
-                Row(
-                  children: [
-                    TextButton(
-                        onPressed: () {
-                          absenC.isLoading.value = true;
-                          absenC.searchDate.value = "";
-                          Get.to(() => SemuaAbsenView(),
-                              arguments: {
-                                "foto_profil": userData![5] != ""
-                                    ? userData![5]
-                                    : userData![1],
-                                "id_user": userData![0]
-                              },
-                              transition: Transition.cupertino);
-                          absenC.getAllAbsen(userData![0]);
-                        },
-                        child: const Text(
-                          'Lihat Semua',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        )),
-                  ],
-                )
               ],
             ),
-            // const SizedBox(height: 5),
+            const SizedBox(height: 5),
             Obx(
               () => absenC.isLoading.value
                   ? ListView.builder(

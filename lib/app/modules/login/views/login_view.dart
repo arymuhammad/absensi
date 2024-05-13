@@ -1,12 +1,17 @@
+import 'dart:io';
+
 import 'package:absensi/app/data/helper/app_colors.dart';
 import 'package:absensi/app/data/helper/const.dart';
+import 'package:absensi/app/data/helper/loading_dialog.dart';
 import 'package:absensi/app/modules/profil/views/verifikasi_update_password.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
 import 'package:icons_plus/icons_plus.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:rive/rive.dart';
+import 'package:sqflite/sqflite.dart';
 
 import '../controllers/login_controller.dart';
 
@@ -43,7 +48,7 @@ class LoginView extends GetView<LoginController> {
                   child: Padding(
                     padding: const EdgeInsets.all(12.0),
                     child: SizedBox(
-                      height: 385,
+                      height: 395,
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         mainAxisSize: MainAxisSize.max,
@@ -149,6 +154,61 @@ class LoginView extends GetView<LoginController> {
                                           Get.toNamed('/add-pegawai');
                                         })
                                 ])),
+                          ),
+                          const SizedBox(
+                            height: 5,
+                          ),
+                          Row(
+                            children: [
+                              InkWell(
+                                onTap: () async {
+                                  var databasesPath = await getDatabasesPath();
+                                  // var dbPath = join(databasesPath, 'penjualan.db');
+
+                                  var status = await Permission
+                                      .manageExternalStorage.status;
+                                  if (!status.isGranted) {
+                                    await Permission.manageExternalStorage
+                                        .request();
+                                  }
+
+                                  var status1 = await Permission.storage.status;
+                                  if (!status1.isGranted) {
+                                    await Permission.storage.request();
+                                  }
+
+                                  try {
+                                    File savedDb = File(
+                                        "/storage/emulated/0/URBANCO SPOT/absensi.db");
+
+                                    await savedDb
+                                        .copy('$databasesPath/absensi.db');
+                                  } catch (e) {
+                                    showToast(
+                                        e.toString());
+                                  }
+
+                                  showToast('Successfully Restored Database');
+                                },
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.restore_rounded,
+                                      color: mainColor,
+                                    ),
+                                    const SizedBox(
+                                      width: 10,
+                                    ),
+                                    Text(
+                                      'Restore Database',
+                                      style: TextStyle(
+                                          color: mainColor,
+                                          fontWeight: FontWeight.bold),
+                                    )
+                                  ],
+                                ),
+                              )
+                            ],
                           )
                         ],
                       ),

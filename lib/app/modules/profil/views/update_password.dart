@@ -5,7 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class UpdatePassword extends GetView {
-  UpdatePassword({super.key});
+  UpdatePassword({super.key, this.dataUser});
+  final List? dataUser;
   final pegawaiC = Get.put(AddPegawaiController());
 
   @override
@@ -76,7 +77,7 @@ class UpdatePassword extends GetView {
               child: ElevatedButton(
                 onPressed: () async {
                   await pegawaiC.updatePassword(context,
-                      Get.arguments["id_user"], Get.arguments["username"]);
+                      Get.arguments["id_user"], Get.arguments["username"], dataUser!);
                   //  Restart.restartApp();
                 },
                 style: ElevatedButton.styleFrom(

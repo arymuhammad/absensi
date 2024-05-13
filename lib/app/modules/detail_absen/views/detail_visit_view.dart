@@ -20,6 +20,7 @@ class DetailVisitView extends GetView {
         elevation: 10,
         child: Image.network(
           "${ServiceApi().baseUrl}${Get.arguments['foto_in']}",
+          errorBuilder: (context, error, stackTrace) =>Image.asset('assets/image/selfie.png'),
           fit: BoxFit.cover,
         ),
       ),
@@ -42,6 +43,7 @@ class DetailVisitView extends GetView {
         child: Image.network(
           "${ServiceApi().baseUrl}${Get.arguments['foto_out']}",
           fit: BoxFit.cover,
+  errorBuilder: (context, error, stackTrace) =>Image.asset('assets/image/selfie.png'),
         ),
       ),
     ),

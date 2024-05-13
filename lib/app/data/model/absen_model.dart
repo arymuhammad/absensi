@@ -4,6 +4,7 @@ class Absen {
   String? tanggalPulang;
   String? nama;
   String? namaCabang;
+  String? kodeCabang;
   String? idShift;
   String? jamMasuk;
   String? jamPulang;
@@ -25,6 +26,7 @@ class Absen {
       this.tanggalPulang,
       this.nama,
       this.namaCabang,
+      this.kodeCabang,
       this.idShift,
       this.jamMasuk,
       this.jamPulang,
@@ -47,17 +49,18 @@ class Absen {
     tanggalPulang = json['tanggal_pulang'];
     nama = json['nama'];
     namaCabang = json['nama_cabang'];
-    idShift = json['id_shift'];
+    kodeCabang = json['kode_cabang'];
+    idShift = json['id_shift'].toString();
     jamMasuk = json['jam_masuk'];
     jamPulang = json['jam_pulang'];
     jamAbsenMasuk = json['jam_absen_masuk'];
     jamAbsenPulang = json['jam_absen_pulang'];
     fotoMasuk = json['foto_masuk'];
     fotoPulang = json['foto_pulang'];
-    latMasuk = json['lat_masuk'];
-    longMasuk = json['long_masuk'];
-    latPulang = json['lat_pulang'];
-    longPulang = json['long_pulang'];
+    latMasuk = json['lat_masuk'].toString();
+    longMasuk = json['long_masuk'].toString();
+    latPulang = json['lat_pulang'].toString();
+    longPulang = json['long_pulang'].toString();
     namaShift = json['nama_shift'];
     devInfo = json['device_info'];
     devInfo2 = json['device_info2'];
@@ -69,7 +72,8 @@ class Absen {
     data['tanggal_masuk'] = tanggalMasuk;
     data['tanggal_pulang'] = tanggalPulang;
     data['nama'] = nama;
-    data['nama_cabang'] = namaCabang;
+    // data['nama_cabang'] = namaCabang;
+    data['kode_cabang'] = kodeCabang;
     data['id_shift'] = idShift;
     data['jam_masuk'] = jamMasuk;
     data['jam_pulang'] = jamPulang;
@@ -81,7 +85,7 @@ class Absen {
     data['long_masuk'] = longMasuk;
     data['lat_pulang'] = latPulang;
     data['long_pulang'] = longPulang;
-    data['nama_shift'] = namaShift;
+    // data['nama_shift'] = namaShift;
     data['device_info'] = devInfo;
     data['device_info2'] = devInfo2;
     return data;
