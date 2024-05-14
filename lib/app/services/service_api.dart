@@ -292,17 +292,8 @@ class ServiceApi {
 
       final dataDecode = jsonDecode(responseString);
       debugPrint(dataDecode.toString());
-
-      // if (res.statusCode == 200) {
-      //   // return showDialogSuccess('Sukses', 'Event Berhasil Dibuat');
-      // } else {
-      //   // return print('error koneksi');
-      // }
-      // loadingDialog("Sedang mengirim data...", "");
-      auth.selectedMenu(0);
       Get.back();
-
-      // succesDialog(Get.context, "Y", "Anda berhasil Absen");
+      succesDialog(Get.context, "Y", "Anda berhasil Absen");
     } on SocketException {
       Get.back();
       failedDialog(Get.context, 'ERROR',

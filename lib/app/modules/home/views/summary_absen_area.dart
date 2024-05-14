@@ -22,8 +22,8 @@ class SummaryAbsenArea extends GetView {
             var paramLimitVisit = {
               "mode": "limit",
               "id_user": userData![0],
-              // "tanggal1": absenC.initDate1,
-              // "tanggal2": absenC.initDate2
+              "tanggal1": absenC.initDate1,
+              "tanggal2": absenC.initDate2
             };
 
             var paramSingleVisit = {

@@ -29,7 +29,7 @@ dialogAbsenView(dataUser, latitude, longitude) async {
 
 
     absC.getVisitToday(paramVisitToday);
-    
+
     var tempDataVisit =
     await SQLHelper.instance.getVisitToday(absC.idUser.value, absC.dateNow,'', 0);
 
@@ -296,6 +296,8 @@ dialogAbsenView(dataUser, latitude, longitude) async {
                         var paramLimitVisit = {
                           "mode": "limit",
                           "id_user": dataUser[0],
+                          "tanggal1": absC.initDate1,
+                          "tanggal2": absC.initDate2
                         };
                         absC.getVisitToday(paramVisitToday);
                         absC.getLimitVisit(paramLimitVisit);
@@ -412,7 +414,9 @@ dialogAbsenView(dataUser, latitude, longitude) async {
 
                             var paramLimitVisit = {
                               "mode": "limit",
-                              "id_user": dataUser[0]
+                              "id_user": dataUser[0],
+                              "tanggal1": absC.initDate1,
+                              "tanggal2": absC.initDate2
                             };
                             absC.getVisitToday(paramVisitToday);
                             absC.getLimitVisit(paramLimitVisit);
@@ -541,7 +545,9 @@ dialogAbsenView(dataUser, latitude, longitude) async {
 
                           var paramLimitVisit = {
                             "mode": "limit",
-                            "id_user": dataUser[0]
+                            "id_user": dataUser[0],
+                            "tanggal1": absC.initDate1,
+                            "tanggal2": absC.initDate2
                           };
                           absC.getVisitToday(paramVisitToday);
                           absC.getLimitVisit(paramLimitVisit);
@@ -925,7 +931,7 @@ dialogAbsenView(dataUser, latitude, longitude) async {
                             "device_info": absC.devInfo.value
                           };
 
-                          // loadingDialog("Sedang mengirim data...", "");
+                          loadingDialog("Sedang mengirim data...", "");
                           await SQLHelper.instance.insertDataAbsen(Absen(
                               idUser: dataUser[0],
                               tanggalMasuk: DateFormat('yyyy-MM-dd')
@@ -949,39 +955,45 @@ dialogAbsenView(dataUser, latitude, longitude) async {
                               devInfo2: ''));
 
                           await ServiceApi().submitAbsen(data);
-                        }
-                        var paramAbsenToday = {
-                          "mode": "single",
-                          "id_user": dataUser[0],
-                          "tanggal_masuk": DateFormat('yyyy-MM-dd')
-                              .format(DateTime.parse(absC.dateNowServer))
-                        };
 
-                        var paramLimitAbsen = {
-                          "mode": "limit",
-                          "id_user": dataUser[0],
-                          "tanggal1": absC.initDate1,
-                          "tanggal2": absC.initDate2
-                        };
-                        absC.getAbsenToday(paramAbsenToday);
-                        absC.getLimitAbsen(paramLimitAbsen);
-                        await absC.cekDataAbsen(
-                            "masuk",
-                            dataUser[0],
-                            DateFormat('yyyy-MM-dd').format(DateTime.parse(
-                                absC.dateNowServer.isNotEmpty
-                                    ? absC.dateNowServer
-                                    : absC.dateNow)));
-                        if (absC.cekAbsen.value.total == "0") {
-                          failedDialog(Get.context, 'PERINGATAN',
-                              'Terjadi kesalahan saat melakukan absensi\nHarap mencoba kembali');
-                        } else {
-                          succesDialog(Get.context, "N", "Anda berhasil Absen");
+                          var paramAbsenToday = {
+                            "mode": "single",
+                            "id_user": dataUser[0],
+                            "tanggal_masuk": DateFormat('yyyy-MM-dd')
+                                .format(DateTime.parse(absC.dateNowServer))
+                          };
+
+                          var paramLimitAbsen = {
+                            "mode": "limit",
+                            "id_user": dataUser[0],
+                            "tanggal1": absC.initDate1,
+                            "tanggal2": absC.initDate2
+                          };
+                          absC.getAbsenToday(paramAbsenToday);
+                          absC.getLimitAbsen(paramLimitAbsen);
+                          // await absC.cekDataAbsen(
+                          //     "masuk",
+                          //     dataUser[0],
+                          //     DateFormat('yyyy-MM-dd').format(DateTime.parse(
+                          //         absC.dateNowServer.isNotEmpty
+                          //             ? absC.dateNowServer
+                          //             : absC.dateNow)));
+                          // if (absC.cekAbsen.value.total == "0") {
+                          //   failedDialog(Get.context, 'PERINGATAN',
+                          //       'Terjadi kesalahan saat melakukan absensi\nHarap mencoba kembali');
+                          // } else {
+                          //   succesDialog(Get.context, "N", "Anda berhasil Absen");
+                          // }
+                          absC.selectedShift.value = "";
+                          absC.selectedCabang.value = "";
+                          absC.lat.value = "";
+                          absC.long.value = "";
+                        }else {
+                          Get.back();
+                          failedDialog(Get.context, "Peringatan",
+                              "Absen Masuk dibatalkan");
                         }
-                        absC.selectedShift.value = "";
-                        absC.selectedCabang.value = "";
-                        absC.lat.value = "";
-                        absC.long.value = "";
+
                       }
                     }
                   },
@@ -1136,20 +1148,20 @@ dialogAbsenView(dataUser, latitude, longitude) async {
                           };
                           absC.getAbsenToday(paramAbsenToday);
                           absC.getLimitAbsen(paramLimitAbsen);
-                          await absC.cekDataAbsen(
-                              "masuk",
-                              dataUser[0],
-                              DateFormat('yyyy-MM-dd').format(DateTime.parse(
-                                  absC.dateNowServer.isNotEmpty
-                                      ? absC.dateNowServer
-                                      : absC.dateNow)));
-                          if (absC.cekAbsen.value.total == "0") {
-                            failedDialog(Get.context, 'PERINGATAN',
-                                'Terjadi kesalahan saat melakukan absensi\nHarap mencoba kembali');
-                          } else {
-                            succesDialog(
-                                Get.context, "N", "Anda berhasil Absen");
-                          }
+                          // await absC.cekDataAbsen(
+                          //     "masuk",
+                          //     dataUser[0],
+                          //     DateFormat('yyyy-MM-dd').format(DateTime.parse(
+                          //         absC.dateNowServer.isNotEmpty
+                          //             ? absC.dateNowServer
+                          //             : absC.dateNow)));
+                          // if (absC.cekAbsen.value.total == "0") {
+                          //   failedDialog(Get.context, 'PERINGATAN',
+                          //       'Terjadi kesalahan saat melakukan absensi\nHarap mencoba kembali');
+                          // } else {
+                          //   succesDialog(
+                          //       Get.context, "N", "Anda berhasil Absen");
+                          // }
                           absC.selectedCabang.value = "";
                           absC.lat.value = "";
                           absC.long.value = "";
@@ -1324,20 +1336,20 @@ dialogAbsenView(dataUser, latitude, longitude) async {
                           };
                           absC.getAbsenToday(paramAbsenToday);
                           absC.getLimitAbsen(paramLimitAbsen);
-                          await absC.cekDataAbsen(
-                              "masuk",
-                              dataUser[0],
-                              DateFormat('yyyy-MM-dd').format(DateTime.parse(
-                                  absC.dateNowServer.isNotEmpty
-                                      ? absC.dateNowServer
-                                      : absC.dateNow)));
-                          if (absC.cekAbsen.value.total == "0") {
-                            failedDialog(Get.context, 'PERINGATAN',
-                                'Terjadi kesalahan saat melakukan absensi\nHarap mencoba kembali');
-                          } else {
-                            succesDialog(
-                                Get.context, "N", "Anda berhasil Absen");
-                          }
+                          // await absC.cekDataAbsen(
+                          //     "masuk",
+                          //     dataUser[0],
+                          //     DateFormat('yyyy-MM-dd').format(DateTime.parse(
+                          //         absC.dateNowServer.isNotEmpty
+                          //             ? absC.dateNowServer
+                          //             : absC.dateNow)));
+                          // if (absC.cekAbsen.value.total == "0") {
+                          //   failedDialog(Get.context, 'PERINGATAN',
+                          //       'Terjadi kesalahan saat melakukan absensi\nHarap mencoba kembali');
+                          // } else {
+                          //   succesDialog(
+                          //       Get.context, "N", "Anda berhasil Absen");
+                          // }
                           absC.selectedCabang.value = "";
                           absC.lat.value = "";
                           absC.long.value = "";

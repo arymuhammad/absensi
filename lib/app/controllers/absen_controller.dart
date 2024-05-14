@@ -541,9 +541,11 @@ class AbsenController extends GetxController {
       if (response.isNotEmpty && response[0].jamAbsenPulang != "") {
         dataAbsen.value = response;
         // print('online');
-      } else if(response.isNotEmpty && response[0].jamAbsenPulang == "")  {
-        dataAbsen.value = tempDataAbs;
+      } else if(response.isNotEmpty && response[0].jamAbsenMasuk != tempDataAbs[0].jamAbsenMasuk!)  {
+        dataAbsen.value = response;
         // print('offline');
+      }else{
+        dataAbsen.value = tempDataAbs;
       }
     }else{
       // print('online II');
@@ -556,7 +558,7 @@ class AbsenController extends GetxController {
   Future<List<Absen>> getLimitAbsen(paramLimitAbsen) async {
     final response = await ServiceApi().getAbsen(paramLimitAbsen);
     dataLimitAbsen.clear();
-
+    isLoading.value = true;
     var tempSingleAbs = await SQLHelper.instance
         .getLimitDataAbsen(idUser.value, initDate1, initDate2);
 
@@ -766,14 +768,14 @@ class AbsenController extends GetxController {
     await SQLHelper.instance.getVisitToday(idUser.value, dateNow,'', 1);
 
     if(tempDataVisit.isNotEmpty){
-      if (response.isNotEmpty && response[0].jamOut != "") {
-        print("a") ;
+      if (response.isNotEmpty && response.first.jamOut != "") {
+
         dataVisit.value = response;
-      }else if (response.isNotEmpty && response[0].jamIn != tempDataVisit[0].jamIn!) {
-        print("b") ;
+      }else if (response.isNotEmpty && response.first.jamIn != tempDataVisit.first.jamIn!) {
+
         dataVisit.value = response;
       } else {
-        print("c") ;
+
         dataVisit.value = tempDataVisit;
       }
     }else{
