@@ -767,10 +767,13 @@ class AbsenController extends GetxController {
 
     if(tempDataVisit.isNotEmpty){
       if (response.isNotEmpty && response[0].jamOut != "") {
+        print("a") ;
         dataVisit.value = response;
       }else if (response.isNotEmpty && response[0].jamIn != tempDataVisit[0].jamIn!) {
+        print("b") ;
         dataVisit.value = response;
       } else {
+        print("c") ;
         dataVisit.value = tempDataVisit;
       }
     }else{
