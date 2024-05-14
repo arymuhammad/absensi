@@ -117,8 +117,8 @@ class AbsenController extends GetxController {
     var paramLimitVisit = {
       "mode": "limit",
       "id_user": dataUserLogin[0],
-      // "tanggal1": initDate1,
-      // "tanggal2": initDate2
+      "tanggal1": initDate1,
+      "tanggal2": initDate2
     };
 
     var paramSingle = {
@@ -767,6 +767,8 @@ class AbsenController extends GetxController {
 
     if(tempDataVisit.isNotEmpty){
       if (response.isNotEmpty && response[0].jamOut != "") {
+        dataVisit.value = response;
+      }else if (response.isNotEmpty && response[0].jamIn != tempDataVisit[0].jamIn!) {
         dataVisit.value = response;
       } else {
         dataVisit.value = tempDataVisit;

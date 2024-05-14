@@ -6,8 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class VerifikasiUpdatePassword extends GetView {
-  VerifikasiUpdatePassword({super.key, this.userData});
-  final List? userData;
+  VerifikasiUpdatePassword({super.key});
   final pegawaiC = Get.put(AddPegawaiController());
   @override
   Widget build(BuildContext context) {
@@ -59,7 +58,7 @@ class VerifikasiUpdatePassword extends GetView {
               padding: const EdgeInsets.symmetric(horizontal: 60),
               child: ElevatedButton(
                 onPressed: () {
-                  pegawaiC.cekUser(context, userData!);
+                  pegawaiC.cekUser(context);
                 },
                 style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.contentDefBtn,

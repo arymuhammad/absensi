@@ -81,7 +81,7 @@ class SettingsView extends GetView<SettingsController> {
                         ),
                         ListTile(
                           onTap: () {
-                            Get.to(() => VerifikasiUpdatePassword(userData: listDataUser!),
+                            Get.to(() => VerifikasiUpdatePassword(),
                                 transition: Transition.cupertino);
                           },
                           leading: Container(

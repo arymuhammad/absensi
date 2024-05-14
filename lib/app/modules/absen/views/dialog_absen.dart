@@ -18,6 +18,7 @@ import '../../../data/model/visit_model.dart';
 final absC = Get.put(AbsenController());
 
 dialogAbsenView(dataUser, latitude, longitude) async {
+
   if (dataUser![12] == "1") {
     var paramVisitToday = {
       "mode": "single",
@@ -26,18 +27,19 @@ dialogAbsenView(dataUser, latitude, longitude) async {
           DateFormat('yyyy-MM-dd').format(DateTime.parse(absC.dateNowServer))
     };
 
-    var paramLimitVisit = {
-      "mode": "limit",
-      "id_user": dataUser[0],
-    };
+
     absC.getVisitToday(paramVisitToday);
-    absC.getLimitVisit(paramLimitVisit);
-    if (absC.dataLimitVisit.isNotEmpty &&
-        absC.dataLimitVisit.first.visitIn! != "" &&
-        absC.dataLimitVisit.first.visitOut! != "") {
+    
+    var tempDataVisit =
+    await SQLHelper.instance.getVisitToday(absC.idUser.value, absC.dateNow,'', 0);
+
+
+    if (tempDataVisit.isNotEmpty &&
+        tempDataVisit.first.visitIn! != "" &&
+        tempDataVisit.first.visitOut! != "") {
       absC.optVisitVisible.value = true;
-    } else if (absC.dataLimitVisit.isNotEmpty &&
-        absC.dataLimitVisit.first.visitIn! != "") {
+    } else if (tempDataVisit.isNotEmpty &&
+        tempDataVisit.first.visitIn! != "") {
       absC.optVisitVisible.value = false;
     }
 

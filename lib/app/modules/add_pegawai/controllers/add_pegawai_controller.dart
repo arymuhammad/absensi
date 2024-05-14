@@ -521,7 +521,7 @@ class AddPegawaiController extends GetxController {
     }
   }
 
-  void cekUser(context, List<dynamic> userData) async {
+  void cekUser(context) async {
     var data = {"no_telp": telp.text};
     if (telp.text != "") {
       loadingDialog("Sedang mencari data user", "");
@@ -531,7 +531,7 @@ class AddPegawaiController extends GetxController {
       if (cekDataUser.isNotEmpty) {
         telp.clear();
 
-        Get.to(() => UpdatePassword(dataUser: userData), arguments: {
+        Get.to(() => UpdatePassword(), arguments: {
           "id_user": cekDataUser[0].id,
           "username": cekDataUser[0].username,
           "nama": cekDataUser[0].nama,
@@ -547,14 +547,14 @@ class AddPegawaiController extends GetxController {
     }
   }
 
-  updatePassword(context, String id, String username, List<dynamic> dataUser) async {
+  updatePassword(context, String id, String username) async {
     var data = {"id": id, "username": username, "password": pass.text};
     if (pass.text != "") {
       loadingDialog("Memperbarui data user...", "");
 
       SQLHelper.instance.updateDataUser({
         "password" : md5.convert(utf8.encode(pass.text)).toString()
-      }, dataUser[0], dataUser[10]);
+      }, id, username);
 
       final response = await ServiceApi().updatePasswordUser(data);
       Future.delayed(Duration.zero, () {
