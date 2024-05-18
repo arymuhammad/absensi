@@ -29,7 +29,7 @@ void main() async {
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
-  await Workmanager().initialize(callbackDispatcher);
+  await Workmanager().initialize(callbackDispatcher, isInDebugMode: true);
   await initializeDateFormatting('id_ID', "");
   await Alarm.init();
 
@@ -45,34 +45,6 @@ void main() async {
     auth.logUser.value = userDataLogin;
   }
 
-
-      Workmanager().registerPeriodicTask('1', 'masuk',
-        frequency: const Duration(hours: 3),
-        constraints: Constraints(networkType: NetworkType.connected),
-        existingWorkPolicy: ExistingWorkPolicy.append,
-
-      );
-
-      Workmanager().registerPeriodicTask('2', 'pulang',
-        frequency: const Duration(hours: 3),
-        constraints: Constraints(networkType: NetworkType.connected),
-        existingWorkPolicy: ExistingWorkPolicy.append,
-
-      );
-
-      Workmanager().registerPeriodicTask('3', 'masukVisit',
-        frequency: const Duration(hours: 3),
-        constraints: Constraints(networkType: NetworkType.connected),
-        existingWorkPolicy: ExistingWorkPolicy.append,
-
-      );
-
-      Workmanager().registerPeriodicTask('4', 'pulangVisit',
-        frequency: const Duration(hours: 3),
-        constraints: Constraints(networkType: NetworkType.connected),
-        existingWorkPolicy: ExistingWorkPolicy.append,
-
-      );
 
   runApp(GetMaterialApp(
     debugShowCheckedModeBanner: false,
@@ -105,24 +77,20 @@ void main() async {
   ));
 }
 
-
 @pragma('vm:entry-point')
 void callbackDispatcher() {
   Workmanager().executeTask((task, inputData) async {
-     await initializeDateFormatting('id_ID', "");
-     var dateNow = DateFormat('yyyy-MM-dd').format(DateTime.now());
+    await initializeDateFormatting('id_ID', "");
+    var dateNow = DateFormat('yyyy-MM-dd').format(DateTime.now());
 
-     SharedPreferences prefs = await SharedPreferences.getInstance();
-     List<String> userDataLogin = prefs.getStringList('userDataLogin') ?? [""];
-
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String> userDataLogin = prefs.getStringList('userDataLogin') ?? [""];
 
     switch (task) {
       case 'masuk':
-      // Code to run in background
+        // Code to run in background
 
-
-        var tempDataAbs = await SQLHelper.instance
-            .getAllAbsenToday(dateNow);
+        var tempDataAbs = await SQLHelper.instance.getAllAbsenToday(dateNow);
         for (var i in tempDataAbs) {
           var data = {
             "status": "add",
@@ -144,10 +112,7 @@ void callbackDispatcher() {
 
         break;
       case 'pulang':
-
-
-        var tempDataAbs = await SQLHelper.instance
-            .getAllAbsenToday(dateNow);
+        var tempDataAbs = await SQLHelper.instance.getAllAbsenToday(dateNow);
         for (var i in tempDataAbs) {
           var data = {
             "status": "update",
@@ -164,15 +129,12 @@ void callbackDispatcher() {
           await ServiceApi().submitAbsen(data);
         }
 
-
         break;
       case 'masukVisit':
         var tempDataVisit = await SQLHelper.instance
             .getVisitToday(userDataLogin[0], dateNow, '', 0);
 
         for (var i in tempDataVisit) {
-
-
           var data = {
             "status": "add",
             "id": i.id!,
@@ -187,17 +149,13 @@ void callbackDispatcher() {
             "is_rnd": i.isRnd!
           };
           await ServiceApi().submitVisit(data);
-
-    }
-
+        }
 
         break;
       case 'pulangVisit':
-
-
         var tempDataVisit = await SQLHelper.instance
-            .getVisitToday(userDataLogin[0],dateNow,'',0);
-        for(var i in tempDataVisit){
+            .getVisitToday(userDataLogin[0], dateNow, '', 0);
+        for (var i in tempDataVisit) {
           var data = {
             "status": "update",
             "id": i.id,
@@ -209,7 +167,7 @@ void callbackDispatcher() {
             "foto_out": File(i.fotoOut.toString()),
             "lat_out": i.latOut,
             "long_out": i.longOut,
-            "device_info2":i.deviceInfo2
+            "device_info2": i.deviceInfo2
           };
           await ServiceApi().submitVisit(data);
         }

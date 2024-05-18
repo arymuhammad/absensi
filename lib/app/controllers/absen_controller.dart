@@ -21,6 +21,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:workmanager/workmanager.dart';
 import 'package:xml/xml.dart' as xml;
 import '../modules/absen/views/dialog_absen.dart';
 import '../services/service_api.dart';
@@ -167,6 +168,76 @@ class AbsenController extends GetxController {
     } else {}
 
     _startDateStream();
+
+    //register workmanager
+    if(dataUserLogin[12] == "0"){
+      await cekDataAbsen(
+          "masuk",
+          dataUserLogin[0],
+          DateFormat('yyyy-MM-dd').format(DateTime.parse(
+              dateNowServer.isNotEmpty
+                  ? dateNowServer
+                  : dateNow)));
+      if(int.parse(cekAbsen.value.total!) <= 0){
+        Workmanager().registerPeriodicTask(
+          '1',
+          'masuk',
+          frequency: const Duration(minutes: 15),
+          constraints: Constraints(networkType: NetworkType.connected),
+          existingWorkPolicy: ExistingWorkPolicy.append,
+        );
+      }
+
+      await cekDataAbsen(
+          "pulang",
+          dataUserLogin[0],
+          DateFormat('yyyy-MM-dd').format(DateTime.parse(
+              dateNowServer.isNotEmpty
+                  ? dateNowServer
+                  : dateNow)));
+      if(int.parse(cekAbsen.value.total!) <= 0) {
+        Workmanager().registerPeriodicTask(
+          '2',
+          'pulang',
+          frequency: const Duration(minutes: 15),
+          constraints: Constraints(networkType: NetworkType.connected),
+          existingWorkPolicy: ExistingWorkPolicy.append,
+        );
+      }
+
+    }else{
+
+      await cekDataVisit(
+          "masukv2",
+          dataUserLogin[0],
+          dateNow,'');
+      if (int.parse(cekAbsen.value.total!) <= 0) {
+        Workmanager().registerPeriodicTask(
+          '3',
+          'masukVisit',
+          frequency: const Duration(minutes: 15),
+          constraints: Constraints(networkType: NetworkType.connected),
+          existingWorkPolicy: ExistingWorkPolicy.append,
+        );
+      }
+
+      await cekDataVisit(
+          "pulangv2",
+          dataUserLogin[0],
+          dateNow,'');
+      if (int.parse(cekAbsen.value.total!) <= 0) {
+        Workmanager().registerPeriodicTask(
+          '4',
+          'pulangVisit',
+          frequency: const Duration(minutes: 15),
+          constraints: Constraints(networkType: NetworkType.connected),
+          existingWorkPolicy: ExistingWorkPolicy.append,
+        );
+      }
+    }
+
+
+
 
   }
 
