@@ -776,7 +776,7 @@ class ServiceApi {
 
       showToast('Tidak ada koneksi internet\nHarap mencoba kembali');
     } catch (e) {
-
+      // print('a');
       showToast('Tidak ada koneksi internet\nHarap mencoba kembali');
       // debugPrint('$e');
     }

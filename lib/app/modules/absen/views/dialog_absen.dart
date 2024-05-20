@@ -33,7 +33,7 @@ dialogAbsenView(dataUser, latitude, longitude) async {
     var tempDataVisit =
     await SQLHelper.instance.getVisitToday(absC.idUser.value, absC.dateNow,'', 0);
 
-
+print(tempDataVisit.first.visitIn);
     if (tempDataVisit.isNotEmpty &&
         tempDataVisit.first.visitIn! != "" &&
         tempDataVisit.first.visitOut! != "") {
@@ -41,24 +41,26 @@ dialogAbsenView(dataUser, latitude, longitude) async {
     } else if (tempDataVisit.isNotEmpty &&
         tempDataVisit.first.visitIn! != "") {
       absC.optVisitVisible.value = false;
+    }else{
+      absC.optVisitVisible.value = true;
     }
 
-    if (absC.dataVisit.isNotEmpty &&
-        absC.dataVisit[0].isRnd == "1" &&
-        absC.dataVisit[0].visitIn != "" &&
-        absC.dataVisit[0].visitOut == "") {
+    if (tempDataVisit.isNotEmpty &&
+        tempDataVisit.first.isRnd == "1" &&
+        tempDataVisit.first.visitIn != "" &&
+        tempDataVisit.first.visitOut == "") {
       absC.optVisitSelected.value = "Research and Development";
-      absC.rndLoc..text = absC.dataVisit[0].visitIn!;
-    } else if (absC.dataVisit.isNotEmpty &&
-        absC.dataVisit[0].isRnd == "1" &&
-        absC.dataVisit[0].visitIn != "" &&
-        absC.dataVisit[0].visitOut != "") {
+      absC.rndLoc..text = tempDataVisit.first.visitIn!;
+    } else if (tempDataVisit.isNotEmpty &&
+        tempDataVisit.first.isRnd == "1" &&
+        tempDataVisit.first.visitIn != "" &&
+        tempDataVisit.first.visitOut != "") {
       absC.optVisitSelected.value = "";
       absC.rndLoc.text = "";
-    } else if (absC.dataVisit.isNotEmpty &&
-        absC.dataVisit[0].isRnd == "0" &&
-        absC.dataVisit[0].visitIn != "" &&
-        absC.dataVisit[0].visitOut == "") {
+    } else if (tempDataVisit.isNotEmpty &&
+        tempDataVisit.first.isRnd == "0" &&
+        tempDataVisit.first.visitIn != "" &&
+        tempDataVisit.first.visitOut == "") {
       absC.optVisitSelected.value = "Store Visit";
     } else {
       absC.optVisitSelected.value = "";
@@ -174,10 +176,10 @@ dialogAbsenView(dataUser, latitude, longitude) async {
                 //       .format(DateTime.parse(absC.dateNowServer))
                 // };
                 // absC.getVisitToday(paramVisitToday);
-                if (absC.dataVisit.isNotEmpty &&
-                    absC.dataVisit[0].isRnd == "1" &&
-                    absC.dataVisit[0].visitOut == "" &&
-                    absC.dataVisit[0].visitIn! != absC.rndLoc.text) {
+                if (tempDataVisit.isNotEmpty &&
+                    tempDataVisit.first.isRnd == "1" &&
+                    tempDataVisit.first.visitOut == "" &&
+                    tempDataVisit.first.visitIn! != absC.rndLoc.text) {
                   dialogMsg('Info',
                       'Nama Mall yang di input berbeda dengan nama Mall saat absen masuk.\nPerhatikan huruf besar kecil nya');
                 } else {
@@ -435,10 +437,10 @@ dialogAbsenView(dataUser, latitude, longitude) async {
 
                   } else {
                 
-                    if (absC.dataVisit.isNotEmpty &&
-                        absC.dataVisit[0].isRnd == "1" &&
-                        absC.dataVisit[0].visitOut == "" &&
-                        absC.dataVisit[0].visitIn! != absC.rndLoc.text) {
+                    if (tempDataVisit.isNotEmpty &&
+                        tempDataVisit.first.isRnd == "1" &&
+                        tempDataVisit.first.visitOut == "" &&
+                        tempDataVisit.first.visitIn! != absC.rndLoc.text) {
                       dialogMsg('Info',
                           'Nama Mall yang di input berbeda dengan nama Mall saat absen masuk.\nPerhatikan huruf besar kecil nya');
                     } else {

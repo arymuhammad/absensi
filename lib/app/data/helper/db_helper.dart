@@ -214,7 +214,8 @@ class SQLHelper {
     return res;
   }
 
-  Future<List<Visit>> getVisitToday( String idUser, String date, String cabang, int limit) async {
+  Future<List<Visit>>
+  getVisitToday( String idUser, String date, String cabang, int limit) async {
     var lmt = "";
     var cbg = "";
     if(limit > 0){

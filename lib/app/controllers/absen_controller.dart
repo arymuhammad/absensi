@@ -565,7 +565,7 @@ class AbsenController extends GetxController {
         .getLimitDataAbsen(idUser.value, initDate1, initDate2);
 
     if(tempSingleAbs.isNotEmpty){
-      if (response.isNotEmpty && DateTime.parse(response.first.tanggalMasuk!).isBefore(
+      if (response.isEmpty || response.isNotEmpty && DateTime.parse(response.first.tanggalMasuk!).isBefore(
           DateTime.parse(tempSingleAbs.first.tanggalMasuk!)) || response.isNotEmpty && DateTime.parse(response.first.tanggalMasuk!).isAtSameMomentAs(
           DateTime.parse(tempSingleAbs.first.tanggalMasuk!)) && response.first.jamAbsenPulang! =="") {
 
@@ -769,14 +769,9 @@ class AbsenController extends GetxController {
     await SQLHelper.instance.getVisitToday(idUser.value, dateNow,'', 1);
 
     if(tempDataVisit.isNotEmpty){
-      if (response.isNotEmpty && response.first.jamOut != "") {
-
+      if (response.isNotEmpty && response.first.jamOut != "" && response.first.visitIn! == tempDataVisit.first.visitIn! ) {
         dataVisit.value = response;
-      }else if (response.isNotEmpty && response.first.jamIn != tempDataVisit.first.jamIn!) {
-
-        dataVisit.value = response;
-      } else {
-
+      }else{
         dataVisit.value = tempDataVisit;
       }
     }else{
@@ -796,9 +791,12 @@ class AbsenController extends GetxController {
         .getLimitDataVisit(idUser.value, initDate1, initDate2);
 
     if(tempLimitVisit.isNotEmpty){
-      if (response.isNotEmpty && DateTime.parse(response.first.tglVisit!).isBefore(
-          DateTime.parse(tempLimitVisit.first.tglVisit!)) || response.isNotEmpty && DateTime.parse(response.first.tglVisit!).isAtSameMomentAs(
-          DateTime.parse(tempLimitVisit.first.tglVisit!)) && response.first.jamOut! =="") {
+      if (response.isEmpty
+          || response.isNotEmpty && DateTime.parse(response.first.tglVisit!).isBefore(
+          DateTime.parse(tempLimitVisit.first.tglVisit!))
+          || response.isNotEmpty && DateTime.parse(response.first.tglVisit!).isAtSameMomentAs(
+          DateTime.parse(tempLimitVisit.first.tglVisit!)) && response.first.jamOut! ==""
+          || response.isNotEmpty && response.first.visitIn! != tempLimitVisit.first.visitIn!) {
 
         isLoading.value = false;
         dataLimitVisit.value = tempLimitVisit;
