@@ -11,9 +11,11 @@ import 'package:lottie/lottie.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:sqflite/sqflite.dart';
 
-class BackupView extends GetView {
-  BackupView({super.key});
+import '../../../services/service_api.dart';
 
+class BackupView extends GetView {
+  BackupView({super.key, this.userData});
+  final List? userData;
   final ctrl = Get.put(AddPegawaiController());
 
   @override
@@ -143,6 +145,68 @@ class BackupView extends GetView {
                       'Tools', style: TextStyle(fontWeight: FontWeight.bold),),
                     const Divider(),
                     OutlinedButton.icon(style: ButtonStyle(
+                        shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20)))),
+                      icon: Icon(Icons.camera_front, color: mainColor,),
+                      onPressed: () async {
+                      if(userData![12] == '0'){
+                        var tempDataAbs = await SQLHelper.instance.getAllDataAbsen();
+                        for (var i in tempDataAbs) {
+                          var data = {
+                            "tanggal_masuk": i.tanggalMasuk,
+                            "tanggal_pulang": i.tanggalPulang,
+                            "id": i.idUser,
+                            "kode_cabang": i.kodeCabang,
+                            "nama": i.nama,
+                            "id_shift": i.idShift,
+                            "jam_masuk": i.jamMasuk,
+                            "jam_pulang": i.jamPulang,
+                            "jam_absen_masuk": i.jamAbsenMasuk,
+                            "jam_absen_pulang": i.jamAbsenPulang,
+                            "foto_masuk": File(i.fotoMasuk.toString()),
+                            "foto_pulang": File(i.fotoPulang!),
+                            "lat_masuk": i.latMasuk,
+                            "long_masuk": i.longMasuk,
+                            "lat_pulang": i.latPulang,
+                            "long_pulang": i.longPulang,
+                            "device_info": i.devInfo,
+                            "device_info2": i.devInfo2
+                          };
+                          await ServiceApi().reSubmitAbsen(data);
+                        }
+                      }else{
+                        var tempDataVisit = await SQLHelper.instance.getAllDataVisit();
+
+                        for (var i in tempDataVisit) {
+                          var data = {
+                            "id": i.id!,
+                            "nama": i.nama!,
+                            "tgl_visit": i.tglVisit!,
+                            "visit_in": i.visitIn!,
+                            "jam_in": i.jamIn!,
+                            "visit_out": i.visitOut,
+                            "jam_out": i.jamOut,
+                            "foto_in": File(i.fotoIn!.toString()),
+                            "lat_in": i.latIn!,
+                            "long_in": i.longIn!,
+                            "foto_out": File(i.fotoOut.toString()),
+                            "lat_out": i.latOut,
+                            "long_out": i.longOut,
+                            "device_info": i.deviceInfo!,
+                            "device_info2": i.deviceInfo2,
+                            "is_rnd": i.isRnd!
+
+                          };
+                          await ServiceApi().reSubmitVisit(data);
+                        }
+                      }
+                        await SQLHelper.instance.truncateShift();
+                        showToast(userData![12] == '0' ? 'Data absen berhasil dikirim ulang' : 'Data visit berhasil dikirim ulang');
+                      },
+                      label:  Text( userData![12] == '0' ? 'Kirim ulang data absensi' : 'Kirim ulang data visit',
+                        style: const TextStyle(color: Colors.black),),
+                    ),
+                    const SizedBox(height: 5,),OutlinedButton.icon(style: ButtonStyle(
                         shape: MaterialStateProperty.all(RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(20)))),
                       icon: Icon(Icons.delete_sweep_rounded, color: red,),

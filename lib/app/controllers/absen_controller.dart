@@ -169,75 +169,6 @@ class AbsenController extends GetxController {
 
     _startDateStream();
 
-    //register workmanager
-    if(dataUserLogin[12] == "0"){
-      await cekDataAbsen(
-          "masuk",
-          dataUserLogin[0],
-          DateFormat('yyyy-MM-dd').format(DateTime.parse(
-              dateNowServer.isNotEmpty
-                  ? dateNowServer
-                  : dateNow)));
-      if(int.parse(cekAbsen.value.total!) <= 0){
-        Workmanager().registerPeriodicTask(
-          '1',
-          'masuk',
-          frequency: const Duration(minutes: 15),
-          constraints: Constraints(networkType: NetworkType.connected),
-          existingWorkPolicy: ExistingWorkPolicy.append,
-        );
-      }
-
-      await cekDataAbsen(
-          "pulang",
-          dataUserLogin[0],
-          DateFormat('yyyy-MM-dd').format(DateTime.parse(
-              dateNowServer.isNotEmpty
-                  ? dateNowServer
-                  : dateNow)));
-      if(int.parse(cekAbsen.value.total!) <= 0) {
-        Workmanager().registerPeriodicTask(
-          '2',
-          'pulang',
-          frequency: const Duration(minutes: 15),
-          constraints: Constraints(networkType: NetworkType.connected),
-          existingWorkPolicy: ExistingWorkPolicy.append,
-        );
-      }
-
-    }else{
-
-      await cekDataVisit(
-          "masukv2",
-          dataUserLogin[0],
-          dateNow,'');
-      if (int.parse(cekAbsen.value.total!) <= 0) {
-        Workmanager().registerPeriodicTask(
-          '3',
-          'masukVisit',
-          frequency: const Duration(minutes: 15),
-          constraints: Constraints(networkType: NetworkType.connected),
-          existingWorkPolicy: ExistingWorkPolicy.append,
-        );
-      }
-
-      await cekDataVisit(
-          "pulangv2",
-          dataUserLogin[0],
-          dateNow,'');
-      if (int.parse(cekAbsen.value.total!) <= 0) {
-        Workmanager().registerPeriodicTask(
-          '4',
-          'pulangVisit',
-          frequency: const Duration(minutes: 15),
-          constraints: Constraints(networkType: NetworkType.connected),
-          existingWorkPolicy: ExistingWorkPolicy.append,
-        );
-      }
-    }
-
-
-
 
   }
 
@@ -635,15 +566,14 @@ class AbsenController extends GetxController {
 
     if(tempSingleAbs.isNotEmpty){
       if (response.isNotEmpty && DateTime.parse(response.first.tanggalMasuk!).isBefore(
-          DateTime.parse(tempSingleAbs.first.tanggalMasuk!))) {
+          DateTime.parse(tempSingleAbs.first.tanggalMasuk!)) || response.isNotEmpty && DateTime.parse(response.first.tanggalMasuk!).isAtSameMomentAs(
+          DateTime.parse(tempSingleAbs.first.tanggalMasuk!)) && response.first.jamAbsenPulang! =="") {
 
         isLoading.value = false;
         dataLimitAbsen.value = tempSingleAbs;
         dataLimitAbsen.addAll(response);
 
-      }
-      else if(response.isNotEmpty && DateTime.parse(response.first.tanggalMasuk!).isAtSameMomentAs(
-          DateTime.parse(tempSingleAbs.first.tanggalMasuk!))){
+      } else {
 
           isLoading.value = false;
           dataLimitAbsen.value = response;
@@ -867,18 +797,18 @@ class AbsenController extends GetxController {
 
     if(tempLimitVisit.isNotEmpty){
       if (response.isNotEmpty && DateTime.parse(response.first.tglVisit!).isBefore(
-          DateTime.parse(tempLimitVisit.first.tglVisit!))) {
+          DateTime.parse(tempLimitVisit.first.tglVisit!)) || response.isNotEmpty && DateTime.parse(response.first.tglVisit!).isAtSameMomentAs(
+          DateTime.parse(tempLimitVisit.first.tglVisit!)) && response.first.jamOut! =="") {
 
         isLoading.value = false;
         dataLimitVisit.value = tempLimitVisit;
         dataLimitVisit.addAll(response);
 
-      }
-      else if(response.isNotEmpty && DateTime.parse(response.first.tglVisit!).isAtSameMomentAs(
-          DateTime.parse(tempLimitVisit.first.tglVisit!))){
+      }else{
 
         isLoading.value = false;
         dataLimitVisit.value = response;
+
       }
     } else {
       isLoading.value = false;

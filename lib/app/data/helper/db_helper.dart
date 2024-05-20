@@ -236,7 +236,7 @@ class SQLHelper {
       String idUser, String date1, String date2) async {
     Database db = await instance.database;
     var res = await db.rawQuery(
-        " SELECT A.*, B.nama_cabang FROM tbl_visit_area A LEFT JOIN tbl_cabang B ON B.kode_cabang = A.visit_in WHERE id_user =  '$idUser'  AND tgl_visit BETWEEN '$date1' AND '$date2' ORDER BY tgl_visit DESC LIMIT 7 ");
+        " SELECT A.*, B.nama_cabang FROM tbl_visit_area A LEFT JOIN tbl_cabang B ON B.kode_cabang = A.visit_in WHERE id_user =  '$idUser'  AND tgl_visit BETWEEN '$date1' AND '$date2' ORDER BY tgl_visit DESC, jam_in DESC LIMIT 7 ");
     return res.map((json) => Visit.fromJson(json)).toList();
   }
 
@@ -263,12 +263,18 @@ class SQLHelper {
     return res.map((e) => LoginOffline.fromJson(e)).toList();
   }
 
-  Future<List<Absen>> getAllDataAbsen(idUser) async {
+  Future<List<Absen>> getAllDataAbsen() async {
     Database db = await instance.database;
     var res = await db.query('absen',
-        orderBy: "tanggal_masuk DESC", where: 'id_user=$idUser');
-
+        orderBy: "tanggal_masuk DESC");
     return res.map((json) => Absen.fromJson(json)).toList();
+  }
+
+  Future<List<Visit>> getAllDataVisit() async {
+    Database db = await instance.database;
+    var res = await db.query('tbl_visit_area',
+        orderBy: "tgl_visit DESC");
+    return res.map((json) => Visit.fromJson(json)).toList();
   }
 
 

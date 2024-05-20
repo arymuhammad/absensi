@@ -436,7 +436,7 @@ class AddPegawaiController extends GetxController {
           }, dataUser[0], dataUser[10]);
           //end of update
 
-          dialogMsgScsUpd("Sukses", "Data berhasil disimpan");
+          dialogMsgScsUpd("Sukses", "Data berhasil disimpan\nSilahkan login ulang");
           await ServiceApi().addUpdatePegawai(data);
           newPhone.value = telp.text;
 
@@ -496,7 +496,7 @@ class AddPegawaiController extends GetxController {
           }, dataUser[0], dataUser[10]);
           //end of update
 
-          dialogMsgScsUpd("Sukses", "Data berhasil disimpan");
+          dialogMsgScsUpd("Sukses", "Data berhasil disimpan\nSilahkan login ulang");
           await ServiceApi().addUpdatePegawai(data);
           newPhone.value = telp.text;
 

@@ -21,7 +21,6 @@ import 'package:workmanager/workmanager.dart';
 import 'app/data/helper/loading_dialog.dart';
 import 'app/routes/app_pages.dart';
 
-const fetchBackground = "fetchBackground";
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -29,7 +28,7 @@ void main() async {
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
-  await Workmanager().initialize(callbackDispatcher, isInDebugMode: true);
+  await Workmanager().initialize(callbackDispatcher);
   await initializeDateFormatting('id_ID', "");
   await Alarm.init();
 
@@ -44,6 +43,43 @@ void main() async {
   if (auth.logUser.isEmpty) {
     auth.logUser.value = userDataLogin;
   }
+
+  //register workmanager
+
+    Workmanager().registerPeriodicTask(
+      '1',
+      'masuk',
+      frequency: const Duration(hours: 1, minutes: 30),
+      constraints: Constraints(networkType: NetworkType.connected, requiresBatteryNotLow: false, requiresCharging: false, requiresStorageNotLow: false, requiresDeviceIdle: false),
+      existingWorkPolicy: ExistingWorkPolicy.append,
+    );
+
+    Workmanager().registerPeriodicTask(
+      '2',
+      'pulang',
+      frequency: const Duration(hours: 1, minutes: 30),
+      constraints: Constraints(networkType: NetworkType.connected, requiresBatteryNotLow: false, requiresCharging: false, requiresStorageNotLow: false, requiresDeviceIdle: false),
+      existingWorkPolicy: ExistingWorkPolicy.append,
+    );
+
+
+    Workmanager().registerPeriodicTask(
+      '3',
+      'masukVisit',
+      frequency: const Duration(hours: 1, minutes: 30),
+      constraints: Constraints(networkType: NetworkType.connected, requiresBatteryNotLow: false, requiresCharging: false, requiresStorageNotLow: false, requiresDeviceIdle: false),
+      existingWorkPolicy: ExistingWorkPolicy.append,
+    );
+
+    Workmanager().registerPeriodicTask(
+      '4',
+      'pulangVisit',
+      frequency: const Duration(hours: 1, minutes: 30),
+      constraints: Constraints(networkType: NetworkType.connected, requiresBatteryNotLow: false, requiresCharging: false, requiresStorageNotLow: false, requiresDeviceIdle: false),
+      existingWorkPolicy: ExistingWorkPolicy.append,
+    );
+
+
 
 
   runApp(GetMaterialApp(

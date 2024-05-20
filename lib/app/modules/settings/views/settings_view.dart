@@ -105,7 +105,7 @@ class SettingsView extends GetView<SettingsController> {
                         ),
                         ListTile(
                           onTap: () {
-                            Get.to(() =>  BackupView(),
+                            Get.to(() =>  BackupView(userData:listDataUser!),
                                 transition: Transition.cupertino);
                           },
                           leading: Container(
