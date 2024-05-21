@@ -6,7 +6,7 @@ import 'package:absensi/app/data/model/cek_visit_model.dart';
 import 'package:absensi/app/data/model/user_model.dart';
 import 'package:absensi/app/data/model/visit_model.dart';
 import 'package:absensi/app/modules/home/views/dialog_update_app.dart';
-// import 'package:connectivity_plus/connectivity_plus.dart';
+
 
 import 'package:device_marketing_names/device_marketing_names.dart';
 import 'package:flutter/services.dart';
@@ -32,6 +32,7 @@ import '../data/model/cek_absen_model.dart';
 import 'package:pdf/pdf.dart';
 import 'package:printing/printing.dart';
 import 'package:pdf/widgets.dart' as pw;
+import 'package:device_info_null_safety/device_info_null_safety.dart';
 
 class AbsenController extends GetxController {
   var isLoading = true.obs;
@@ -76,6 +77,7 @@ class AbsenController extends GetxController {
   var updateList = [];
   var currVer = "";
   var latestVer = "";
+  var supportedAbi = "";
   RxList<Absen> searchAbsen = RxList<Absen>([]);
   RxList<Visit> searchVisit = RxList<Visit>([]);
   late final TextEditingController  date1, date2, store, userCab, rndLoc;
@@ -165,10 +167,15 @@ class AbsenController extends GetxController {
           checkForUpdates("onInit");
         }
       }
-    } else {}
+
+      final DeviceInfoNullSafety deviceInfoNullSafety = DeviceInfoNullSafety();
+      Map<String, dynamic> abiInfo = await deviceInfoNullSafety.abiInfo;
+      var abi = abiInfo.entries.toList();
+      supportedAbi = abi[1].value;
+
+    }
 
     _startDateStream();
-
 
   }
 

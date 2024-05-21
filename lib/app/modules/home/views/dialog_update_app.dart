@@ -124,7 +124,8 @@ dialogUpdateApp() {
           //LINK CONTAINS APK OF FLUTTER HELLO WORLD FROM FLUTTER SDK EXAMPLES
           OtaUpdate()
               .execute(
-            'http://103.156.15.60/update apk/absensiApp.apk',
+            absC.supportedAbi == 'arm64-v8a' ?
+            'http://103.156.15.60/update apk/absensiApp.arm64v8a.apk' : 'http://103.156.15.60/update apk/absensiApp.apk',
             // OPTIONAL
             // destinationFilename: '/',
             // OPTIONAL, ANDROID ONLY - ABILITY TO VALIDATE CHECKSUM OF FILE:
