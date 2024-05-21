@@ -3,7 +3,7 @@ version: 2.3.17+14
 publish_to: none
 description: URBAN&CO SPOT
 environment: 
-  sdk: 3.4.0
+  sdk: 3.3.4
 
 dependencies: 
   awesome_dialog: 3.1.0
@@ -35,7 +35,7 @@ dependencies:
   package_info_plus: ^4.2.0
   percent_indicator: ^4.2.3
   permission_handler: ^11.0.1
-  pdf: ^3.10.0
+  pdf: 3.10.8
   photo_view: 0.14.0
   shared_preferences: ^2.2.2
   shimmer: ^3.0.0
