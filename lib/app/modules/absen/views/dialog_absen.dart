@@ -33,17 +33,15 @@ dialogAbsenView(dataUser, latitude, longitude) async {
     var tempDataVisit =
     await SQLHelper.instance.getVisitToday(absC.idUser.value, absC.dateNow,'', 0);
 
-print(tempDataVisit.first.visitIn);
     if (tempDataVisit.isNotEmpty &&
         tempDataVisit.first.visitIn! != "" &&
-        tempDataVisit.first.visitOut! != "") {
+        tempDataVisit.first.visitOut! != "" || tempDataVisit.isEmpty) {
       absC.optVisitVisible.value = true;
     } else if (tempDataVisit.isNotEmpty &&
         tempDataVisit.first.visitIn! != "") {
       absC.optVisitVisible.value = false;
-    }else{
-      absC.optVisitVisible.value = true;
     }
+
 
     if (tempDataVisit.isNotEmpty &&
         tempDataVisit.first.isRnd == "1" &&
