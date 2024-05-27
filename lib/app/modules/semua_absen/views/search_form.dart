@@ -59,7 +59,7 @@ searchForm() {
                           width: Get.mediaQuery.size.width / 2.1,
                           child: DateTimeField(
                               controller: absC.date1,
-                              style: const TextStyle(fontSize: 14),
+                              style: const TextStyle(fontSize: 16),
                               decoration: const InputDecoration(
                                   contentPadding: EdgeInsets.all(0.5),
                                   prefixIcon:
@@ -81,7 +81,7 @@ searchForm() {
                           width: Get.mediaQuery.size.width / 2.1,
                           child: DateTimeField(
                               controller: absC.date2,
-                              style: const TextStyle(fontSize: 14),
+                              style: const TextStyle(fontSize: 16),
                               decoration: const InputDecoration(
                                   contentPadding: EdgeInsets.all(0.5),
                                   prefixIcon:
@@ -114,6 +114,7 @@ searchForm() {
 
                             return TypeAheadFormField<String>(
                               textFieldConfiguration: TextFieldConfiguration(
+                                style: const TextStyle(fontSize: 16),
                                 controller: absC.store,
                                 decoration: const InputDecoration(
                                   labelText: 'Cabang',
@@ -177,6 +178,7 @@ searchForm() {
 
                               return TypeAheadFormField<String>(
                                 textFieldConfiguration: TextFieldConfiguration(
+                                  style: const TextStyle(fontSize: 16),
                                   controller: absC.userCab,
                                   decoration: const InputDecoration(
                                     labelText: 'User',
@@ -216,8 +218,24 @@ searchForm() {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Platform.isAndroid
-                                    ? const CircularProgressIndicator()
-                                    : const CupertinoActivityIndicator(),
+                                    ? const Row(
+                                        children: [
+                                          CircularProgressIndicator(),
+                                          SizedBox(
+                                            width: 5,
+                                          ),
+                                          Text('Load user')
+                                        ],
+                                      )
+                                    : const Row(
+                                        children: [
+                                          CupertinoActivityIndicator(),
+                                          SizedBox(
+                                            width: 5,
+                                          ),
+                                          Text('Load user')
+                                        ],
+                                      ),
                                 const SizedBox(
                                   width: 5,
                                 ),
@@ -242,7 +260,8 @@ searchForm() {
                         style: ElevatedButton.styleFrom(
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(30)),
-                                 side:const BorderSide(width: 2.0, color: Colors.red),
+                            side:
+                                const BorderSide(width: 2.0, color: Colors.red),
                             fixedSize: Size(Get.mediaQuery.size.width, 50)),
                         child: const Text(
                           'BATALKAN',
@@ -265,11 +284,12 @@ searchForm() {
                             await absC.getFilteredAbsen(
                                 absC.selectedUserCabang.value);
                             absC.userCab.clear();
-                            absC.store.clear();
-                            absC.selectedCabang.value = "";
                             absC.selectedUserCabang.value = "";
-                            absC.date1.clear();
-                            absC.date2.clear();
+                            // absC.store.clear();
+                            // absC.selectedCabang.value = "";
+                            // absC.date1.clear();
+                            // absC.date2.clear();
+                            
                           }
                         },
                         style: ElevatedButton.styleFrom(

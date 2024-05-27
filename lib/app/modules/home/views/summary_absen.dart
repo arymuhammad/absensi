@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:absensi/app/controllers/absen_controller.dart';
 import 'package:absensi/app/data/helper/const.dart';
 import 'package:absensi/app/data/helper/loading_dialog.dart';
 import 'package:absensi/app/modules/detail_absen/views/detail_absen_view.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icons_plus/icons_plus.dart';
@@ -75,20 +78,27 @@ class SummaryAbsen extends GetView {
                             height: 10,
                           ),
                           Obx(
-                            () => Text(
-                              absenC.dataAbsen.isNotEmpty &&
-                                      absenC.dataAbsen[0].jamAbsenMasuk! != ""
-                                  ? absenC.dataAbsen[0].jamAbsenMasuk!
-                                  : '-:-',
-                              style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: absenC.dataAbsen.isNotEmpty &&
-                                          absenC.dataAbsen[0].jamAbsenMasuk! !=
-                                              ""
-                                      ? timeColor
-                                      : defaultColor),
-                            ),
+                            () => absenC.isLoading.value 
+                              ? Platform.isAndroid 
+                                    ? const SizedBox(height: 17, width: 17, child:  CircularProgressIndicator())
+                                    : const SizedBox(height: 17, width: 17, child:   CupertinoActivityIndicator())
+                                : Text(
+                                    absenC.dataAbsen.isNotEmpty &&
+                                            absenC.dataAbsen[0]
+                                                    .jamAbsenMasuk! !=
+                                                ""
+                                        ? absenC.dataAbsen[0].jamAbsenMasuk!
+                                        : '-:-',
+                                    style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: absenC.dataAbsen.isNotEmpty &&
+                                                absenC.dataAbsen[0]
+                                                        .jamAbsenMasuk! !=
+                                                    ""
+                                            ? timeColor
+                                            : defaultColor),
+                                  ),
                           ),
                           Text(
                             'Masuk',
@@ -109,7 +119,11 @@ class SummaryAbsen extends GetView {
                             height: 10,
                           ),
                           Obx(
-                            () => Text(
+                            () => absenC.isLoading.value 
+                               ? Platform.isAndroid 
+                                    ? const SizedBox(height: 17, width: 17, child:  CircularProgressIndicator())
+                                    : const SizedBox(height: 17, width: 17, child:   CupertinoActivityIndicator())
+                                : Text(
                               absenC.dataAbsen.isNotEmpty &&
                                       absenC.dataAbsen[0].jamAbsenPulang! != ""
                                   ? absenC.dataAbsen[0].jamAbsenPulang!
@@ -162,7 +176,11 @@ class SummaryAbsen extends GetView {
                               } else {
                                 diffHours = const Duration();
                               }
-                              return Text(
+                              return absenC.isLoading.value 
+                              ? Platform.isAndroid 
+                                    ? const SizedBox(height: 17, width: 17, child:  CircularProgressIndicator())
+                                    : const SizedBox(height: 17, width: 17, child:   CupertinoActivityIndicator())
+                                : Text(
                                 absenC.dataAbsen.isNotEmpty &&
                                         absenC.dataAbsen[0].jamAbsenMasuk! != ""
                                     ? '${absenC.dataAbsen[0].jamAbsenPulang != "" ? diffHours.inHours % 24 : '-'} j ${absenC.dataAbsen[0].jamAbsenPulang != "" ? diffHours.inMinutes % 60 : '-'} m'

@@ -258,7 +258,7 @@ dialogAbsenView(dataUser, latitude, longitude) async {
 
                           loadingDialog("Sedang mengirim data...", "");
                           // submit data visit ke local storage
-                          await SQLHelper.instance.insertDataVisit(Visit(
+                           SQLHelper.instance.insertDataVisit(Visit(
                               id: dataUser[0],
                               nama: dataUser[1],
                               tglVisit: DateFormat('yyyy-MM-dd')
@@ -285,7 +285,7 @@ dialogAbsenView(dataUser, latitude, longitude) async {
                                   ? "1"
                                   : "0"));
                           // submit data visit ke server
-                          // await ServiceApi().submitVisit(data);
+                          ServiceApi().submitVisit(data);
                           Get.back();
                           succesDialog(Get.context, "Y", "Anda berhasil Absen");
                         }
@@ -376,7 +376,7 @@ dialogAbsenView(dataUser, latitude, longitude) async {
 
                               loadingDialog("Sedang mengirim data...", "");
                               // update data visit ke local storage
-                              await SQLHelper.instance.updateDataVisit(
+                              SQLHelper.instance.updateDataVisit(
                                   {
 
                                     "visit_out": absC.optVisitSelected.value ==
@@ -400,7 +400,7 @@ dialogAbsenView(dataUser, latitude, longitude) async {
                                       : dataUser[8]
                                       : absC.rndLoc.text);
                               // update data visit ke server
-                              // await ServiceApi().submitVisit(data);
+                              ServiceApi().submitVisit(data);
                               Get.back();
                               succesDialog(Get.context, "Y", "Anda berhasil Absen");
                               absC.selectedCabangVisit.value = "";
@@ -509,7 +509,7 @@ dialogAbsenView(dataUser, latitude, longitude) async {
                          
                             loadingDialog("Sedang mengirim data...", "");
                             // update data visit ke local storage
-                            await SQLHelper.instance.updateDataVisit(
+                             SQLHelper.instance.updateDataVisit(
                                 {
 
                                     "visit_out": absC.optVisitSelected.value ==
@@ -533,7 +533,7 @@ dialogAbsenView(dataUser, latitude, longitude) async {
                                         : dataUser[8]
                                     : absC.rndLoc.text);
                             // update data visit ke server
-                            // await ServiceApi().submitVisit(data);
+                            ServiceApi().submitVisit(data);
                             Get.back();
                             succesDialog(Get.context, "Y", "Anda berhasil Absen");
                             absC.selectedCabangVisit.value = "";
@@ -701,7 +701,7 @@ dialogAbsenView(dataUser, latitude, longitude) async {
                       };
 
                       loadingDialog("Sedang mengirim data...", "");
-                      await SQLHelper.instance.updateDataAbsen({
+                      SQLHelper.instance.updateDataAbsen({
                         "tanggal_pulang": DateFormat('yyyy-MM-dd')
                             .format(DateTime.parse(absC.dateNowServer)),
                         "nama": dataUser[1],
@@ -711,7 +711,7 @@ dialogAbsenView(dataUser, latitude, longitude) async {
                         "long_pulang": longitude.toString(),
                         "device_info2": absC.devInfo.value
                       }, dataUser[0], previous);
-                      await ServiceApi().submitAbsen(data);
+                      ServiceApi().submitAbsen(data);
 
                       var paramAbsenToday = {
                         "mode": "single",
@@ -940,7 +940,7 @@ dialogAbsenView(dataUser, latitude, longitude) async {
 
                           loadingDialog("Sedang mengirim data...", "");
                           //submit data absensi ke local storage
-                          await SQLHelper.instance.insertDataAbsen(Absen(
+                           SQLHelper.instance.insertDataAbsen(Absen(
                               idUser: dataUser[0],
                               tanggalMasuk: DateFormat('yyyy-MM-dd')
                                   .format(DateTime.parse(absC.dateNowServer)),
@@ -962,7 +962,7 @@ dialogAbsenView(dataUser, latitude, longitude) async {
                               devInfo: absC.devInfo.value,
                               devInfo2: ''));
                           // submit data absensi ke server
-                          // await ServiceApi().submitAbsen(data);
+                          ServiceApi().submitAbsen(data);
                           Get.back();
                           succesDialog(Get.context, "Y", "Anda berhasil Absen");
                           var paramAbsenToday = {
@@ -1115,7 +1115,7 @@ dialogAbsenView(dataUser, latitude, longitude) async {
 
                           loadingDialog("Sedang mengirim data...", "");
                           //update data absensi ke local storage
-                          await SQLHelper.instance.updateDataAbsen(
+                          SQLHelper.instance.updateDataAbsen(
                               {
                                 "tanggal_pulang": DateFormat('yyyy-MM-dd')
                                     .format(DateTime.parse(absC.dateNowServer)),
@@ -1130,7 +1130,7 @@ dialogAbsenView(dataUser, latitude, longitude) async {
                               DateFormat('yyyy-MM-dd')
                                   .format(DateTime.parse(absC.dateNowServer)));
                           // update data absensi ke server
-                          // await ServiceApi().submitAbsen(data);
+                          ServiceApi().submitAbsen(data);
                           Get.back();
                           succesDialog(Get.context, "Y", "Anda berhasil Absen");
                           var paramAbsenToday = {
@@ -1293,7 +1293,7 @@ dialogAbsenView(dataUser, latitude, longitude) async {
 
                           loadingDialog("Sedang mengirim data...", "");
                           // update data absensi ke local storage
-                          await SQLHelper.instance.updateDataAbsen(
+                           SQLHelper.instance.updateDataAbsen(
                               {
                                 "tanggal_pulang": DateFormat('yyyy-MM-dd')
                                     .format(DateTime.parse(absC.dateNowServer)),
@@ -1309,7 +1309,7 @@ dialogAbsenView(dataUser, latitude, longitude) async {
                                   .format(DateTime.parse(absC.dateNowServer)));
 
                           // update data absensi ke server
-                          // await ServiceApi().submitAbsen(data);
+                          ServiceApi().submitAbsen(data);
                           Get.back();
                           succesDialog(Get.context, "Y", "Anda berhasil Absen");
                           var paramAbsenToday = {

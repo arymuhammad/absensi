@@ -7,7 +7,6 @@ import 'package:absensi/app/data/model/user_model.dart';
 import 'package:absensi/app/data/model/visit_model.dart';
 import 'package:absensi/app/modules/home/views/dialog_update_app.dart';
 
-
 import 'package:device_marketing_names/device_marketing_names.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
@@ -80,7 +79,7 @@ class AbsenController extends GetxController {
   var supportedAbi = "";
   RxList<Absen> searchAbsen = RxList<Absen>([]);
   RxList<Visit> searchVisit = RxList<Visit>([]);
-  late final TextEditingController  date1, date2, store, userCab, rndLoc;
+  late final TextEditingController date1, date2, store, userCab, rndLoc;
   final TextEditingController filterAbsen = TextEditingController();
   final TextEditingController filterVisit = TextEditingController();
   final ImagePicker picker = ImagePicker();
@@ -136,7 +135,6 @@ class AbsenController extends GetxController {
       "tgl_visit": dateNow
     };
 
-
     date1 = TextEditingController();
     date2 = TextEditingController();
     store = TextEditingController();
@@ -163,7 +161,8 @@ class AbsenController extends GetxController {
         final document = xml.XmlDocument.parse(readDoc.body);
         final cLog = document.findElements('items').first;
         latestVer = cLog.findElements('versi').first.innerText;
-        if (int.parse(latestVer.replaceAll('.', '')) > int.parse(currVer.replaceAll('.', ''))) {
+        if (int.parse(latestVer.replaceAll('.', '')) >
+            int.parse(currVer.replaceAll('.', ''))) {
           checkForUpdates("onInit");
         }
       }
@@ -172,14 +171,10 @@ class AbsenController extends GetxController {
       Map<String, dynamic> abiInfo = await deviceInfoNullSafety.abiInfo;
       var abi = abiInfo.entries.toList();
       supportedAbi = abi[1].value;
-
     }
 
     _startDateStream();
-
   }
-
-  
 
   void _startDateStream() {
     // Buat Stream yang mengeluarkan tanggal setiap detik
@@ -212,11 +207,12 @@ class AbsenController extends GetxController {
       cabang.value = response;
       cabang
           .map((e) async => await SQLHelper.instance.insertCabang(Cabang(
-          kodeCabang: e.kodeCabang,
-          brandCabang: e.brandCabang,
-          namaCabang: e.namaCabang,
-          lat: e.lat,
-          long: e.long))).toList();
+              kodeCabang: e.kodeCabang,
+              brandCabang: e.brandCabang,
+              namaCabang: e.namaCabang,
+              lat: e.lat,
+              long: e.long)))
+          .toList();
       return cabang;
     }
   }
@@ -542,53 +538,56 @@ class AbsenController extends GetxController {
   getAbsenToday(paramAbsen) async {
     final response = await ServiceApi().getAbsen(paramAbsen);
 
-    var tempDataAbs =
-    await SQLHelper.instance.getAbsenToday(idUser.value, dateNow);
-    dataAbsen.value = tempDataAbs;
+    // var tempDataAbs =
+    // await SQLHelper.instance.getAbsenToday(idUser.value, dateNow);
+    // dataAbsen.value = tempDataAbs;
 
-    if(tempDataAbs.isNotEmpty){
-      if (response.isNotEmpty && response[0].jamAbsenPulang != "") {
-        dataAbsen.value = response;
-        // print('online');
-      } else if(response.isNotEmpty && response[0].jamAbsenMasuk != tempDataAbs[0].jamAbsenMasuk!)  {
-        dataAbsen.value = response;
-        // print('offline');
-      }else{
-        dataAbsen.value = tempDataAbs;
-      }
-    }else{
-      // print('online II');
-      dataAbsen.value = response;
-    }
+    // if(tempDataAbs.isNotEmpty){
+    //   if (response.isNotEmpty && response[0].jamAbsenPulang != "") {
+    //     dataAbsen.value = response;
+    //     // print('online');
+    //   } else if(response.isNotEmpty && response[0].jamAbsenMasuk != tempDataAbs[0].jamAbsenMasuk!)  {
+    //     dataAbsen.value = response;
+    //     // print('offline');
+    //   }else{
+    //     dataAbsen.value = tempDataAbs;
+    //   }
+    // }else{
+    //   // print('online II');
+    isLoading.value = false;
+    dataAbsen.value = response;
+    // }
 
     return dataAbsen;
   }
 
   Future<List<Absen>> getLimitAbsen(paramLimitAbsen) async {
     final response = await ServiceApi().getAbsen(paramLimitAbsen);
-    dataLimitAbsen.clear();
-    isLoading.value = true;
-    var tempSingleAbs = await SQLHelper.instance
-        .getLimitDataAbsen(idUser.value, initDate1, initDate2);
+    // dataLimitAbsen.clear();
+    // isLoading.value = true;
+    // var tempSingleAbs = await SQLHelper.instance
+    //     .getLimitDataAbsen(idUser.value, initDate1, initDate2);
 
-    if(tempSingleAbs.isNotEmpty){
-      if (response.isEmpty || response.isNotEmpty && DateTime.parse(response.first.tanggalMasuk!).isBefore(
-          DateTime.parse(tempSingleAbs.first.tanggalMasuk!)) || response.isNotEmpty && DateTime.parse(response.first.tanggalMasuk!).isAtSameMomentAs(
-          DateTime.parse(tempSingleAbs.first.tanggalMasuk!)) && response.first.jamAbsenPulang! =="") {
-
-        isLoading.value = false;
-        dataLimitAbsen.value = tempSingleAbs;
-        dataLimitAbsen.addAll(response);
-
-      } else {
-
-          isLoading.value = false;
-          dataLimitAbsen.value = response;
-      }
-    } else {
+    // if (tempSingleAbs.isNotEmpty) {
+    //   if (response.isEmpty ||
+    //       response.isNotEmpty &&
+    //           DateTime.parse(response.first.tanggalMasuk!).isBefore(
+    //               DateTime.parse(tempSingleAbs.first.tanggalMasuk!)) ||
+    //       response.isNotEmpty &&
+    //           DateTime.parse(response.first.tanggalMasuk!).isAtSameMomentAs(
+    //               DateTime.parse(tempSingleAbs.first.tanggalMasuk!)) &&
+    //           response.first.jamAbsenPulang! == "") {
+    //     isLoading.value = false;
+    //     dataLimitAbsen.value = tempSingleAbs;
+    //     dataLimitAbsen.addAll(response);
+    //   } else {
+    //     isLoading.value = false;
+    //     dataLimitAbsen.value = response;
+    //   }
+    // } else {
       isLoading.value = false;
       dataLimitAbsen.value = response;
-    }
+    // }
     return dataLimitAbsen;
   }
 
@@ -701,7 +700,8 @@ class AbsenController extends GetxController {
 
     try {
       final readDoc = await http
-          .get(Uri.parse('http://103.156.15.60/update apk/updateLog.xml')).timeout(const Duration(seconds: 20));
+          .get(Uri.parse('http://103.156.15.60/update apk/updateLog.xml'))
+          .timeout(const Duration(seconds: 20));
 
       final response = await http
           .head(Uri.parse('http://103.156.15.60/update apk/absensiApp.apk'))
@@ -725,7 +725,8 @@ class AbsenController extends GetxController {
               .add({'name': name, 'desc': desc, 'icon': icon, 'color': color});
         }
         //end loop item on readDoc
-        if (int.parse(latestVer.replaceAll('.', '')) <= int.parse(currVer.replaceAll('.', ''))) {
+        if (int.parse(latestVer.replaceAll('.', '')) <=
+            int.parse(currVer.replaceAll('.', ''))) {
           if (status != "onInit") {
             Get.back(closeOverlays: true);
             succesDialog(Get.context!, "N", "Tidak ada pembaruan sistem");
@@ -748,7 +749,7 @@ class AbsenController extends GetxController {
           Get.back(closeOverlays: true);
         },
       );
-    } on TimeoutException catch(_){
+    } on TimeoutException catch (_) {
       Get.back(closeOverlays: true);
       showToast("Waktu untuk koneksi ke server telah habis");
     }
@@ -772,53 +773,54 @@ class AbsenController extends GetxController {
 
   getVisitToday(Map<String, dynamic> paramSingleVisit) async {
     final response = await ServiceApi().getVisit(paramSingleVisit);
-    var tempDataVisit =
-    await SQLHelper.instance.getVisitToday(idUser.value, dateNow,'', 1);
+    // var tempDataVisit =
+    //     await SQLHelper.instance.getVisitToday(idUser.value, dateNow, '', 1);
 
-    if(tempDataVisit.isNotEmpty){
-      if (response.isNotEmpty && response.first.jamOut != "" && response.first.visitIn! == tempDataVisit.first.visitIn! ) {
-        dataVisit.value = response;
-      }else{
-        dataVisit.value = tempDataVisit;
-      }
-    }else{
-      dataVisit.value = response;
-    }
+    // if (tempDataVisit.isNotEmpty) {
+    //   if (response.isNotEmpty &&
+    //       response.first.jamOut != "" &&
+    //       response.first.visitIn! == tempDataVisit.first.visitIn!) {
+    //     dataVisit.value = response;
+    //   } else {
+    //     dataVisit.value = tempDataVisit;
+    //   }
+    // } else {
+    isLoading.value = false;
+    dataVisit.value = response;
+    // }
 
     return dataVisit;
-
   }
 
   getLimitVisit(Map<String, dynamic> paramLimitVisit) async {
-
     final response = await ServiceApi().getLimitVisit(paramLimitVisit);
-    dataLimitVisit.clear();
+    // dataLimitVisit.clear();
 
-    var tempLimitVisit = await SQLHelper.instance
-        .getLimitDataVisit(idUser.value, initDate1, initDate2);
+    // var tempLimitVisit = await SQLHelper.instance
+    //     .getLimitDataVisit(idUser.value, initDate1, initDate2);
 
-    if(tempLimitVisit.isNotEmpty){
-      if (response.isEmpty
-          || response.isNotEmpty && DateTime.parse(response.first.tglVisit!).isBefore(
-          DateTime.parse(tempLimitVisit.first.tglVisit!))
-          || response.isNotEmpty && DateTime.parse(response.first.tglVisit!).isAtSameMomentAs(
-          DateTime.parse(tempLimitVisit.first.tglVisit!)) && response.first.jamOut! ==""
-          || response.isNotEmpty && response.first.visitIn! != tempLimitVisit.first.visitIn!) {
-
-        isLoading.value = false;
-        dataLimitVisit.value = tempLimitVisit;
-        dataLimitVisit.addAll(response);
-
-      }else{
-
-        isLoading.value = false;
-        dataLimitVisit.value = response;
-
-      }
-    } else {
+    // if (tempLimitVisit.isNotEmpty) {
+    //   if (response.isEmpty ||
+    //       response.isNotEmpty &&
+    //           DateTime.parse(response.first.tglVisit!)
+    //               .isBefore(DateTime.parse(tempLimitVisit.first.tglVisit!)) ||
+    //       response.isNotEmpty &&
+    //           DateTime.parse(response.first.tglVisit!).isAtSameMomentAs(
+    //               DateTime.parse(tempLimitVisit.first.tglVisit!)) &&
+    //           response.first.jamOut! == "" ||
+    //       response.isNotEmpty &&
+    //           response.first.visitIn! != tempLimitVisit.first.visitIn!) {
+    //     isLoading.value = false;
+    //     dataLimitVisit.value = tempLimitVisit;
+    //     dataLimitVisit.addAll(response);
+    //   } else {
+    //     isLoading.value = false;
+    //     dataLimitVisit.value = response;
+    //   }
+    // } else {
       isLoading.value = false;
       dataLimitVisit.value = response;
-    }
+    // }
     return dataLimitVisit;
   }
 }

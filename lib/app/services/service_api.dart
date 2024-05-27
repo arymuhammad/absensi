@@ -710,7 +710,7 @@ class ServiceApi {
 
       var responseBytes = await res.stream.toBytes();
       var responseString = utf8.decode(responseBytes);
-
+  
       //debug
       debugPrint("response code: ${res.statusCode}");
       debugPrint("response: $responseString");
