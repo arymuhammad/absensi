@@ -1,11 +1,9 @@
-import 'dart:io';
-
 import 'package:absensi/app/data/helper/const.dart';
-// import 'package:absensi/app/data/helper/db_helper.dart';
+
 import 'package:absensi/app/modules/home/views/bottom_navbar.dart';
 import 'package:absensi/app/modules/login/controllers/login_controller.dart';
 import 'package:absensi/app/modules/login/views/login_view.dart';
-// import 'package:absensi/app/services/service_api.dart';
+
 import 'package:alarm/alarm.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -13,12 +11,12 @@ import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 
 import 'package:get/get.dart';
 import 'package:intl/date_symbol_data_local.dart';
-// import 'package:intl/intl.dart';
+
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:splash_screen_view/SplashScreenView.dart';
-// import 'package:workmanager/workmanager.dart';
 
-// import 'app/data/helper/loading_dialog.dart';
+
+
 import 'app/routes/app_pages.dart';
 
 

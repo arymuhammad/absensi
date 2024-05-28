@@ -188,7 +188,7 @@ class SQLHelper {
   Future<List<Absen>> getAllAbsenToday(String today) async {
     Database db = await instance.database;
     var res = await db.query('absen',
-        where: 'tanggal_masuk = ?', whereArgs: [today]);
+        where: 'tanggal_masuk = ?', whereArgs: [today], orderBy: 'tanggal_masuk DESC');
     return res.map((e) => Absen.fromJson(e)).toList();
   }
 

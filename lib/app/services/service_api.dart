@@ -228,7 +228,7 @@ class ServiceApi {
     }
   }
 
-  submitAbsen(data) async {
+  submitAbsen(data, bool isOnInit) async {
     try {
       var request = http.MultipartRequest('POST', Uri.parse('${baseUrl}absen'));
 
@@ -292,51 +292,57 @@ class ServiceApi {
 
       final dataDecode = jsonDecode(responseString);
       debugPrint(dataDecode.toString());
-      Get.back();
-      succesDialog(Get.context, "Y", "Anda berhasil Absen");
+      if (!isOnInit) {
+        Get.back();
+        succesDialog(Get.context, "Y", "Anda berhasil Absen");
+      }
     } on SocketException {
-      Get.back();
-      failedDialog(Get.context, 'ERROR',
-          'Tidak ada koneksi internet\nHarap mencoba kembali');
+      if (!isOnInit) {
+        Get.back();
+        failedDialog(Get.context, 'ERROR',
+            'Tidak ada koneksi internet\nHarap mencoba kembali');
+      }
     } catch (e) {
-      Get.back();
-      failedDialog(Get.context, 'ERROR',
-          'Tidak ada koneksi internet\nHarap mencoba kembali');
+      if (!isOnInit) {
+        Get.back();
+        showToast('Terjadi kesalahan saat mengirim data');
+      }
       // debugPrint('$e');
     }
   }
 
   reSubmitAbsen(data) async {
     try {
-      var request = http.MultipartRequest('POST', Uri.parse('${baseUrl}reabsen'));
+      var request =
+          http.MultipartRequest('POST', Uri.parse('${baseUrl}reabsen'));
 
-        request.fields['tanggal_masuk'] = data["tanggal_masuk"];
-        request.fields['tanggal_pulang'] = data["tanggal_pulang"];
-        request.fields['id'] = data["id"];
-        request.fields['kode_cabang'] = data["kode_cabang"];
-        request.fields['nama'] = data["nama"];
-        request.fields['id_shift'] = data["id_shift"];
-        request.fields['jam_masuk'] = data["jam_masuk"];
-        request.fields['jam_pulang'] = data["jam_pulang"];
-        request.fields['jam_absen_masuk'] = data["jam_absen_masuk"];
-        request.fields['jam_absen_pulang'] = data["jam_absen_pulang"];
-        request.files.add(http.MultipartFile(
+      request.fields['tanggal_masuk'] = data["tanggal_masuk"];
+      request.fields['tanggal_pulang'] = data["tanggal_pulang"];
+      request.fields['id'] = data["id"];
+      request.fields['kode_cabang'] = data["kode_cabang"];
+      request.fields['nama'] = data["nama"];
+      request.fields['id_shift'] = data["id_shift"];
+      request.fields['jam_masuk'] = data["jam_masuk"];
+      request.fields['jam_pulang'] = data["jam_pulang"];
+      request.fields['jam_absen_masuk'] = data["jam_absen_masuk"];
+      request.fields['jam_absen_pulang'] = data["jam_absen_pulang"];
+      request.files.add(http.MultipartFile(
           'foto_masuk',
           data["foto_masuk"].readAsBytes().asStream(),
           data["foto_masuk"].lengthSync(),
           filename: data["foto_masuk"].path.split("/").last));
-        request.files.add(http.MultipartFile(
+      request.files.add(http.MultipartFile(
           'foto_pulang',
           data["foto_pulang"].readAsBytes().asStream(),
           data["foto_pulang"].lengthSync(),
           filename: data["foto_pulang"].path.split("/").last));
 
-        request.fields['lat_masuk'] = data["lat_masuk"];
-        request.fields['long_masuk'] = data["long_masuk"];
-        request.fields['lat_pulang'] = data["lat_pulang"];
-        request.fields['long_pulang'] = data["long_pulang"];
-        request.fields['device_info'] = data["device_info"];
-        request.fields['device_info2'] = data["device_info2"];
+      request.fields['lat_masuk'] = data["lat_masuk"];
+      request.fields['long_masuk'] = data["long_masuk"];
+      request.fields['lat_pulang'] = data["lat_pulang"];
+      request.fields['long_pulang'] = data["long_pulang"];
+      request.fields['device_info'] = data["device_info"];
+      request.fields['device_info2'] = data["device_info2"];
 
       var res = await request.send();
       var responseBytes = await res.stream.toBytes();
@@ -348,12 +354,9 @@ class ServiceApi {
 
       final dataDecode = jsonDecode(responseString);
       debugPrint(dataDecode.toString());
-
     } on SocketException {
-
       showToast('Tidak ada koneksi internet\nHarap mencoba kembali');
     } catch (e) {
-
       showToast('Tidak ada koneksi internet\nHarap mencoba kembali');
       // debugPrint('$e');
     }
@@ -393,8 +396,8 @@ class ServiceApi {
         case 200:
           List<dynamic> result = json.decode(response.body)['data'];
           dataAbsen = result.map((e) => Absen.fromJson(e)).toList();
-          // print(result);
-          
+        // print(result);
+
         case 400:
         case 401:
         case 402:
@@ -667,7 +670,7 @@ class ServiceApi {
     }
   }
 
-  submitVisit(Map<String, dynamic> data) async {
+  submitVisit(Map<String, dynamic> data, bool isOnInit) async {
     try {
       var request = http.MultipartRequest('POST', Uri.parse('${baseUrl}visit'));
       // request.headers.addAll(headers);
@@ -710,55 +713,62 @@ class ServiceApi {
 
       var responseBytes = await res.stream.toBytes();
       var responseString = utf8.decode(responseBytes);
-  
+
       //debug
-      debugPrint("response code: ${res.statusCode}");
-      debugPrint("response: $responseString");
+      // debugPrint("response code: ${res.statusCode}");
+      // debugPrint("response: $responseString");
 
       final dataDecode = jsonDecode(responseString);
       debugPrint(dataDecode.toString());
-      Get.back();
-      succesDialog(Get.context, "Y", "Anda berhasil Absen");
+
+      if (!isOnInit) {
+        Get.back();
+        succesDialog(Get.context, "Y", "Anda berhasil Absen");
+      }
     } on SocketException {
-      Get.back();
-      failedDialog(Get.context, 'ERROR',
-          'Tidak ada koneksi internet\nHarap mencoba kembali');
+      if (!isOnInit) {
+        Get.back();
+        failedDialog(Get.context, 'ERROR',
+            'Tidak ada koneksi internet\nHarap mencoba kembali');
+      }
     } catch (e) {
-      Get.back();
-      failedDialog(Get.context, 'ERROR',
-          'Tidak ada koneksi internet\nHarap mencoba kembali');
-      // debugPrint('$e');
+      if (!isOnInit) {
+        Get.back();
+       showToast('Terjadi kesalahan saat mengirim data');
+        debugPrint('$e');
+      }
     }
   }
 
   reSubmitVisit(Map<String, dynamic> data) async {
     try {
-      var request = http.MultipartRequest('POST', Uri.parse('${baseUrl}revisit'));
+      var request =
+          http.MultipartRequest('POST', Uri.parse('${baseUrl}revisit'));
       // request.headers.addAll(headers);
-        request.fields['id'] = data["id"];
-        request.fields['nama'] = data["nama"];
-        request.fields['tgl_visit'] = data["tgl_visit"];
-        request.fields['visit_in'] = data["visit_in"];
-        request.fields['jam_in'] = data["jam_in"];
-        request.fields['visit_out'] = data["visit_out"];
-        request.fields['jam_out'] = data["jam_out"];
-        request.files.add(http.MultipartFile(
+      request.fields['id'] = data["id"];
+      request.fields['nama'] = data["nama"];
+      request.fields['tgl_visit'] = data["tgl_visit"];
+      request.fields['visit_in'] = data["visit_in"];
+      request.fields['jam_in'] = data["jam_in"];
+      request.fields['visit_out'] = data["visit_out"];
+      request.fields['jam_out'] = data["jam_out"];
+      request.files.add(http.MultipartFile(
           'foto_in',
           data["foto_in"].readAsBytes().asStream(),
           data["foto_in"].lengthSync(),
           filename: data["foto_in"].path.split("/").last));
-        request.fields['lat_in'] = data["lat_in"];
-        request.fields['long_in'] = data["long_in"];
-        request.files.add(http.MultipartFile(
+      request.fields['lat_in'] = data["lat_in"];
+      request.fields['long_in'] = data["long_in"];
+      request.files.add(http.MultipartFile(
           'foto_out',
           data["foto_out"].readAsBytes().asStream(),
           data["foto_out"].lengthSync(),
           filename: data["foto_out"].path.split("/").last));
-        request.fields['lat_out'] = data["lat_out"];
-        request.fields['long_out'] = data["long_out"];
-        request.fields['device_info'] = data["device_info"];
-        request.fields['device_info2'] = data["device_info2"];
-        request.fields['is_rnd'] = data["is_rnd"];
+      request.fields['lat_out'] = data["lat_out"];
+      request.fields['long_out'] = data["long_out"];
+      request.fields['device_info'] = data["device_info"];
+      request.fields['device_info2'] = data["device_info2"];
+      request.fields['is_rnd'] = data["is_rnd"];
 
       var res = await request.send();
 
@@ -771,9 +781,7 @@ class ServiceApi {
 
       final dataDecode = jsonDecode(responseString);
       debugPrint(dataDecode.toString());
-
     } on SocketException {
-
       showToast('Tidak ada koneksi internet\nHarap mencoba kembali');
     } catch (e) {
       // print('a');

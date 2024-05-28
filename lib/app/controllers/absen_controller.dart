@@ -20,7 +20,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:workmanager/workmanager.dart';
+
 import 'package:xml/xml.dart' as xml;
 import '../modules/absen/views/dialog_absen.dart';
 import '../services/service_api.dart';
@@ -173,18 +173,162 @@ class AbsenController extends GetxController {
       supportedAbi = abi[1].value;
     }
 
-    _startDateStream();
+    _startDateStream(paramSingle, paramLimit, paramSingleVisit, paramLimitVisit,
+        dataUserLogin);
   }
 
-  void _startDateStream() {
+  void _startDateStream(paramSingle, paramLimit, paramSingleVisit,
+      paramLimitVisit, dataUserLogin) {
     // Buat Stream yang mengeluarkan tanggal setiap detik
     final dateStream =
-        Stream.periodic(const Duration(seconds: 1), (_) => DateTime.now());
+        Stream.periodic(const Duration(minutes:1), (_) => DateTime.now());
 
     // Perbarui nilai tanggal di _dateStream setiap kali Stream mengeluarkan nilai baru
     dateStream.listen((date) {
       _dateStream.value = date;
       tglStream.value = date;
+
+      if (dataUserLogin[12] == "0") {
+        // start cek absen
+        Timer.periodic(const Duration(minutes: 1), (timer) async {
+          var tempDataAbs = await SQLHelper.instance.getAllAbsenToday(dateNow);
+
+          await cekDataAbsen(
+              "masuk",
+              idUser.value,
+              DateFormat('yyyy-MM-dd').format(DateTime.parse(
+                  dateNowServer.isNotEmpty ? dateNowServer : dateNow)));
+
+          if (cekAbsen.value.total == "0") {
+            if (tempDataAbs.isNotEmpty) {
+              for (var i in tempDataAbs) {
+                var data = {
+                  "status": "add",
+                  "id": i.idUser!,
+                  "tanggal_masuk": i.tanggalMasuk!,
+                  "kode_cabang": i.kodeCabang!,
+                  "nama": i.nama!,
+                  "id_shift": i.idShift!,
+                  "jam_masuk": i.jamMasuk!,
+                  "jam_pulang": i.jamPulang!,
+                  "jam_absen_masuk": i.jamAbsenMasuk!,
+                  "foto_masuk": File(i.fotoMasuk!.toString()),
+                  "lat_masuk": i.latMasuk!,
+                  "long_masuk": i.longMasuk!,
+                  "device_info": i.devInfo!
+                };
+                // submit data absensi ke server
+                ServiceApi().submitAbsen(data, true);
+              }
+              getAbsenToday(paramSingle);
+              getLimitAbsen(paramLimit);
+            }
+          } else {
+            await cekDataAbsen(
+                "pulang",
+                idUser.value,
+                DateFormat('yyyy-MM-dd').format(DateTime.parse(
+                    dateNowServer.isNotEmpty ? dateNowServer : dateNow)));
+            if (cekAbsen.value.total == "0") {
+              if (tempDataAbs.isNotEmpty &&
+                  tempDataAbs.first.jamAbsenPulang! != "") {
+                for (var i in tempDataAbs) {
+                  var data = {
+                    "status": "update",
+                    "id": i.idUser!,
+                    "tanggal_masuk": i.tanggalMasuk!,
+                    "tanggal_pulang": i.tanggalPulang!,
+                    "nama": i.nama!,
+                    "jam_absen_pulang": i.jamAbsenPulang!,
+                    "foto_pulang": File(i.fotoPulang!.toString()),
+                    "lat_pulang": i.latPulang!,
+                    "long_pulang": i.longPulang!,
+                    "device_info2": i.devInfo2!
+                  };
+                  ServiceApi().submitAbsen(data, true);
+                }
+              }
+            } else {
+              // print('timer absen stop');
+              timer.cancel();
+            }
+            getAbsenToday(paramSingle);
+            getLimitAbsen(paramLimit);
+          }
+        });
+        // end cek absen
+      } else {
+        // print('visit');
+
+        // cek visit
+        Timer.periodic(const Duration(minutes: 1), (timer) async {
+          var tempDataVisit = await SQLHelper.instance
+              .getVisitToday(idUser.value, dateNow, '', 0);
+
+          await cekDataVisit(
+              "masukv2",
+              idUser.value,
+              DateFormat('yyyy-MM-dd').format(DateTime.parse(
+                  dateNowServer.isNotEmpty ? dateNowServer : dateNow)),
+              '');
+          
+          if (tempDataVisit.isNotEmpty) {
+            if (int.parse(cekVisit.value.total) == 0 ) {
+              for (var i in tempDataVisit) {
+                var data = {
+                  "status": "add",
+                  "id": i.id!,
+                  "nama": i.nama!,
+                  "tgl_visit": i.tglVisit!,
+                  "visit_in": i.visitIn!,
+                  "jam_in": i.jamIn!,
+                  "foto_in": File(i.fotoIn.toString()),
+                  "lat_in": i.latIn!,
+                  "long_in": i.longIn!,
+                  "device_info": i.deviceInfo!,
+                  "is_rnd": i.isRnd!
+                };
+                // submit data absensi ke server
+                ServiceApi().submitVisit(data, true);
+              }
+              getVisitToday(paramSingleVisit);
+              getLimitVisit(paramLimitVisit);
+            } else {
+              await cekDataVisit(
+                  "pulangv2",
+                  idUser.value,
+                  DateFormat('yyyy-MM-dd').format(DateTime.parse(
+                      dateNowServer.isNotEmpty ? dateNowServer : dateNow)),
+                  '');
+              
+             if (int.parse(cekVisit.value.total) > 0) {
+                for (var i in tempDataVisit) {
+                  var data = {
+                    "status": "update",
+                    "id": i.id!,
+                    "nama": i.nama!,
+                    "tgl_visit": i.tglVisit!,
+                    "visit_out": i.visitOut!,
+                    "visit_in": i.visitIn!,
+                    "jam_in": i.jamIn!,
+                    "jam_out": i.jamOut!,
+                    "foto_out": File(i.fotoOut!.toString()),
+                    "lat_out": i.latOut!,
+                    "long_out": i.longOut!,
+                    "device_info2": i.deviceInfo2!
+                  };
+                  ServiceApi().submitVisit(data, true);
+                }
+              } else {
+                // print('timer visit stop');
+                timer.cancel();
+              }
+              getVisitToday(paramSingleVisit);
+              getLimitVisit(paramLimitVisit);
+            }
+          }
+        });
+      }
       // print(DateFormat('yyyy-MM-dd').format(tglStream.value));
     });
   }
@@ -538,56 +682,56 @@ class AbsenController extends GetxController {
   getAbsenToday(paramAbsen) async {
     final response = await ServiceApi().getAbsen(paramAbsen);
 
-    // var tempDataAbs =
-    // await SQLHelper.instance.getAbsenToday(idUser.value, dateNow);
-    // dataAbsen.value = tempDataAbs;
+    var tempDataAbs =
+    await SQLHelper.instance.getAbsenToday(idUser.value, dateNow);
+    dataAbsen.value = tempDataAbs;
 
-    // if(tempDataAbs.isNotEmpty){
-    //   if (response.isNotEmpty && response[0].jamAbsenPulang != "") {
-    //     dataAbsen.value = response;
-    //     // print('online');
-    //   } else if(response.isNotEmpty && response[0].jamAbsenMasuk != tempDataAbs[0].jamAbsenMasuk!)  {
-    //     dataAbsen.value = response;
-    //     // print('offline');
-    //   }else{
-    //     dataAbsen.value = tempDataAbs;
-    //   }
-    // }else{
-    //   // print('online II');
+    if(tempDataAbs.isNotEmpty){
+      if (response.isNotEmpty && response[0].jamAbsenPulang != "") {
+        dataAbsen.value = response;
+        
+      } else if(response.isNotEmpty && response[0].jamAbsenMasuk != tempDataAbs[0].jamAbsenMasuk!)  {
+        dataAbsen.value = response;
+       
+      }else{
+        dataAbsen.value = tempDataAbs;
+      }
+    }else{
+    
     isLoading.value = false;
     dataAbsen.value = response;
-    // }
+    }
 
     return dataAbsen;
   }
 
   Future<List<Absen>> getLimitAbsen(paramLimitAbsen) async {
     final response = await ServiceApi().getAbsen(paramLimitAbsen);
-    // dataLimitAbsen.clear();
-    // isLoading.value = true;
-    // var tempSingleAbs = await SQLHelper.instance
-    //     .getLimitDataAbsen(idUser.value, initDate1, initDate2);
+    dataLimitAbsen.clear();
+    isLoading.value = true;
+    var tempSingleAbs = await SQLHelper.instance
+        .getLimitDataAbsen(idUser.value, initDate1, initDate2);
 
-    // if (tempSingleAbs.isNotEmpty) {
-    //   if (response.isEmpty ||
-    //       response.isNotEmpty &&
-    //           DateTime.parse(response.first.tanggalMasuk!).isBefore(
-    //               DateTime.parse(tempSingleAbs.first.tanggalMasuk!)) ||
-    //       response.isNotEmpty &&
-    //           DateTime.parse(response.first.tanggalMasuk!).isAtSameMomentAs(
-    //               DateTime.parse(tempSingleAbs.first.tanggalMasuk!)) &&
-    //           response.first.jamAbsenPulang! == "") {
-    //     isLoading.value = false;
-    //     dataLimitAbsen.value = tempSingleAbs;
-    //     dataLimitAbsen.addAll(response);
-    //   } else {
-    //     isLoading.value = false;
-    //     dataLimitAbsen.value = response;
-    //   }
-    // } else {
-      isLoading.value = false;
-      dataLimitAbsen.value = response;
-    // }
+    if (tempSingleAbs.isNotEmpty) {
+      if (response.isEmpty ||
+          response.isNotEmpty &&
+              DateTime.parse(response.first.tanggalMasuk!).isBefore(
+                  DateTime.parse(tempSingleAbs.first.tanggalMasuk!)) ||
+          response.isNotEmpty &&
+              DateTime.parse(response.first.tanggalMasuk!).isAtSameMomentAs(
+                  DateTime.parse(tempSingleAbs.first.tanggalMasuk!)) &&
+              response.first.jamAbsenPulang! == "") {
+        isLoading.value = false;
+        dataLimitAbsen.value = tempSingleAbs;
+        dataLimitAbsen.addAll(response);
+      } else {
+        isLoading.value = false;
+        dataLimitAbsen.value = response;
+      }
+    } else {
+    isLoading.value = false;
+    dataLimitAbsen.value = response;
+    }
     return dataLimitAbsen;
   }
 
@@ -773,54 +917,54 @@ class AbsenController extends GetxController {
 
   getVisitToday(Map<String, dynamic> paramSingleVisit) async {
     final response = await ServiceApi().getVisit(paramSingleVisit);
-    // var tempDataVisit =
-    //     await SQLHelper.instance.getVisitToday(idUser.value, dateNow, '', 1);
+    var tempDataVisit =
+        await SQLHelper.instance.getVisitToday(idUser.value, dateNow, '', 1);
 
-    // if (tempDataVisit.isNotEmpty) {
-    //   if (response.isNotEmpty &&
-    //       response.first.jamOut != "" &&
-    //       response.first.visitIn! == tempDataVisit.first.visitIn!) {
-    //     dataVisit.value = response;
-    //   } else {
-    //     dataVisit.value = tempDataVisit;
-    //   }
-    // } else {
+    if (tempDataVisit.isNotEmpty) {
+      if (response.isNotEmpty &&
+          response.first.jamOut != "" &&
+          response.first.visitIn! == tempDataVisit.first.visitIn!) {
+        dataVisit.value = response;
+      } else {
+        dataVisit.value = tempDataVisit;
+      }
+    } else {
     isLoading.value = false;
     dataVisit.value = response;
-    // }
+    }
 
     return dataVisit;
   }
 
   getLimitVisit(Map<String, dynamic> paramLimitVisit) async {
     final response = await ServiceApi().getLimitVisit(paramLimitVisit);
-    // dataLimitVisit.clear();
+    dataLimitVisit.clear();
 
-    // var tempLimitVisit = await SQLHelper.instance
-    //     .getLimitDataVisit(idUser.value, initDate1, initDate2);
+    var tempLimitVisit = await SQLHelper.instance
+        .getLimitDataVisit(idUser.value, initDate1, initDate2);
 
-    // if (tempLimitVisit.isNotEmpty) {
-    //   if (response.isEmpty ||
-    //       response.isNotEmpty &&
-    //           DateTime.parse(response.first.tglVisit!)
-    //               .isBefore(DateTime.parse(tempLimitVisit.first.tglVisit!)) ||
-    //       response.isNotEmpty &&
-    //           DateTime.parse(response.first.tglVisit!).isAtSameMomentAs(
-    //               DateTime.parse(tempLimitVisit.first.tglVisit!)) &&
-    //           response.first.jamOut! == "" ||
-    //       response.isNotEmpty &&
-    //           response.first.visitIn! != tempLimitVisit.first.visitIn!) {
-    //     isLoading.value = false;
-    //     dataLimitVisit.value = tempLimitVisit;
-    //     dataLimitVisit.addAll(response);
-    //   } else {
-    //     isLoading.value = false;
-    //     dataLimitVisit.value = response;
-    //   }
-    // } else {
-      isLoading.value = false;
-      dataLimitVisit.value = response;
-    // }
+    if (tempLimitVisit.isNotEmpty) {
+      if (response.isEmpty ||
+          response.isNotEmpty &&
+              DateTime.parse(response.first.tglVisit!)
+                  .isBefore(DateTime.parse(tempLimitVisit.first.tglVisit!)) ||
+          response.isNotEmpty &&
+              DateTime.parse(response.first.tglVisit!).isAtSameMomentAs(
+                  DateTime.parse(tempLimitVisit.first.tglVisit!)) &&
+              response.first.jamOut! == "" ||
+          response.isNotEmpty &&
+              response.first.visitIn! != tempLimitVisit.first.visitIn!) {
+        isLoading.value = false;
+        dataLimitVisit.value = tempLimitVisit;
+        dataLimitVisit.addAll(response);
+      } else {
+        isLoading.value = false;
+        dataLimitVisit.value = response;
+      }
+    } else {
+    isLoading.value = false;
+    dataLimitVisit.value = response;
+    }
     return dataLimitVisit;
   }
 }

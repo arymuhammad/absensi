@@ -18,7 +18,6 @@ import '../../../data/model/visit_model.dart';
 final absC = Get.put(AbsenController());
 
 dialogAbsenView(dataUser, latitude, longitude) async {
-
   if (dataUser![12] == "1") {
     var paramVisitToday = {
       "mode": "single",
@@ -27,21 +26,19 @@ dialogAbsenView(dataUser, latitude, longitude) async {
           DateFormat('yyyy-MM-dd').format(DateTime.parse(absC.dateNowServer))
     };
 
-
     absC.getVisitToday(paramVisitToday);
 
-    var tempDataVisit =
-    await SQLHelper.instance.getVisitToday(absC.idUser.value, absC.dateNow,'', 0);
+    var tempDataVisit = await SQLHelper.instance
+        .getVisitToday(absC.idUser.value, absC.dateNow, '', 0);
 
     if (tempDataVisit.isNotEmpty &&
-        tempDataVisit.first.visitIn! != "" &&
-        tempDataVisit.first.visitOut! != "" || tempDataVisit.isEmpty) {
+            tempDataVisit.first.visitIn! != "" &&
+            tempDataVisit.first.visitOut! != "" ||
+        tempDataVisit.isEmpty) {
       absC.optVisitVisible.value = true;
-    } else if (tempDataVisit.isNotEmpty &&
-        tempDataVisit.first.visitIn! != "") {
+    } else if (tempDataVisit.isNotEmpty && tempDataVisit.first.visitIn! != "") {
       absC.optVisitVisible.value = false;
     }
-
 
     if (tempDataVisit.isNotEmpty &&
         tempDataVisit.first.isRnd == "1" &&
@@ -92,7 +89,6 @@ dialogAbsenView(dataUser, latitude, longitude) async {
                             .toList(),
                         onChanged: (val) {
                           absC.optVisitSelected.value = val!;
-
                         }))),
                 const SizedBox(height: 5),
                 Obx(() {
@@ -129,7 +125,6 @@ dialogAbsenView(dataUser, latitude, longitude) async {
                                 : absC.selectedCabangVisit.value,
                             onChanged: (data) {
                               absC.selectedCabangVisit.value = data!;
-
 
                               for (int i = 0; i < dataCabang.length; i++) {
                                 if (dataCabang[i].kodeCabang == data) {
@@ -191,20 +186,23 @@ dialogAbsenView(dataUser, latitude, longitude) async {
                               : dataUser[8]
                           : absC.rndLoc.text);
                   if (absC.cekVisit.value.total == "0") {
-                    var tempDataVisit = await SQLHelper.instance
-                        .getVisitToday(dataUser[0],absC.dateNow,
+                    var tempDataVisit = await SQLHelper.instance.getVisitToday(
+                        dataUser[0],
+                        absC.dateNow,
                         absC.optVisitSelected.value == "Store Visit"
-                        ? absC.selectedCabangVisit.isNotEmpty
-                        ? absC.selectedCabangVisit.value
-                        : dataUser[8]
-                        : absC.rndLoc.text,1);
+                            ? absC.selectedCabangVisit.isNotEmpty
+                                ? absC.selectedCabangVisit.value
+                                : dataUser[8]
+                            : absC.rndLoc.text,
+                        1);
 
-                    if(tempDataVisit.isEmpty){
+                    if (tempDataVisit.isEmpty) {
                       SharedPreferences pref =
-                      await SharedPreferences.getInstance();
+                          await SharedPreferences.getInstance();
                       double distance = Geolocator.distanceBetween(
-                          double.parse(
-                              absC.lat.isNotEmpty ? absC.lat.value : dataUser[6]),
+                          double.parse(absC.lat.isNotEmpty
+                              ? absC.lat.value
+                              : dataUser[6]),
                           double.parse(absC.long.isNotEmpty
                               ? absC.long.value
                               : dataUser[7]),
@@ -217,8 +215,8 @@ dialogAbsenView(dataUser, latitude, longitude) async {
 
                       absC.distanceStore.value = distance;
                       // CEK POSISI USER SAAT HENDAK ABSEN
-                      if (absC.optVisitSelected.value == "Store Visit"
-                          && absC.distanceStore.value > num.parse(dataUser[11])) {
+                      if (absC.optVisitSelected.value == "Store Visit" &&
+                          absC.distanceStore.value > num.parse(dataUser[11])) {
                         //POSISI USER BERADA DILUAR JANGKAUAN/AREA ABSEN
                         Get.back();
                         dialogMsgCncl('Terjadi Kesalahan',
@@ -229,7 +227,6 @@ dialogAbsenView(dataUser, latitude, longitude) async {
                         absC.long.value = "";
                         absC.optVisitSelected.value = "";
                       } else {
-
                         await absC.uploadFotoAbsen();
                         Get.back();
                         if (absC.image != null) {
@@ -240,35 +237,35 @@ dialogAbsenView(dataUser, latitude, longitude) async {
                             "tgl_visit": DateFormat('yyyy-MM-dd')
                                 .format(DateTime.parse(absC.dateNowServer)),
                             "visit_in":
-                            absC.optVisitSelected.value == "Store Visit"
-                                ? absC.selectedCabangVisit.isNotEmpty
-                                ? absC.selectedCabangVisit.value
-                                : dataUser[8]
-                                : absC.rndLoc.text,
+                                absC.optVisitSelected.value == "Store Visit"
+                                    ? absC.selectedCabangVisit.isNotEmpty
+                                        ? absC.selectedCabangVisit.value
+                                        : dataUser[8]
+                                    : absC.rndLoc.text,
                             "jam_in": absC.timeNow.toString(),
                             "foto_in": File(absC.image!.path.toString()),
                             "lat_in": latitude.toString(),
                             "long_in": longitude.toString(),
                             "device_info": absC.devInfo.value,
                             "is_rnd": absC.optVisitSelected.value ==
-                                "Research and Development"
+                                    "Research and Development"
                                 ? "1"
                                 : "0"
                           };
 
                           loadingDialog("Sedang mengirim data...", "");
                           // submit data visit ke local storage
-                           SQLHelper.instance.insertDataVisit(Visit(
+                          SQLHelper.instance.insertDataVisit(Visit(
                               id: dataUser[0],
                               nama: dataUser[1],
                               tglVisit: DateFormat('yyyy-MM-dd')
                                   .format(DateTime.parse(absC.dateNowServer)),
                               visitIn:
-                              absC.optVisitSelected.value == "Store Visit"
-                                  ? absC.selectedCabangVisit.isNotEmpty
-                                  ? absC.selectedCabangVisit.value
-                                  : dataUser[8]
-                                  : absC.rndLoc.text,
+                                  absC.optVisitSelected.value == "Store Visit"
+                                      ? absC.selectedCabangVisit.isNotEmpty
+                                          ? absC.selectedCabangVisit.value
+                                          : dataUser[8]
+                                      : absC.rndLoc.text,
                               jamIn: absC.timeNow.toString(),
                               visitOut: '',
                               jamOut: '',
@@ -281,37 +278,39 @@ dialogAbsenView(dataUser, latitude, longitude) async {
                               deviceInfo: absC.devInfo.value,
                               deviceInfo2: '',
                               isRnd: absC.optVisitSelected.value ==
-                                  "Research and Development"
+                                      "Research and Development"
                                   ? "1"
                                   : "0"));
                           // submit data visit ke server
-                          ServiceApi().submitVisit(data);
+                          ServiceApi().submitVisit(data, false);
+                          var paramVisitToday = {
+                            "mode": "single",
+                            "id_user": dataUser[0],
+                            "tgl_visit": DateFormat('yyyy-MM-dd')
+                                .format(DateTime.parse(absC.dateNowServer))
+                          };
+
+                          var paramLimitVisit = {
+                            "mode": "limit",
+                            "id_user": dataUser[0],
+                            "tanggal1": absC.initDate1,
+                            "tanggal2": absC.initDate2
+                          };
+                          absC.getVisitToday(paramVisitToday);
+                          absC.getLimitVisit(paramLimitVisit);
+
+                          absC.selectedCabangVisit.value = "";
+                          absC.optVisitSelected.value = "";
+                          absC.rndLoc.clear();
+                          absC.lat.value = "";
+                          absC.long.value = "";
+                        } else {
                           Get.back();
-                          succesDialog(Get.context, "Y", "Anda berhasil Absen");
+                          failedDialog(Get.context, "Peringatan",
+                              "Absen Masuk dibatalkan");
                         }
-                        var paramVisitToday = {
-                          "mode": "single",
-                          "id_user": dataUser[0],
-                          "tgl_visit": DateFormat('yyyy-MM-dd')
-                              .format(DateTime.parse(absC.dateNowServer))
-                        };
-
-                        var paramLimitVisit = {
-                          "mode": "limit",
-                          "id_user": dataUser[0],
-                          "tanggal1": absC.initDate1,
-                          "tanggal2": absC.initDate2
-                        };
-                        absC.getVisitToday(paramVisitToday);
-                        absC.getLimitVisit(paramLimitVisit);
-                        absC.selectedCabangVisit.value = "";
-                        absC.optVisitSelected.value = "";
-                        absC.rndLoc.clear();
-                        absC.lat.value = "";
-                        absC.long.value = "";
                       }
-                    }else{
-
+                    } else {
                       if (tempDataVisit.isNotEmpty &&
                           tempDataVisit.first.isRnd == "1" &&
                           tempDataVisit.first.visitOut == "" &&
@@ -319,11 +318,10 @@ dialogAbsenView(dataUser, latitude, longitude) async {
                         dialogMsg('Info',
                             'Nama Mall yang di input berbeda dengan nama Mall saat absen masuk.\nPerhatikan huruf besar kecil nya');
                       } else {
-
-                        if (tempDataVisit.isNotEmpty && tempDataVisit.first.jamOut == "") {
-
+                        if (tempDataVisit.isNotEmpty &&
+                            tempDataVisit.first.jamOut == "") {
                           SharedPreferences pref =
-                          await SharedPreferences.getInstance();
+                              await SharedPreferences.getInstance();
                           double distance = Geolocator.distanceBetween(
                               double.parse(absC.lat.isNotEmpty
                                   ? absC.lat.value
@@ -340,8 +338,9 @@ dialogAbsenView(dataUser, latitude, longitude) async {
 
                           absC.distanceStore.value = distance;
                           // CEK POSISI USER SAAT HENDAK ABSEN
-                          if (absC.optVisitSelected.value == "Store Visit" && absC.distanceStore.value >
-                              num.parse(dataUser[11])) {
+                          if (absC.optVisitSelected.value == "Store Visit" &&
+                              absC.distanceStore.value >
+                                  num.parse(dataUser[11])) {
                             //POSISI USER BERADA DILUAR JANGKAUAN/AREA ABSEN
                             Get.back();
                             dialogMsgCncl('Terjadi Kesalahan',
@@ -361,11 +360,11 @@ dialogAbsenView(dataUser, latitude, longitude) async {
                                 "tgl_visit": DateFormat('yyyy-MM-dd')
                                     .format(DateTime.parse(absC.dateNowServer)),
                                 "visit_out":
-                                absC.optVisitSelected.value == "Store Visit"
-                                    ? absC.selectedCabangVisit.isNotEmpty
-                                    ? absC.selectedCabangVisit.value
-                                    : dataUser[8]
-                                    : absC.rndLoc.text,
+                                    absC.optVisitSelected.value == "Store Visit"
+                                        ? absC.selectedCabangVisit.isNotEmpty
+                                            ? absC.selectedCabangVisit.value
+                                            : dataUser[8]
+                                        : absC.rndLoc.text,
                                 "visit_in": absC.cekVisit.value.kodeStore,
                                 "jam_out": absC.timeNow.toString(),
                                 "foto_out": File(absC.image!.path.toString()),
@@ -378,12 +377,11 @@ dialogAbsenView(dataUser, latitude, longitude) async {
                               // update data visit ke local storage
                               SQLHelper.instance.updateDataVisit(
                                   {
-
                                     "visit_out": absC.optVisitSelected.value ==
-                                        "Store Visit"
+                                            "Store Visit"
                                         ? absC.selectedCabangVisit.isNotEmpty
-                                        ? absC.selectedCabangVisit.value
-                                        : dataUser[8]
+                                            ? absC.selectedCabangVisit.value
+                                            : dataUser[8]
                                         : absC.rndLoc.text,
                                     "jam_out": absC.timeNow.toString(),
                                     "foto_out": absC.image!.path.toString(),
@@ -392,39 +390,40 @@ dialogAbsenView(dataUser, latitude, longitude) async {
                                     "device_info2": absC.devInfo.value
                                   },
                                   dataUser[0],
-                                  DateFormat('yyyy-MM-dd')
-                                      .format(DateTime.parse(absC.dateNowServer)),
+                                  DateFormat('yyyy-MM-dd').format(
+                                      DateTime.parse(absC.dateNowServer)),
                                   absC.optVisitSelected.value == "Store Visit"
                                       ? absC.selectedCabangVisit.isNotEmpty
-                                      ? absC.selectedCabangVisit.value
-                                      : dataUser[8]
+                                          ? absC.selectedCabangVisit.value
+                                          : dataUser[8]
                                       : absC.rndLoc.text);
                               // update data visit ke server
-                              ServiceApi().submitVisit(data);
-                              Get.back();
-                              succesDialog(Get.context, "Y", "Anda berhasil Absen");
+                              ServiceApi().submitVisit(data, false);
+                              var paramVisitToday = {
+                                "mode": "single",
+                                "id_user": dataUser[0],
+                                "tgl_visit": DateFormat('yyyy-MM-dd')
+                                    .format(DateTime.parse(absC.dateNowServer))
+                              };
+
+                              var paramLimitVisit = {
+                                "mode": "limit",
+                                "id_user": dataUser[0],
+                                "tanggal1": absC.initDate1,
+                                "tanggal2": absC.initDate2
+                              };
+                              absC.getVisitToday(paramVisitToday);
+                              absC.getLimitVisit(paramLimitVisit);
                               absC.selectedCabangVisit.value = "";
                               absC.lat.value = "";
                               absC.long.value = "";
                               absC.optVisitSelected.value = "";
                               absC.rndLoc.clear();
-
+                            } else {
+                              Get.back();
+                              failedDialog(Get.context, "Peringatan",
+                                  "Absen Pulang dibatalkan");
                             }
-                            var paramVisitToday = {
-                              "mode": "single",
-                              "id_user": dataUser[0],
-                              "tgl_visit": DateFormat('yyyy-MM-dd')
-                                  .format(DateTime.parse(absC.dateNowServer))
-                            };
-
-                            var paramLimitVisit = {
-                              "mode": "limit",
-                              "id_user": dataUser[0],
-                              "tanggal1": absC.initDate1,
-                              "tanggal2": absC.initDate2
-                            };
-                            absC.getVisitToday(paramVisitToday);
-                            absC.getLimitVisit(paramLimitVisit);
                           }
                         } else {
                           showToast(
@@ -432,9 +431,7 @@ dialogAbsenView(dataUser, latitude, longitude) async {
                         }
                       }
                     }
-
                   } else {
-                
                     if (tempDataVisit.isNotEmpty &&
                         tempDataVisit.first.isRnd == "1" &&
                         tempDataVisit.first.visitOut == "" &&
@@ -442,7 +439,6 @@ dialogAbsenView(dataUser, latitude, longitude) async {
                       dialogMsg('Info',
                           'Nama Mall yang di input berbeda dengan nama Mall saat absen masuk.\nPerhatikan huruf besar kecil nya');
                     } else {
-
                       await absC.cekDataVisit(
                           "pulang",
                           dataUser[0],
@@ -454,7 +450,6 @@ dialogAbsenView(dataUser, latitude, longitude) async {
                               : absC.rndLoc.text);
 
                       if (absC.cekVisit.value.total == "1") {
-                    
                         SharedPreferences pref =
                             await SharedPreferences.getInstance();
                         double distance = Geolocator.distanceBetween(
@@ -473,8 +468,9 @@ dialogAbsenView(dataUser, latitude, longitude) async {
 
                         absC.distanceStore.value = distance;
                         // CEK POSISI USER SAAT HENDAK ABSEN
-                        if (absC.optVisitSelected.value == "Store Visit" && absC.distanceStore.value >
-                            num.parse(dataUser[11])) {
+                        if (absC.optVisitSelected.value == "Store Visit" &&
+                            absC.distanceStore.value >
+                                num.parse(dataUser[11])) {
                           //POSISI USER BERADA DILUAR JANGKAUAN/AREA ABSEN
                           Get.back();
                           dialogMsgCncl('Terjadi Kesalahan',
@@ -506,23 +502,22 @@ dialogAbsenView(dataUser, latitude, longitude) async {
                               "long_out": longitude.toString(),
                               "device_info2": absC.devInfo.value
                             };
-                         
+
                             loadingDialog("Sedang mengirim data...", "");
                             // update data visit ke local storage
-                             SQLHelper.instance.updateDataVisit(
+                            SQLHelper.instance.updateDataVisit(
                                 {
-
-                                    "visit_out": absC.optVisitSelected.value ==
-                                            "Store Visit"
-                                        ? absC.selectedCabangVisit.isNotEmpty
-                                            ? absC.selectedCabangVisit.value
-                                            : dataUser[8]
-                                        : absC.rndLoc.text,
-                                    "jam_out": absC.timeNow.toString(),
-                                    "foto_out": absC.image!.path.toString(),
-                                    "lat_out": latitude.toString(),
-                                    "long_out": longitude.toString(),
-                                    "device_info2": absC.devInfo.value
+                                  "visit_out": absC.optVisitSelected.value ==
+                                          "Store Visit"
+                                      ? absC.selectedCabangVisit.isNotEmpty
+                                          ? absC.selectedCabangVisit.value
+                                          : dataUser[8]
+                                      : absC.rndLoc.text,
+                                  "jam_out": absC.timeNow.toString(),
+                                  "foto_out": absC.image!.path.toString(),
+                                  "lat_out": latitude.toString(),
+                                  "long_out": longitude.toString(),
+                                  "device_info2": absC.devInfo.value
                                 },
                                 dataUser[0],
                                 DateFormat('yyyy-MM-dd')
@@ -533,31 +528,32 @@ dialogAbsenView(dataUser, latitude, longitude) async {
                                         : dataUser[8]
                                     : absC.rndLoc.text);
                             // update data visit ke server
-                            ServiceApi().submitVisit(data);
-                            Get.back();
-                            succesDialog(Get.context, "Y", "Anda berhasil Absen");
+                            ServiceApi().submitVisit(data, false);
+                            var paramVisitToday = {
+                              "mode": "single",
+                              "id_user": dataUser[0],
+                              "tgl_visit": DateFormat('yyyy-MM-dd')
+                                  .format(DateTime.parse(absC.dateNowServer))
+                            };
+
+                            var paramLimitVisit = {
+                              "mode": "limit",
+                              "id_user": dataUser[0],
+                              "tanggal1": absC.initDate1,
+                              "tanggal2": absC.initDate2
+                            };
+                            absC.getVisitToday(paramVisitToday);
+                            absC.getLimitVisit(paramLimitVisit);
                             absC.selectedCabangVisit.value = "";
                             absC.lat.value = "";
                             absC.long.value = "";
                             absC.optVisitSelected.value = "";
                             absC.rndLoc.clear();
-                           
+                          } else {
+                            Get.back();
+                            failedDialog(Get.context, "Peringatan",
+                                "Absen Pulang dibatalkan");
                           }
-                          var paramVisitToday = {
-                            "mode": "single",
-                            "id_user": dataUser[0],
-                            "tgl_visit": DateFormat('yyyy-MM-dd')
-                                .format(DateTime.parse(absC.dateNowServer))
-                          };
-
-                          var paramLimitVisit = {
-                            "mode": "limit",
-                            "id_user": dataUser[0],
-                            "tanggal1": absC.initDate1,
-                            "tanggal2": absC.initDate2
-                          };
-                          absC.getVisitToday(paramVisitToday);
-                          absC.getLimitVisit(paramLimitVisit);
                         }
                       } else {
                         showToast(
@@ -711,7 +707,7 @@ dialogAbsenView(dataUser, latitude, longitude) async {
                         "long_pulang": longitude.toString(),
                         "device_info2": absC.devInfo.value
                       }, dataUser[0], previous);
-                      ServiceApi().submitAbsen(data);
+                      ServiceApi().submitAbsen(data, false);
 
                       var paramAbsenToday = {
                         "mode": "single",
@@ -940,7 +936,7 @@ dialogAbsenView(dataUser, latitude, longitude) async {
 
                           loadingDialog("Sedang mengirim data...", "");
                           //submit data absensi ke local storage
-                           SQLHelper.instance.insertDataAbsen(Absen(
+                          SQLHelper.instance.insertDataAbsen(Absen(
                               idUser: dataUser[0],
                               tanggalMasuk: DateFormat('yyyy-MM-dd')
                                   .format(DateTime.parse(absC.dateNowServer)),
@@ -962,9 +958,8 @@ dialogAbsenView(dataUser, latitude, longitude) async {
                               devInfo: absC.devInfo.value,
                               devInfo2: ''));
                           // submit data absensi ke server
-                          ServiceApi().submitAbsen(data);
-                          Get.back();
-                          succesDialog(Get.context, "Y", "Anda berhasil Absen");
+                          ServiceApi().submitAbsen(data, false);
+
                           var paramAbsenToday = {
                             "mode": "single",
                             "id_user": dataUser[0],
@@ -985,12 +980,11 @@ dialogAbsenView(dataUser, latitude, longitude) async {
                           absC.selectedCabang.value = "";
                           absC.lat.value = "";
                           absC.long.value = "";
-                        }else {
+                        } else {
                           Get.back();
                           failedDialog(Get.context, "Peringatan",
                               "Absen Masuk dibatalkan");
                         }
-
                       }
                     }
                   },
@@ -1130,9 +1124,8 @@ dialogAbsenView(dataUser, latitude, longitude) async {
                               DateFormat('yyyy-MM-dd')
                                   .format(DateTime.parse(absC.dateNowServer)));
                           // update data absensi ke server
-                          ServiceApi().submitAbsen(data);
-                          Get.back();
-                          succesDialog(Get.context, "Y", "Anda berhasil Absen");
+                          ServiceApi().submitAbsen(data, false);
+
                           var paramAbsenToday = {
                             "mode": "single",
                             "id_user": dataUser[0],
@@ -1152,11 +1145,6 @@ dialogAbsenView(dataUser, latitude, longitude) async {
                           absC.selectedCabang.value = "";
                           absC.lat.value = "";
                           absC.long.value = "";
-                          // await Future.delayed(
-                          //     const Duration(milliseconds: 400));
-                          // Get.back();
-                          // succesDialog(
-                          //     Get.context, "Y", "Anda berhasil Absen");
                         } else {
                           Get.back();
                           failedDialog(Get.context, "Peringatan",
@@ -1186,7 +1174,8 @@ dialogAbsenView(dataUser, latitude, longitude) async {
           var localDataAbs =
               await SQLHelper.instance.getAbsenToday(dataUser[0], absC.dateNow);
           if (localDataAbs.isNotEmpty &&
-              localDataAbs[0].tanggalPulang == null || localDataAbs.isEmpty) {
+                  localDataAbs[0].tanggalPulang == null ||
+              localDataAbs.isEmpty) {
             absC.msg.value =
                 "Pilih lokasi absen pulang\nJarak anda ${absC.distanceStore.value.toStringAsFixed(2)} m dari titik lokasi";
 
@@ -1293,7 +1282,7 @@ dialogAbsenView(dataUser, latitude, longitude) async {
 
                           loadingDialog("Sedang mengirim data...", "");
                           // update data absensi ke local storage
-                           SQLHelper.instance.updateDataAbsen(
+                          SQLHelper.instance.updateDataAbsen(
                               {
                                 "tanggal_pulang": DateFormat('yyyy-MM-dd')
                                     .format(DateTime.parse(absC.dateNowServer)),
@@ -1309,9 +1298,8 @@ dialogAbsenView(dataUser, latitude, longitude) async {
                                   .format(DateTime.parse(absC.dateNowServer)));
 
                           // update data absensi ke server
-                          ServiceApi().submitAbsen(data);
-                          Get.back();
-                          succesDialog(Get.context, "Y", "Anda berhasil Absen");
+                          ServiceApi().submitAbsen(data, false);
+
                           var paramAbsenToday = {
                             "mode": "single",
                             "id_user": dataUser[0],
@@ -1350,10 +1338,7 @@ dialogAbsenView(dataUser, latitude, longitude) async {
                     btnOkColor: Colors.blueAccent[700],
                     btnOkIcon: Icons.camera_front)
                 .show();
-          }
-
-          else {
-
+          } else {
             succesDialog(Get.context, "Y", "Anda sudah Absen Pulang hari ini.");
           }
         } else {
