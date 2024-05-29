@@ -2,19 +2,17 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:math';
 
-import 'package:absensi/app/data/helper/db_helper.dart';
 import 'package:alarm/alarm.dart';
 import 'package:alarm/model/alarm_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import '../views/alarm_ring_view.dart';
 import '../views/edit_alarm_view.dart';
 
 class AlarmController extends GetxController {
-  //TODO: Implement AlarmController
+  
   var alarms = <AlarmSettings>[].obs;
   static StreamSubscription<AlarmSettings>? subscription;
   var loading = false.obs;
