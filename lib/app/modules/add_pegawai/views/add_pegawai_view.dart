@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:absensi/app/data/helper/app_colors.dart';
+import 'package:absensi/app/data/model/login_model.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -23,7 +24,7 @@ class AddPegawaiView extends GetView<AddPegawaiController> {
           decoration: const BoxDecoration(
             image: DecorationImage(
               image: AssetImage(
-                  'assets/image/bgapp.jpg'), // Gantilah dengan path gambar Anda
+                  'assets/image/new_bg_app.jpg'), // Gantilah dengan path gambar Anda
               fit: BoxFit.cover,
             ),
           ),
@@ -287,7 +288,7 @@ class AddPegawaiView extends GetView<AddPegawaiController> {
                         borderRadius: BorderRadius.circular(50)),
                     minimumSize: Size(Get.size.width / 2, 50)),
                 onPressed: () {
-                  controller.addUpdatePegawai(context, "add", [""]);
+                  controller.addUpdatePegawai(context, "add", Data());
                 },
                 child: const Text('SUBMIT', style: TextStyle(color: AppColors.mainTextColor1),)),
           )

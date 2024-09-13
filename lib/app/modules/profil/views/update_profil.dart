@@ -1,18 +1,21 @@
 import 'dart:io';
 
 import 'package:absensi/app/data/helper/app_colors.dart';
+import 'package:absensi/app/data/model/login_model.dart';
 import 'package:absensi/app/modules/add_pegawai/controllers/add_pegawai_controller.dart';
+import 'package:absensi/app/modules/login/controllers/login_controller.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:get/get.dart';
 
+import '../../../data/helper/loading_dialog.dart';
 import '../../../services/service_api.dart';
 
 class UpdateProfil extends GetView {
   UpdateProfil({super.key, this.userData});
-  final List? userData;
+  final Data? userData;
   final ctr = Get.put(AddPegawaiController());
 
   @override
@@ -27,7 +30,7 @@ class UpdateProfil extends GetView {
           decoration: const BoxDecoration(
             image: DecorationImage(
               image: AssetImage(
-                  'assets/image/bgapp.jpg'), // Gantilah dengan path gambar Anda
+                  'assets/image/new_bg_app.jpg'), // Gantilah dengan path gambar Anda
               fit: BoxFit.cover,
             ),
           ),
@@ -71,11 +74,11 @@ class UpdateProfil extends GetView {
                         height: 150,
                         width: 150,
                         decoration: BoxDecoration(color: Colors.grey[300]),
-                        child: userData![5] != ""
+                        child: userData!.foto != ""
                             ? Image.network(
-                                "${ServiceApi().baseUrl}${userData![5]}")
+                                "${ServiceApi().baseUrl}${userData!.foto}")
                             : Image.network(
-                                "https://ui-avatars.com/api/?name=${userData![1]}",
+                                "https://ui-avatars.com/api/?name=${userData!.nama}",
                                 fit: BoxFit.cover,
                               ),
                       );
@@ -267,8 +270,10 @@ class UpdateProfil extends GetView {
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(50)),
                     minimumSize: Size(Get.size.width / 2, 50)),
-                onPressed: () {
-                  ctr.addUpdatePegawai(context, "update", userData!);
+                onPressed: () async {
+                  loadingDialog("updating data", "");
+                  await ctr.addUpdatePegawai(context, "update", userData!);
+                  
                 },
                 child: const Text(
                   'UPDATE PROFILE',

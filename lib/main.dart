@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:absensi/app/data/helper/const.dart';
+import 'package:absensi/app/data/model/login_model.dart';
 
 import 'package:absensi/app/modules/home/views/bottom_navbar.dart';
 import 'package:absensi/app/modules/login/controllers/login_controller.dart';
@@ -15,10 +18,7 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:splash_screen_view/SplashScreenView.dart';
 
-
-
 import 'app/routes/app_pages.dart';
-
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -32,53 +32,18 @@ void main() async {
 
   SharedPreferences prefs = await SharedPreferences.getInstance();
   var status = prefs.getBool('is_login') ?? false;
-  List<String> userDataLogin = prefs.getStringList('userDataLogin') ?? [""];
+  var userDataLogin = prefs.getString('userDataLogin') ?? "";
   final auth = Get.put(LoginController());
 
   if (auth.isAuth.value == false) {
     auth.isAuth.value = status;
   }
-  if (auth.logUser.isEmpty) {
-    auth.logUser.value = userDataLogin;
+  if (auth.logUser.value.id == null) {
+    auth.logUser.value =
+        userDataLogin != "" ? Data.fromJson(jsonDecode(userDataLogin)) : Data();
   }
-
-  //register workmanager
-
-    // Workmanager().registerPeriodicTask(
-    //   '1',
-    //   'masuk',
-    //   frequency: const Duration(hours: 1, minutes: 30),
-    //   constraints: Constraints(networkType: NetworkType.connected, requiresBatteryNotLow: false, requiresCharging: false, requiresStorageNotLow: false, requiresDeviceIdle: false),
-    //   existingWorkPolicy: ExistingWorkPolicy.append,
-    // );
-    //
-    // Workmanager().registerPeriodicTask(
-    //   '2',
-    //   'pulang',
-    //   frequency: const Duration(hours: 1, minutes: 30),
-    //   constraints: Constraints(networkType: NetworkType.connected, requiresBatteryNotLow: false, requiresCharging: false, requiresStorageNotLow: false, requiresDeviceIdle: false),
-    //   existingWorkPolicy: ExistingWorkPolicy.append,
-    // );
-    //
-    //
-    // Workmanager().registerPeriodicTask(
-    //   '3',
-    //   'masukVisit',
-    //   frequency: const Duration(hours: 1, minutes: 30),
-    //   constraints: Constraints(networkType: NetworkType.connected, requiresBatteryNotLow: false, requiresCharging: false, requiresStorageNotLow: false, requiresDeviceIdle: false),
-    //   existingWorkPolicy: ExistingWorkPolicy.append,
-    // );
-    //
-    // Workmanager().registerPeriodicTask(
-    //   '4',
-    //   'pulangVisit',
-    //   frequency: const Duration(hours: 1, minutes: 30),
-    //   constraints: Constraints(networkType: NetworkType.connected, requiresBatteryNotLow: false, requiresCharging: false, requiresStorageNotLow: false, requiresDeviceIdle: false),
-    //   existingWorkPolicy: ExistingWorkPolicy.append,
-    // );
-    //
-
-
+  // auth.logUser.value;
+  // print(auth.logUser.value.id);
 
   runApp(GetMaterialApp(
     debugShowCheckedModeBanner: false,
@@ -91,7 +56,7 @@ void main() async {
         canvasColor: backgroundColor),
     home: SplashScreenView(
       navigateRoute: Obx(() => auth.isAuth.value
-          ? BottomNavBar(listDataUser: auth.logUser)
+          ? BottomNavBar(listDataUser: auth.logUser.value)
           : const LoginView()),
       duration: 2700,
       imageSize: 140,
@@ -110,106 +75,3 @@ void main() async {
     builder: FlutterSmartDialog.init(),
   ));
 }
-
-// @pragma('vm:entry-point')
-// void callbackDispatcher() {
-//   Workmanager().executeTask((task, inputData) async {
-//     await initializeDateFormatting('id_ID', "");
-//     var dateNow = DateFormat('yyyy-MM-dd').format(DateTime.now());
-//
-//     SharedPreferences prefs = await SharedPreferences.getInstance();
-//     List<String> userDataLogin = prefs.getStringList('userDataLogin') ?? [""];
-//
-//     switch (task) {
-//       case 'masuk':
-//         // Code to run in background
-//
-//         var tempDataAbs = await SQLHelper.instance.getAllAbsenToday(dateNow);
-//         for (var i in tempDataAbs) {
-//           var data = {
-//             "status": "add",
-//             "id": i.idUser,
-//             "tanggal_masuk": i.tanggalMasuk,
-//             "kode_cabang": i.kodeCabang,
-//             "nama": i.nama,
-//             "id_shift": i.idShift,
-//             "jam_masuk": i.jamMasuk,
-//             "jam_pulang": i.jamPulang,
-//             "jam_absen_masuk": i.jamAbsenMasuk,
-//             "foto_masuk": File(i.fotoMasuk.toString()),
-//             "lat_masuk": i.latMasuk,
-//             "long_masuk": i.longMasuk,
-//             "device_info": i.devInfo
-//           };
-//           await ServiceApi().submitAbsen(data);
-//         }
-//
-//         break;
-//       case 'pulang':
-//         var tempDataAbs = await SQLHelper.instance.getAllAbsenToday(dateNow);
-//         for (var i in tempDataAbs) {
-//           var data = {
-//             "status": "update",
-//             "id": i.idUser,
-//             "tanggal_masuk": i.tanggalMasuk,
-//             "tanggal_pulang": i.tanggalPulang,
-//             "nama": i.nama,
-//             "jam_absen_pulang": i.jamAbsenPulang,
-//             "foto_pulang": File(i.fotoPulang!),
-//             "lat_pulang": i.latPulang,
-//             "long_pulang": i.longPulang,
-//             "device_info2": i.devInfo2
-//           };
-//           await ServiceApi().submitAbsen(data);
-//         }
-//
-//         break;
-//       case 'masukVisit':
-//         var tempDataVisit = await SQLHelper.instance
-//             .getVisitToday(userDataLogin[0], dateNow, '', 0);
-//
-//         for (var i in tempDataVisit) {
-//           var data = {
-//             "status": "add",
-//             "id": i.id!,
-//             "nama": i.nama!,
-//             "tgl_visit": i.tglVisit!,
-//             "visit_in": i.visitIn!,
-//             "jam_in": i.jamIn!,
-//             "foto_in": File(i.fotoIn!.toString()),
-//             "lat_in": i.latIn!,
-//             "long_in": i.longIn!,
-//             "device_info": i.deviceInfo!,
-//             "is_rnd": i.isRnd!
-//           };
-//           await ServiceApi().submitVisit(data);
-//         }
-//
-//         break;
-//       case 'pulangVisit':
-//         var tempDataVisit = await SQLHelper.instance
-//             .getVisitToday(userDataLogin[0], dateNow, '', 0);
-//         for (var i in tempDataVisit) {
-//           var data = {
-//             "status": "update",
-//             "id": i.id,
-//             "nama": i.nama,
-//             "tgl_visit": i.tglVisit,
-//             "visit_out": i.visitOut,
-//             "visit_in": i.visitIn,
-//             "jam_out": i.jamOut,
-//             "foto_out": File(i.fotoOut.toString()),
-//             "lat_out": i.latOut,
-//             "long_out": i.longOut,
-//             "device_info2": i.deviceInfo2
-//           };
-//           await ServiceApi().submitVisit(data);
-//         }
-//
-//         break;
-//       default:
-//         showToast("Unknown task executed");
-//     }
-//     return Future.value(true);
-//   });
-// }

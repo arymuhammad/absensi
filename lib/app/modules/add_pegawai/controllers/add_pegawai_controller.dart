@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
+import 'package:absensi/app/data/model/login_model.dart';
+import 'package:absensi/app/modules/login/controllers/login_controller.dart';
 import 'package:crypto/crypto.dart';
 import 'package:absensi/app/data/helper/db_helper.dart';
 import 'package:absensi/app/services/service_api.dart';
@@ -289,7 +291,7 @@ class AddPegawaiController extends GetxController {
     }
   }
 
-  addUpdatePegawai(context, String mode, List<dynamic> dataUser) async {
+  addUpdatePegawai(context, String mode, Data dataUser) async {
     Random random = Random();
     int randomNumber = random.nextInt(100);
     final response = await ServiceApi().getUser();
@@ -400,14 +402,15 @@ class AddPegawaiController extends GetxController {
           fileResult != null) {
         var data = {
           "status": mode,
-          "id": dataUser[0],
-          "username": dataUser[10],
-          "nama": name.text != "" ? name.text : dataUser[1],
-          "no_telp": telp.text != "" ? telp.text : dataUser[3],
-          "kode_cabang":
-              selectedCabang.value != "" ? selectedCabang.value : dataUser[8],
+          "id": dataUser.id,
+          "username": dataUser.username,
+          "nama": name.text != "" ? name.text : dataUser.nama,
+          "no_telp": telp.text != "" ? telp.text : dataUser.noTelp,
+          "kode_cabang": selectedCabang.value != ""
+              ? selectedCabang.value
+              : dataUser.kodeCabang,
           "level":
-              selectedLevel.value != "" ? selectedLevel.value : dataUser[9],
+              selectedLevel.value != "" ? selectedLevel.value : dataUser.level,
           "foto":
               kIsWeb ? fileResult!.files.single : File(image!.path.toString())
         };
@@ -416,31 +419,38 @@ class AddPegawaiController extends GetxController {
           dialogMsg("",
               "No Telp ini sudah terdaftar\nSilahkan masukkan No Telp lain");
         } else {
+          // loadingDialog("updating data", "");
           //start update local db for tbl_user
           SQLHelper.instance.updateDataUser({
-            "nama": name.text != "" ? name.text : dataUser[1],
-            "no_telp": telp.text != "" ? telp.text : dataUser[3],
-            "kode_cabang":
-                selectedCabang.value != "" ? selectedCabang.value : dataUser[8],
-            "nama_cabang": cabangName.value != "" ? cabangName.value : dataUser[2],
-            "lat": lat.value != "" ? lat.value : dataUser[6],
-            "long": long.value != "" ? long.value : dataUser[7],
-            "area_coverage": cvrArea.value != "" ? cvrArea.value : dataUser[11],
-            "level":
-                selectedLevel.value != "" ? selectedLevel.value : dataUser[9],
+            "nama": name.text != "" ? name.text : dataUser.nama,
+            "no_telp": telp.text != "" ? telp.text : dataUser.noTelp,
+            "kode_cabang": selectedCabang.value != ""
+                ? selectedCabang.value
+                : dataUser.kodeCabang,
+            "nama_cabang":
+                cabangName.value != "" ? cabangName.value : dataUser.namaCabang,
+            "lat": lat.value != "" ? lat.value : dataUser.lat,
+            "long": long.value != "" ? long.value : dataUser.long,
+            "area_coverage":
+                cvrArea.value != "" ? cvrArea.value : dataUser.areaCover,
+            "level": selectedLevel.value != ""
+                ? selectedLevel.value
+                : dataUser.level,
             "level_user":
-            levelName.value != "" ? levelName.value : dataUser[4],
+                levelName.value != "" ? levelName.value : dataUser.levelUser,
             "foto": image!.path.toString(),
-            "visit": vst.value != "" ? vst.value : dataUser[12],
-            "cek_stok": cekStok.value != "" ? cekStok.value : dataUser[13]
-          }, dataUser[0], dataUser[10]);
+            "visit": vst.value != "" ? vst.value : dataUser.visit,
+            "cek_stok": cekStok.value != "" ? cekStok.value : dataUser.cekStok
+          }, dataUser.id!, dataUser.username!);
           //end of update
 
-          dialogMsgScsUpd("Sukses", "Data berhasil disimpan\nSilahkan login ulang");
           await ServiceApi().addUpdatePegawai(data);
+          Get.back();
+          dialogMsgScsUpd(
+              "Sukses", "Data berhasil disimpan\nSilahkan login ulang");
           newPhone.value = telp.text;
 
-          var idUser = {"id": dataUser[0]};
+          var idUser = {"id": dataUser.id};
           FotoProfil foto = await ServiceApi().getFotoProfil(idUser);
           SharedPreferences pref = await SharedPreferences.getInstance();
           await pref.setString("fotoProfil", foto.foto!);
@@ -466,38 +476,49 @@ class AddPegawaiController extends GetxController {
       } else {
         var data = {
           "status": mode,
-          "id": dataUser[0],
-          "nama": name.text != "" ? name.text : dataUser[1],
-          "no_telp": telp.text != "" ? telp.text : dataUser[3],
-          "kode_cabang":
-              selectedCabang.value != "" ? selectedCabang.value : dataUser[8],
-          "level": selectedLevel.value != "" ? selectedLevel.value : dataUser[9]
+          "id": dataUser.id,
+          "nama": name.text != "" ? name.text : dataUser.nama,
+          "no_telp": telp.text != "" ? telp.text : dataUser.noTelp,
+          "kode_cabang": selectedCabang.value != ""
+              ? selectedCabang.value
+              : dataUser.kodeCabang,
+          "level":
+              selectedLevel.value != "" ? selectedLevel.value : dataUser.level
         };
         if (lstPhone.contains(telp.text)) {
           dialogMsg("",
               "No Telp ini sudah terdaftar\nSilahkan masukkan No Telp lain");
         } else {
+          // loadingDialog("updating data", "");
           //start update local db for tbl_user
           SQLHelper.instance.updateDataUser({
-            "nama": name.text != "" ? name.text : dataUser[1],
-            "no_telp": telp.text != "" ? telp.text : dataUser[3],
-            "kode_cabang":
-            selectedCabang.value != "" ? selectedCabang.value : dataUser[8],
-            "nama_cabang": cabangName.value != "" ? cabangName.value : dataUser[2],
-            "lat": lat.value != "" ? lat.value : dataUser[6],
-            "long": long.value != "" ? long.value : dataUser[7],
-            "area_coverage": cvrArea.value != "" ? cvrArea.value : dataUser[11],
-            "level":
-            selectedLevel.value != "" ? selectedLevel.value : dataUser[9],
+            "nama": name.text != "" ? name.text : dataUser.nama,
+            "no_telp": telp.text != "" ? telp.text : dataUser.noTelp,
+            "kode_cabang": selectedCabang.value != ""
+                ? selectedCabang.value
+                : dataUser.kodeCabang,
+            "nama_cabang":
+                cabangName.value != "" ? cabangName.value : dataUser.namaCabang,
+            "lat": lat.value != "" ? lat.value : dataUser.lat,
+            "long": long.value != "" ? long.value : dataUser.long,
+            "area_coverage":
+                cvrArea.value != "" ? cvrArea.value : dataUser.areaCover,
+            "level": selectedLevel.value != ""
+                ? selectedLevel.value
+                : dataUser.level,
             "level_user":
-            levelName.value != "" ? levelName.value : dataUser[4],
-            "visit": vst.value != "" ? vst.value : dataUser[12],
-            "cek_stok": cekStok.value != "" ? cekStok.value : dataUser[13]
-          }, dataUser[0], dataUser[10]);
+                levelName.value != "" ? levelName.value : dataUser.levelUser,
+            "visit": vst.value != "" ? vst.value : dataUser.visit,
+            "cek_stok": cekStok.value != "" ? cekStok.value : dataUser.cekStok
+          }, dataUser.id!, dataUser.username!);
           //end of update
 
-          dialogMsgScsUpd("Sukses", "Data berhasil disimpan\nSilahkan login ulang");
           await ServiceApi().addUpdatePegawai(data);
+        
+          Get.back();
+          dialogMsgScsUpd(
+              "Sukses", "Data berhasil disimpan\nSilahkan login ulang");
+
           newPhone.value = telp.text;
 
           selectedCabang.value = "";
@@ -552,9 +573,10 @@ class AddPegawaiController extends GetxController {
     if (pass.text != "") {
       loadingDialog("Memperbarui data user...", "");
 
-      SQLHelper.instance.updateDataUser({
-        "password" : md5.convert(utf8.encode(pass.text)).toString()
-      }, id, username);
+      SQLHelper.instance.updateDataUser(
+          {"password": md5.convert(utf8.encode(pass.text)).toString()},
+          id,
+          username);
 
       final response = await ServiceApi().updatePasswordUser(data);
       Future.delayed(Duration.zero, () {

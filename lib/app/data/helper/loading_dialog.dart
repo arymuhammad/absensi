@@ -104,7 +104,7 @@ void succesDialog(context, pageAbsen, desc) {
         Future.delayed(const Duration(milliseconds: 300));
         Get.back();
       } else {
-        Get.back();
+        // Get.back();
         Get.back();
       }
     },

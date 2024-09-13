@@ -1,7 +1,9 @@
-import 'package:absensi/app/controllers/absen_controller.dart';
+import 'package:absensi/app/modules/absen/controllers/absen_controller.dart';
 import 'package:absensi/app/data/helper/app_colors.dart';
 import 'package:absensi/app/data/helper/const.dart';
 import 'package:absensi/app/data/helper/loading_dialog.dart';
+import 'package:absensi/app/data/model/login_model.dart';
+import 'package:absensi/app/modules/shared/background_image_header.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -19,31 +21,23 @@ import 'package:intl/intl.dart';
 class SemuaAbsenView extends GetView<SemuaAbsenController> {
   SemuaAbsenView({super.key, this.data});
   final absenC = Get.put(AbsenController());
-  final List<dynamic>? data;
+  final Data? data;
   // final String? foto;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-     
       body: Stack(
-        children: [  ClipPath(
-          clipper: ClipPathClass(),
-          child: Container(
+        children: [
+          const CsBgImgHeader(
             height: 380,
-            width: Get.width,
-            decoration: const BoxDecoration(
-                image: DecorationImage(
-                    image: AssetImage('assets/image/bgapp.jpg'),
-                    fit: BoxFit.fill)),
           ),
-        ),
           Padding(
-             padding: const EdgeInsets.only(top: 110, left: 15.0, right: 15.0),
+            padding: const EdgeInsets.only(top: 110, left: 15.0, right: 15.0),
             child: Card(
-               elevation: 4,
-              shape:
-                  RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              elevation: 4,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20)),
               child: SizedBox(
                 height: 620,
                 child: Column(
@@ -56,69 +50,79 @@ class SemuaAbsenView extends GetView<SemuaAbsenController> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           SizedBox(
-                            width: Get.mediaQuery.size.width/1.4,
+                            width: Get.mediaQuery.size.width / 1.4,
                             child: Card(
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(10)),
                               elevation: 8,
                               child: TextField(
                                 controller: absenC.filterAbsen,
-                                onChanged: (data) => absenC.filterDataAbsen(data),
+                                onChanged: (data) =>
+                                    absenC.filterDataAbsen(data),
                                 decoration: InputDecoration(
                                     prefixIcon: const Icon(Icons.search),
                                     hintText: 'format thn-bln-tgl',
                                     labelText: 'Cari Absen',
                                     border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(10))),
+                                        borderRadius:
+                                            BorderRadius.circular(10))),
                               ),
                             ),
                           ),
-                           Obx(
-            () => absenC.ascending.value
-                ? SizedBox(
-                  width: 45,height: 65,
-                  child: Card(
-                    color: mainColor,
-                    shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10)),
-                              elevation: 8,
-                    child: IconButton(
-                        tooltip: 'Sort ASC',
-                        onPressed: () {
-                          absenC.searchAbsen.sort(
-                              (a, b) => a.tanggalMasuk!.compareTo(b.tanggalMasuk!));
-                          absenC.ascending.value = false;
-                        },
-                        icon: const Icon(
-                          CupertinoIcons.line_horizontal_3_decrease,
-                          color: Colors.white,
-                        )),
-                  ),
-                )
-                : SizedBox(width: 45,
-                height: 65,
-                  child: Card(
-                    color: mainColor,
-                    shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10)),
-                              elevation: 8,
-                    child: IconButton(
-                        tooltip: 'Sort DESC',
-                        onPressed: () {
-                          absenC.searchAbsen.sort(
-                              (a, b) => b.tanggalMasuk!.compareTo(a.tanggalMasuk!));
-                          absenC.ascending.value = true;
-                        },
-                        icon: Transform.rotate(
-                          angle: 180 * math.pi / 180,
-                          child: const Icon(
-                            CupertinoIcons.line_horizontal_3_decrease,
-                            color: Colors.white,
-                          ),
-                        )),
-                  ),
-                ),
-          )
+                          Obx(
+                            () => absenC.ascending.value
+                                ? SizedBox(
+                                    width: 45,
+                                    height: 65,
+                                    child: Card(
+                                      color: mainColor,
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(10)),
+                                      elevation: 8,
+                                      child: IconButton(
+                                          tooltip: 'Sort ASC',
+                                          onPressed: () {
+                                            absenC.searchAbsen.sort((a, b) => a
+                                                .tanggalMasuk!
+                                                .compareTo(b.tanggalMasuk!));
+                                            absenC.ascending.value = false;
+                                          },
+                                          icon: const Icon(
+                                            CupertinoIcons
+                                                .line_horizontal_3_decrease,
+                                            color: Colors.white,
+                                          )),
+                                    ),
+                                  )
+                                : SizedBox(
+                                    width: 45,
+                                    height: 65,
+                                    child: Card(
+                                      color: mainColor,
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(10)),
+                                      elevation: 8,
+                                      child: IconButton(
+                                          tooltip: 'Sort DESC',
+                                          onPressed: () {
+                                            absenC.searchAbsen.sort((a, b) => b
+                                                .tanggalMasuk!
+                                                .compareTo(a.tanggalMasuk!));
+                                            absenC.ascending.value = true;
+                                          },
+                                          icon: Transform.rotate(
+                                            angle: 180 * math.pi / 180,
+                                            child: const Icon(
+                                              CupertinoIcons
+                                                  .line_horizontal_3_decrease,
+                                              color: Colors.white,
+                                            ),
+                                          )),
+                                    ),
+                                  ),
+                          )
                         ],
                       ),
                     ),
@@ -128,17 +132,19 @@ class SemuaAbsenView extends GetView<SemuaAbsenController> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text('Periode',
-                                  style: TextStyle(color: subTitleColor, fontSize: 18)),
+                                  style: TextStyle(
+                                      color: subTitleColor, fontSize: 18)),
                               Text(
                                 absenC.searchDate.value != ""
                                     ? absenC.searchDate.value
                                     : absenC.thisMonth,
-                                style: TextStyle(color: mainColor, fontSize: 18),
+                                style:
+                                    TextStyle(color: mainColor, fontSize: 18),
                               ),
                             ],
                           )),
                     ),
-                     Padding(
+                    Padding(
                       padding: const EdgeInsets.only(left: 20.0, right: 20.0),
                       child: Divider(
                         color: subTitleColor,
@@ -159,9 +165,11 @@ class SemuaAbsenView extends GetView<SemuaAbsenController> {
                                       padding: const EdgeInsets.all(10),
                                       decoration: BoxDecoration(
                                           color: Colors.grey[200],
-                                          borderRadius: BorderRadius.circular(20)),
+                                          borderRadius:
+                                              BorderRadius.circular(20)),
                                       child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
                                           Row(
                                             mainAxisAlignment:
@@ -169,28 +177,32 @@ class SemuaAbsenView extends GetView<SemuaAbsenController> {
                                             children: [
                                               Shimmer.fromColors(
                                                 baseColor: Colors.grey,
-                                                highlightColor: const Color.fromARGB(
-                                                    255, 238, 238, 238),
+                                                highlightColor:
+                                                    const Color.fromARGB(
+                                                        255, 238, 238, 238),
                                                 child: Container(
                                                   width: 60,
                                                   height: 15,
                                                   decoration: BoxDecoration(
                                                       color: Colors.white,
                                                       borderRadius:
-                                                          BorderRadius.circular(10)),
+                                                          BorderRadius.circular(
+                                                              10)),
                                                 ),
                                               ),
                                               Shimmer.fromColors(
                                                 baseColor: Colors.grey,
-                                                highlightColor: const Color.fromARGB(
-                                                    255, 238, 238, 238),
+                                                highlightColor:
+                                                    const Color.fromARGB(
+                                                        255, 238, 238, 238),
                                                 child: Container(
                                                   width: 130,
                                                   height: 15,
                                                   decoration: BoxDecoration(
                                                       color: Colors.white,
                                                       borderRadius:
-                                                          BorderRadius.circular(10)),
+                                                          BorderRadius.circular(
+                                                              10)),
                                                 ),
                                               )
                                             ],
@@ -201,14 +213,16 @@ class SemuaAbsenView extends GetView<SemuaAbsenController> {
                                           Shimmer.fromColors(
                                             baseColor: Colors.grey,
                                             highlightColor:
-                                                const Color.fromARGB(255, 238, 238, 238),
+                                                const Color.fromARGB(
+                                                    255, 238, 238, 238),
                                             child: Container(
                                               width: 70,
                                               height: 15,
                                               decoration: BoxDecoration(
                                                   color: Colors.white,
                                                   borderRadius:
-                                                      BorderRadius.circular(10)),
+                                                      BorderRadius.circular(
+                                                          10)),
                                             ),
                                           ),
                                           const SizedBox(
@@ -217,14 +231,16 @@ class SemuaAbsenView extends GetView<SemuaAbsenController> {
                                           Shimmer.fromColors(
                                             baseColor: Colors.grey,
                                             highlightColor:
-                                                const Color.fromARGB(255, 238, 238, 238),
+                                                const Color.fromARGB(
+                                                    255, 238, 238, 238),
                                             child: Container(
                                               width: 60,
                                               height: 15,
                                               decoration: BoxDecoration(
                                                   color: Colors.white,
                                                   borderRadius:
-                                                      BorderRadius.circular(10)),
+                                                      BorderRadius.circular(
+                                                          10)),
                                             ),
                                           ),
                                           const SizedBox(
@@ -233,14 +249,16 @@ class SemuaAbsenView extends GetView<SemuaAbsenController> {
                                           Shimmer.fromColors(
                                             baseColor: Colors.grey,
                                             highlightColor:
-                                                const Color.fromARGB(255, 238, 238, 238),
+                                                const Color.fromARGB(
+                                                    255, 238, 238, 238),
                                             child: Container(
                                               width: 70,
                                               height: 15,
                                               decoration: BoxDecoration(
                                                   color: Colors.white,
                                                   borderRadius:
-                                                      BorderRadius.circular(10)),
+                                                      BorderRadius.circular(
+                                                          10)),
                                             ),
                                           ),
                                         ],
@@ -251,24 +269,26 @@ class SemuaAbsenView extends GetView<SemuaAbsenController> {
                               : absenC.searchAbsen.isEmpty
                                   ? RefreshIndicator(
                                       onRefresh: () {
-                                        return Future.delayed(const Duration(seconds: 1),
+                                        return Future.delayed(
+                                            const Duration(seconds: 1),
                                             () async {
-                                          await absenC
-                                              .getAllAbsen(data![0]);
+                                          await absenC.getAllAbsen(data!.id!);
                                           absenC.searchDate.value = "";
                                           showToast("Halaman Disegarkan.");
                                         });
                                       },
                                       child: ListView(
-                                        physics: const AlwaysScrollableScrollPhysics(),
+                                        physics:
+                                            const AlwaysScrollableScrollPhysics(),
                                         children: [
                                           Padding(
-                                            padding:
-                                                EdgeInsets.only(top: Get.size.height / 3),
+                                            padding: EdgeInsets.only(
+                                                top: Get.size.height / 3),
                                             child: const Column(
                                               children: [
                                                 Center(
-                                                  child: Text('Belum ada data absen'),
+                                                  child: Text(
+                                                      'Belum ada data absen'),
                                                 ),
                                               ],
                                             ),
@@ -278,10 +298,10 @@ class SemuaAbsenView extends GetView<SemuaAbsenController> {
                                     )
                                   : RefreshIndicator(
                                       onRefresh: () {
-                                        return Future.delayed(const Duration(seconds: 1),
+                                        return Future.delayed(
+                                            const Duration(seconds: 1),
                                             () async {
-                                          await absenC
-                                              .getAllAbsen(data![0]);
+                                          await absenC.getAllAbsen(data!.id!);
                                           absenC.searchDate.value = "";
                                           showToast("Halaman Disegarkan.");
                                         });
@@ -289,7 +309,9 @@ class SemuaAbsenView extends GetView<SemuaAbsenController> {
                                       child: ListView.builder(
                                         shrinkWrap: true,
                                         padding: const EdgeInsets.only(
-                                            bottom: 20.0, left: 20.0, right: 20.0),
+                                            bottom: 20.0,
+                                            left: 20.0,
+                                            right: 20.0),
                                         itemCount: absenC.searchAbsen.length,
                                         itemBuilder: (c, i) {
                                           return InkWell(
@@ -298,80 +320,100 @@ class SemuaAbsenView extends GetView<SemuaAbsenController> {
                                               Get.toNamed(Routes.DETAIL_ABSEN,
                                                   arguments: {
                                                     "foto_profil":
-                                                        data![5] != "" ? data![5] : data![1],
-                                                    "nama": absenC.searchAbsen[i].nama!,
-                                                    "nama_shift":
-                                                        absenC.searchAbsen[i].namaShift!,
-                                                    "id_user":
-                                                        absenC.searchAbsen[i].idUser!,
+                                                        data!.foto != ""
+                                                            ? data!.foto
+                                                            : data!.nama,
+                                                    "nama": absenC
+                                                        .searchAbsen[i].nama!,
+                                                    "nama_shift": absenC
+                                                        .searchAbsen[i]
+                                                        .namaShift!,
+                                                    "id_user": absenC
+                                                        .searchAbsen[i].idUser!,
                                                     "tanggal_masuk": absenC
-                                                        .searchAbsen[i].tanggalMasuk!,
+                                                        .searchAbsen[i]
+                                                        .tanggalMasuk!,
                                                     "tanggal_pulang": absenC
                                                                 .searchAbsen[i]
                                                                 .tanggalPulang !=
                                                             null
-                                                        ? absenC
-                                                            .searchAbsen[i].tanggalPulang!
+                                                        ? absenC.searchAbsen[i]
+                                                            .tanggalPulang!
                                                         : "",
                                                     "jam_masuk": DateFormat("HH:mm")
-                                                            .parse(absenC.searchAbsen[i]
+                                                            .parse(absenC
+                                                                .searchAbsen[i]
                                                                 .jamAbsenMasuk!)
                                                             .isBefore(DateFormat("HH:mm")
                                                                 .parse(absenC
-                                                                    .searchAbsen[i]
+                                                                    .searchAbsen[
+                                                                        i]
                                                                     .jamMasuk!))
                                                         ? "Awal Waktu"
                                                         : DateFormat("HH:mm")
                                                                 .parse(absenC
-                                                                    .searchAbsen[i]
+                                                                    .searchAbsen[
+                                                                        i]
                                                                     .jamAbsenMasuk!)
                                                                 .isAtSameMomentAs(
                                                                     DateFormat("HH:mm")
-                                                                        .parse(absenC
-                                                                            .searchAbsen[i]
-                                                                            .jamMasuk!))
+                                                                        .parse(absenC.searchAbsen[i].jamMasuk!))
                                                             ? "Tepat Waktu"
                                                             : "Telat",
-                                                    "jam_pulang": absenC.searchAbsen[i]
+                                                    "jam_pulang": absenC
+                                                                .searchAbsen[i]
                                                                 .jamAbsenPulang! ==
                                                             ""
                                                         ? "Belum Absen"
-                                                        : DateTime.parse(absenC.searchAbsen[i].tanggalPulang!)
-                                                                    .isAfter(DateTime.parse(absenC
-                                                                        .searchAbsen[i]
-                                                                        .tanggalMasuk!)) &&
+                                                        : DateTime.parse(absenC.searchAbsen[i].tanggalPulang!).isAfter(DateTime.parse(absenC.searchAbsen[i].tanggalMasuk!)) &&
                                                                 DateFormat("HH:mm")
+                                                                    .parse(absenC
+                                                                        .searchAbsen[
+                                                                            i]
+                                                                        .jamAbsenPulang!)
+                                                                    .isBefore(DateFormat("HH:mm")
+                                                                        .parse(
+                                                                            "08:01"))
+                                                            ? "Lembur"
+                                                            : DateFormat("HH:mm")
                                                                     .parse(absenC
                                                                         .searchAbsen[i]
                                                                         .jamAbsenPulang!)
-                                                                    .isBefore(DateFormat("HH:mm")
-                                                                        .parse("08:01"))
-                                                            ? "Lembur"
-                                                            : DateFormat("HH:mm")
-                                                                    .parse(absenC.searchAbsen[i].jamAbsenPulang!)
                                                                     .isBefore(DateFormat("HH:mm").parse(absenC.searchAbsen[i].jamPulang!))
                                                                 ? "Pulang Cepat"
-                                                                : "Lembur",
+                                                                : DateFormat("HH:mm").parse(absenC.searchAbsen[i].jamAbsenPulang!).isAtSameMomentAs(DateFormat("HH:mm").parse(absenC.searchAbsen[i].jamPulang!))
+                                                                    ? "Tepat Waktu"
+                                                                    : "Lembur",
                                                     "jam_absen_masuk": absenC
-                                                        .searchAbsen[i].jamAbsenMasuk!,
+                                                        .searchAbsen[i]
+                                                        .jamAbsenMasuk!,
                                                     "jam_absen_pulang": absenC
-                                                        .searchAbsen[i].jamAbsenPulang!,
-                                                    "foto_masuk":
-                                                        absenC.searchAbsen[i].fotoMasuk!,
-                                                    "foto_pulang":
-                                                        absenC.searchAbsen[i].fotoPulang!,
-                                                    "lat_masuk":
-                                                        absenC.searchAbsen[i].latMasuk!,
-                                                    "long_masuk":
-                                                        absenC.searchAbsen[i].longMasuk!,
-                                                    "lat_pulang":
-                                                        absenC.searchAbsen[i].latPulang!,
-                                                    "long_pulang":
-                                                        absenC.searchAbsen[i].longPulang!,
-                                                    "device_info":
-                                                        absenC.searchAbsen[i].devInfo!,
-                                                    "device_info2":
-                                                        absenC.searchAbsen[i].devInfo2!,
+                                                        .searchAbsen[i]
+                                                        .jamAbsenPulang!,
+                                                    "foto_masuk": absenC
+                                                        .searchAbsen[i]
+                                                        .fotoMasuk!,
+                                                    "foto_pulang": absenC
+                                                        .searchAbsen[i]
+                                                        .fotoPulang!,
+                                                    "lat_masuk": absenC
+                                                        .searchAbsen[i]
+                                                        .latMasuk!,
+                                                    "long_masuk": absenC
+                                                        .searchAbsen[i]
+                                                        .longMasuk!,
+                                                    "lat_pulang": absenC
+                                                        .searchAbsen[i]
+                                                        .latPulang!,
+                                                    "long_pulang": absenC
+                                                        .searchAbsen[i]
+                                                        .longPulang!,
+                                                    "device_info": absenC
+                                                        .searchAbsen[i]
+                                                        .devInfo!,
+                                                    "device_info2": absenC
+                                                        .searchAbsen[i]
+                                                        .devInfo2!,
                                                   });
                                               absenC.filterAbsen.clear();
                                               absenC.filterDataAbsen("");
@@ -380,36 +422,39 @@ class SemuaAbsenView extends GetView<SemuaAbsenController> {
                                               color: bgContainer,
                                               elevation: 8,
                                               shape: RoundedRectangleBorder(
-                                                  borderRadius: BorderRadius.circular(6)),
+                                                  borderRadius:
+                                                      BorderRadius.circular(6)),
                                               child: Row(
                                                 children: [
                                                   Container(
                                                       width: 10,
-                                                      height:
-                                                          Get.mediaQuery.size.height / 12,
-                                                      padding: const EdgeInsets.all(10),
+                                                      height: Get.mediaQuery
+                                                              .size.height /
+                                                          12,
+                                                      padding: const EdgeInsets.all(
+                                                          10),
                                                       decoration: BoxDecoration(
                                                           color: DateFormat("HH:mm")
                                                                   .parse(absenC
-                                                                      .searchAbsen[i]
+                                                                      .searchAbsen[
+                                                                          i]
                                                                       .jamAbsenMasuk!)
-                                                                  .isBefore(DateFormat("HH:mm")
+                                                                  .isBefore(DateFormat(
+                                                                          "HH:mm")
                                                                       .parse(absenC
                                                                           .searchAbsen[i]
                                                                           .jamMasuk!))
                                                               ? Colors.greenAccent[700]
-                                                              : DateFormat("HH:mm")
-                                                                      .parse(absenC
-                                                                          .searchAbsen[i]
-                                                                          .jamAbsenMasuk!)
-                                                                      .isAtSameMomentAs(DateFormat("HH:mm")
-                                                                          .parse(absenC.searchAbsen[i].jamMasuk!))
+                                                              : DateFormat("HH:mm").parse(absenC.searchAbsen[i].jamAbsenMasuk!).isAtSameMomentAs(DateFormat("HH:mm").parse(absenC.searchAbsen[i].jamMasuk!))
                                                                   ? Colors.greenAccent[700]
                                                                   : Colors.redAccent[700],
                                                           borderRadius: const BorderRadius.only(
-                                                            topLeft: Radius.circular(5),
+                                                            topLeft:
+                                                                Radius.circular(
+                                                                    5),
                                                             bottomLeft:
-                                                                Radius.circular(5),
+                                                                Radius.circular(
+                                                                    5),
                                                           ))),
                                                   const SizedBox(
                                                     width: 20,
@@ -418,12 +463,15 @@ class SemuaAbsenView extends GetView<SemuaAbsenController> {
                                                     children: [
                                                       Text(
                                                         DateFormat('MMM')
-                                                            .format(DateTime.parse(absenC
-                                                                .searchAbsen[i]
-                                                                .tanggalMasuk!))
+                                                            .format(DateTime
+                                                                .parse(absenC
+                                                                    .searchAbsen[
+                                                                        i]
+                                                                    .tanggalMasuk!))
                                                             .toUpperCase(),
                                                         style: TextStyle(
-                                                            color: subTitleColor),
+                                                            color:
+                                                                subTitleColor),
                                                       ),
                                                       Text(
                                                         DateFormat('dd').format(
@@ -431,7 +479,8 @@ class SemuaAbsenView extends GetView<SemuaAbsenController> {
                                                                 .searchAbsen[i]
                                                                 .tanggalMasuk!)),
                                                         style: TextStyle(
-                                                            fontWeight: FontWeight.bold,
+                                                            fontWeight:
+                                                                FontWeight.bold,
                                                             fontSize: 16,
                                                             color: titleColor),
                                                       ),
@@ -442,62 +491,69 @@ class SemuaAbsenView extends GetView<SemuaAbsenController> {
                                                   ),
                                                   Column(
                                                     crossAxisAlignment:
-                                                        CrossAxisAlignment.start,
+                                                        CrossAxisAlignment
+                                                            .start,
                                                     children: [
                                                       Text(
-                                                          DateFormat("EEEE", "id_ID")
-                                                              .format(DateTime.parse(
-                                                                  absenC.searchAbsen[i]
+                                                          DateFormat("EEEE",
+                                                                  "id_ID")
+                                                              .format(DateTime
+                                                                  .parse(absenC
+                                                                      .searchAbsen[
+                                                                          i]
                                                                       .tanggalMasuk!)),
                                                           style: TextStyle(
-                                                              fontWeight: FontWeight.bold,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
                                                               fontSize: 18,
-                                                              color: titleColor)),
+                                                              color:
+                                                                  titleColor)),
                                                       const SizedBox(
                                                         width: 10,
                                                       ),
                                                       Text(
                                                         DateFormat("HH:mm")
                                                                 .parse(absenC
-                                                                    .searchAbsen[i]
+                                                                    .searchAbsen[
+                                                                        i]
                                                                     .jamAbsenMasuk!)
                                                                 .isBefore(DateFormat(
                                                                         "HH:mm")
                                                                     .parse(absenC
-                                                                        .searchAbsen[i]
+                                                                        .searchAbsen[
+                                                                            i]
                                                                         .jamMasuk!))
                                                             ? "Awal Waktu"
                                                             : DateFormat("HH:mm")
                                                                     .parse(absenC
-                                                                        .searchAbsen[i]
+                                                                        .searchAbsen[
+                                                                            i]
                                                                         .jamAbsenMasuk!)
-                                                                    .isAtSameMomentAs(
-                                                                        DateFormat("HH:mm")
-                                                                            .parse(absenC
-                                                                                .searchAbsen[
-                                                                                    i]
-                                                                                .jamMasuk!))
+                                                                    .isAtSameMomentAs(DateFormat("HH:mm").parse(absenC
+                                                                        .searchAbsen[i]
+                                                                        .jamMasuk!))
                                                                 ? "Tepat Waktu"
                                                                 : "Telat",
                                                         style: TextStyle(
-                                                            color: DateFormat("HH:mm")
+                                                            color: DateFormat(
+                                                                        "HH:mm")
                                                                     .parse(absenC
-                                                                        .searchAbsen[i]
+                                                                        .searchAbsen[
+                                                                            i]
                                                                         .jamAbsenMasuk!)
-                                                                    .isBefore(
-                                                                        DateFormat("HH:mm")
-                                                                            .parse(absenC
-                                                                                .searchAbsen[
-                                                                                    i]
-                                                                                .jamMasuk!))
-                                                                ? Colors.greenAccent[700]
-                                                                : DateFormat("HH:mm")
+                                                                    .isBefore(DateFormat("HH:mm").parse(absenC
+                                                                        .searchAbsen[
+                                                                            i]
+                                                                        .jamMasuk!))
+                                                                ? Colors.greenAccent[
+                                                                    700]
+                                                                : DateFormat(
+                                                                            "HH:mm")
                                                                         .parse(absenC
-                                                                            .searchAbsen[
-                                                                                i]
+                                                                            .searchAbsen[i]
                                                                             .jamAbsenMasuk!)
-                                                                        .isAtSameMomentAs(
-                                                                            DateFormat("HH:mm").parse(absenC.searchAbsen[i].jamMasuk!))
+                                                                        .isAtSameMomentAs(DateFormat("HH:mm").parse(absenC.searchAbsen[i].jamMasuk!))
                                                                     ? Colors.greenAccent[700]
                                                                     : Colors.redAccent[700]),
                                                       )
@@ -505,19 +561,25 @@ class SemuaAbsenView extends GetView<SemuaAbsenController> {
                                                   ),
                                                   const Spacer(),
                                                   Padding(
-                                                    padding: const EdgeInsets.all(8.0),
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            8.0),
                                                     child: Row(
                                                       children: [
                                                         Column(
                                                           children: [
                                                             const Text('Masuk'),
                                                             Text(
-                                                              absenC.searchAbsen[i]
+                                                              absenC
+                                                                  .searchAbsen[
+                                                                      i]
                                                                   .jamAbsenMasuk!,
                                                               style: TextStyle(
                                                                   fontWeight:
-                                                                      FontWeight.bold,
-                                                                  color: titleColor),
+                                                                      FontWeight
+                                                                          .bold,
+                                                                  color:
+                                                                      titleColor),
                                                             ),
                                                           ],
                                                         ),
@@ -526,18 +588,25 @@ class SemuaAbsenView extends GetView<SemuaAbsenController> {
                                                         ),
                                                         Column(
                                                           children: [
-                                                            const Text('Pulang'),
+                                                            const Text(
+                                                                'Pulang'),
                                                             Text(
-                                                              absenC.searchAbsen[i]
+                                                              absenC
+                                                                          .searchAbsen[
+                                                                              i]
                                                                           .jamAbsenPulang! !=
                                                                       ""
-                                                                  ? absenC.searchAbsen[i]
+                                                                  ? absenC
+                                                                      .searchAbsen[
+                                                                          i]
                                                                       .jamAbsenPulang!
                                                                   : "-",
                                                               style: TextStyle(
                                                                   fontWeight:
-                                                                      FontWeight.bold,
-                                                                  color: titleColor),
+                                                                      FontWeight
+                                                                          .bold,
+                                                                  color:
+                                                                      titleColor),
                                                             ),
                                                           ],
                                                         ),
@@ -560,35 +629,34 @@ class SemuaAbsenView extends GetView<SemuaAbsenController> {
             ),
           ),
           const Positioned(
-            top: 60,
-            left: 20,
-            right: 20,
-            bottom: 0,
-            child:  Row(
-              // mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                 Padding(
-                  padding: EdgeInsets.only(top: 1.0),
-                  child: Icon(
-                    CupertinoIcons.doc_text_search,
-                    size: 25,
-                    color: Colors.white,
-                  ),
-                ),
-                SizedBox(
-                  width: 5,
-                ),
-                 Text(
-                  'History',
-                  style: TextStyle(
+              top: 60,
+              left: 20,
+              right: 20,
+              bottom: 0,
+              child: Row(
+                // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.only(top: 1.0),
+                    child: Icon(
+                      CupertinoIcons.doc_text_search,
+                      size: 25,
                       color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold),
-                ), 
-               
-              ],
-            ))
+                    ),
+                  ),
+                  SizedBox(
+                    width: 5,
+                  ),
+                  Text(
+                    'History',
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ))
         ],
       ),
       floatingActionButton: Column(
@@ -622,7 +690,7 @@ class SemuaAbsenView extends GetView<SemuaAbsenController> {
               heroTag: 'form-filter',
               backgroundColor: AppColors.contentDefBtn,
               onPressed: () {
-                formFilter(data![0]);
+                formFilter(data!.id);
               },
               child: Icon(
                 TernavIcons.lightOutline.calender_3,

@@ -1,9 +1,11 @@
 import 'package:absensi/app/data/helper/const.dart';
 import 'package:absensi/app/data/helper/loading_dialog.dart';
+import 'package:absensi/app/data/model/login_model.dart';
 import 'package:absensi/app/modules/profil/views/about_view.dart';
 import 'package:absensi/app/modules/profil/views/backup_view.dart';
 import 'package:absensi/app/modules/profil/views/update_profil.dart';
 import 'package:absensi/app/modules/profil/views/verifikasi_update_password.dart';
+import 'package:absensi/app/modules/shared/background_image_header.dart';
 import 'package:absensi/app/routes/app_pages.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -17,25 +19,17 @@ import '../controllers/settings_controller.dart';
 
 class SettingsView extends GetView<SettingsController> {
   const SettingsView({super.key, this.listDataUser});
-  final List<dynamic>? listDataUser;
+  final Data? listDataUser;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         body: Stack(
       children: [
-        ClipPath(
-          clipper: ClipPathClass(),
-          child: Container(
-            height: 380,
-            width: Get.width,
-            decoration: const BoxDecoration(
-                image: DecorationImage(
-                    image: AssetImage('assets/image/bgapp.jpg'),
-                    fit: BoxFit.fill)),
-          ),
+        const CsBgImgHeader(
+          height: 380,
         ),
         Padding(
-          padding: const EdgeInsets.only(top: 160, left: 15.0, right: 15.0),
+          padding: const EdgeInsets.only(top: 110, left: 15.0, right: 15.0),
           child: Card(
             elevation: 4,
             shape:
@@ -105,7 +99,7 @@ class SettingsView extends GetView<SettingsController> {
                         ),
                         ListTile(
                           onTap: () {
-                            Get.to(() =>  BackupView(userData:listDataUser!),
+                            Get.to(() => BackupView(userData: listDataUser!),
                                 transition: Transition.cupertino);
                           },
                           leading: Container(
@@ -139,8 +133,7 @@ class SettingsView extends GetView<SettingsController> {
                             decoration: BoxDecoration(
                                 color: bgContainer,
                                 borderRadius: BorderRadius.circular(8)),
-                            child: Icon(Bootstrap.alarm_fill,
-                                color: mainColor),
+                            child: Icon(Bootstrap.alarm_fill, color: mainColor),
                           ),
                           title: Text(
                             'Alarm',
@@ -154,7 +147,7 @@ class SettingsView extends GetView<SettingsController> {
                               color: subTitleColor),
                         ),
                         Visibility(
-                          visible: listDataUser![9] == "1" ? true : false,
+                          visible: listDataUser!.level == "1" ? true : false,
                           child: ListTile(
                             onTap: () {
                               Get.toNamed(Routes.ADD_PEGAWAI);
@@ -272,5 +265,3 @@ class SettingsView extends GetView<SettingsController> {
     ));
   }
 }
-
-

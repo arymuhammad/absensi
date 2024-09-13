@@ -58,7 +58,7 @@ class DetailVisitView extends GetView {
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             image: DecorationImage(
-              image: AssetImage('assets/image/bgapp.jpg'),
+              image: AssetImage('assets/image/new_bg_app.jpg'),
               fit: BoxFit.cover,
             ),
           ),

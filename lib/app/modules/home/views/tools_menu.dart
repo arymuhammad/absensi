@@ -1,69 +1,64 @@
-import 'package:absensi/app/data/helper/const.dart';
-import 'package:absensi/app/data/helper/loading_dialog.dart';
-import 'package:absensi/app/data/model/login_model.dart';
-import 'package:absensi/app/modules/cek_stok/views/cek_stok_view.dart';
+import 'package:absensi/app/modules/absen/controllers/absen_controller.dart';
 import 'package:absensi/app/modules/report_sales/controllers/report_sales_controller.dart';
 import 'package:absensi/app/modules/report_sales/views/report_sales_view.dart';
-import 'package:absensi/app/modules/semua_absen/views/monitoring_absen_view.dart';
-import 'package:absensi/app/modules/semua_absen/views/search_form.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:icons_plus/icons_plus.dart';
 
+import '../../../data/helper/const.dart';
+import '../../../data/helper/loading_dialog.dart';
+import '../../../data/model/login_model.dart';
 import '../../adjust_presence/views/adjust_presence_view.dart';
+import '../../cek_stok/views/cek_stok_view.dart';
+import '../../semua_absen/views/monitoring_absen_view.dart';
 
-class CardInfoMenu extends GetView {
-  CardInfoMenu({super.key, this.userData});
+class ToolsMenu extends StatelessWidget {
   final Data? userData;
+  ToolsMenu({super.key, this.userData});
+
+  final absC = Get.find<AbsenController>();
   final reportC = Get.put(ReportSalesController());
 
   @override
   Widget build(BuildContext context) {
     return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      // shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       elevation: 10,
-      child: Container(
-        width: Get.mediaQuery.size.width,
-        decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(15), color: Colors.white),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(12.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Container(
+          width: Get.mediaQuery.size.width,
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(15), color: Colors.white),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Row(
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '${userData!.levelUser}',
-                        style: const TextStyle(
-                            fontSize: 15, fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 5),
-                      Text('${userData!.id}'),
-                      const SizedBox(height: 5),
-                      Text(userData!.namaCabang.toString().toUpperCase()),
-                    ],
+                  Icon(
+                    Iconsax.menu_board_outline,
+                    color: Colors.blue,
+                  ),
+                  SizedBox(
+                    width: 5,
+                  ),
+                  Text(
+                    ' Tools Menu',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                   ),
                 ],
               ),
-            ),
-            const SizedBox(
-              height: 1,
-              child: Divider(
+              const Divider(
                 thickness: 1,
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 8.0, bottom: 8.0),
-              child: SingleChildScrollView(
+              SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Row(
                   children: [
+                    userData!.cekStok == "0"
+                        ? const Text('Tidak ada menu yang tersedia')
+                        : Container(),
                     Visibility(
                       visible: userData!.cekStok == "1" ? true : false,
                       child: Column(
@@ -126,8 +121,7 @@ class CardInfoMenu extends GetView {
                       width: 12,
                     ),
                     Visibility(
-                      visible: userData!.level == "1" ||
-                              userData!.level == "26"
+                      visible: userData!.level == "1" || userData!.level == "26"
                           ? true
                           : false,
                       child: Column(
@@ -156,9 +150,7 @@ class CardInfoMenu extends GetView {
                       width: 12,
                     ),
                     Visibility(
-                      visible: userData!.level == "1"
-                          ? true
-                          : false,
+                      visible: userData!.level == "1" ? true : false,
                       child: Column(
                         children: [
                           IconButton(
@@ -184,8 +176,8 @@ class CardInfoMenu extends GetView {
                   ],
                 ),
               ),
-            )
-          ],
+            ],
+          ),
         ),
       ),
     );

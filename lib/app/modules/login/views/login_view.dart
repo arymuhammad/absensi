@@ -30,8 +30,8 @@ class LoginView extends GetView<LoginController> {
           height: Get.mediaQuery.size.height / 2,
           decoration: const BoxDecoration(
               image: DecorationImage(
-                  image: AssetImage('assets/image/bgapp.jpg'),
-                  fit: BoxFit.fill)),
+                  image: AssetImage('assets/image/new_bg_app.jpg'),
+                  fit: BoxFit.fitHeight)),
         ),
         Padding(
           padding: const EdgeInsets.all(15),

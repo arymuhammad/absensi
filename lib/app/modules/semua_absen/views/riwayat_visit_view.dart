@@ -1,7 +1,8 @@
-import 'package:absensi/app/controllers/absen_controller.dart';
+import 'package:absensi/app/modules/absen/controllers/absen_controller.dart';
 import 'package:absensi/app/data/helper/app_colors.dart';
 import 'package:absensi/app/data/helper/const.dart';
 import 'package:absensi/app/data/helper/loading_dialog.dart';
+import 'package:absensi/app/data/model/login_model.dart';
 import 'package:absensi/app/modules/detail_absen/views/detail_visit_view.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/material.dart';
@@ -14,7 +15,7 @@ import 'package:ternav_icons/ternav_icons.dart';
 class RiwayatVisitView extends GetView {
   RiwayatVisitView({super.key, this.userData});
 
-  final List? userData;
+  final Data? userData;
   final visitC = Get.put(AbsenController());
 
   @override
@@ -26,7 +27,7 @@ class RiwayatVisitView extends GetView {
           decoration: const BoxDecoration(
             image: DecorationImage(
               image: AssetImage(
-                  'assets/image/bgapp.jpg'), // Gantilah dengan path gambar Anda
+                  'assets/image/new_bg_app.jpg'), // Gantilah dengan path gambar Anda
               fit: BoxFit.cover,
             ),
           ),
@@ -216,7 +217,7 @@ class RiwayatVisitView extends GetView {
                                   () async {
                                 visitC.isLoading.value = true;
                                 await visitC
-                                    .getAllVisited(userData![0]);
+                                    .getAllVisited(userData!.id!);
                                 visitC.searchDate.value = "";
                                 showToast("Halaman Disegarkan.");
                               });
@@ -242,9 +243,9 @@ class RiwayatVisitView extends GetView {
                                   return InkWell(
                                     onTap: () => Get.to(() => DetailVisitView(),
                                         arguments: {
-                                          "foto_profil": userData![5] != ""
-                                              ? userData![5]
-                                              : userData![1],
+                                          "foto_profil": userData!.foto != ""
+                                              ? userData!.foto
+                                              : userData!.nama,
                                           "nama": visitC.searchVisit[i].nama!,
                                           "id_user": visitC.searchVisit[i].id!,
                                           "store":
@@ -442,7 +443,7 @@ class RiwayatVisitView extends GetView {
       floatingActionButton: FloatingActionButton(
           backgroundColor: AppColors.contentDefBtn,
           onPressed: () {
-            formFilter(userData![0]);
+            formFilter(userData!.id);
           },
           child: Icon(
             TernavIcons.lightOutline.calender_3,

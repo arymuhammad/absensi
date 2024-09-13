@@ -1,5 +1,6 @@
 import 'package:absensi/app/data/helper/app_colors.dart';
 import 'package:absensi/app/data/helper/loading_dialog.dart';
+import 'package:absensi/app/data/model/login_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
@@ -8,19 +9,18 @@ import 'package:get/get.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:latlong2/latlong.dart';
 
-import '../../../controllers/absen_controller.dart';
+import '../controllers/absen_controller.dart';
 
 class AbsenView extends GetView<AbsenController> {
   AbsenView(
       {super.key, this.data, this.exitTimeout = const Duration(seconds: 2)});
-  final List? data;
+  final Data? data;
   final absenC = Get.put(AbsenController());
   final Duration exitTimeout;
 
   @override
   Widget build(BuildContext context) {
-    return Obx(
-      () => WillPopScope(
+    return  WillPopScope(
         onWillPop: () async {
           if (absenC.lastTime == null ||
               DateTime.now().difference(absenC.lastTime!) > exitTimeout) {
@@ -39,7 +39,7 @@ class AbsenView extends GetView<AbsenController> {
         child: Scaffold(
             appBar: AppBar(
               title: Text(
-                data![9] == "26" ? 'VISIT' : 'ABSEN',
+                data!.visit == "1" ? 'VISIT' : 'ABSEN',
                 style: const TextStyle(color: AppColors.mainTextColor1),
               ),
               automaticallyImplyLeading: false,
@@ -48,7 +48,7 @@ class AbsenView extends GetView<AbsenController> {
                 decoration: const BoxDecoration(
                   image: DecorationImage(
                     image: AssetImage(
-                        'assets/image/bgapp.jpg'), // Gantilah dengan path gambar Anda
+                        'assets/image/new_bg_app.jpg'), // Gantilah dengan path gambar Anda
                     fit: BoxFit.cover,
                   ),
                 ),
@@ -59,7 +59,7 @@ class AbsenView extends GetView<AbsenController> {
                 FlutterMap(
                   options: MapOptions(
                       initialCenter: LatLng(
-                          double.parse(data![6]), double.parse(data![7])),
+                          double.parse(data!.lat!), double.parse(data!.long!)),
                       initialZoom: 17,
                       maxZoom: 18.4,
                       minZoom: 17),
@@ -73,7 +73,7 @@ class AbsenView extends GetView<AbsenController> {
                       circles: [
                         CircleMarker(
                             point: LatLng(
-                                double.parse(data![6]), double.parse(data![7])),
+                                double.parse(data!.lat!), double.parse(data!.long!)),
                             radius: 100,
                             useRadiusInMeter: true,
                             color: const Color.fromARGB(71, 16, 134, 230),
@@ -130,7 +130,7 @@ class AbsenView extends GetView<AbsenController> {
                 )
               ],
             )),
-      ),
+      
     );
   }
 }

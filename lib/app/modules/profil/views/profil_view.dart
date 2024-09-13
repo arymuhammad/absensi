@@ -1,5 +1,8 @@
 import 'package:absensi/app/data/helper/const.dart';
+import 'package:absensi/app/data/model/login_model.dart';
 import 'package:absensi/app/modules/login/controllers/login_controller.dart';
+import 'package:absensi/app/modules/shared/background_image_header.dart';
+import 'package:absensi/app/modules/shared/rounded_image.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -17,24 +20,14 @@ class ProfilView extends GetView<ProfilController> {
   ProfilView({super.key, this.listDataUser});
   final auth = Get.put(LoginController());
   final user = Get.put(AddPegawaiController());
-  final List? listDataUser;
+  final Data? listDataUser;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         body: Stack(
       children: [
-        ClipPath(
-          clipper: ClipPathClass(),
-          child: Container(
-            height: 380,
-            width: Get.width,
-            decoration: const BoxDecoration(
-                image: DecorationImage(
-                    image: AssetImage('assets/image/bgapp.jpg'),
-                    fit: BoxFit.fill)),
-          ),
-        ),
+        const CsBgImgHeader(height: 380),
         Padding(
           padding: const EdgeInsets.only(top: 190, left: 15.0, right: 15.0),
           child: Card(
@@ -42,41 +35,30 @@ class ProfilView extends GetView<ProfilController> {
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
             child: SizedBox(
-              height: 350,
+              height: 389,
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   const SizedBox(
-                    height: 20,
+                    height: 100,
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Container(),
-                      Container(),
-                      Column(
-                        children: [
-                          SizedBox(
-                            width: 150,
-                            child: Text(
-                              listDataUser![1].toString().capitalize!,
-                              textAlign: TextAlign.center,
-                              style: const TextStyle(
-                                  fontSize: 20, fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                          SizedBox(
-                            width: 150,
-                            child: Text(
-                              '${listDataUser![4]}',
-                              textAlign: TextAlign.center,
-                              style:
-                                  TextStyle(fontSize: 15, color: subTitleColor),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
+                  SizedBox(
+                    width: 180,
+                    child: Text(
+                      listDataUser!.nama.toString().capitalize!,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                          fontSize: 25, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  SizedBox(
+                    // width: 150,
+                    child: Text(
+                      '${listDataUser!.levelUser}',
+                      textAlign: TextAlign.center,
+                      style:
+                          TextStyle(fontSize: 15, color: subTitleColor),
+                    ),
                   ),
                   const SizedBox(
                     height: 25,
@@ -97,7 +79,7 @@ class ProfilView extends GetView<ProfilController> {
                               ],
                             ),
                             Text(
-                              '${listDataUser![0]}',
+                              '${listDataUser!.id}',
                               textAlign: TextAlign.center,
                               style:
                                   TextStyle(fontSize: 15, color: subTitleColor),
@@ -120,7 +102,7 @@ class ProfilView extends GetView<ProfilController> {
                               ],
                             ),
                             Text(
-                              '${listDataUser![10]}',
+                              '${listDataUser!.username}',
                               textAlign: TextAlign.center,
                               style:
                                   TextStyle(fontSize: 15, color: subTitleColor),
@@ -143,7 +125,7 @@ class ProfilView extends GetView<ProfilController> {
                             ),
                             Obx(
                               () => Text(
-                                '${user.newPhone.isNotEmpty ? user.newPhone.value : listDataUser![3]}',
+                                '${user.newPhone.isNotEmpty ? user.newPhone.value : listDataUser!.noTelp}',
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                     fontSize: 15, color: subTitleColor),
@@ -165,13 +147,11 @@ class ProfilView extends GetView<ProfilController> {
                                 const Text('Store'),
                               ],
                             ),
-                            Obx(
-                              () => Text(
-                                '${listDataUser![2]}',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                    fontSize: 15, color: subTitleColor),
-                              ),
+                            Text(
+                              '${listDataUser!.namaCabang}',
+                              textAlign: TextAlign.center,
+                              style:
+                                  TextStyle(fontSize: 15, color: subTitleColor),
                             ),
                           ],
                         ),
@@ -187,53 +167,61 @@ class ProfilView extends GetView<ProfilController> {
           ),
         ),
         Padding(
-          padding: const EdgeInsets.symmetric(vertical: 150, horizontal: 28),
+          padding: EdgeInsets.symmetric(
+              vertical: 110, horizontal: MediaQuery.of(context).size.width / 3.8),
           child: Container(
             decoration: BoxDecoration(
-                color: Colors.white, borderRadius: BorderRadius.circular(5)),
-            height: 140,
-            width: 140,
+                color: Colors.white, borderRadius: BorderRadius.circular(100)),
+            height: 180,
+            width: 180,
             child: Card(
               elevation: 4,
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(5),
+                  borderRadius: BorderRadius.circular(100),
                   side: BorderSide(width: 2, color: subTitleColor!)),
               child: FullScreenWidget(
                 child: Hero(
-                  tag: 'customTag',
-                  child: ClipRect(
-                    child: listDataUser![5] != ""
-                        ? Obx(
-                            () => CachedNetworkImage(
-                              imageUrl:
-                                  "${ServiceApi().baseUrl}${user.fotoProfil.value != "" ? user.fotoProfil.value : listDataUser![5]}",
-                              fit: BoxFit.cover,
-                              progressIndicatorBuilder:
-                                  (context, url, progress) =>
-                                      CircularProgressIndicator(
-                                value: progress.progress,
-                                strokeWidth: 15,
-                              ),
-                              errorWidget: (context, url, error) {
-                                return Image.network(
-                                    "${ServiceApi().baseUrl}${user.fotoProfil.value}");
-                              },
-                            ),
-                          )
-                        // PhotoView(
-                        //       backgroundDecoration: BoxDecoration(
-                        //           color: Colors.grey[200]),
-                        //       imageProvider: NetworkImage(
-                        //           "${ServiceApi().baseUrl}${userFoto.fotoProfil.value !="" ? userFoto.fotoProfil.value : listDataUser![5]}"),
+                    tag: 'customTag',
+                    child: RoundedImage(
+                        height: 180,
+                        width: 180,
+                        foto: user.fotoProfil.value != ""
+                            ? user.fotoProfil.value
+                            : listDataUser!.foto!,
+                        name: listDataUser!.nama!)
+                    // ClipRect(
+                    //   child: listDataUser!.foto != ""
+                    //       ? Obx(
+                    //           () => CachedNetworkImage(
+                    //             imageUrl:
+                    //                 "${ServiceApi().baseUrl}${user.fotoProfil.value != "" ? user.fotoProfil.value : listDataUser!.foto}",
+                    //             fit: BoxFit.cover,
+                    //             progressIndicatorBuilder:
+                    //                 (context, url, progress) =>
+                    //                     CircularProgressIndicator(
+                    //               value: progress.progress,
+                    //               strokeWidth: 15,
+                    //             ),
+                    //             errorWidget: (context, url, error) {
+                    //               return Image.network(
+                    //                   "${ServiceApi().baseUrl}${user.fotoProfil.value}");
+                    //             },
+                    //           ),
+                    //         )
+                    //       // PhotoView(
+                    //       //       backgroundDecoration: BoxDecoration(
+                    //       //           color: Colors.grey[200]),
+                    //       //       imageProvider: NetworkImage(
+                    //       //           "${ServiceApi().baseUrl}${userFoto.fotoProfil.value !="" ? userFoto.fotoProfil.value : listDataUser![5]}"),
 
-                        //     ),
-                        // )
-                        : Image.network(
-                            "https://ui-avatars.com/api/?name=${listDataUser![1]}",
-                            fit: BoxFit.cover,
-                          ),
-                  ),
-                ),
+                    //       //     ),
+                    //       // )
+                    //       : Image.network(
+                    //           "https://ui-avatars.com/api/?name=${listDataUser!.nama}",
+                    //           fit: BoxFit.cover,
+                    //         ),
+                    // ),
+                    ),
               ),
             ),
           ),
@@ -270,22 +258,4 @@ class ProfilView extends GetView<ProfilController> {
       ],
     ));
   }
-}
-
-class ClipPathClass extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    var path = Path();
-    path.lineTo(0.0, size.height - 60);
-
-    path.quadraticBezierTo(
-        size.width / 2, size.height, size.width, size.height - 60);
-
-    path.lineTo(size.width, 0.0);
-    path.close();
-    return path;
-  }
-
-  @override
-  bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
 }

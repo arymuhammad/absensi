@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 import 'package:absensi/app/data/model/cabang_model.dart';
 import 'package:absensi/app/data/model/cek_absen_model.dart';
@@ -19,15 +20,19 @@ import 'package:http/http.dart' as http;
 
 import '../data/helper/loading_dialog.dart';
 import '../data/model/absen_model.dart';
+import '../data/model/dept_model.dart';
 import '../data/model/foto_profil_model.dart';
 import '../data/model/login_model.dart';
+import '../data/model/users_model.dart';
 import 'app_exceptions.dart';
 
 class ServiceApi {
-  var baseUrl = "https://attendance.urbanco.id/api/";
+  // var baseUrl = "https://attendance.urbanco.id/api/"; // poduction
+  var baseUrl = "http://103.156.15.60/absensi/"; // dev
   var isLoading = false.obs;
 
-  loginUser(data) async {
+  Future<Login> loginUser(data) async {
+    var result = Login();
     try {
       loadingWithIcon();
 
@@ -44,8 +49,8 @@ class ServiceApi {
 
       switch (response.statusCode) {
         case 200:
-          final result = json.decode(response.body);
-          return Login.fromJson(result);
+          final data = json.decode(response.body);
+          return result = Login.fromJson(data);
         case 400:
         case 401:
         case 402:
@@ -78,11 +83,13 @@ class ServiceApi {
       );
       isLoading.value = false;
     }
+    return result;
   }
 
   getBrandCabang() async {
     try {
       final response = await http.get(Uri.parse('${baseUrl}brand_cabang'));
+      log('${baseUrl}brand_cabang');
       switch (response.statusCode) {
         case 200:
           List<dynamic> result = json.decode(response.body)['data'];
@@ -369,6 +376,7 @@ class ServiceApi {
       switch (response.statusCode) {
         case 200:
           final result = json.decode(response.body)['data'];
+
           return CekAbsen.fromJson(result);
         case 400:
         case 401:
@@ -387,6 +395,42 @@ class ServiceApi {
     }
   }
 
+  Future<Absen> getDataAdjust(paramAbsen) async {
+    var dataAbsen = Absen();
+    try {
+      final response = await http
+          .post(Uri.parse('${baseUrl}get_adjust'), body: paramAbsen)
+          .timeout(const Duration(seconds: 5));
+      switch (response.statusCode) {
+        case 200:
+          var result = json.decode(response.body)['data'];
+          if (result != null) {
+            dataAbsen = Absen.fromJson(result);
+          } else {
+            showToast("data tidak ditemukan.");
+          }
+
+        case 400:
+        case 401:
+        case 402:
+        case 404:
+          final result = json.decode(response.body);
+          throw FetchDataException(result["message"]);
+        default:
+          throw FetchDataException(
+            'Something went wrong.',
+          );
+      }
+    } on FetchDataException catch (e) {
+      // print('error caught: ${e.message}');
+      showToast("${e.message}");
+    } on TimeoutException catch (_) {
+      // Get.back();
+      showToast("waktu koneksi ke server habis");
+    }
+    return dataAbsen;
+  }
+
   Future<List<Absen>> getAbsen(paramAbsen) async {
     List<Absen> dataAbsen = [];
     try {
@@ -396,8 +440,7 @@ class ServiceApi {
         case 200:
           List<dynamic> result = json.decode(response.body)['data'];
           dataAbsen = result.map((e) => Absen.fromJson(e)).toList();
-        // print(result);
-
+          log('${baseUrl}get_absen', name: 'GET ABSEN');
         case 400:
         case 401:
         case 402:
@@ -526,8 +569,9 @@ class ServiceApi {
 
   getFilteredAbsen(Map<String, dynamic> data) async {
     try {
-      final response =
-          await http.post(Uri.parse('${baseUrl}get_absen'), body: data);
+      final response = await http
+          .post(Uri.parse('${baseUrl}get_absen'), body: data)
+          .timeout(const Duration(seconds: 15));
       switch (response.statusCode) {
         case 200:
           List<dynamic> result = json.decode(response.body)['data'];
@@ -547,6 +591,8 @@ class ServiceApi {
     } on FetchDataException catch (e) {
       // print('error caught: ${e.message}');
       showToast("${e.message}");
+    } on TimeoutException catch (_) {
+      showToast("waktu koneksi ke server habis.\nharap mencoba kembali");
     }
   }
 
@@ -734,7 +780,7 @@ class ServiceApi {
     } catch (e) {
       if (!isOnInit) {
         Get.back();
-       showToast('Terjadi kesalahan saat mengirim data');
+        showToast('Terjadi kesalahan saat mengirim data');
         debugPrint('$e');
       }
     }
@@ -791,14 +837,20 @@ class ServiceApi {
   }
 
   getVisit(Map<String, dynamic> paramSingleVisit) async {
+    // List<Visit> dataVisit = [];
     try {
-      final response = await http.post(Uri.parse('${baseUrl}get_visit'),
-          body: paramSingleVisit);
+      final response = await http
+          .post(Uri.parse('${baseUrl}get_visit'), body: paramSingleVisit)
+          .timeout(const Duration(seconds: 10));
       switch (response.statusCode) {
         case 200:
           List<dynamic> result = json.decode(response.body)['data'];
-          // print(result);
+          // if (result.isNotEmpty) {
           List<Visit> dataVisit = result.map((e) => Visit.fromJson(e)).toList();
+          // } else {
+          // showToast("data tidak ditemukan.");
+          // }
+
           return dataVisit;
         case 400:
         case 401:
@@ -814,19 +866,24 @@ class ServiceApi {
     } on FetchDataException catch (e) {
       // print('error caught: ${e.message}');
       showToast("${e.message}");
+    } on TimeoutException catch (_) {
+      // Get.back();
+      showToast("waktu koneksi ke server habis");
     }
   }
 
-  getLimitVisit(Map<String, dynamic> paramLimitVisit) async {
+  Future<List<Visit>> getLimitVisit(
+      Map<String, dynamic> paramLimitVisit) async {
+    List<Visit> dataVisit = [];
     try {
       final response = await http.post(Uri.parse('${baseUrl}get_visit'),
           body: paramLimitVisit);
       switch (response.statusCode) {
         case 200:
           List<dynamic> result = json.decode(response.body)['data'];
-          List<Visit> dataAbsen = result.map((e) => Visit.fromJson(e)).toList();
-          // print(result);
-          return dataAbsen;
+          dataVisit = result.map((e) => Visit.fromJson(e)).toList();
+        // print(result);
+
         case 400:
         case 401:
         case 402:
@@ -842,6 +899,7 @@ class ServiceApi {
       // print('error caught: ${e.message}');
       showToast("${e.message}");
     }
+    return dataVisit;
   }
 
   getUserCabang(idStore) async {
@@ -869,6 +927,90 @@ class ServiceApi {
     } on FetchDataException catch (e) {
       // print('error caught: ${e.message}');
       showToast("${e.message}");
+    }
+  }
+
+  updateAbsen(Map<String, dynamic> data) async {
+    try {
+      await http
+          .post(Uri.parse('${baseUrl}get_adjust'), body: data)
+          .timeout(const Duration(seconds: 5));
+    } on FetchDataException catch (e) {
+      // print('error caught: ${e.message}');
+      showToast("${e.message}");
+    } on TimeoutException catch (_) {
+      showToast("waktu koneksi ke server habis");
+    }
+  }
+
+  getDeptVisit() async {
+    try {
+      final response = await http.get(Uri.parse('${baseUrl}get_dept_visit'));
+
+      switch (response.statusCode) {
+        case 200:
+          List<dynamic> result = json.decode(response.body)['data'];
+          List<Dept> dataDept = result.map((e) => Dept.fromJson(e)).toList();
+          return dataDept;
+        case 400:
+        case 401:
+        case 402:
+        case 404:
+          final result = json.decode(response.body);
+          throw FetchDataException(result["message"]);
+        default:
+          throw FetchDataException(
+            'Something went wrong.',
+          );
+      }
+    } on FetchDataException catch (e) {
+      // print('error caught: ${e.message}');
+      showToast("${e.message}");
+    }
+  }
+
+  getUserVisit(idDept) async {
+    var data = {"idDept": idDept};
+    try {
+      final response =
+          await http.post(Uri.parse('${baseUrl}get_user_visit'), body: data);
+
+      switch (response.statusCode) {
+        case 200:
+          List<dynamic> result = json.decode(response.body)['data'];
+          List<Users> dataUser = result.map((e) => Users.fromJson(e)).toList();
+          return dataUser;
+        case 400:
+        case 401:
+        case 402:
+        case 404:
+          final result = json.decode(response.body);
+          throw FetchDataException(result["message"]);
+        default:
+          throw FetchDataException(
+            'Something went wrong.',
+          );
+      }
+    } on FetchDataException catch (e) {
+      // print('error caught: ${e.message}');
+      showToast("${e.message}");
+    }
+  }
+
+  sendDataToXmor(data) async {
+    String url = "https://xmor.urbanco.id/api";
+    final response = await http.post(Uri.parse('$url/attendance/create'),
+        headers: {
+          "Accept": "application/json",
+          "Authorization":
+              "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJuaWsiOiIyMDI0MDcwMDAxIiwicGFzc3dvcmQiOiJhc2Q5OTkiLCJpZCI6MjY1LCJ1c2VyX2lkIjoyfQ.s7rw000BPNeJjrH7z-5pkxw4LZ8eixiXE9Cp913ItBE"
+        },
+        body: data);
+
+    if (response.statusCode == 200) {
+      log("kirim data sukses", name: "XMOR");
+    } else {
+      log("gagal kirim data", name: "XMOR");
     }
   }
 }

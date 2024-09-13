@@ -15,6 +15,7 @@ abstract class Routes {
   static const MONITORING_ABSEN = _Paths.MONITORING_ABSEN;
   static const SETTINGS = _Paths.SETTINGS;
   static const ALARM = _Paths.ALARM;
+  static const ADJUST_PRESENCE = _Paths.ADJUST_PRESENCE;
 }
 
 abstract class _Paths {
@@ -31,4 +32,5 @@ abstract class _Paths {
   static const MONITORING_ABSEN = '/monitoring-absen';
   static const SETTINGS = '/settings';
   static const ALARM = '/alarm';
+  static const ADJUST_PRESENCE = '/adjust-presence';
 }

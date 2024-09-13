@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:absensi/app/data/helper/const.dart';
 import 'package:absensi/app/data/helper/db_helper.dart';
 import 'package:absensi/app/data/helper/loading_dialog.dart';
+import 'package:absensi/app/data/model/login_model.dart';
 import 'package:absensi/app/modules/add_pegawai/controllers/add_pegawai_controller.dart';
 import 'package:flutter/material.dart';
 
@@ -15,7 +16,7 @@ import '../../../services/service_api.dart';
 
 class BackupView extends GetView {
   BackupView({super.key, this.userData});
-  final List? userData;
+  final Data? userData;
   final ctrl = Get.put(AddPegawaiController());
 
   @override
@@ -28,7 +29,7 @@ class BackupView extends GetView {
             decoration: const BoxDecoration(
               image: DecorationImage(
                 image: AssetImage(
-                    'assets/image/bgapp.jpg'),
+                    'assets/image/new_bg_app.jpg'),
                 // Gantilah dengan path gambar Anda
                 fit: BoxFit.cover,
               ),
@@ -149,7 +150,7 @@ class BackupView extends GetView {
                             borderRadius: BorderRadius.circular(20)))),
                       icon: Icon(Icons.camera_front, color: mainColor,),
                       onPressed: () async {
-                      if(userData![12] == '0'){
+                      if(userData!.visit == '0'){
                         var tempDataAbs = await SQLHelper.instance.getAllDataAbsen();
                         for (var i in tempDataAbs) {
                           var data = {
@@ -201,9 +202,9 @@ class BackupView extends GetView {
                         }
                       }
                         await SQLHelper.instance.truncateShift();
-                        showToast(userData![12] == '0' ? 'Data absen berhasil dikirim ulang' : 'Data visit berhasil dikirim ulang');
+                        showToast(userData!.visit == '0' ? 'Data absen berhasil dikirim ulang' : 'Data visit berhasil dikirim ulang');
                       },
-                      label:  Text( userData![12] == '0' ? 'Kirim ulang data absensi' : 'Kirim ulang data visit',
+                      label:  Text( userData!.visit == '0' ? 'Kirim ulang data absensi' : 'Kirim ulang data visit',
                         style: const TextStyle(color: Colors.black),),
                     ),
                     const SizedBox(height: 5,),OutlinedButton.icon(style: ButtonStyle(

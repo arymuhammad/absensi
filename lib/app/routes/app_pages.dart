@@ -3,6 +3,8 @@ import 'package:get/get.dart';
 import '../modules/absen/views/absen_view.dart';
 import '../modules/add_pegawai/bindings/add_pegawai_binding.dart';
 import '../modules/add_pegawai/views/add_pegawai_view.dart';
+import '../modules/adjust_presence/bindings/adjust_presence_binding.dart';
+import '../modules/adjust_presence/views/adjust_presence_view.dart';
 import '../modules/alarm/bindings/alarm_binding.dart';
 import '../modules/alarm/views/alarm_view.dart';
 import '../modules/cek_stok/bindings/cek_stok_binding.dart';
@@ -83,6 +85,11 @@ class AppPages {
       name: _Paths.ALARM,
       page: () => AlarmView(),
       binding: AlarmBinding(),
+    ),
+    GetPage(
+      name: _Paths.ADJUST_PRESENCE,
+      page: () => AdjustPresenceView(),
+      binding: AdjustPresenceBinding(),
     ),
   ];
 }

@@ -19,7 +19,7 @@ class UpdatePassword extends GetView {
           decoration: const BoxDecoration(
             image: DecorationImage(
               image: AssetImage(
-                  'assets/image/bgapp.jpg'), // Gantilah dengan path gambar Anda
+                  'assets/image/new_bg_app.jpg'), // Gantilah dengan path gambar Anda
               fit: BoxFit.cover,
             ),
           ),

@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:absensi/app/controllers/absen_controller.dart';
+import 'package:absensi/app/modules/absen/controllers/absen_controller.dart';
 import 'package:absensi/app/data/helper/app_colors.dart';
 import 'package:absensi/app/data/helper/loading_dialog.dart';
 import 'package:flutter/material.dart';
@@ -25,7 +25,7 @@ class AboutView extends GetView {
           decoration: const BoxDecoration(
             image: DecorationImage(
               image: AssetImage(
-                  'assets/image/bgapp.jpg'), // Gantilah dengan path gambar Anda
+                  'assets/image/new_bg_app.jpg'), // Gantilah dengan path gambar Anda
               fit: BoxFit.cover,
             ),
           ),

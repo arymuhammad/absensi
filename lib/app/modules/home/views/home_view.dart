@@ -1,127 +1,98 @@
 import 'package:absensi/app/data/helper/loading_dialog.dart';
+import 'package:absensi/app/data/model/login_model.dart';
 import 'package:absensi/app/modules/home/views/card_info_menu.dart';
 import 'package:absensi/app/modules/home/views/summary_absen.dart';
 import 'package:absensi/app/modules/home/views/summary_absen_area.dart';
 import 'package:absensi/app/modules/profil/views/profil_view.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:absensi/app/modules/shared/background_image_header.dart';
+import 'package:absensi/app/modules/shared/rounded_image.dart';
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
 
-import '../../../services/service_api.dart';
 import '../controllers/home_controller.dart';
 
 class HomeView extends GetView<HomeController> {
   const HomeView({super.key, this.listDataUser});
-  final List? listDataUser;
+  final Data? listDataUser;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
         children: [
-          ClipPath(
-            clipper: ClipPathClass(),
-            child: Container(
-              height: 250,
-              width: Get.size.width,
-              decoration: const BoxDecoration(
-                  image: DecorationImage(
-                      image: AssetImage('assets/image/bgapp.jpg'),
-                      fit: BoxFit.fill)),
-            ),
+          const CsBgImgHeader(
+            height: 350,
           ),
           Padding(
-            padding: const EdgeInsets.only(left: 20.0, top: 60.0, right: 20.0),
+            padding: const EdgeInsets.only(left: 15.0, top: 60.0, right: 15.0),
             child: Column(
               children: [
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Row(
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        InkWell(
-                          onTap: () {
-                            Get.to(
-                                () => ProfilView(listDataUser: listDataUser!));
-                          },
-                          child: Card(
-                            elevation: 4,
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(100),
-                                side: const BorderSide(
-                                    width: 3, color: Colors.white)),
-                            child: ClipOval(
-                              child: Hero(
-                                tag: 'pro',
-                                transitionOnUserGestures: true,
-                                child: Container(
-                                  height: 80,
-                                  width: 80,
-                                  color: Colors.grey[200],
-                                  child: listDataUser![5] != ""
-                                      ? CachedNetworkImage(
-                                          imageUrl:
-                                              "${ServiceApi().baseUrl}${listDataUser![5]}",
-                                          fit: BoxFit.cover,
-                                          progressIndicatorBuilder:
-                                              (context, url, progress) =>
-                                                  CircularProgressIndicator(
-                                            value: progress.progress,
-                                            strokeWidth: 15,
-                                          ),
-                                          cacheKey:
-                                              "${ServiceApi().baseUrl}${listDataUser![5]} + ${DateTime.now().day.toString()}",
-                                        )
-                                      : Image.network(
-                                          "https://ui-avatars.com/api/?name=${listDataUser![1]}",
-                                          fit: BoxFit.cover,
-                                        ),
-                                ),
-                              ),
-                            ),
+                        Text(
+                          listDataUser!.nama!.substring(
+                                  0,
+                                  listDataUser!.nama!.length > 18
+                                      ? 18
+                                      : listDataUser!.nama!.length) +
+                              (listDataUser!.nama!.length > 18 ? '...' : '')
+                                  .toString()
+                                  .capitalize!,
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                          softWrap: true,
+                          style: const TextStyle(
+                              fontSize: 22,
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        Text(
+                          listDataUser!.levelUser.toString().capitalize!,
+                          style: const TextStyle(
+                            fontSize: 17,
+                            color: Colors.white,
                           ),
                         ),
-                        const SizedBox(width: 10),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              'Selamat Datang',
-                              style:
-                                  TextStyle(fontSize: 18, color: Colors.white),
-                            ),
-                            Text(
-                              listDataUser![1].toString().capitalize!,
-                              style: const TextStyle(
-                                  fontSize: 18, color: Colors.white),
-                            ),
-                          ],
-                        )
                       ],
                     ),
-                    IconButton(
-                        onPressed: () {
-                          promptDialog(context, 'Anda yakin ingin keluar?');
-                        },
-                        icon: const Icon(
-                          Icons.logout_rounded,
-                          color: Colors.white,
-                          size: 35,
-                        ))
+                    InkWell(
+                      onTap: () {
+                        Get.to(() => ProfilView(listDataUser: listDataUser!));
+                      },
+                      child: Card(
+                        elevation: 4,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(100),
+                            side: const BorderSide(
+                                width: 3, color: Colors.white)),
+                        child: RoundedImage(
+                            height: 80,
+                            width: 80,
+                            foto: listDataUser!.foto!,
+                            name: listDataUser!.nama!),
+                      ),
+                    ),
+                    // const SizedBox(width: 10),
+                    // IconButton(
+                    //     onPressed: () {
+                    //       promptDialog(context, 'Anda yakin ingin keluar?');
+                    //     },
+                    //     icon: const Icon(
+                    //       Icons.logout_rounded,
+                    //       color: Colors.white,
+                    //       size: 35,
+                    //     ))
                   ],
                 ),
                 const SizedBox(height: 20),
-                Expanded(
-                    flex: 1,
-                    child: Column(
-                      children: [
-                        CardInfoMenu(userData: listDataUser!),
-                        listDataUser![12] == "1"
-                            ? SummaryAbsenArea(userData: listDataUser!)
-                            : SummaryAbsen(userData: listDataUser!)
-                      ],
-                    )),
+                listDataUser!.visit == "1"
+                    ? SummaryAbsenArea(userData: listDataUser!)
+                    : SummaryAbsen(userData: listDataUser!),
               ],
             ),
           ),
@@ -129,22 +100,4 @@ class HomeView extends GetView<HomeController> {
       ),
     );
   }
-}
-
-class ClipPathClass extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    var path = Path();
-    path.lineTo(0.0, size.height - 60);
-
-    path.quadraticBezierTo(
-        size.width / 2, size.height, size.width, size.height - 60);
-
-    path.lineTo(size.width, 0.0);
-    path.close();
-    return path;
-  }
-
-  @override
-  bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
 }
