@@ -14,7 +14,7 @@ import 'package:get/get.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:ternav_icons/ternav_icons.dart';
 
-import '../../alarm/views/alarm_view.dart';
+// import '../../alarm/views/alarm_view.dart';
 import '../controllers/settings_controller.dart';
 
 class SettingsView extends GetView<SettingsController> {
@@ -122,30 +122,32 @@ class SettingsView extends GetView<SettingsController> {
                           trailing: Icon(Icons.keyboard_arrow_right_rounded,
                               color: subTitleColor),
                         ),
-                        ListTile(
-                          onTap: () {
-                            Get.to(() => AlarmView(),
-                                transition: Transition.cupertino);
-                          },
-                          leading: Container(
-                            height: 40,
-                            width: 40,
-                            decoration: BoxDecoration(
-                                color: bgContainer,
-                                borderRadius: BorderRadius.circular(8)),
-                            child: Icon(Bootstrap.alarm_fill, color: mainColor),
-                          ),
-                          title: Text(
-                            'Alarm',
-                            style: TextStyle(
-                                color: titleColor, fontWeight: FontWeight.bold),
-                          ),
-                          subtitle: Text('Remind me  (BETA Test)',
-                              style: TextStyle(
-                                  color: subTitleColor, fontSize: 13)),
-                          trailing: Icon(Icons.keyboard_arrow_right_rounded,
-                              color: subTitleColor),
-                        ),
+
+                        // REMOVE ALARM FITURE
+                        // ListTile(
+                        //   onTap: () {
+                        //     Get.to(() => AlarmView(),
+                        //         transition: Transition.cupertino);
+                        //   },
+                        //   leading: Container(
+                        //     height: 40,
+                        //     width: 40,
+                        //     decoration: BoxDecoration(
+                        //         color: bgContainer,
+                        //         borderRadius: BorderRadius.circular(8)),
+                        //     child: Icon(Bootstrap.alarm_fill, color: mainColor),
+                        //   ),
+                        //   title: Text(
+                        //     'Alarm',
+                        //     style: TextStyle(
+                        //         color: titleColor, fontWeight: FontWeight.bold),
+                        //   ),
+                        //   subtitle: Text('Remind me  (BETA Test)',
+                        //       style: TextStyle(
+                        //           color: subTitleColor, fontSize: 13)),
+                        //   trailing: Icon(Icons.keyboard_arrow_right_rounded,
+                        //       color: subTitleColor),
+                        // ),
                         Visibility(
                           visible: listDataUser!.level == "1" ? true : false,
                           child: ListTile(

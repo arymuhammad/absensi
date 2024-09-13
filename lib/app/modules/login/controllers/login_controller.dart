@@ -32,6 +32,7 @@ class LoginController extends GetxController {
 
   @override
   void onInit() async {
+    await RiveFile.initialize();
     rootBundle.load(animationLink).then((value) {
       final file = RiveFile.import(value);
       final art = file.mainArtboard;
@@ -117,7 +118,7 @@ class LoginController extends GetxController {
       // print('user data login $tempUser');
       // final user = userDataLogin != "" ? Data.fromJson(jsonDecode(userDataLogin!)) : null;
       logUser.value = Data.fromJson(jsonDecode(tempUser!));
-   
+
       // (tempUser != "" ? Data.fromJson(jsonDecode(tempUser!)) : null)!;
       isAuth.value = await pref.setBool("is_login", true);
       username.clear();

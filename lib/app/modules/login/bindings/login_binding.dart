@@ -10,7 +10,7 @@ class LoginBinding extends Bindings {
     Get.lazyPut<LoginController>(
       () => LoginController(),
     );
-    Get.put(()=>AlarmController());
+    // Get.put(()=>AlarmController());
     Get.put(()=>AbsenController());
   }
 }

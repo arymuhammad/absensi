@@ -1,12 +1,12 @@
-import 'package:get/get.dart';
+// import 'package:get/get.dart';
 
-import '../controllers/alarm_controller.dart';
+// import '../controllers/alarm_controller.dart';
 
-class AlarmBinding extends Bindings {
-  @override
-  void dependencies() {
-    Get.lazyPut<AlarmController>(
-      () => AlarmController(),
-    );
-  }
-}
+// class AlarmBinding extends Bindings {
+//   @override
+//   void dependencies() {
+//     Get.lazyPut<AlarmController>(
+//       () => AlarmController(),
+//     );
+//   }
+// }

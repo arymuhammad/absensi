@@ -268,8 +268,11 @@ dialogAbsenView(Data dataUser, latitude, longitude) async {
                 auth.selectedMenu(0);
               },
               btnOkOnPress: () async {
+                log(absC.selectedShift.value, name: 'SHIFT');
                 if (statAbs != "") {
                   absC.selectedShift.value = statShiftAbs;
+                } else {
+                  absC.selectedShift.value = absC.selectedShift.value;
                 }
                 if (absC.stsAbsenSelected.isEmpty) {
                   showToast("Harap pilih Absen Masuk / Pulang");

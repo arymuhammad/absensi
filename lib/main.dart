@@ -1,23 +1,17 @@
 import 'dart:convert';
-
 import 'package:absensi/app/data/helper/const.dart';
 import 'package:absensi/app/data/model/login_model.dart';
-
 import 'package:absensi/app/modules/home/views/bottom_navbar.dart';
 import 'package:absensi/app/modules/login/controllers/login_controller.dart';
 import 'package:absensi/app/modules/login/views/login_view.dart';
-
-import 'package:alarm/alarm.dart';
+// import 'package:alarm/alarm.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
-
 import 'package:get/get.dart';
 import 'package:intl/date_symbol_data_local.dart';
-
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:splash_screen_view/SplashScreenView.dart';
-
 import 'app/routes/app_pages.dart';
 
 void main() async {
@@ -28,7 +22,7 @@ void main() async {
   ]);
   // await Workmanager().initialize(callbackDispatcher);
   await initializeDateFormatting('id_ID', "");
-  await Alarm.init();
+  // await Alarm.init();
 
   SharedPreferences prefs = await SharedPreferences.getInstance();
   var status = prefs.getBool('is_login') ?? false;

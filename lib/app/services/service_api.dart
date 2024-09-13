@@ -1006,10 +1006,13 @@ class ServiceApi {
               "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJuaWsiOiIyMDI0MDcwMDAxIiwicGFzc3dvcmQiOiJhc2Q5OTkiLCJpZCI6MjY1LCJ1c2VyX2lkIjoyfQ.s7rw000BPNeJjrH7z-5pkxw4LZ8eixiXE9Cp913ItBE"
         },
         body: data);
-
     if (response.statusCode == 200) {
+      log('$url/attendance/create', name: 'LINK');
+      print(data);
       log("kirim data sukses", name: "XMOR");
     } else {
+      log('$url/attendance/create', name: 'LINK');
+      print(data);
       log("gagal kirim data", name: "XMOR");
     }
   }
