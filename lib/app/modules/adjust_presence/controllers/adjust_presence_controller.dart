@@ -2,7 +2,6 @@ import 'package:absensi/app/data/helper/loading_dialog.dart';
 import 'package:absensi/app/data/model/absen_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 
 import '../../../data/helper/db_helper.dart';
 import '../../../data/model/cabang_model.dart';

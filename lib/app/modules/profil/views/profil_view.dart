@@ -3,7 +3,6 @@ import 'package:absensi/app/data/model/login_model.dart';
 import 'package:absensi/app/modules/login/controllers/login_controller.dart';
 import 'package:absensi/app/modules/shared/background_image_header.dart';
 import 'package:absensi/app/modules/shared/rounded_image.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:full_screen_image_null_safe/full_screen_image_null_safe.dart';
@@ -12,7 +11,6 @@ import 'package:get/get.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:ternav_icons/ternav_icons.dart';
 
-import '../../../services/service_api.dart';
 import '../../add_pegawai/controllers/add_pegawai_controller.dart';
 import '../controllers/profil_controller.dart';
 

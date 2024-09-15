@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 import 'package:absensi/app/data/model/login_model.dart';
-import 'package:absensi/app/modules/login/controllers/login_controller.dart';
 import 'package:crypto/crypto.dart';
 import 'package:absensi/app/data/helper/db_helper.dart';
 import 'package:absensi/app/services/service_api.dart';

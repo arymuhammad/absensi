@@ -1,17 +1,13 @@
-import 'dart:io';
 
 import 'package:absensi/app/data/helper/app_colors.dart';
 import 'package:absensi/app/data/helper/const.dart';
-import 'package:absensi/app/data/helper/loading_dialog.dart';
 import 'package:absensi/app/modules/profil/views/verifikasi_update_password.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
 import 'package:icons_plus/icons_plus.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:rive/rive.dart';
-import 'package:sqflite/sqflite.dart';
 
 import '../controllers/login_controller.dart';
 

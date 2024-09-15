@@ -1,5 +1,4 @@
 import 'package:absensi/app/modules/absen/controllers/absen_controller.dart';
-import 'package:absensi/app/modules/alarm/controllers/alarm_controller.dart';
 import 'package:get/get.dart';
 
 import '../controllers/login_controller.dart';
