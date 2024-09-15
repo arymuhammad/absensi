@@ -208,7 +208,7 @@ class AbsenController extends GetxController {
       paramLimitVisit, Data dataUserLogin) {
     // Buat Stream yang mengeluarkan tanggal setiap detik
     final dateStream =
-        Stream.periodic(const Duration(minutes: 1), (_) => DateTime.now());
+        Stream.periodic(const Duration(seconds: 1), (_) => DateTime.now());
     // var urut = 1.obs;
     // Perbarui nilai tanggal di _dateStream setiap kali Stream mengeluarkan nilai baru
     _sub = dateStream.listen((date) async {
@@ -1054,7 +1054,7 @@ class AbsenController extends GetxController {
       String device) async {
     var img = "";
     if (image != null) {
-      img = base64Encode(File(image!.path).readAsBytesSync());
+      img = base64.encode(File(image!.path).readAsBytesSync());
     }
     var data = {
       "emp_id": id,

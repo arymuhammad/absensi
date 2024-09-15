@@ -155,61 +155,61 @@ class LoginView extends GetView<LoginController> {
                                         })
                                 ])),
                           ),
-                          const SizedBox(
-                            height: 5,
-                          ),
-                          Row(
-                            children: [
-                              InkWell(
-                                onTap: () async {
-                                  var databasesPath = await getDatabasesPath();
-                                  // var dbPath = join(databasesPath, 'penjualan.db');
+                          // const SizedBox(
+                          //   height: 5,
+                          // ),
+                          // Row(
+                          //   children: [
+                          //     InkWell(
+                          //       onTap: () async {
+                          //         var databasesPath = await getDatabasesPath();
+                          //         // var dbPath = join(databasesPath, 'penjualan.db');
 
-                                  var status = await Permission
-                                      .manageExternalStorage.status;
-                                  if (!status.isGranted) {
-                                    await Permission.manageExternalStorage
-                                        .request();
-                                  }
+                          //         var status = await Permission
+                          //             .manageExternalStorage.status;
+                          //         if (!status.isGranted) {
+                          //           await Permission.manageExternalStorage
+                          //               .request();
+                          //         }
 
-                                  var status1 = await Permission.storage.status;
-                                  if (!status1.isGranted) {
-                                    await Permission.storage.request();
-                                  }
+                          //         var status1 = await Permission.storage.status;
+                          //         if (!status1.isGranted) {
+                          //           await Permission.storage.request();
+                          //         }
 
-                                  try {
-                                    File savedDb = File(
-                                        "/storage/emulated/0/URBANCO SPOT/absensi.db");
+                          //         try {
+                          //           File savedDb = File(
+                          //               "/storage/emulated/0/URBANCO SPOT/absensi.db");
 
-                                    await savedDb
-                                        .copy('$databasesPath/absensi.db');
-                                  } catch (e) {
-                                    showToast(
-                                        e.toString());
-                                  }
+                          //           await savedDb
+                          //               .copy('$databasesPath/absensi.db');
+                          //         } catch (e) {
+                          //           showToast(
+                          //               e.toString());
+                          //         }
 
-                                  showToast('Successfully Restored Database');
-                                },
-                                child: Row(
-                                  children: [
-                                    Icon(
-                                      Icons.restore_rounded,
-                                      color: mainColor,
-                                    ),
-                                    const SizedBox(
-                                      width: 10,
-                                    ),
-                                    Text(
-                                      'Restore Database',
-                                      style: TextStyle(
-                                          color: mainColor,
-                                          fontWeight: FontWeight.bold),
-                                    )
-                                  ],
-                                ),
-                              )
-                            ],
-                          )
+                          //         showToast('Successfully Restored Database');
+                          //       },
+                          //       child: Row(
+                          //         children: [
+                          //           Icon(
+                          //             Icons.restore_rounded,
+                          //             color: mainColor,
+                          //           ),
+                          //           const SizedBox(
+                          //             width: 10,
+                          //           ),
+                          //           Text(
+                          //             'Restore Database',
+                          //             style: TextStyle(
+                          //                 color: mainColor,
+                          //                 fontWeight: FontWeight.bold),
+                          //           )
+                          //         ],
+                          //       ),
+                          //     )
+                          //   ],
+                          // )
                         ],
                       ),
                     ),
