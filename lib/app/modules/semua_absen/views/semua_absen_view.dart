@@ -14,7 +14,10 @@ import 'package:icons_plus/icons_plus.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:ternav_icons/ternav_icons.dart';
 
+import '../../../data/helper/format_waktu.dart';
 import '../../../routes/app_pages.dart';
+import '../../shared/container.dart';
+import '../../shared/rounded_image.dart';
 import '../controllers/semua_absen_controller.dart';
 import 'package:intl/intl.dart';
 
@@ -33,19 +36,19 @@ class SemuaAbsenView extends GetView<SemuaAbsenController> {
             height: 380,
           ),
           Padding(
-            padding: const EdgeInsets.only(top: 110, left: 15.0, right: 15.0),
+            padding: const EdgeInsets.only(top: 110, left: 7.0, right: 7.0),
             child: Card(
               elevation: 4,
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20)),
               child: SizedBox(
-                height: 620,
+                height: 680,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Padding(
                       padding: const EdgeInsets.only(
-                          left: 15.0, top: 10.0, right: 15.0, bottom: 10),
+                          left: 10.0, top: 10.0, right: 10.0, bottom: 10),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -72,7 +75,7 @@ class SemuaAbsenView extends GetView<SemuaAbsenController> {
                           Obx(
                             () => absenC.ascending.value
                                 ? SizedBox(
-                                    width: 45,
+                                    width: 55,
                                     height: 65,
                                     child: Card(
                                       color: mainColor,
@@ -96,7 +99,7 @@ class SemuaAbsenView extends GetView<SemuaAbsenController> {
                                     ),
                                   )
                                 : SizedBox(
-                                    width: 45,
+                                    width: 55,
                                     height: 65,
                                     child: Card(
                                       color: mainColor,
@@ -127,7 +130,7 @@ class SemuaAbsenView extends GetView<SemuaAbsenController> {
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.only(left: 20.0, right: 20.0),
+                      padding: const EdgeInsets.only(left: 15.0, right: 15.0),
                       child: Obx(() => Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
@@ -145,7 +148,7 @@ class SemuaAbsenView extends GetView<SemuaAbsenController> {
                           )),
                     ),
                     Padding(
-                      padding: const EdgeInsets.only(left: 20.0, right: 20.0),
+                      padding: const EdgeInsets.only(left: 15.0, right: 15.0),
                       child: Divider(
                         color: subTitleColor,
                         thickness: 1,
@@ -310,10 +313,50 @@ class SemuaAbsenView extends GetView<SemuaAbsenController> {
                                         shrinkWrap: true,
                                         padding: const EdgeInsets.only(
                                             bottom: 20.0,
-                                            left: 20.0,
-                                            right: 20.0),
+                                            left: 8.0,
+                                            right: 8.0),
                                         itemCount: absenC.searchAbsen.length,
                                         itemBuilder: (c, i) {
+                                          var stsMasuk = FormatWaktu.formatJamMenit(
+                                              jamMenit: absenC.searchAbsen[i]
+                                                  .jamAbsenMasuk!)
+                                          .isBefore(FormatWaktu.formatJamMenit(
+                                              jamMenit: absenC
+                                                  .searchAbsen[i].jamMasuk!))
+                                      ? "Awal Waktu"
+                                      : FormatWaktu.formatJamMenit(
+                                                  jamMenit: absenC
+                                                      .searchAbsen[i]
+                                                      .jamAbsenMasuk!)
+                                              .isAtSameMomentAs(
+                                                  FormatWaktu.formatJamMenit(
+                                                      jamMenit: absenC
+                                                          .searchAbsen[i]
+                                                          .jamMasuk!))
+                                          ? "Tepat Waktu"
+                                          : "Telat";
+                                  var stsPulang = absenC.searchAbsen[i]
+                                              .jamAbsenPulang! ==
+                                          ""
+                                      ? "Belum Absen"
+                                      : DateTime.parse(absenC.searchAbsen[i].tanggalPulang!).isAfter(DateTime.parse(absenC.searchAbsen[i].tanggalMasuk!)) &&
+                                              FormatWaktu.formatJamMenit(
+                                                      jamMenit: absenC
+                                                          .searchAbsen[i]
+                                                          .jamAbsenPulang!)
+                                                  .isBefore(FormatWaktu.formatJamMenit(
+                                                      jamMenit: "08:01"))
+                                          ? "Lembur"
+                                          : FormatWaktu.formatJamMenit(
+                                                      jamMenit: absenC
+                                                          .searchAbsen[i]
+                                                          .jamAbsenPulang!)
+                                                  .isBefore(
+                                                      FormatWaktu.formatJamMenit(jamMenit: absenC.searchAbsen[i].jamPulang!))
+                                              ? "Pulang Cepat"
+                                              : FormatWaktu.formatJamMenit(jamMenit: absenC.searchAbsen[i].jamAbsenPulang!).isAtSameMomentAs(FormatWaktu.formatJamMenit(jamMenit: absenC.searchAbsen[i].jamPulang!))
+                                                  ? 'Tepat Waktu'
+                                                  : "Lembur";
                                           return InkWell(
                                             onTap: () {
                                               absenC.searchAbsen;
@@ -340,50 +383,8 @@ class SemuaAbsenView extends GetView<SemuaAbsenController> {
                                                         ? absenC.searchAbsen[i]
                                                             .tanggalPulang!
                                                         : "",
-                                                    "jam_masuk": DateFormat("HH:mm")
-                                                            .parse(absenC
-                                                                .searchAbsen[i]
-                                                                .jamAbsenMasuk!)
-                                                            .isBefore(DateFormat("HH:mm")
-                                                                .parse(absenC
-                                                                    .searchAbsen[
-                                                                        i]
-                                                                    .jamMasuk!))
-                                                        ? "Awal Waktu"
-                                                        : DateFormat("HH:mm")
-                                                                .parse(absenC
-                                                                    .searchAbsen[
-                                                                        i]
-                                                                    .jamAbsenMasuk!)
-                                                                .isAtSameMomentAs(
-                                                                    DateFormat("HH:mm")
-                                                                        .parse(absenC.searchAbsen[i].jamMasuk!))
-                                                            ? "Tepat Waktu"
-                                                            : "Telat",
-                                                    "jam_pulang": absenC
-                                                                .searchAbsen[i]
-                                                                .jamAbsenPulang! ==
-                                                            ""
-                                                        ? "Belum Absen"
-                                                        : DateTime.parse(absenC.searchAbsen[i].tanggalPulang!).isAfter(DateTime.parse(absenC.searchAbsen[i].tanggalMasuk!)) &&
-                                                                DateFormat("HH:mm")
-                                                                    .parse(absenC
-                                                                        .searchAbsen[
-                                                                            i]
-                                                                        .jamAbsenPulang!)
-                                                                    .isBefore(DateFormat("HH:mm")
-                                                                        .parse(
-                                                                            "08:01"))
-                                                            ? "Lembur"
-                                                            : DateFormat("HH:mm")
-                                                                    .parse(absenC
-                                                                        .searchAbsen[i]
-                                                                        .jamAbsenPulang!)
-                                                                    .isBefore(DateFormat("HH:mm").parse(absenC.searchAbsen[i].jamPulang!))
-                                                                ? "Pulang Cepat"
-                                                                : DateFormat("HH:mm").parse(absenC.searchAbsen[i].jamAbsenPulang!).isAtSameMomentAs(DateFormat("HH:mm").parse(absenC.searchAbsen[i].jamPulang!))
-                                                                    ? "Tepat Waktu"
-                                                                    : "Lembur",
+                                                    "jam_masuk": stsMasuk,
+                                                    "jam_pulang": stsPulang,
                                                     "jam_absen_masuk": absenC
                                                         .searchAbsen[i]
                                                         .jamAbsenMasuk!,
@@ -418,204 +419,363 @@ class SemuaAbsenView extends GetView<SemuaAbsenController> {
                                               absenC.filterAbsen.clear();
                                               absenC.filterDataAbsen("");
                                             },
-                                            child: Card(
-                                              color: bgContainer,
+                                            child: 
+                                            Card(color: bgContainer,
                                               elevation: 8,
-                                              shape: RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(6)),
-                                              child: Row(
-                                                children: [
-                                                  Container(
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(6)),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Text(
+                                                  FormatWaktu.formatIndo(
+                                                      tanggal: DateTime.parse(
+                                                          absenC
+                                                              .searchAbsen[i]
+                                                              .tanggalMasuk!)),
+                                                  style: const TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontSize: 16),
+                                                ),
+                                                Row(
+                                                  children: [
+                                                    CsContainer(
+                                                      title: stsMasuk,
+                                                      color: stsMasuk == "Telat"
+                                                          ? Colors
+                                                              .redAccent[700]!
+                                                          : Colors.greenAccent[
+                                                              700]!,
+                                                      textColor: Colors.white,
+                                                      fontSize: 11,
+                                                    ),
+                                                    const SizedBox(
+                                                      width: 5,
+                                                    ),
+                                                    CsContainer(
+                                                      title: stsPulang,
+                                                      color: stsPulang ==
+                                                                  "Pulang Cepat" ||
+                                                              stsPulang ==
+                                                                  "Belum Absen"
+                                                          ? Colors
+                                                              .redAccent[700]!
+                                                          : Colors.greenAccent[
+                                                              700]!,
+                                                      textColor: Colors.white,
+                                                      fontSize: 11,
+                                                    )
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
+                                            const Divider(
+                                              thickness: 2,
+                                            ),
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Row(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    RoundedImage(
+                                                        height: 50,
+                                                        width: 50,
+                                                        foto: absenC
+                                                            .searchAbsen[i]
+                                                            .fotoMasuk!,
+                                                        name: absenC
+                                                            .searchAbsen[i]
+                                                            .nama!),
+                                                    const SizedBox(
                                                       width: 10,
-                                                      height: Get.mediaQuery
-                                                              .size.height /
-                                                          12,
-                                                      padding: const EdgeInsets.all(
-                                                          10),
-                                                      decoration: BoxDecoration(
-                                                          color: DateFormat("HH:mm")
-                                                                  .parse(absenC
-                                                                      .searchAbsen[
-                                                                          i]
-                                                                      .jamAbsenMasuk!)
-                                                                  .isBefore(DateFormat(
-                                                                          "HH:mm")
-                                                                      .parse(absenC
-                                                                          .searchAbsen[i]
-                                                                          .jamMasuk!))
-                                                              ? Colors.greenAccent[700]
-                                                              : DateFormat("HH:mm").parse(absenC.searchAbsen[i].jamAbsenMasuk!).isAtSameMomentAs(DateFormat("HH:mm").parse(absenC.searchAbsen[i].jamMasuk!))
-                                                                  ? Colors.greenAccent[700]
-                                                                  : Colors.redAccent[700],
-                                                          borderRadius: const BorderRadius.only(
-                                                            topLeft:
-                                                                Radius.circular(
-                                                                    5),
-                                                            bottomLeft:
-                                                                Radius.circular(
-                                                                    5),
-                                                          ))),
-                                                  const SizedBox(
-                                                    width: 20,
-                                                  ),
-                                                  Column(
-                                                    children: [
-                                                      Text(
-                                                        DateFormat('MMM')
-                                                            .format(DateTime
-                                                                .parse(absenC
-                                                                    .searchAbsen[
-                                                                        i]
-                                                                    .tanggalMasuk!))
-                                                            .toUpperCase(),
-                                                        style: TextStyle(
-                                                            color:
-                                                                subTitleColor),
-                                                      ),
-                                                      Text(
-                                                        DateFormat('dd').format(
-                                                            DateTime.parse(absenC
-                                                                .searchAbsen[i]
-                                                                .tanggalMasuk!)),
-                                                        style: TextStyle(
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                            fontSize: 16,
-                                                            color: titleColor),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  const SizedBox(
-                                                    width: 20,
-                                                  ),
-                                                  Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    children: [
-                                                      Text(
-                                                          DateFormat("EEEE",
-                                                                  "id_ID")
-                                                              .format(DateTime
-                                                                  .parse(absenC
-                                                                      .searchAbsen[
-                                                                          i]
-                                                                      .tanggalMasuk!)),
+                                                    ),
+                                                    Column(
+                                                      children: [
+                                                        const Text('MASUK',
+                                                            style: TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                                fontSize: 16)),
+                                                        Text(
+                                                          absenC
+                                                              .searchAbsen[i]
+                                                              .jamAbsenMasuk!,
                                                           style: TextStyle(
+                                                              color: stsMasuk ==
+                                                                      "Telat"
+                                                                  ? red
+                                                                  : green,
                                                               fontWeight:
                                                                   FontWeight
                                                                       .bold,
-                                                              fontSize: 18,
-                                                              color:
-                                                                  titleColor)),
-                                                      const SizedBox(
-                                                        width: 10,
-                                                      ),
-                                                      Text(
-                                                        DateFormat("HH:mm")
-                                                                .parse(absenC
-                                                                    .searchAbsen[
-                                                                        i]
-                                                                    .jamAbsenMasuk!)
-                                                                .isBefore(DateFormat(
-                                                                        "HH:mm")
-                                                                    .parse(absenC
-                                                                        .searchAbsen[
-                                                                            i]
-                                                                        .jamMasuk!))
-                                                            ? "Awal Waktu"
-                                                            : DateFormat("HH:mm")
-                                                                    .parse(absenC
-                                                                        .searchAbsen[
-                                                                            i]
-                                                                        .jamAbsenMasuk!)
-                                                                    .isAtSameMomentAs(DateFormat("HH:mm").parse(absenC
-                                                                        .searchAbsen[i]
-                                                                        .jamMasuk!))
-                                                                ? "Tepat Waktu"
-                                                                : "Telat",
-                                                        style: TextStyle(
-                                                            color: DateFormat(
-                                                                        "HH:mm")
-                                                                    .parse(absenC
-                                                                        .searchAbsen[
-                                                                            i]
-                                                                        .jamAbsenMasuk!)
-                                                                    .isBefore(DateFormat("HH:mm").parse(absenC
-                                                                        .searchAbsen[
-                                                                            i]
-                                                                        .jamMasuk!))
-                                                                ? Colors.greenAccent[
-                                                                    700]
-                                                                : DateFormat(
-                                                                            "HH:mm")
-                                                                        .parse(absenC
-                                                                            .searchAbsen[i]
-                                                                            .jamAbsenMasuk!)
-                                                                        .isAtSameMomentAs(DateFormat("HH:mm").parse(absenC.searchAbsen[i].jamMasuk!))
-                                                                    ? Colors.greenAccent[700]
-                                                                    : Colors.redAccent[700]),
-                                                      )
-                                                    ],
-                                                  ),
-                                                  const Spacer(),
-                                                  Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            8.0),
-                                                    child: Row(
-                                                      children: [
-                                                        Column(
-                                                          children: [
-                                                            const Text('Masuk'),
-                                                            Text(
-                                                              absenC
-                                                                  .searchAbsen[
-                                                                      i]
-                                                                  .jamAbsenMasuk!,
-                                                              style: TextStyle(
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
-                                                                  color:
-                                                                      titleColor),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                        const SizedBox(
-                                                          width: 15,
-                                                        ),
-                                                        Column(
-                                                          children: [
-                                                            const Text(
-                                                                'Pulang'),
-                                                            Text(
-                                                              absenC
-                                                                          .searchAbsen[
-                                                                              i]
-                                                                          .jamAbsenPulang! !=
-                                                                      ""
-                                                                  ? absenC
-                                                                      .searchAbsen[
-                                                                          i]
-                                                                      .jamAbsenPulang!
-                                                                  : "-",
-                                                              style: TextStyle(
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
-                                                                  color:
-                                                                      titleColor),
-                                                            ),
-                                                          ],
+                                                              fontSize: 16),
                                                         ),
                                                       ],
+                                                    )
+                                                  ],
+                                                ),
+                                                Row(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    RoundedImage(
+                                                        height: 50,
+                                                        width: 50,
+                                                        foto: absenC
+                                                            .searchAbsen[i]
+                                                            .fotoPulang!,
+                                                        name: absenC
+                                                            .searchAbsen[i]
+                                                            .nama!),
+                                                    const SizedBox(
+                                                      width: 10,
                                                     ),
-                                                  ),
-                                                ],
-                                              ),
+                                                    Column(
+                                                      children: [
+                                                        const Text('PULANG',
+                                                            style: TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                                fontSize: 16)),
+                                                        Text(
+                                                          absenC
+                                                              .searchAbsen[i]
+                                                              .jamAbsenPulang!,
+                                                          style: TextStyle(
+                                                              color: stsPulang ==
+                                                                          "Pulang Cepat" ||
+                                                                      stsPulang ==
+                                                                          "Belum Absen"
+                                                                  ? red
+                                                                  : green,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              fontSize: 16),
+                                                        ),
+                                                      ],
+                                                    )
+                                                  ],
+                                                ),
+                                              ],
                                             ),
+                                          ],
+                                        ),
+                                      ),
+                                    )
+                                            // Card(
+                                            //   color: bgContainer,
+                                            //   elevation: 8,
+                                            //   shape: RoundedRectangleBorder(
+                                            //       borderRadius:
+                                            //           BorderRadius.circular(6)),
+                                            //   child: Row(
+                                            //     children: [
+                                            //       Container(
+                                            //           width: 10,
+                                            //           height: Get.mediaQuery
+                                            //                   .size.height /
+                                            //               12,
+                                            //           padding: const EdgeInsets.all(
+                                            //               10),
+                                            //           decoration: BoxDecoration(
+                                            //               color: DateFormat("HH:mm")
+                                            //                       .parse(absenC
+                                            //                           .searchAbsen[
+                                            //                               i]
+                                            //                           .jamAbsenMasuk!)
+                                            //                       .isBefore(DateFormat(
+                                            //                               "HH:mm")
+                                            //                           .parse(absenC
+                                            //                               .searchAbsen[i]
+                                            //                               .jamMasuk!))
+                                            //                   ? Colors.greenAccent[700]
+                                            //                   : DateFormat("HH:mm").parse(absenC.searchAbsen[i].jamAbsenMasuk!).isAtSameMomentAs(DateFormat("HH:mm").parse(absenC.searchAbsen[i].jamMasuk!))
+                                            //                       ? Colors.greenAccent[700]
+                                            //                       : Colors.redAccent[700],
+                                            //               borderRadius: const BorderRadius.only(
+                                            //                 topLeft:
+                                            //                     Radius.circular(
+                                            //                         5),
+                                            //                 bottomLeft:
+                                            //                     Radius.circular(
+                                            //                         5),
+                                            //               ))),
+                                            //       const SizedBox(
+                                            //         width: 20,
+                                            //       ),
+                                            //       Column(
+                                            //         children: [
+                                            //           Text(
+                                            //             DateFormat('MMM')
+                                            //                 .format(DateTime
+                                            //                     .parse(absenC
+                                            //                         .searchAbsen[
+                                            //                             i]
+                                            //                         .tanggalMasuk!))
+                                            //                 .toUpperCase(),
+                                            //             style: TextStyle(
+                                            //                 color:
+                                            //                     subTitleColor),
+                                            //           ),
+                                            //           Text(
+                                            //             DateFormat('dd').format(
+                                            //                 DateTime.parse(absenC
+                                            //                     .searchAbsen[i]
+                                            //                     .tanggalMasuk!)),
+                                            //             style: TextStyle(
+                                            //                 fontWeight:
+                                            //                     FontWeight.bold,
+                                            //                 fontSize: 16,
+                                            //                 color: titleColor),
+                                            //           ),
+                                            //         ],
+                                            //       ),
+                                            //       const SizedBox(
+                                            //         width: 20,
+                                            //       ),
+                                            //       Column(
+                                            //         crossAxisAlignment:
+                                            //             CrossAxisAlignment
+                                            //                 .start,
+                                            //         children: [
+                                            //           Text(
+                                            //               DateFormat("EEEE",
+                                            //                       "id_ID")
+                                            //                   .format(DateTime
+                                            //                       .parse(absenC
+                                            //                           .searchAbsen[
+                                            //                               i]
+                                            //                           .tanggalMasuk!)),
+                                            //               style: TextStyle(
+                                            //                   fontWeight:
+                                            //                       FontWeight
+                                            //                           .bold,
+                                            //                   fontSize: 18,
+                                            //                   color:
+                                            //                       titleColor)),
+                                            //           const SizedBox(
+                                            //             width: 10,
+                                            //           ),
+                                            //           Text(
+                                            //             DateFormat("HH:mm")
+                                            //                     .parse(absenC
+                                            //                         .searchAbsen[
+                                            //                             i]
+                                            //                         .jamAbsenMasuk!)
+                                            //                     .isBefore(DateFormat(
+                                            //                             "HH:mm")
+                                            //                         .parse(absenC
+                                            //                             .searchAbsen[
+                                            //                                 i]
+                                            //                             .jamMasuk!))
+                                            //                 ? "Awal Waktu"
+                                            //                 : DateFormat("HH:mm")
+                                            //                         .parse(absenC
+                                            //                             .searchAbsen[
+                                            //                                 i]
+                                            //                             .jamAbsenMasuk!)
+                                            //                         .isAtSameMomentAs(DateFormat("HH:mm").parse(absenC
+                                            //                             .searchAbsen[i]
+                                            //                             .jamMasuk!))
+                                            //                     ? "Tepat Waktu"
+                                            //                     : "Telat",
+                                            //             style: TextStyle(
+                                            //                 color: DateFormat(
+                                            //                             "HH:mm")
+                                            //                         .parse(absenC
+                                            //                             .searchAbsen[
+                                            //                                 i]
+                                            //                             .jamAbsenMasuk!)
+                                            //                         .isBefore(DateFormat("HH:mm").parse(absenC
+                                            //                             .searchAbsen[
+                                            //                                 i]
+                                            //                             .jamMasuk!))
+                                            //                     ? Colors.greenAccent[
+                                            //                         700]
+                                            //                     : DateFormat(
+                                            //                                 "HH:mm")
+                                            //                             .parse(absenC
+                                            //                                 .searchAbsen[i]
+                                            //                                 .jamAbsenMasuk!)
+                                            //                             .isAtSameMomentAs(DateFormat("HH:mm").parse(absenC.searchAbsen[i].jamMasuk!))
+                                            //                         ? Colors.greenAccent[700]
+                                            //                         : Colors.redAccent[700]),
+                                            //           )
+                                            //         ],
+                                            //       ),
+                                            //       const Spacer(),
+                                            //       Padding(
+                                            //         padding:
+                                            //             const EdgeInsets.all(
+                                            //                 8.0),
+                                            //         child: Row(
+                                            //           children: [
+                                            //             Column(
+                                            //               children: [
+                                            //                 const Text('Masuk'),
+                                            //                 Text(
+                                            //                   absenC
+                                            //                       .searchAbsen[
+                                            //                           i]
+                                            //                       .jamAbsenMasuk!,
+                                            //                   style: TextStyle(
+                                            //                       fontWeight:
+                                            //                           FontWeight
+                                            //                               .bold,
+                                            //                       color:
+                                            //                           titleColor),
+                                            //                 ),
+                                            //               ],
+                                            //             ),
+                                            //             const SizedBox(
+                                            //               width: 15,
+                                            //             ),
+                                            //             Column(
+                                            //               children: [
+                                            //                 const Text(
+                                            //                     'Pulang'),
+                                            //                 Text(
+                                            //                   absenC
+                                            //                               .searchAbsen[
+                                            //                                   i]
+                                            //                               .jamAbsenPulang! !=
+                                            //                           ""
+                                            //                       ? absenC
+                                            //                           .searchAbsen[
+                                            //                               i]
+                                            //                           .jamAbsenPulang!
+                                            //                       : "-",
+                                            //                   style: TextStyle(
+                                            //                       fontWeight:
+                                            //                           FontWeight
+                                            //                               .bold,
+                                            //                       color:
+                                            //                           titleColor),
+                                            //                 ),
+                                            //               ],
+                                            //             ),
+                                            //           ],
+                                            //         ),
+                                            //       ),
+                                            //     ],
+                                            //   ),
+                                            // ),
                                           );
                                         },
                                       ),
