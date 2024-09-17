@@ -2,15 +2,13 @@ import 'package:absensi/app/data/helper/const.dart';
 import 'package:absensi/app/data/model/login_model.dart';
 import 'package:absensi/app/modules/login/controllers/login_controller.dart';
 import 'package:absensi/app/modules/shared/background_image_header.dart';
-import 'package:absensi/app/modules/shared/rounded_image.dart';
+import 'package:absensi/app/services/service_api.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:full_screen_image_null_safe/full_screen_image_null_safe.dart';
-
 import 'package:get/get.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:ternav_icons/ternav_icons.dart';
-
+import 'package:widget_zoom/widget_zoom.dart';
 import '../../../data/helper/loading_dialog.dart';
 import '../../add_pegawai/controllers/add_pegawai_controller.dart';
 import '../controllers/profil_controller.dart';
@@ -178,16 +176,26 @@ class ProfilView extends GetView<ProfilController> {
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(100),
                   side: BorderSide(width: 2, color: subTitleColor!)),
-              child: FullScreenWidget(
-                child: Hero(
-                    tag: 'customTag',
-                    child: RoundedImage(
-                        height: 180,
-                        width: 180,
-                        foto: user.fotoProfil.value != ""
-                            ? user.fotoProfil.value
-                            : listDataUser!.foto!,
-                        name: listDataUser!.nama!)
+              child: ClipOval(
+                child: WidgetZoom(
+                    heroAnimationTag: 'customTag',
+                    zoomWidget: Image.network(
+                        '${ServiceApi().baseUrl}${listDataUser!.foto!}',
+                        fit: BoxFit.fitWidth,
+                        errorBuilder: (context, error, stackTrace) => Image.network(
+                            "https://ui-avatars.com/api/?name=${listDataUser!.nama}",
+                            fit: BoxFit.cover),
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return Center(
+                              child: CircularProgressIndicator(
+                            value: loadingProgress.expectedTotalBytes != null
+                                ? loadingProgress.cumulativeBytesLoaded /
+                                    loadingProgress.expectedTotalBytes!
+                                : null,
+                          ));
+                        })
+
                     // ClipRect(
                     //   child: listDataUser!.foto != ""
                     //       ? Obx(
@@ -220,6 +228,7 @@ class ProfilView extends GetView<ProfilController> {
                     //           fit: BoxFit.cover,
                     //         ),
                     // ),
+
                     ),
               ),
             ),
@@ -234,9 +243,9 @@ class ProfilView extends GetView<ProfilController> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-               const Row(
+                const Row(
                   children: [
-                     Padding(
+                    Padding(
                       padding: EdgeInsets.only(top: 1.0),
                       child: Icon(
                         CupertinoIcons.person_alt_circle,
@@ -256,15 +265,15 @@ class ProfilView extends GetView<ProfilController> {
                     ),
                   ],
                 ),
-                    IconButton(
-                        onPressed: () {
-                          promptDialog(context, 'Anda yakin ingin keluar?');
-                        },
-                        icon: const Icon(
-                          Icons.logout_rounded,
-                          color: Colors.white,
-                          size: 35,
-                        ))
+                IconButton(
+                    onPressed: () {
+                      promptDialog(context, 'Anda yakin ingin keluar?');
+                    },
+                    icon: const Icon(
+                      Icons.logout_rounded,
+                      color: Colors.white,
+                      size: 35,
+                    ))
               ],
             ))
       ],

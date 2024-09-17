@@ -23,7 +23,6 @@ dependencies:
   flutter_smart_dialog: ^4.9.8+1
   flutter_typeahead: 4.8.0
   fluttertoast: ^8.2.2
-  full_screen_image_null_safe: ^2.0.0
   geocoding: 3.0.0
   geolocator: ^11.1.0
   get: ^4.6.6
@@ -54,6 +53,7 @@ dependencies:
   expansion_tile_group: 2.0.0
   flutter: 
     sdk: flutter
+  widget_zoom: ^0.0.4
 
 dev_dependencies: 
   flutter_lints: ^4.0.0
