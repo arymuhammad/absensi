@@ -89,7 +89,7 @@ class ServiceApi {
   getBrandCabang() async {
     try {
       final response = await http.get(Uri.parse('${baseUrl}brand_cabang'));
-      log('${baseUrl}brand_cabang');
+      // log('${baseUrl}brand_cabang');
       switch (response.statusCode) {
         case 200:
           List<dynamic> result = json.decode(response.body)['data'];
@@ -440,7 +440,7 @@ class ServiceApi {
         case 200:
           List<dynamic> result = json.decode(response.body)['data'];
           dataAbsen = result.map((e) => Absen.fromJson(e)).toList();
-          log('${baseUrl}get_absen', name: 'GET ABSEN');
+          // log('${baseUrl}get_absen', name: 'GET ABSEN');
         case 400:
         case 401:
         case 402:
@@ -1008,7 +1008,7 @@ class ServiceApi {
         body: data);
     if (response.statusCode == 200) {
       log('$url/attendance/create', name: 'LINK');
-      print(data);
+      // print(data);
       log("kirim data sukses", name: "XMOR");
     } else {
       log('$url/attendance/create', name: 'LINK');

@@ -227,7 +227,7 @@ dialogAbsenView(Data dataUser, latitude, longitude) async {
                   DropdownButtonFormField(
                       decoration: const InputDecoration(
                           border: OutlineInputBorder(),
-                          label: Text('Pilih salah satu')),
+                          label: Text('Pilih Absen Masuk / Pulang')),
                       value: statAbs != ""
                           ? absC.stsAbsenSelected.value = statAbs
                           : statAbs == "" && absC.stsAbsenSelected.isEmpty

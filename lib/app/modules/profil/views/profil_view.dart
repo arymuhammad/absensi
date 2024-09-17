@@ -11,6 +11,7 @@ import 'package:get/get.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:ternav_icons/ternav_icons.dart';
 
+import '../../../data/helper/loading_dialog.dart';
 import '../../add_pegawai/controllers/add_pegawai_controller.dart';
 import '../controllers/profil_controller.dart';
 
@@ -54,8 +55,7 @@ class ProfilView extends GetView<ProfilController> {
                     child: Text(
                       '${listDataUser!.levelUser}',
                       textAlign: TextAlign.center,
-                      style:
-                          TextStyle(fontSize: 15, color: subTitleColor),
+                      style: TextStyle(fontSize: 15, color: subTitleColor),
                     ),
                   ),
                   const SizedBox(
@@ -166,7 +166,8 @@ class ProfilView extends GetView<ProfilController> {
         ),
         Padding(
           padding: EdgeInsets.symmetric(
-              vertical: 110, horizontal: MediaQuery.of(context).size.width / 3.8),
+              vertical: 110,
+              horizontal: MediaQuery.of(context).size.width / 3.8),
           child: Container(
             decoration: BoxDecoration(
                 color: Colors.white, borderRadius: BorderRadius.circular(100)),
@@ -224,33 +225,46 @@ class ProfilView extends GetView<ProfilController> {
             ),
           ),
         ),
-        const Positioned(
+        Positioned(
             top: 60,
             left: 20,
-            right: 0,
+            right: 20,
             bottom: 0,
             child: Row(
-              // mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Padding(
-                  padding: EdgeInsets.only(top: 1.0),
-                  child: Icon(
-                    CupertinoIcons.person_alt_circle,
-                    size: 25,
-                    color: Colors.white,
-                  ),
+               const Row(
+                  children: [
+                     Padding(
+                      padding: EdgeInsets.only(top: 1.0),
+                      child: Icon(
+                        CupertinoIcons.person_alt_circle,
+                        size: 25,
+                        color: Colors.white,
+                      ),
+                    ),
+                    SizedBox(
+                      width: 5,
+                    ),
+                    Text(
+                      'Profile',
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold),
+                    ),
+                  ],
                 ),
-                SizedBox(
-                  width: 5,
-                ),
-                Text(
-                  'Profile',
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold),
-                ),
+                    IconButton(
+                        onPressed: () {
+                          promptDialog(context, 'Anda yakin ingin keluar?');
+                        },
+                        icon: const Icon(
+                          Icons.logout_rounded,
+                          color: Colors.white,
+                          size: 35,
+                        ))
               ],
             ))
       ],

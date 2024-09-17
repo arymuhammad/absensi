@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 import 'package:absensi/app/data/helper/db_helper.dart';
 import 'package:absensi/app/data/model/cek_visit_model.dart';
@@ -207,7 +208,7 @@ class AbsenController extends GetxController {
       paramLimitVisit, Data dataUserLogin) {
     // Buat Stream yang mengeluarkan tanggal setiap detik
     final dateStream =
-        Stream.periodic(const Duration(seconds: 1), (_) => DateTime.now());
+        Stream.periodic(const Duration(seconds: 5), (_) => DateTime.now());
     // var urut = 1.obs;
     // Perbarui nilai tanggal di _dateStream setiap kali Stream mengeluarkan nilai baru
     _sub = dateStream.listen((date) async {
@@ -216,7 +217,7 @@ class AbsenController extends GetxController {
 
       if (dataUserLogin.visit == "0") {
         // start cek absen
-        // Timer.periodic(const Duration(minutes: 1), (timer) async {
+
         var tempDataAbs = await SQLHelper.instance.getAllAbsenToday(dateNow);
 
         await cekDataAbsen(
@@ -246,14 +247,15 @@ class AbsenController extends GetxController {
                 "device_info": i.devInfo!
               };
               // submit data absensi ke server
-              ServiceApi().submitAbsen(data, true);
+              await ServiceApi().submitAbsen(data, true);
             }
-            getAbsenToday(paramSingle);
-            getLimitAbsen(paramLimit);
             _sub.cancel();
           } else {
             _sub.cancel();
           }
+         
+          getAbsenToday(paramSingle);
+          getLimitAbsen(paramLimit);
         } else {
           await cekDataAbsen(
               "pulang",
@@ -278,7 +280,7 @@ class AbsenController extends GetxController {
                   "long_pulang": i.longPulang!,
                   "device_info2": i.devInfo2!
                 };
-                ServiceApi().submitAbsen(data, true);
+                await ServiceApi().submitAbsen(data, true);
                 _sub.cancel();
               }
             } else {
@@ -323,7 +325,7 @@ class AbsenController extends GetxController {
                 "is_rnd": i.isRnd!
               };
               // submit data absensi ke server
-              ServiceApi().submitVisit(data, true);
+              await ServiceApi().submitVisit(data, true);
             }
             _sub.cancel();
           } else {
@@ -356,7 +358,7 @@ class AbsenController extends GetxController {
                   "long_out": i.longOut!,
                   "device_info2": i.deviceInfo2!
                 };
-                ServiceApi().submitVisit(data, true);
+                await ServiceApi().submitVisit(data, true);
               }
 
               _sub.cancel();
