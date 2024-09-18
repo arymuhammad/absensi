@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 import 'package:absensi/app/data/helper/db_helper.dart';
 import 'package:absensi/app/data/model/cek_visit_model.dart';
@@ -9,10 +10,11 @@ import 'package:absensi/app/modules/home/views/dialog_update_app.dart';
 
 import 'package:device_marketing_names/device_marketing_names.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:http/http.dart' as http;
 import 'package:absensi/app/data/model/shift_kerja_model.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_native_timezone/flutter_native_timezone.dart';
+// import 'package:flutter_native_timezone/flutter_native_timezone.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
@@ -111,7 +113,7 @@ class AbsenController extends GetxController {
   void onInit() async {
     super.onInit();
 
-    timeNetwork(await FlutterNativeTimezone.getLocalTimezone());
+    timeNetwork(await FlutterTimezone.getLocalTimezone());
 
     SharedPreferences pref = await SharedPreferences.getInstance();
     var dataUserLogin =
@@ -425,7 +427,7 @@ class AbsenController extends GetxController {
 
   getLoc(Data? dataUser) async {
     final String currentTimeZone =
-        await FlutterNativeTimezone.getLocalTimezone();
+        await FlutterTimezone.getLocalTimezone();
 
     try {
       final deviceNames = DeviceMarketingNames();

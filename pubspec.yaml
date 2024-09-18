@@ -19,7 +19,8 @@ dependencies:
   flutter_launcher_icons: ^0.13.1
   flutter_map: 6.1.0
   flutter_map_location_marker: any
-  flutter_native_timezone: 2.0.0
+  flutter_timezone: 3.0.1
+#  flutter_native_timezone: 2.0.0
   flutter_smart_dialog: ^4.9.8+1
   flutter_typeahead: 4.8.0
   fluttertoast: ^8.2.2
