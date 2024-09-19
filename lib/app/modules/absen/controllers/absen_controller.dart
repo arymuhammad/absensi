@@ -10,11 +10,11 @@ import 'package:absensi/app/modules/home/views/dialog_update_app.dart';
 
 import 'package:device_marketing_names/device_marketing_names.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_timezone/flutter_timezone.dart';
+import 'package:flutter_native_timezone_updated_gradle/flutter_native_timezone.dart';
+// import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:http/http.dart' as http;
 import 'package:absensi/app/data/model/shift_kerja_model.dart';
 import 'package:flutter/material.dart';
-// import 'package:flutter_native_timezone/flutter_native_timezone.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
@@ -113,7 +113,7 @@ class AbsenController extends GetxController {
   void onInit() async {
     super.onInit();
 
-    timeNetwork(await FlutterTimezone.getLocalTimezone());
+    timeNetwork(await FlutterNativeTimezone.getLocalTimezone());
 
     SharedPreferences pref = await SharedPreferences.getInstance();
     var dataUserLogin =
@@ -254,7 +254,7 @@ class AbsenController extends GetxController {
           } else {
             _sub.cancel();
           }
-         
+
           getAbsenToday(paramSingle);
           getLimitAbsen(paramLimit);
         } else {
@@ -427,7 +427,7 @@ class AbsenController extends GetxController {
 
   getLoc(Data? dataUser) async {
     final String currentTimeZone =
-        await FlutterTimezone.getLocalTimezone();
+        await FlutterNativeTimezone.getLocalTimezone();
 
     try {
       final deviceNames = DeviceMarketingNames();
@@ -976,7 +976,8 @@ class AbsenController extends GetxController {
         await SQLHelper.instance.getVisitToday(idUser.value, dateNow, '', 1);
 
     if (tempLimitVisit.isNotEmpty) {
-      if (response.isNotEmpty &&
+      if (response.isEmpty ||
+          response.isNotEmpty &&
               DateTime.parse(response.first.tglVisit!)
                   .isBefore(DateTime.parse(tempLimitVisit.first.tglVisit!)) ||
           response.isNotEmpty &&

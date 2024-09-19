@@ -83,40 +83,40 @@ class ToolsMenu extends StatelessWidget {
                         ],
                       ),
                     ),
-                    const SizedBox(
-                      width: 12,
-                    ),
-                    Visibility(
-                      visible: userData!.level == "1" ||
-                              userData!.level == "9" ||
-                              userData!.level == "10" ||
-                              userData!.level == "26" ||
-                              userData!.level == "50"
-                          ? true
-                          : false,
-                      child: Column(
-                        children: [
-                          IconButton(
-                              onPressed: () async {
-                                Get.to(() => ReportSalesView(),
-                                    transition: Transition.cupertino);
-                                loadingWithIcon();
-                                await reportC.fetchSalesReport();
-                                SmartDialog.dismiss();
-                              },
-                              icon: Icon(
-                                FontAwesome.circle_dollar_to_slot_solid,
-                                color: mainColor,
-                                size: 30,
-                              )),
-                          const Text(
-                            'Laporan\nSales',
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                            textAlign: TextAlign.center,
-                          )
-                        ],
-                      ),
-                    ),
+                    // const SizedBox(
+                    //   width: 12,
+                    // ),
+                    // Visibility(
+                    //   visible: userData!.level == "1" ||
+                    //           userData!.level == "9" ||
+                    //           userData!.level == "10" ||
+                    //           userData!.level == "26" ||
+                    //           userData!.level == "50"
+                    //       ? true
+                    //       : false,
+                    //   child: Column(
+                    //     children: [
+                    //       IconButton(
+                    //           onPressed: () async {
+                    //             Get.to(() => ReportSalesView(),
+                    //                 transition: Transition.cupertino);
+                    //             loadingWithIcon();
+                    //             await reportC.fetchSalesReport();
+                    //             SmartDialog.dismiss();
+                    //           },
+                    //           icon: Icon(
+                    //             FontAwesome.circle_dollar_to_slot_solid,
+                    //             color: mainColor,
+                    //             size: 30,
+                    //           )),
+                    //       const Text(
+                    //         'Laporan\nSales',
+                    //         style: TextStyle(fontWeight: FontWeight.bold),
+                    //         textAlign: TextAlign.center,
+                    //       )
+                    //     ],
+                    //   ),
+                    // ),
                     const SizedBox(
                       width: 12,
                     ),
