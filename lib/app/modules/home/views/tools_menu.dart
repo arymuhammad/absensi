@@ -1,13 +1,10 @@
 import 'package:absensi/app/modules/absen/controllers/absen_controller.dart';
 import 'package:absensi/app/modules/report_sales/controllers/report_sales_controller.dart';
-import 'package:absensi/app/modules/report_sales/views/report_sales_view.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:icons_plus/icons_plus.dart';
 
 import '../../../data/helper/const.dart';
-import '../../../data/helper/loading_dialog.dart';
 import '../../../data/model/login_model.dart';
 import '../../adjust_presence/views/adjust_presence_view.dart';
 import '../../cek_stok/views/cek_stok_view.dart';
