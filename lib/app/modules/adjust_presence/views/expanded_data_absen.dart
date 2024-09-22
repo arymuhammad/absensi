@@ -75,6 +75,7 @@ class ExpandedDataAbsen extends StatelessWidget {
                                       }),
                                 ),
                                 CsElevatedButtonIcon(
+                                  label: '',
                                   icon: const Icon(Icons.save_as_rounded),
                                   onPressed: () => ctrl.updateDataAbsen(
                                       data.idUser, data.tanggalMasuk!),

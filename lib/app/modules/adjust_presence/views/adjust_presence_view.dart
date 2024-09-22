@@ -21,7 +21,7 @@ class AdjustPresenceView extends GetView<AdjustPresenceController> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Adjust Presence'),
+        title: const Text('ADJUST PRESENCE'),
         centerTitle: true,flexibleSpace: Container(
         decoration: const BoxDecoration(
           image: DecorationImage(

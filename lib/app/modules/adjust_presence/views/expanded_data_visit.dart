@@ -79,6 +79,7 @@ class ExpandedDataVisit extends StatelessWidget {
                                           }),
                                     ),
                                     CsElevatedButtonIcon(
+                                      label: '',
                                       icon: const Icon(Icons.save_as_rounded),
                                       onPressed: () => ctrl.updateDataVisit(
                                           i.id, i.tglVisit, i.visitIn),

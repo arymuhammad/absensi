@@ -196,7 +196,7 @@ dialogAbsenView(Data dataUser, latitude, longitude) async {
       var statAbs = pref.getString("stateStatusAbsen") ?? '';
       var statShiftAbs = pref.getString("stateShiftAbsen") ?? '';
 
-      log(statAbs, name: 'STATUS ABSEN');
+      // log(statAbs, name: 'STATUS ABSEN');
       // await absC.cekDataAbsen(
       //     "masuk",
       //     dataUser.id!,
@@ -250,12 +250,16 @@ dialogAbsenView(Data dataUser, latitude, longitude) async {
                         : absC.selectedCabang.value,
                   ),
                   const SizedBox(height: 5),
-                  Visibility(
-                    visible: statAbs == "" ? true : false,
-                    child: CsDropdownShiftKerja(
-                        value: absC.selectedShift.value == ""
-                            ? null
-                            : absC.selectedShift.value),
+                  Obx(
+                    () => Visibility(
+                      visible: absC.stsAbsenSelected.value != "Pulang"
+                          ? true
+                          : false,
+                      child: CsDropdownShiftKerja(
+                          value: absC.selectedShift.value == ""
+                              ? null
+                              : absC.selectedShift.value),
+                    ),
                   )
                 ],
               ),
@@ -268,7 +272,7 @@ dialogAbsenView(Data dataUser, latitude, longitude) async {
                 auth.selectedMenu(0);
               },
               btnOkOnPress: () async {
-                log(absC.selectedShift.value, name: 'SHIFT');
+                // log(absC.selectedShift.value, name: 'SHIFT');
                 if (statAbs != "") {
                   absC.selectedShift.value = statShiftAbs;
                 } else {
@@ -276,7 +280,9 @@ dialogAbsenView(Data dataUser, latitude, longitude) async {
                 }
                 if (absC.stsAbsenSelected.isEmpty) {
                   showToast("Harap pilih Absen Masuk / Pulang");
-                } else if (absC.selectedShift.isEmpty) {
+                } else if ( absC.selectedShift.isEmpty &&
+                    absC.stsAbsenSelected.value != "Pulang") {
+                  absC.stsAbsenSelected.value == "";
                   showToast("Harap pilih Shift Absen");
                 } else {
                   double distance = Geolocator.distanceBetween(
@@ -301,7 +307,7 @@ dialogAbsenView(Data dataUser, latitude, longitude) async {
                     dialogMsgCncl('Terjadi Kesalahan',
                         'Anda berada diluar area absen\nJarak anda ${absC.distanceStore.value.toStringAsFixed(2)} m dari titik lokasi');
                     absC.selectedShift.value = "";
-                    absC.selectedCabang.value = "";
+                    absC.selectedCabang.value = "";absC.stsAbsenSelected.value == "";
                     absC.lat.value = "";
                     absC.long.value = "";
                   } else {
@@ -349,7 +355,7 @@ dialogAbsenView(Data dataUser, latitude, longitude) async {
 
                             loadingDialog("Sedang mengirim data...", "");
                             //submit data absensi ke local storage
-                            await SQLHelper.instance.insertDataAbsen(Absen(
+                            SQLHelper.instance.insertDataAbsen(Absen(
                                 idUser: dataUser.id,
                                 tanggalMasuk: DateFormat('yyyy-MM-dd')
                                     .format(DateTime.parse(absC.dateNowServer)),
@@ -373,18 +379,18 @@ dialogAbsenView(Data dataUser, latitude, longitude) async {
                             // submit data absensi ke server
                             ServiceApi().submitAbsen(data, false);
 
-                            absC.sendDataToXmor(
-                                dataUser.id!,
-                                "clock_in",
-                                DateFormat('yyyy-MM-dd HH:mm:ss')
-                                    .format(DateTime.parse(absC.dateNowServer)),
-                                absC.selectedShift.value,
-                                latitude.toString(),
-                                longitude.toString(),
-                                absC.lokasi.value,
-                                dataUser.namaCabang!,
-                                dataUser.kodeCabang!,
-                                absC.devInfo.value);
+                            // absC.sendDataToXmor(
+                            //     dataUser.id!,
+                            //     "clock_in",
+                            //     DateFormat('yyyy-MM-dd HH:mm:ss')
+                            //         .format(DateTime.parse(absC.dateNowServer)),
+                            //     absC.selectedShift.value,
+                            //     latitude.toString(),
+                            //     longitude.toString(),
+                            //     absC.lokasi.value,
+                            //     dataUser.namaCabang!,
+                            //     dataUser.kodeCabang!,
+                            //     absC.devInfo.value);
 
                             var paramAbsenToday = {
                               "mode": "single",

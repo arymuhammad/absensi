@@ -340,7 +340,6 @@ class AddPegawaiController extends GetxController {
                 "No Telp ini sudah terdaftar pada akun lain\nSilahkan masukkan No Telp lain");
           } else {
             succesDialog(context, "N", "Data berhasil disimpan");
-
             await ServiceApi().addUpdatePegawai(data);
             selectedCabang.value = "";
             username.clear();
@@ -377,6 +376,7 @@ class AddPegawaiController extends GetxController {
           } else {
             dialogMsgScsUpd(
                 "Sukses", "Data berhasil disimpan. Silahkan login untuk masuk");
+           
             await ServiceApi().addUpdatePegawai(data);
             selectedCabang.value = "";
             username.clear();
@@ -513,7 +513,7 @@ class AddPegawaiController extends GetxController {
           //end of update
 
           await ServiceApi().addUpdatePegawai(data);
-        
+
           Get.back();
           dialogMsgScsUpd(
               "Sukses", "Data berhasil disimpan\nSilahkan login ulang");
