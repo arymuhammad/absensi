@@ -1,4 +1,3 @@
-
 import 'package:absensi/app/data/model/absen_model.dart';
 import 'package:absensi/app/data/model/cabang_model.dart';
 import 'package:absensi/app/data/model/login_offline_model.dart';
@@ -10,7 +9,7 @@ import '../model/visit_model.dart';
 class SQLHelper {
   final _databaseName = "/absensi.db";
   SQLHelper._privateConstructor();
-   static final SQLHelper instance = SQLHelper._privateConstructor();
+  static final SQLHelper instance = SQLHelper._privateConstructor();
 
   static Database? _database;
   Future<Database> get database async {
@@ -112,9 +111,8 @@ class SQLHelper {
         device_info2 TEXT DEFAULT ''
       )
       """);
-
   }
-  
+
   Future<List<LoginOffline>> loginUserOffline(
       String username, String password) async {
     Database db = await instance.database;
@@ -138,6 +136,15 @@ class SQLHelper {
     return res;
   }
 
+  Future<int> deleteDataAbsenPulang(
+      Map<String, dynamic> todo, String idUser, String tglMasuk) async {
+         Database db = await instance.database;
+    var res = await db.update('absen', todo,
+        where: 'id_user = ? and tanggal_masuk = ?',
+        whereArgs: [idUser, tglMasuk]);
+    return res;
+      }
+
   Future<int> insertShift(ShiftKerja todo) async {
     Database db = await instance.database;
     var res = await db.insert('shift_kerja', todo.toJson());
@@ -152,7 +159,7 @@ class SQLHelper {
     return res.map((e) => ShiftKerja.fromJson(e)).toList();
   }
 
-  Future truncateShift()async{
+  Future truncateShift() async {
     Database db = await instance.database;
     var res = await db.delete('shift_kerja');
     return res;
@@ -172,7 +179,7 @@ class SQLHelper {
     return res.map((e) => Cabang.fromJson(e)).toList();
   }
 
-  Future truncateCabang()async{
+  Future truncateCabang() async {
     Database db = await instance.database;
     var res = await db.delete('tbl_cabang');
     return res;
@@ -188,7 +195,9 @@ class SQLHelper {
   Future<List<Absen>> getAllAbsenToday(String today) async {
     Database db = await instance.database;
     var res = await db.query('absen',
-        where: 'tanggal_masuk = ?', whereArgs: [today], orderBy: 'tanggal_masuk DESC');
+        where: 'tanggal_masuk = ?',
+        whereArgs: [today],
+        orderBy: 'tanggal_masuk DESC');
     return res.map((e) => Absen.fromJson(e)).toList();
   }
 
@@ -206,30 +215,32 @@ class SQLHelper {
     return res;
   }
 
-  Future<int> updateDataVisit(
-      Map<String, dynamic> todo, String idUser, String tglVisit, String visitIn) async {
+  Future<int> updateDataVisit(Map<String, dynamic> todo, String idUser,
+      String tglVisit, String visitIn) async {
     Database db = await instance.database;
     var res = await db.update('tbl_visit_area', todo,
-        where: 'id_user=? and tgl_visit=? and visit_in=?', whereArgs: [idUser, tglVisit, visitIn]);
+        where: 'id_user=? and tgl_visit=? and visit_in=?',
+        whereArgs: [idUser, tglVisit, visitIn]);
     return res;
   }
 
-  Future<List<Visit>>
-  getVisitToday( String idUser, String date, String cabang, int limit) async {
+  Future<List<Visit>> getVisitToday(
+      String idUser, String date, String cabang, int limit) async {
     var lmt = "";
     var cbg = "";
-    if(limit > 0){
+    if (limit > 0) {
       lmt = "LIMIT $limit";
-    }else{
+    } else {
       lmt = "";
     }
-    if(cabang !=""){
+    if (cabang != "") {
       cbg = " AND A.visit_in = '$cabang'";
-    }else{
+    } else {
       cbg = "";
     }
     Database db = await instance.database;
-    var res = await db.rawQuery(" SELECT A.*, B.nama_cabang FROM tbl_visit_area A LEFT JOIN tbl_cabang B ON B.kode_cabang = A.visit_in WHERE id_user =  '$idUser'  AND tgl_visit ='$date' $cbg ORDER BY tgl_visit, jam_in DESC $lmt");
+    var res = await db.rawQuery(
+        " SELECT A.*, B.nama_cabang FROM tbl_visit_area A LEFT JOIN tbl_cabang B ON B.kode_cabang = A.visit_in WHERE id_user =  '$idUser'  AND tgl_visit ='$date' $cbg ORDER BY tgl_visit, jam_in DESC $lmt");
     return res.map((e) => Visit.fromJson(e)).toList();
   }
 
@@ -241,13 +252,11 @@ class SQLHelper {
     return res.map((json) => Visit.fromJson(json)).toList();
   }
 
-
   Future<int> insertDataUser(LoginOffline todo) async {
     Database db = await instance.database;
     var res = await db.insert('tbl_user', todo.toJson());
     return res;
   }
-  
 
   Future<int> updateDataUser(
       Map<String, dynamic> todo, String idUser, String username) async {
@@ -257,7 +266,6 @@ class SQLHelper {
     return res;
   }
 
-
   Future<List<LoginOffline>> getDataUser(String idUser) async {
     Database db = await database;
     var res = await db.query('tbl_user', where: 'id = ?', whereArgs: [idUser]);
@@ -266,19 +274,15 @@ class SQLHelper {
 
   Future<List<Absen>> getAllDataAbsen() async {
     Database db = await instance.database;
-    var res = await db.query('absen',
-        orderBy: "tanggal_masuk DESC");
+    var res = await db.query('absen', orderBy: "tanggal_masuk DESC");
     return res.map((json) => Absen.fromJson(json)).toList();
   }
 
   Future<List<Visit>> getAllDataVisit() async {
     Database db = await instance.database;
-    var res = await db.query('tbl_visit_area',
-        orderBy: "tgl_visit DESC");
+    var res = await db.query('tbl_visit_area', orderBy: "tgl_visit DESC");
     return res.map((json) => Visit.fromJson(json)).toList();
   }
 
-
   Future close() async => _database!.close();
-
 }
