@@ -337,7 +337,7 @@ dialogAbsenView(Data dataUser, latitude, longitude) async {
 
                             loadingDialog("Sedang mengirim data...", "");
                             //submit data absensi ke local storage
-                            SQLHelper.instance.insertDataAbsen(Absen(
+                            await SQLHelper.instance.insertDataAbsen(Absen(
                                 idUser: dataUser.id,
                                 tanggalMasuk: DateFormat('yyyy-MM-dd')
                                     .format(DateTime.parse(absC.dateNowServer)),
@@ -359,7 +359,11 @@ dialogAbsenView(Data dataUser, latitude, longitude) async {
                                 devInfo: absC.devInfo.value,
                                 devInfo2: ''));
                             // submit data absensi ke server
-                            ServiceApi().submitAbsen(data, false);
+                            // offline first
+                            // ServiceApi().submitAbsen(data, false);
+                            Get.back();
+                            succesDialog(Get.context, "Y",
+                                "Anda berhasil Absen\nHarap periksa kembali home / history page Anda");
 
                             // absC.sendDataToXmor(
                             //     dataUser.id!,
@@ -482,27 +486,27 @@ dialogAbsenView(Data dataUser, latitude, longitude) async {
                               if (localDataAbs.isNotEmpty &&
                                       localDataAbs[0].tanggalPulang == null ||
                                   localDataAbs.isEmpty) {
-                                var data = {
-                                  "status": "update",
-                                  "id": dataUser.id,
-                                  "tanggal_masuk": DateFormat('yyyy-MM-dd')
-                                      .format(
-                                          DateTime.parse(absC.dateNowServer)),
-                                  "tanggal_pulang": DateFormat('yyyy-MM-dd')
-                                      .format(
-                                          DateTime.parse(absC.dateNowServer)),
-                                  "nama": dataUser.nama,
-                                  "jam_absen_pulang": absC.timeNow.toString(),
-                                  "foto_pulang":
-                                      File(absC.image!.path.toString()),
-                                  "lat_pulang": latitude.toString(),
-                                  "long_pulang": longitude.toString(),
-                                  "device_info2": absC.devInfo.value
-                                };
+                                // var data = {
+                                //   "status": "update",
+                                //   "id": dataUser.id,
+                                //   "tanggal_masuk": DateFormat('yyyy-MM-dd')
+                                //       .format(
+                                //           DateTime.parse(absC.dateNowServer)),
+                                //   "tanggal_pulang": DateFormat('yyyy-MM-dd')
+                                //       .format(
+                                //           DateTime.parse(absC.dateNowServer)),
+                                //   "nama": dataUser.nama,
+                                //   "jam_absen_pulang": absC.timeNow.toString(),
+                                //   "foto_pulang":
+                                //       File(absC.image!.path.toString()),
+                                //   "lat_pulang": latitude.toString(),
+                                //   "long_pulang": longitude.toString(),
+                                //   "device_info2": absC.devInfo.value
+                                // };
 
                                 loadingDialog("Sedang mengirim data...", "");
                                 // update data absensi ke local storage
-                                SQLHelper.instance.updateDataAbsen(
+                                await SQLHelper.instance.updateDataAbsen(
                                     {
                                       "tanggal_pulang": DateFormat('yyyy-MM-dd')
                                           .format(DateTime.parse(
@@ -521,8 +525,11 @@ dialogAbsenView(Data dataUser, latitude, longitude) async {
                                         DateTime.parse(absC.dateNowServer)));
 
                                 // update data absensi ke server
-                                ServiceApi().submitAbsen(data, false);
-
+                                // offline first
+                                // ServiceApi().submitAbsen(data, false);
+                                Get.back();
+                                succesDialog(
+                                    Get.context, "Y", "Anda berhasil Absen\nHarap periksa kembali home / history page Anda");
                                 // absC.sendDataToXmor(
                                 //     dataUser.id!,
                                 //     "clock_out",

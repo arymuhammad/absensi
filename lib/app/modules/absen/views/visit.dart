@@ -227,32 +227,32 @@ visit(Data dataUser, latitude, longitude) async {
                       await absC.uploadFotoAbsen();
                       Get.back();
                       if (absC.image != null) {
-                        var data = {
-                          "status": "add",
-                          "id": dataUser.id,
-                          "nama": dataUser.nama,
-                          "tgl_visit": DateFormat('yyyy-MM-dd')
-                              .format(DateTime.parse(absC.dateNowServer)),
-                          "visit_in":
-                              absC.optVisitSelected.value == "Store Visit"
-                                  ? absC.selectedCabangVisit.isNotEmpty
-                                      ? absC.selectedCabangVisit.value
-                                      : dataUser.kodeCabang
-                                  : absC.rndLoc.text,
-                          "jam_in": absC.timeNow.toString(),
-                          "foto_in": File(absC.image!.path.toString()),
-                          "lat_in": latitude.toString(),
-                          "long_in": longitude.toString(),
-                          "device_info": absC.devInfo.value,
-                          "is_rnd": absC.optVisitSelected.value ==
-                                  "Research and Development"
-                              ? "1"
-                              : "0"
-                        };
+                        // var data = {
+                        //   "status": "add",
+                        //   "id": dataUser.id,
+                        //   "nama": dataUser.nama,
+                        //   "tgl_visit": DateFormat('yyyy-MM-dd')
+                        //       .format(DateTime.parse(absC.dateNowServer)),
+                        //   "visit_in":
+                        //       absC.optVisitSelected.value == "Store Visit"
+                        //           ? absC.selectedCabangVisit.isNotEmpty
+                        //               ? absC.selectedCabangVisit.value
+                        //               : dataUser.kodeCabang
+                        //           : absC.rndLoc.text,
+                        //   "jam_in": absC.timeNow.toString(),
+                        //   "foto_in": File(absC.image!.path.toString()),
+                        //   "lat_in": latitude.toString(),
+                        //   "long_in": longitude.toString(),
+                        //   "device_info": absC.devInfo.value,
+                        //   "is_rnd": absC.optVisitSelected.value ==
+                        //           "Research and Development"
+                        //       ? "1"
+                        //       : "0"
+                        // };
 
                         loadingDialog("Sedang mengirim data...", "");
                         // submit data visit ke local storage
-                        SQLHelper.instance.insertDataVisit(Visit(
+                        await SQLHelper.instance.insertDataVisit(Visit(
                             id: dataUser.id,
                             nama: dataUser.nama,
                             tglVisit: DateFormat('yyyy-MM-dd')
@@ -279,7 +279,11 @@ visit(Data dataUser, latitude, longitude) async {
                                 ? "1"
                                 : "0"));
                         // submit data visit ke server
-                        ServiceApi().submitVisit(data, false);
+                        // offline first
+                        // ServiceApi().submitVisit(data, false);
+                        Get.back();
+                        succesDialog(Get.context, "Y",
+                            "Anda berhasil Absen\nHarap periksa kembali home / history page Anda");
                         var paramVisitToday = {
                           "mode": "single",
                           "id_user": dataUser.id,
@@ -353,29 +357,29 @@ visit(Data dataUser, latitude, longitude) async {
                           await absC.uploadFotoAbsen();
                           Get.back();
                           if (absC.image != null) {
-                            var data = {
-                              "status": "update",
-                              "id": dataUser.id,
-                              "nama": dataUser.nama,
-                              "tgl_visit": DateFormat('yyyy-MM-dd')
-                                  .format(DateTime.parse(absC.dateNowServer)),
-                              "visit_out":
-                                  absC.optVisitSelected.value == "Store Visit"
-                                      ? absC.selectedCabangVisit.isNotEmpty
-                                          ? absC.selectedCabangVisit.value
-                                          : dataUser.kodeCabang
-                                      : absC.rndLoc.text,
-                              "visit_in": absC.cekVisit.value.kodeStore,
-                              "jam_out": absC.timeNow.toString(),
-                              "foto_out": File(absC.image!.path.toString()),
-                              "lat_out": latitude.toString(),
-                              "long_out": longitude.toString(),
-                              "device_info2": absC.devInfo.value
-                            };
+                            // var data = {
+                            //   "status": "update",
+                            //   "id": dataUser.id,
+                            //   "nama": dataUser.nama,
+                            //   "tgl_visit": DateFormat('yyyy-MM-dd')
+                            //       .format(DateTime.parse(absC.dateNowServer)),
+                            //   "visit_out":
+                            //       absC.optVisitSelected.value == "Store Visit"
+                            //           ? absC.selectedCabangVisit.isNotEmpty
+                            //               ? absC.selectedCabangVisit.value
+                            //               : dataUser.kodeCabang
+                            //           : absC.rndLoc.text,
+                            //   "visit_in": absC.cekVisit.value.kodeStore,
+                            //   "jam_out": absC.timeNow.toString(),
+                            //   "foto_out": File(absC.image!.path.toString()),
+                            //   "lat_out": latitude.toString(),
+                            //   "long_out": longitude.toString(),
+                            //   "device_info2": absC.devInfo.value
+                            // };
 
                             loadingDialog("Sedang mengirim data...", "");
                             // update data visit ke local storage
-                            SQLHelper.instance.updateDataVisit(
+                            await SQLHelper.instance.updateDataVisit(
                                 {
                                   "visit_out": absC.optVisitSelected.value ==
                                           "Store Visit"
@@ -398,7 +402,11 @@ visit(Data dataUser, latitude, longitude) async {
                                         : dataUser.kodeCabang!
                                     : absC.rndLoc.text);
                             // update data visit ke server
-                            ServiceApi().submitVisit(data, false);
+                            // offline first
+                            // ServiceApi().submitVisit(data, false);
+                            Get.back();
+                            succesDialog(Get.context, "Y",
+                                "Anda berhasil Absen\nHarap periksa kembali home / history page Anda");
                             var paramVisitToday = {
                               "mode": "single",
                               "id_user": dataUser.id,
@@ -485,29 +493,29 @@ visit(Data dataUser, latitude, longitude) async {
                         await absC.uploadFotoAbsen();
                         Get.back();
                         if (absC.image != null) {
-                          var data = {
-                            "status": "update",
-                            "id": dataUser.id,
-                            "nama": dataUser.nama,
-                            "tgl_visit": DateFormat('yyyy-MM-dd')
-                                .format(DateTime.parse(absC.dateNowServer)),
-                            "visit_out":
-                                absC.optVisitSelected.value == "Store Visit"
-                                    ? absC.selectedCabangVisit.isNotEmpty
-                                        ? absC.selectedCabangVisit.value
-                                        : dataUser.kodeCabang
-                                    : absC.rndLoc.text,
-                            "visit_in": absC.cekVisit.value.kodeStore,
-                            "jam_out": absC.timeNow.toString(),
-                            "foto_out": File(absC.image!.path.toString()),
-                            "lat_out": latitude.toString(),
-                            "long_out": longitude.toString(),
-                            "device_info2": absC.devInfo.value
-                          };
+                          // var data = {
+                          //   "status": "update",
+                          //   "id": dataUser.id,
+                          //   "nama": dataUser.nama,
+                          //   "tgl_visit": DateFormat('yyyy-MM-dd')
+                          //       .format(DateTime.parse(absC.dateNowServer)),
+                          //   "visit_out":
+                          //       absC.optVisitSelected.value == "Store Visit"
+                          //           ? absC.selectedCabangVisit.isNotEmpty
+                          //               ? absC.selectedCabangVisit.value
+                          //               : dataUser.kodeCabang
+                          //           : absC.rndLoc.text,
+                          //   "visit_in": absC.cekVisit.value.kodeStore,
+                          //   "jam_out": absC.timeNow.toString(),
+                          //   "foto_out": File(absC.image!.path.toString()),
+                          //   "lat_out": latitude.toString(),
+                          //   "long_out": longitude.toString(),
+                          //   "device_info2": absC.devInfo.value
+                          // };
 
                           loadingDialog("Sedang mengirim data...", "");
                           // update data visit ke local storage
-                          SQLHelper.instance.updateDataVisit(
+                          await SQLHelper.instance.updateDataVisit(
                               {
                                 "visit_out":
                                     absC.optVisitSelected.value == "Store Visit"
@@ -530,7 +538,11 @@ visit(Data dataUser, latitude, longitude) async {
                                       : dataUser.kodeCabang!
                                   : absC.rndLoc.text);
                           // update data visit ke server
-                          ServiceApi().submitVisit(data, false);
+                          // offline first
+                          // ServiceApi().submitVisit(data, false);
+                          Get.back();
+                          succesDialog(Get.context, "Y",
+                              "Anda berhasil Absen\nHarap periksa kembali home / history page Anda");
                           var paramVisitToday = {
                             "mode": "single",
                             "id_user": dataUser.id,

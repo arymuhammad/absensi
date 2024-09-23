@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:absensi/app/data/helper/db_helper.dart';
 import 'package:absensi/app/data/helper/loading_dialog.dart';
 import 'package:absensi/app/data/model/login_offline_model.dart';
