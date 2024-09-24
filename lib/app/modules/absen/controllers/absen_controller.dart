@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 import 'package:absensi/app/data/helper/db_helper.dart';
 import 'package:absensi/app/data/model/cek_visit_model.dart';
@@ -637,6 +638,8 @@ class AbsenController extends GetxController {
         maxWidth: 600);
 
     if (image != null) {
+      var img = base64.encode(File(image!.path).readAsBytesSync());
+      log(img, name: 'PATH');
       update();
     } else {}
   }
@@ -1056,7 +1059,7 @@ class AbsenController extends GetxController {
       String device) async {
     var img = "";
     if (image != null) {
-      img = base64.encode(File(image!.path).readAsBytesSync());
+      img = "data:image/jpg;base64,${base64.encode(File(image!.path).readAsBytesSync())}";
     }
     var data = {
       "emp_id": id,

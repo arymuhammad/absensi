@@ -238,24 +238,39 @@ class BackupView extends GetView {
                         color: red,
                       ),
                       onPressed: () async {
-                        var data = {
-                          // "status": "update",
-                          // "id": i.idUser!,
-                          // "tanggal_masuk": i.tanggalMasuk!,
-                          "tanggal_pulang": "",
-                          // "nama": i.nama!,
-                          "jam_absen_pulang": "",
-                          "foto_pulang": "",
-                          "lat_pulang": "",
-                          "long_pulang": "",
-                          "device_info2": ""
-                        };
-                        await SQLHelper.instance.deleteDataAbsenPulang(
-                          data,
-                          userData!.id!,
-                          DateFormat('yyyy-MM-dd').format(DateTime.now())
-                        );
-                        showToast('Data Absen pulang berhasil dihapus');
+                        if (userData!.visit == '0') {
+                          var data = {
+                            // "status": "update",
+                            // "id": i.idUser!,
+                            // "tanggal_masuk": i.tanggalMasuk!,
+                            "tanggal_pulang": "",
+                            // "nama": i.nama!,
+                            "jam_absen_pulang": "",
+                            "foto_pulang": "",
+                            "lat_pulang": "",
+                            "long_pulang": "",
+                            "device_info2": ""
+                          };
+                          await SQLHelper.instance.deleteDataAbsenPulang(
+                              data,
+                              userData!.id!,
+                              DateFormat('yyyy-MM-dd').format(DateTime.now()));
+                          showToast('Data Absen pulang berhasil dihapus');
+                        }else{
+                          var data = {
+                            "visit_out": "",
+                            "jam_out": "",
+                            "foto_out": "",
+                            "lat_out": "",
+                            "long_out": "",
+                            "device_info2": ""
+                          };
+                          await SQLHelper.instance.deleteDataVisitPulang(
+                              data,
+                              userData!.id!,
+                              DateFormat('yyyy-MM-dd').format(DateTime.now()));
+                          showToast('Data visit pulang berhasil dihapus');
+                        }
                       },
                       label: const Text(
                         'Hapus data absen pulang',

@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:absensi/app/modules/absen/controllers/absen_controller.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/cupertino.dart';
@@ -11,7 +10,6 @@ import '../../../data/helper/db_helper.dart';
 import '../../../data/helper/loading_dialog.dart';
 import '../../../data/model/login_model.dart';
 import '../../../data/model/visit_model.dart';
-import '../../../services/service_api.dart';
 
 final absC = Get.put(AbsenController());
 visit(Data dataUser, latitude, longitude) async {

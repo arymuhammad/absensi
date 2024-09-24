@@ -144,6 +144,15 @@ class SQLHelper {
         whereArgs: [idUser, tglMasuk]);
     return res;
       }
+  
+  Future<int> deleteDataVisitPulang(
+      Map<String, dynamic> todo, String idUser, String tglMasuk) async {
+         Database db = await instance.database;
+    var res = await db.update('tbl_visit_area', todo,
+        where: 'id_user = ? and tgl_visit = ?',
+        whereArgs: [idUser, tglMasuk]);
+    return res;
+      }
 
   Future<int> insertShift(ShiftKerja todo) async {
     Database db = await instance.database;

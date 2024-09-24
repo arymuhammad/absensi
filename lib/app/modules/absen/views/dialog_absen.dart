@@ -316,24 +316,24 @@ dialogAbsenView(Data dataUser, latitude, longitude) async {
                           var localDataAbs = await SQLHelper.instance
                               .getAbsenToday(dataUser.id!, absC.dateNow);
                           if (localDataAbs.isEmpty) {
-                            var data = {
-                              "status": "add",
-                              "id": dataUser.id,
-                              "tanggal_masuk": DateFormat('yyyy-MM-dd')
-                                  .format(DateTime.parse(absC.dateNowServer)),
-                              "kode_cabang": absC.selectedCabang.isNotEmpty
-                                  ? absC.selectedCabang.value
-                                  : dataUser.kodeCabang,
-                              "nama": dataUser.nama,
-                              "id_shift": absC.selectedShift.value,
-                              "jam_masuk": absC.jamMasuk.value,
-                              "jam_pulang": absC.jamPulang.value,
-                              "jam_absen_masuk": absC.timeNow.toString(),
-                              "foto_masuk": File(absC.image!.path.toString()),
-                              "lat_masuk": latitude.toString(),
-                              "long_masuk": longitude.toString(),
-                              "device_info": absC.devInfo.value
-                            };
+                            // var data = {
+                            //   "status": "add",
+                            //   "id": dataUser.id,
+                            //   "tanggal_masuk": DateFormat('yyyy-MM-dd')
+                            //       .format(DateTime.parse(absC.dateNowServer)),
+                            //   "kode_cabang": absC.selectedCabang.isNotEmpty
+                            //       ? absC.selectedCabang.value
+                            //       : dataUser.kodeCabang,
+                            //   "nama": dataUser.nama,
+                            //   "id_shift": absC.selectedShift.value,
+                            //   "jam_masuk": absC.jamMasuk.value,
+                            //   "jam_pulang": absC.jamPulang.value,
+                            //   "jam_absen_masuk": absC.timeNow.toString(),
+                            //   "foto_masuk": File(absC.image!.path.toString()),
+                            //   "lat_masuk": latitude.toString(),
+                            //   "long_masuk": longitude.toString(),
+                            //   "device_info": absC.devInfo.value
+                            // };
 
                             loadingDialog("Sedang mengirim data...", "");
                             //submit data absensi ke local storage
