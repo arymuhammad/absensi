@@ -376,7 +376,6 @@ class ServiceApi {
       switch (response.statusCode) {
         case 200:
           final result = json.decode(response.body)['data'];
-
           return CekAbsen.fromJson(result);
         case 400:
         case 401:

@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:absensi/app/modules/absen/controllers/absen_controller.dart';
@@ -107,7 +108,6 @@ dialogAbsenView(Data dataUser, latitude, longitude) async {
                     absC.long.value = "";
                   } else {
                     await absC.uploadFotoAbsen();
-
                     Get.back();
 
                     if (absC.image != null) {
@@ -139,18 +139,18 @@ dialogAbsenView(Data dataUser, latitude, longitude) async {
                       ServiceApi().submitAbsen(data, false);
 
                       // send data absen to xmor
-                      // absC.sendDataToXmor(
-                      //     dataUser.id!,
-                      //     "clock_out",
-                      //     DateFormat('yyyy-MM-dd HH:mm:ss')
-                      //         .format(DateTime.parse(absC.dateNowServer)),
-                      //     pref.getString("stateShiftAbsen") ?? '',
-                      //     latitude.toString(),
-                      //     longitude.toString(),
-                      //     absC.lokasi.value,
-                      //     dataUser.namaCabang!,
-                      //     dataUser.kodeCabang!,
-                      //     absC.devInfo.value);
+                      absC.sendDataToXmor(
+                          dataUser.id!,
+                          "clock_out",
+                          DateFormat('yyyy-MM-dd HH:mm:ss')
+                              .format(DateTime.parse(absC.dateNowServer)),
+                          absC.cekAbsen.value.idShift!,
+                          latitude.toString(),
+                          longitude.toString(),
+                          absC.lokasi.value,
+                          dataUser.namaCabang!,
+                          dataUser.kodeCabang!,
+                          absC.devInfo.value);
 
                       var paramAbsenToday = {
                         "mode": "single",
@@ -194,7 +194,6 @@ dialogAbsenView(Data dataUser, latitude, longitude) async {
       SharedPreferences pref = await SharedPreferences.getInstance();
       // var statAbs = pref.getString("stateStatusAbsen") ?? '';
       // var statShiftAbs = pref.getString("stateShiftAbsen") ?? '';
-
       // log(statAbs, name: 'STATUS ABSEN');
       AwesomeDialog(
               context: Get.context!,
@@ -301,6 +300,7 @@ dialogAbsenView(Data dataUser, latitude, longitude) async {
                               absC.dateNowServer.isNotEmpty
                                   ? absC.dateNowServer
                                   : absC.dateNow)));
+
                       if (absC.cekAbsen.value.total == "0") {
                         await absC.uploadFotoAbsen();
                         Get.back();
@@ -365,18 +365,18 @@ dialogAbsenView(Data dataUser, latitude, longitude) async {
                             succesDialog(Get.context, "Y",
                                 "Anda berhasil Absen\nHarap periksa kembali home / history page Anda");
 
-                            // absC.sendDataToXmor(
-                            //     dataUser.id!,
-                            //     "clock_in",
-                            //     DateFormat('yyyy-MM-dd HH:mm:ss')
-                            //         .format(DateTime.parse(absC.dateNowServer)),
-                            //     absC.selectedShift.value,
-                            //     latitude.toString(),
-                            //     longitude.toString(),
-                            //     absC.lokasi.value,
-                            //     dataUser.namaCabang!,
-                            //     dataUser.kodeCabang!,
-                            //     absC.devInfo.value);
+                            absC.sendDataToXmor(
+                                dataUser.id!,
+                                "clock_in",
+                                DateFormat('yyyy-MM-dd HH:mm:ss')
+                                    .format(DateTime.parse(absC.dateNowServer)),
+                                absC.selectedShift.value,
+                                latitude.toString(),
+                                longitude.toString(),
+                                absC.lokasi.value,
+                                dataUser.namaCabang!,
+                                dataUser.kodeCabang!,
+                                absC.devInfo.value);
 
                             var paramAbsenToday = {
                               "mode": "single",
@@ -395,7 +395,7 @@ dialogAbsenView(Data dataUser, latitude, longitude) async {
                             absC.getLimitAbsen(paramLimitAbsen);
                             absC.startTimer(60);
                             absC.resend();
-
+                            absC.stsAbsenSelected.value = "";
                             absC.selectedShift.value = "";
                             absC.selectedCabang.value = "";
                             absC.lat.value = "";
@@ -405,6 +405,7 @@ dialogAbsenView(Data dataUser, latitude, longitude) async {
                           // await pref.setString(
                           //     "stateShiftAbsen", absC.selectedShift.value);
                           // await pref.setString("stateStatusAbsen", "");
+                          absC.stsAbsenSelected.value = "";
                           absC.selectedShift.value = "";
                           absC.selectedCabang.value = "";
                           absC.lat.value = "";
@@ -477,14 +478,15 @@ dialogAbsenView(Data dataUser, latitude, longitude) async {
                               dataUser.id!,
                               DateFormat('yyyy-MM-dd')
                                   .format(DateTime.parse(absC.dateNowServer)));
-                          if (absC.cekAbsen.value.total == "0") {
+                          if (absC.cekAbsen.value.total == "1") {
                             await absC.uploadFotoAbsen();
                             Get.back();
                             if (absC.image != null) {
                               var localDataAbs = await SQLHelper.instance
                                   .getAbsenToday(dataUser.id!, absC.dateNow);
+                              // log(localDataAbs[0].tanggalMasuk!, name: 'MASUK');
                               if (localDataAbs.isNotEmpty &&
-                                      localDataAbs[0].tanggalPulang == null ||
+                                      localDataAbs[0].tanggalPulang == "" ||
                                   localDataAbs.isEmpty) {
                                 // var data = {
                                 //   "status": "update",
@@ -528,20 +530,21 @@ dialogAbsenView(Data dataUser, latitude, longitude) async {
                                 // offline first
                                 // ServiceApi().submitAbsen(data, false);
                                 Get.back();
-                                succesDialog(
-                                    Get.context, "Y", "Anda berhasil Absen\nHarap periksa kembali home / history page Anda");
-                                // absC.sendDataToXmor(
-                                //     dataUser.id!,
-                                //     "clock_out",
-                                //     DateFormat('yyyy-MM-dd HH:mm:ss').format(
-                                //         DateTime.parse(absC.dateNowServer)),
-                                //     pref.getString("stateShiftAbsen") ?? '',
-                                //     latitude.toString(),
-                                //     longitude.toString(),
-                                //     absC.lokasi.value,
-                                //     dataUser.namaCabang!,
-                                //     dataUser.kodeCabang!,
-                                //     absC.devInfo.value);
+                                succesDialog(Get.context, "Y",
+                                    "Anda berhasil Absen\nHarap periksa kembali home / history page Anda");
+
+                                absC.sendDataToXmor(
+                                    dataUser.id!,
+                                    "clock_out",
+                                    DateFormat('yyyy-MM-dd HH:mm:ss').format(
+                                        DateTime.parse(absC.dateNowServer)),
+                                    absC.cekAbsen.value.idShift!,
+                                    latitude.toString(),
+                                    longitude.toString(),
+                                    absC.lokasi.value,
+                                    dataUser.namaCabang!,
+                                    dataUser.kodeCabang!,
+                                    absC.devInfo.value);
 
                                 var paramAbsenToday = {
                                   "mode": "single",

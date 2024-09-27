@@ -200,7 +200,7 @@ class LoginController extends GetxController {
 
     isAuth.value = false;
     selected.value = 0;
-    Get.delete<AbsenController>(force: true);
+    // Get.delete<AbsenController>(force: true);
     Get.back();
 
     showToast("Logout Berhasil");

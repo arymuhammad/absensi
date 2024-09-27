@@ -638,8 +638,8 @@ class AbsenController extends GetxController {
         maxWidth: 600);
 
     if (image != null) {
-      var img = base64.encode(File(image!.path).readAsBytesSync());
-      log(img, name: 'PATH');
+      // var img = base64.encode(File(image!.path).readAsBytesSync());
+      // log(img, name: 'PATH');
       update();
     } else {}
   }

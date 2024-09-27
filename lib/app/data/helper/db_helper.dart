@@ -18,7 +18,7 @@ class SQLHelper {
     return _database!;
   }
 
-  _initDatabase() async {
+  Future<Database> _initDatabase() async {
     // Directory dataDirectory = await getApplicationDocumentsDirectory();
     String dbPath = await getDatabasesPath() + _databaseName;
     // print('db location : ' + dbPath);
@@ -121,43 +121,41 @@ class SQLHelper {
     return res.map((e) => LoginOffline.fromJson(e)).toList();
   }
 
-  Future<int> insertDataAbsen(Absen todo) async {
+  Future<void> insertDataAbsen(Absen todo) async {
     Database db = await instance.database;
-    var res = await db.insert('absen', todo.toJson());
-    return res;
+    await db.insert('absen', todo.toJson());
   }
 
-  Future<int> updateDataAbsen(
+  Future<void> updateDataAbsen(
       Map<String, dynamic> todo, String idUser, String tglMasuk) async {
     Database db = await instance.database;
-    var res = await db.update('absen', todo,
+    await db.update('absen', todo,
         where: 'id_user = ? and tanggal_masuk = ?',
         whereArgs: [idUser, tglMasuk]);
-    return res;
+    // return res;
   }
 
-  Future<int> deleteDataAbsenPulang(
+  Future<void> deleteDataAbsenPulang(
       Map<String, dynamic> todo, String idUser, String tglMasuk) async {
-         Database db = await instance.database;
-    var res = await db.update('absen', todo,
+    Database db = await instance.database;
+     await db.update('absen', todo,
         where: 'id_user = ? and tanggal_masuk = ?',
         whereArgs: [idUser, tglMasuk]);
-    return res;
-      }
-  
-  Future<int> deleteDataVisitPulang(
-      Map<String, dynamic> todo, String idUser, String tglMasuk) async {
-         Database db = await instance.database;
-    var res = await db.update('tbl_visit_area', todo,
-        where: 'id_user = ? and tgl_visit = ?',
-        whereArgs: [idUser, tglMasuk]);
-    return res;
-      }
+    // return res;
+  }
 
-  Future<int> insertShift(ShiftKerja todo) async {
+  Future<void> deleteDataVisitPulang(
+      Map<String, dynamic> todo, String idUser, String tglMasuk) async {
     Database db = await instance.database;
-    var res = await db.insert('shift_kerja', todo.toJson());
-    return res;
+    await db.update('tbl_visit_area', todo,
+        where: 'id_user = ? and tgl_visit = ?', whereArgs: [idUser, tglMasuk]);
+    // return res;
+  }
+
+  Future<void> insertShift(ShiftKerja todo) async {
+    Database db = await instance.database;
+     await db.insert('shift_kerja', todo.toJson());
+    // return res;
   }
 
   Future<List<ShiftKerja>> getShift() async {
@@ -174,10 +172,10 @@ class SQLHelper {
     return res;
   }
 
-  Future<int> insertCabang(Cabang todo) async {
+  Future<void> insertCabang(Cabang todo) async {
     Database db = await instance.database;
-    var res = await db.insert('tbl_cabang', todo.toJson());
-    return res;
+     await db.insert('tbl_cabang', todo.toJson());
+    // return res;
   }
 
   Future<List<Cabang>> getCabang() async {
@@ -218,19 +216,19 @@ class SQLHelper {
     return res.map((json) => Absen.fromJson(json)).toList();
   }
 
-  Future<int> insertDataVisit(Visit todo) async {
+  Future<void> insertDataVisit(Visit todo) async {
     Database db = await instance.database;
-    var res = await db.insert('tbl_visit_area', todo.toJson());
-    return res;
+     await db.insert('tbl_visit_area', todo.toJson());
+    // return res;
   }
 
-  Future<int> updateDataVisit(Map<String, dynamic> todo, String idUser,
+  Future<void> updateDataVisit(Map<String, dynamic> todo, String idUser,
       String tglVisit, String visitIn) async {
     Database db = await instance.database;
-    var res = await db.update('tbl_visit_area', todo,
+     await db.update('tbl_visit_area', todo,
         where: 'id_user=? and tgl_visit=? and visit_in=?',
         whereArgs: [idUser, tglVisit, visitIn]);
-    return res;
+    // return res;
   }
 
   Future<List<Visit>> getVisitToday(
@@ -261,18 +259,18 @@ class SQLHelper {
     return res.map((json) => Visit.fromJson(json)).toList();
   }
 
-  Future<int> insertDataUser(LoginOffline todo) async {
+  Future<void> insertDataUser(LoginOffline todo) async {
     Database db = await instance.database;
-    var res = await db.insert('tbl_user', todo.toJson());
-    return res;
+    await db.insert('tbl_user', todo.toJson());
+    // return res;
   }
 
-  Future<int> updateDataUser(
+  Future<void> updateDataUser(
       Map<String, dynamic> todo, String idUser, String username) async {
     Database db = await instance.database;
-    var res = await db.update('tbl_user', todo,
+     await db.update('tbl_user', todo,
         where: 'id=? and username=?', whereArgs: [idUser, username]);
-    return res;
+    // return res;
   }
 
   Future<List<LoginOffline>> getDataUser(String idUser) async {
