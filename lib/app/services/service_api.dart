@@ -1011,7 +1011,7 @@ class ServiceApi {
       log("kirim data sukses", name: "XMOR");
     } else {
       log('$url/attendance/create', name: 'LINK');
-      print(data);
+      // print(data);
       log("gagal kirim data", name: "XMOR");
     }
   }

@@ -243,7 +243,7 @@ class BackupView extends GetView {
                             // "status": "update",
                             // "id": i.idUser!,
                             // "tanggal_masuk": i.tanggalMasuk!,
-                            "tanggal_pulang": "",
+                            "tanggal_pulang": null,
                             // "nama": i.nama!,
                             "jam_absen_pulang": "",
                             "foto_pulang": "",

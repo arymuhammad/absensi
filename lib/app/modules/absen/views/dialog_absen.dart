@@ -125,7 +125,6 @@ dialogAbsenView(Data dataUser, latitude, longitude) async {
                         "device_info2": absC.devInfo.value
                       };
 
-                      loadingDialog("Sedang mengirim data...", "");
                       SQLHelper.instance.updateDataAbsen({
                         "tanggal_pulang": DateFormat('yyyy-MM-dd')
                             .format(DateTime.parse(absC.dateNowServer)),
@@ -136,7 +135,7 @@ dialogAbsenView(Data dataUser, latitude, longitude) async {
                         "long_pulang": longitude.toString(),
                         "device_info2": absC.devInfo.value
                       }, dataUser.id!, previous);
-                      ServiceApi().submitAbsen(data, false);
+                      // ServiceApi().submitAbsen(data, false);
 
                       // send data absen to xmor
                       absC.sendDataToXmor(
@@ -335,9 +334,8 @@ dialogAbsenView(Data dataUser, latitude, longitude) async {
                             //   "device_info": absC.devInfo.value
                             // };
 
-                            loadingDialog("Sedang mengirim data...", "");
                             //submit data absensi ke local storage
-                            await SQLHelper.instance.insertDataAbsen(Absen(
+                            SQLHelper.instance.insertDataAbsen(Absen(
                                 idUser: dataUser.id,
                                 tanggalMasuk: DateFormat('yyyy-MM-dd')
                                     .format(DateTime.parse(absC.dateNowServer)),
@@ -361,9 +359,9 @@ dialogAbsenView(Data dataUser, latitude, longitude) async {
                             // submit data absensi ke server
                             // offline first
                             // ServiceApi().submitAbsen(data, false);
-                            Get.back();
-                            succesDialog(Get.context, "Y",
-                                "Anda berhasil Absen\nHarap periksa kembali home / history page Anda");
+                            // Get.back();
+                            // succesDialog(Get.context, "Y",
+                            //     "Anda berhasil Absen\nHarap periksa kembali home / history page Anda");
 
                             absC.sendDataToXmor(
                                 dataUser.id!,
@@ -478,6 +476,7 @@ dialogAbsenView(Data dataUser, latitude, longitude) async {
                               dataUser.id!,
                               DateFormat('yyyy-MM-dd')
                                   .format(DateTime.parse(absC.dateNowServer)));
+                        
                           if (absC.cekAbsen.value.total == "1") {
                             await absC.uploadFotoAbsen();
                             Get.back();
@@ -486,7 +485,7 @@ dialogAbsenView(Data dataUser, latitude, longitude) async {
                                   .getAbsenToday(dataUser.id!, absC.dateNow);
                               // log(localDataAbs[0].tanggalMasuk!, name: 'MASUK');
                               if (localDataAbs.isNotEmpty &&
-                                      localDataAbs[0].tanggalPulang == "" ||
+                                      localDataAbs[0].tanggalPulang == null ||
                                   localDataAbs.isEmpty) {
                                 // var data = {
                                 //   "status": "update",
@@ -506,9 +505,8 @@ dialogAbsenView(Data dataUser, latitude, longitude) async {
                                 //   "device_info2": absC.devInfo.value
                                 // };
 
-                                loadingDialog("Sedang mengirim data...", "");
                                 // update data absensi ke local storage
-                                await SQLHelper.instance.updateDataAbsen(
+                                SQLHelper.instance.updateDataAbsen(
                                     {
                                       "tanggal_pulang": DateFormat('yyyy-MM-dd')
                                           .format(DateTime.parse(
@@ -529,9 +527,9 @@ dialogAbsenView(Data dataUser, latitude, longitude) async {
                                 // update data absensi ke server
                                 // offline first
                                 // ServiceApi().submitAbsen(data, false);
-                                Get.back();
-                                succesDialog(Get.context, "Y",
-                                    "Anda berhasil Absen\nHarap periksa kembali home / history page Anda");
+                                // Get.back();
+                                // succesDialog(Get.context, "Y",
+                                //     "Anda berhasil Absen\nHarap periksa kembali home / history page Anda");
 
                                 absC.sendDataToXmor(
                                     dataUser.id!,

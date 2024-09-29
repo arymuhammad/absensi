@@ -1,10 +1,14 @@
+import 'dart:async';
+
 import 'package:absensi/app/data/model/absen_model.dart';
 import 'package:absensi/app/data/model/cabang_model.dart';
 import 'package:absensi/app/data/model/login_offline_model.dart';
 import 'package:absensi/app/data/model/shift_kerja_model.dart';
+import 'package:get/get.dart';
 // import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 import '../model/visit_model.dart';
+import 'loading_dialog.dart';
 
 class SQLHelper {
   final _databaseName = "/absensi.db";
@@ -123,22 +127,50 @@ class SQLHelper {
 
   Future<void> insertDataAbsen(Absen todo) async {
     Database db = await instance.database;
-    await db.insert('absen', todo.toJson());
+    // await db.insert('absen', todo.toJson());
+    try {
+      loadingDialog("Sedang mengirim data...", "");
+      await db
+          .insert('absen', todo.toJson())
+          .timeout(const Duration(seconds: 10))
+          .whenComplete(() {
+        Get.back();
+        succesDialog(Get.context, "Y",
+            "Anda berhasil Absen\nHarap periksa kembali home / history page Anda");
+      }).onError((error, stackTrace) =>
+              failedDialog(Get.context, 'ERROR', stackTrace.toString()));
+    } on TimeoutException catch (e) {
+      showToast(e.toString());
+    }
   }
 
   Future<void> updateDataAbsen(
       Map<String, dynamic> todo, String idUser, String tglMasuk) async {
     Database db = await instance.database;
-    await db.update('absen', todo,
-        where: 'id_user = ? and tanggal_masuk = ?',
-        whereArgs: [idUser, tglMasuk]);
+      loadingDialog("Sedang mengirim data...", "");
+    try {
+      await db
+          .update('absen', todo,
+              where: 'id_user = ? and tanggal_masuk = ?',
+              whereArgs: [idUser, tglMasuk])
+          .timeout(const Duration(seconds: 10))
+          .whenComplete(() {
+            Get.back();
+            succesDialog(Get.context, "Y",
+                "Anda berhasil Absen\nHarap periksa kembali home / history page Anda");
+          })
+          .onError((error, stackTrace) =>
+              failedDialog(Get.context, 'ERROR', stackTrace.toString()));
+    } on TimeoutException catch (e) {
+      showToast(e.toString());
+    }
     // return res;
   }
 
   Future<void> deleteDataAbsenPulang(
       Map<String, dynamic> todo, String idUser, String tglMasuk) async {
     Database db = await instance.database;
-     await db.update('absen', todo,
+    await db.update('absen', todo,
         where: 'id_user = ? and tanggal_masuk = ?',
         whereArgs: [idUser, tglMasuk]);
     // return res;
@@ -154,7 +186,7 @@ class SQLHelper {
 
   Future<void> insertShift(ShiftKerja todo) async {
     Database db = await instance.database;
-     await db.insert('shift_kerja', todo.toJson());
+    await db.insert('shift_kerja', todo.toJson());
     // return res;
   }
 
@@ -174,7 +206,7 @@ class SQLHelper {
 
   Future<void> insertCabang(Cabang todo) async {
     Database db = await instance.database;
-     await db.insert('tbl_cabang', todo.toJson());
+    await db.insert('tbl_cabang', todo.toJson());
     // return res;
   }
 
@@ -218,16 +250,41 @@ class SQLHelper {
 
   Future<void> insertDataVisit(Visit todo) async {
     Database db = await instance.database;
-     await db.insert('tbl_visit_area', todo.toJson());
+    try {
+      await db
+          .insert('tbl_visit_area', todo.toJson())
+          .timeout(const Duration(seconds: 10))
+          .whenComplete(() {
+        Get.back();
+        succesDialog(Get.context, "Y",
+            "Anda berhasil Absen\nHarap periksa kembali home / history page Anda");
+      }).onError((error, stackTrace) =>
+              failedDialog(Get.context, 'ERROR', stackTrace.toString()));
+    } on TimeoutException catch (e) {
+      showToast(e.toString());
+    }
     // return res;
   }
 
   Future<void> updateDataVisit(Map<String, dynamic> todo, String idUser,
       String tglVisit, String visitIn) async {
     Database db = await instance.database;
-     await db.update('tbl_visit_area', todo,
-        where: 'id_user=? and tgl_visit=? and visit_in=?',
-        whereArgs: [idUser, tglVisit, visitIn]);
+    try {
+      await db
+          .update('tbl_visit_area', todo,
+              where: 'id_user=? and tgl_visit=? and visit_in=?',
+              whereArgs: [idUser, tglVisit, visitIn])
+          .timeout(const Duration(seconds: 10))
+          .whenComplete(() {
+            Get.back();
+            succesDialog(Get.context, "Y",
+                "Anda berhasil Absen\nHarap periksa kembali home / history page Anda");
+          })
+          .onError((error, stackTrace) =>
+              failedDialog(Get.context, 'ERROR', stackTrace.toString()));
+    } on TimeoutException catch (e) {
+      showToast(e.toString());
+    }
     // return res;
   }
 
@@ -268,7 +325,7 @@ class SQLHelper {
   Future<void> updateDataUser(
       Map<String, dynamic> todo, String idUser, String username) async {
     Database db = await instance.database;
-     await db.update('tbl_user', todo,
+    await db.update('tbl_user', todo,
         where: 'id=? and username=?', whereArgs: [idUser, username]);
     // return res;
   }
