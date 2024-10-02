@@ -50,7 +50,7 @@ dialogAbsenView(Data dataUser, latitude, longitude) async {
 
     if (isBefore7AM) {
       await absC.cekDataAbsen("pulang", dataUser.id!, previous);
-      if (absC.cekAbsen.value.total == "0") {
+      if (absC.cekAbsen.value.total == "1") {
         // CEK ABSEN PULANG DITANGGAL H+1
         AwesomeDialog(
                 context: Get.context!,
@@ -135,7 +135,7 @@ dialogAbsenView(Data dataUser, latitude, longitude) async {
                         "long_pulang": longitude.toString(),
                         "device_info2": absC.devInfo.value
                       }, dataUser.id!, previous);
-                      // ServiceApi().submitAbsen(data, false);
+                      ServiceApi().submitAbsen(data, false);
 
                       // send data absen to xmor
                       absC.sendDataToXmor(

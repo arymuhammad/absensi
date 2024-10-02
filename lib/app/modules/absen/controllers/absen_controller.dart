@@ -263,11 +263,12 @@ class AbsenController extends GetxController {
               idUser.value,
               DateFormat('yyyy-MM-dd').format(DateTime.parse(
                   dateNowServer.isNotEmpty ? dateNowServer : dateNow)));
-          if (cekAbsen.value.total == "0") {
+            // log(tempDataAbs.first.tanggalPulang!, name:'tanggal pulang');
+          if (cekAbsen.value.total == "1") {
             // log('pengulangan kirim absen pulang ${urut.value}',
             //     name: 'PENGULANGAN');
             if (tempDataAbs.isNotEmpty &&
-                tempDataAbs.first.jamAbsenPulang! != "") {
+                tempDataAbs.first.tanggalPulang != null) {
               for (var i in tempDataAbs) {
                 var data = {
                   "status": "update",
@@ -1059,7 +1060,8 @@ class AbsenController extends GetxController {
       String device) async {
     var img = "";
     if (image != null) {
-      img = "data:image/jpg;base64,${base64.encode(File(image!.path).readAsBytesSync())}";
+      img =
+          "data:image/jpg;base64,${base64.encode(File(image!.path).readAsBytesSync())}";
     }
     var data = {
       "emp_id": id,

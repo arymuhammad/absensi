@@ -28,7 +28,7 @@ void main() async {
   var status = prefs.getBool('is_login') ?? false;
   var userDataLogin = prefs.getString('userDataLogin') ?? "";
   final auth = Get.put(LoginController());
-
+  
   if (auth.isAuth.value == false) {
     auth.isAuth.value = status;
   }

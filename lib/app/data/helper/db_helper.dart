@@ -147,7 +147,7 @@ class SQLHelper {
   Future<void> updateDataAbsen(
       Map<String, dynamic> todo, String idUser, String tglMasuk) async {
     Database db = await instance.database;
-      loadingDialog("Sedang mengirim data...", "");
+    loadingDialog("Sedang mengirim data...", "");
     try {
       await db
           .update('absen', todo,
