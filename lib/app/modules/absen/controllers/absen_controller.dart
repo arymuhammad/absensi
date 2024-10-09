@@ -228,6 +228,7 @@ class AbsenController extends GetxController {
                 dateNowServer.isNotEmpty ? dateNowServer : dateNow)));
 
         if (cekAbsen.value.total == "0") {
+
           // log('pengulangan kirim absen masuk ${urut.value}',
           //     name: 'PENGULANGAN');
           if (tempDataAbs.isNotEmpty) {
@@ -263,7 +264,7 @@ class AbsenController extends GetxController {
               idUser.value,
               DateFormat('yyyy-MM-dd').format(DateTime.parse(
                   dateNowServer.isNotEmpty ? dateNowServer : dateNow)));
-            // log(tempDataAbs.first.tanggalPulang!, name:'tanggal pulang');
+          // log(tempDataAbs.first.tanggalPulang!, name:'tanggal pulang');
           if (cekAbsen.value.total == "1") {
             // log('pengulangan kirim absen pulang ${urut.value}',
             //     name: 'PENGULANGAN');
@@ -640,7 +641,7 @@ class AbsenController extends GetxController {
 
     if (image != null) {
       // var img = base64.encode(File(image!.path).readAsBytesSync());
-      // log(img, name: 'PATH');
+      // log(image!.path, name: 'PATH');
       update();
     } else {}
   }

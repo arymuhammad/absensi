@@ -320,7 +320,7 @@ class SummaryAbsenArea extends GetView {
                               ? null
                               : () async {
                                   loadingDialog("Sending data", "");
-                                  absenC.startTimer(60);
+                                  absenC.startTimer(30);
                                   absenC.resend();
                                   await Future.delayed(
                                       const Duration(seconds: 2), () {

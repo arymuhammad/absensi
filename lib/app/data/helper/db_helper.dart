@@ -126,43 +126,44 @@ class SQLHelper {
   }
 
   Future<void> insertDataAbsen(Absen todo) async {
-    Database db = await instance.database;
-    // await db.insert('absen', todo.toJson());
     try {
+      Database db = await instance.database;
+      // await db.insert('absen', todo.toJson());
       loadingDialog("Sedang mengirim data...", "");
       await db
           .insert('absen', todo.toJson())
-          .timeout(const Duration(seconds: 10))
-          .whenComplete(() {
+          .timeout(const Duration(minutes: 1))
+          .then((value) {
         Get.back();
-        succesDialog(Get.context, "Y",
-            "Anda berhasil Absen\nHarap periksa kembali home / history page Anda");
-      }).onError((error, stackTrace) =>
-              failedDialog(Get.context, 'ERROR', stackTrace.toString()));
+        return succesDialog(Get.context, "Y",
+            "Harap tidak menutup aplikasi selama proses syncron data absensi");
+      });
     } on TimeoutException catch (e) {
-      showToast(e.toString());
+      return showToast(e.toString());
+    } catch (e) {
+      return failedDialog(Get.context, 'ERROR', e.toString());
     }
   }
 
   Future<void> updateDataAbsen(
       Map<String, dynamic> todo, String idUser, String tglMasuk) async {
-    Database db = await instance.database;
-    loadingDialog("Sedang mengirim data...", "");
     try {
+      Database db = await instance.database;
+      loadingDialog("Sedang mengirim data...", "");
       await db
           .update('absen', todo,
               where: 'id_user = ? and tanggal_masuk = ?',
               whereArgs: [idUser, tglMasuk])
-          .timeout(const Duration(seconds: 10))
-          .whenComplete(() {
+          .timeout(const Duration(minutes: 1))
+          .then((value) {
             Get.back();
-            succesDialog(Get.context, "Y",
-                "Anda berhasil Absen\nHarap periksa kembali home / history page Anda");
-          })
-          .onError((error, stackTrace) =>
-              failedDialog(Get.context, 'ERROR', stackTrace.toString()));
+            return succesDialog(Get.context, "Y",
+                "Harap tidak menutup aplikasi selama proses syncron data absensi");
+          });
     } on TimeoutException catch (e) {
-      showToast(e.toString());
+      return showToast(e.toString());
+    } catch (e) {
+      return failedDialog(Get.context, 'ERROR', e.toString());
     }
     // return res;
   }
@@ -249,41 +250,42 @@ class SQLHelper {
   }
 
   Future<void> insertDataVisit(Visit todo) async {
-    Database db = await instance.database;
     try {
+      Database db = await instance.database;
       await db
           .insert('tbl_visit_area', todo.toJson())
-          .timeout(const Duration(seconds: 10))
-          .whenComplete(() {
+          .timeout(const Duration(minutes: 1))
+          .then((value) {
         Get.back();
-        succesDialog(Get.context, "Y",
-            "Anda berhasil Absen\nHarap periksa kembali home / history page Anda");
-      }).onError((error, stackTrace) =>
-              failedDialog(Get.context, 'ERROR', stackTrace.toString()));
+        return succesDialog(Get.context, "Y",
+            "Harap tidak menutup aplikasi selama proses syncron data absensi");
+      });
     } on TimeoutException catch (e) {
-      showToast(e.toString());
+      return showToast(e.toString());
+    } catch (e) {
+      return failedDialog(Get.context, 'ERROR', e.toString());
     }
     // return res;
   }
 
   Future<void> updateDataVisit(Map<String, dynamic> todo, String idUser,
       String tglVisit, String visitIn) async {
-    Database db = await instance.database;
     try {
+      Database db = await instance.database;
       await db
           .update('tbl_visit_area', todo,
               where: 'id_user=? and tgl_visit=? and visit_in=?',
               whereArgs: [idUser, tglVisit, visitIn])
-          .timeout(const Duration(seconds: 10))
-          .whenComplete(() {
+          .timeout(const Duration(minutes: 1))
+          .then((value) {
             Get.back();
-            succesDialog(Get.context, "Y",
-                "Anda berhasil Absen\nHarap periksa kembali home / history page Anda");
-          })
-          .onError((error, stackTrace) =>
-              failedDialog(Get.context, 'ERROR', stackTrace.toString()));
+            return succesDialog(Get.context, "Y",
+                "Harap tidak menutup aplikasi selama proses syncron data absensi");
+          });
     } on TimeoutException catch (e) {
-      showToast(e.toString());
+      return showToast(e.toString());
+    } catch (e) {
+      return failedDialog(Get.context, 'ERROR', e.toString());
     }
     // return res;
   }
