@@ -31,13 +31,13 @@ dialogUpdateApp() {
           // Icon(Icons.logout_rounded)
           // Colors.red
           const Text(
-            'Apa yang baru',
+            "What's new",
             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
           ),
           const SizedBox(
             height: 5,
           ),
-          Text('versi ${absC.latestVer}',
+          Text('version ${absC.latestVer}',
               style: TextStyle(color: subTitleColor)),
           const SizedBox(
             height: 5,

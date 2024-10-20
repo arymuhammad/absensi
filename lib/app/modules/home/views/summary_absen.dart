@@ -648,7 +648,8 @@ class SummaryAbsen extends GetView {
                                                               .fotoMasuk!,
                                                           name: absenC
                                                               .dataLimitAbsen[i]
-                                                              .nama!),
+                                                              .nama!,
+                                                              headerProfile: false,),
                                                       const SizedBox(
                                                         width: 10,
                                                       ),
@@ -690,7 +691,7 @@ class SummaryAbsen extends GetView {
                                                               .fotoPulang!,
                                                           name: absenC
                                                               .dataLimitAbsen[i]
-                                                              .nama!),
+                                                              .nama!, headerProfile: false,),
                                                       const SizedBox(
                                                         width: 10,
                                                       ),

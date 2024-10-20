@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:absensi/app/modules/absen/controllers/absen_controller.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/cupertino.dart';
@@ -264,7 +267,8 @@ visit(Data dataUser, latitude, longitude) async {
                             jamIn: absC.timeNow.toString(),
                             visitOut: '',
                             jamOut: '',
-                            fotoIn: absC.image!.path.toString(),
+                            fotoIn: base64.encode(
+                                File(absC.image!.path).readAsBytesSync()),
                             latIn: latitude.toString(),
                             longIn: longitude.toString(),
                             fotoOut: '',
@@ -281,7 +285,7 @@ visit(Data dataUser, latitude, longitude) async {
                         // ServiceApi().submitVisit(data, false);
                         Get.back();
                         succesDialog(Get.context, "Y",
-                            "Anda berhasil Absen\nHarap periksa kembali home / history page Anda");
+                            "Harap tidak menutup aplikasi selama proses syncron data absensi");
                         var paramVisitToday = {
                           "mode": "single",
                           "id_user": dataUser.id,
@@ -297,7 +301,7 @@ visit(Data dataUser, latitude, longitude) async {
                         };
                         absC.getVisitToday(paramVisitToday);
                         absC.getLimitVisit(paramLimitVisit);
-                        absC.startTimer(60);
+                        absC.startTimer(30);
                         absC.resend();
                         absC.selectedCabangVisit.value = "";
                         absC.optVisitSelected.value = "";
@@ -386,7 +390,8 @@ visit(Data dataUser, latitude, longitude) async {
                                           : dataUser.kodeCabang
                                       : absC.rndLoc.text,
                                   "jam_out": absC.timeNow.toString(),
-                                  "foto_out": absC.image!.path.toString(),
+                                  "foto_out": base64.encode(
+                                      File(absC.image!.path).readAsBytesSync()),
                                   "lat_out": latitude.toString(),
                                   "long_out": longitude.toString(),
                                   "device_info2": absC.devInfo.value
@@ -404,7 +409,7 @@ visit(Data dataUser, latitude, longitude) async {
                             // ServiceApi().submitVisit(data, false);
                             Get.back();
                             succesDialog(Get.context, "Y",
-                                "Anda berhasil Absen\nHarap periksa kembali home / history page Anda");
+                                "Harap tidak menutup aplikasi selama proses syncron data absensi");
                             var paramVisitToday = {
                               "mode": "single",
                               "id_user": dataUser.id,
@@ -420,7 +425,7 @@ visit(Data dataUser, latitude, longitude) async {
                             };
                             absC.getVisitToday(paramVisitToday);
                             absC.getLimitVisit(paramLimitVisit);
-                            absC.startTimer(60);
+                            absC.startTimer(30);
                             absC.resend();
                             absC.selectedCabangVisit.value = "";
                             absC.lat.value = "";
@@ -522,7 +527,8 @@ visit(Data dataUser, latitude, longitude) async {
                                             : dataUser.kodeCabang
                                         : absC.rndLoc.text,
                                 "jam_out": absC.timeNow.toString(),
-                                "foto_out": absC.image!.path.toString(),
+                                "foto_out": base64.encode(
+                                    File(absC.image!.path).readAsBytesSync()),
                                 "lat_out": latitude.toString(),
                                 "long_out": longitude.toString(),
                                 "device_info2": absC.devInfo.value
@@ -540,7 +546,7 @@ visit(Data dataUser, latitude, longitude) async {
                           // ServiceApi().submitVisit(data, false);
                           Get.back();
                           succesDialog(Get.context, "Y",
-                              "Anda berhasil Absen\nHarap periksa kembali home / history page Anda");
+                              "Harap tidak menutup aplikasi selama proses syncron data absensi");
                           var paramVisitToday = {
                             "mode": "single",
                             "id_user": dataUser.id,
@@ -556,7 +562,7 @@ visit(Data dataUser, latitude, longitude) async {
                           };
                           absC.getVisitToday(paramVisitToday);
                           absC.getLimitVisit(paramLimitVisit);
-                          absC.startTimer(60);
+                          absC.startTimer(30);
                           absC.resend();
                           absC.selectedCabangVisit.value = "";
                           absC.lat.value = "";

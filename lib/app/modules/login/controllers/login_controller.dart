@@ -8,7 +8,6 @@ import 'package:get/get.dart';
 import 'package:rive/rive.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:crypto/crypto.dart';
-import '../../absen/controllers/absen_controller.dart';
 import '../../../services/service_api.dart';
 import '../../../data/model/login_model.dart';
 

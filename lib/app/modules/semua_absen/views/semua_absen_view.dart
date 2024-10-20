@@ -498,7 +498,7 @@ class SemuaAbsenView extends GetView<SemuaAbsenController> {
                                                             .fotoMasuk!,
                                                         name: absenC
                                                             .searchAbsen[i]
-                                                            .nama!),
+                                                            .nama!, headerProfile: false,),
                                                     const SizedBox(
                                                       width: 10,
                                                     ),
@@ -540,7 +540,7 @@ class SemuaAbsenView extends GetView<SemuaAbsenController> {
                                                             .fotoPulang!,
                                                         name: absenC
                                                             .searchAbsen[i]
-                                                            .nama!),
+                                                            .nama!, headerProfile: false,),
                                                     const SizedBox(
                                                       width: 10,
                                                     ),

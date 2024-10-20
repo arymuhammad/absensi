@@ -1,14 +1,11 @@
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:absensi/app/modules/absen/controllers/absen_controller.dart';
 import 'package:absensi/app/data/helper/db_helper.dart';
 import 'package:absensi/app/data/helper/loading_dialog.dart';
-import 'package:absensi/app/data/model/absen_model.dart';
 import 'package:absensi/app/modules/absen/views/form_absen.dart';
 import 'package:absensi/app/modules/absen/views/visit.dart';
 import 'package:absensi/app/modules/shared/dropdown_cabang.dart';
-import 'package:absensi/app/modules/shared/dropdown_shift_kerja.dart';
 import 'package:absensi/app/services/service_api.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/cupertino.dart';
@@ -49,9 +46,9 @@ dialogAbsenView(Data dataUser, latitude, longitude) async {
     bool isBefore9AM = currentDateTime.isBefore(targetDateTime);
     // print(isBefore9AM);
 
-    await absC.cekDataAbsen("pulang", dataUser.id!, previous);
     // if (isBefore9AM) {
     if (isBefore9AM) {
+      await absC.cekDataAbsen("pulang", dataUser.id!, previous);
       if (absC.cekAbsen.value.total == "1") {
         // CEK ABSEN PULANG DITANGGAL H+1
         AwesomeDialog(
@@ -187,7 +184,7 @@ dialogAbsenView(Data dataUser, latitude, longitude) async {
             .show();
       } else {
         // succesDialog(Get.context, "Y", "Anda sudah absen pulang sebelum nya.");
-        formabsen pagi Absen(dataUser, latitude, longitude);
+        formAbsen(dataUser, latitude, longitude);
       }
       // JIKA TIDAK ADA ABSEN PULANG MENGGANTUNG, LANJUT KE TAHAP SELANJUTNYA
     } else {

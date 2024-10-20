@@ -27,8 +27,8 @@ import '../data/model/users_model.dart';
 import 'app_exceptions.dart';
 
 class ServiceApi {
-  var baseUrl = "https://attendance.urbanco.id/api/"; // poduction
-  // var baseUrl = "http://103.156.15.60/absensi/"; // dev
+  // var baseUrl = "https://attendance.urbanco.id/api/"; // poduction
+  var baseUrl = "http://103.156.15.60/absensi/"; // dev
   var isLoading = false.obs;
 
   Future<Login> loginUser(data) async {
@@ -253,46 +253,45 @@ class ServiceApi {
         request.fields['lat_masuk'] = data["lat_masuk"];
         request.fields['long_masuk'] = data["long_masuk"];
         request.fields['device_info'] = data["device_info"];
+        request.fields['foto_masuk'] = data["foto_masuk"];
       } else {
         request.fields['tanggal_masuk'] = data["tanggal_masuk"];
         request.fields['tanggal_pulang'] = data["tanggal_pulang"];
         request.fields['jam_absen_pulang'] = data["jam_absen_pulang"];
         request.fields['lat_pulang'] = data["lat_pulang"];
         request.fields['long_pulang'] = data["long_pulang"];
+        request.fields['foto_pulang'] = data["foto_pulang"];
         request.fields['device_info2'] = data["device_info2"];
       }
 
-      if (data["status"] == "add") {
-        if (kIsWeb) {
-          // print(data["foto_masuk"]);
-          request.files.add(http.MultipartFile("foto_masuk",
-              data["foto_masuk"].readStream, data["foto_masuk"].size,
-              filename: data["foto_masuk"].name));
-        } else {
-          request.files.add(http.MultipartFile(
-              'foto_masuk',
-              data["foto_masuk"].readAsBytes().asStream(),
-              data["foto_masuk"].lengthSync(),
-              filename: data["foto_masuk"].path.split("/").last));
-        }
-      } else {
-        if (kIsWeb) {
-          request.files.add(http.MultipartFile("foto_pulang",
-              data["foto_pulang"].readStream, data["foto_pulang"].size,
-              filename: data["foto_pulang"].name));
-        } else {
-          request.files.add(http.MultipartFile(
-              'foto_pulang',
-              data["foto_pulang"].readAsBytes().asStream(),
-              data["foto_pulang"].lengthSync(),
-              filename: data["foto_pulang"].path.split("/").last));
-        }
-      }
+      // if (data["status"] == "add") {
+      // if (kIsWeb) {
+      //   // print(data["foto_masuk"]);
+      //   request.files.add(http.MultipartFile("foto_masuk",
+      //       data["foto_masuk"].readStream, data["foto_masuk"].size,
+      //       filename: data["foto_masuk"].name));
+      // } else {
+      //   request.files.add(http.MultipartFile(
+      //       'foto_masuk',
+      //       data["foto_masuk"].readAsBytes().asStream(),
+      //       data["foto_masuk"].lengthSync(),
+      //       filename: data["foto_masuk"].path.split("/").last));
+      // }
+      // } else {
+      //   // if (kIsWeb) {
+      //   //   request.files.add(http.MultipartFile("foto_pulang",
+      //   //       data["foto_pulang"].readStream, data["foto_pulang"].size,
+      //   //       filename: data["foto_pulang"].name));
+      //   // } else {
+      //   //   request.files.add(http.MultipartFile(
+      //   //       'foto_pulang',
+      //   //       data["foto_pulang"].readAsBytes().asStream(),
+      //   //       data["foto_pulang"].lengthSync(),
+      //   //       filename: data["foto_pulang"].path.split("/").last));
+      //   // }
+      // }
 
-      await request
-          .send()
-          .timeout(const Duration(minutes: 3))
-          .then((value) {
+      await request.send().timeout(const Duration(minutes: 3)).then((value) {
         if (!isOnInit) {
           Get.back();
           succesDialog(Get.context, "Y",
@@ -385,6 +384,8 @@ class ServiceApi {
     try {
       final response =
           await http.post(Uri.parse('${baseUrl}cek_absen'), body: data);
+      log('${baseUrl}cek_absen');
+      log(data.toString());
       switch (response.statusCode) {
         case 200:
           final result = json.decode(response.body)['data'];
@@ -451,7 +452,8 @@ class ServiceApi {
         case 200:
           List<dynamic> result = json.decode(response.body)['data'];
           dataAbsen = result.map((e) => Absen.fromJson(e)).toList();
-        // log('${baseUrl}get_absen', name: 'GET ABSEN');
+          log('${baseUrl}get_absen', name: 'GET ABSEN');
+          log(paramAbsen.toString());
         case 400:
         case 401:
         case 402:
@@ -742,6 +744,7 @@ class ServiceApi {
         request.fields['long_in'] = data["long_in"];
         request.fields['device_info'] = data["device_info"];
         request.fields['is_rnd'] = data["is_rnd"];
+        request.fields['foto_in'] = data["foto_in"];
       } else {
         request.fields['visit_in'] = data["visit_in"];
         request.fields['tgl_visit'] = data["tgl_visit"];
@@ -750,21 +753,22 @@ class ServiceApi {
         request.fields['lat_out'] = data["lat_out"];
         request.fields['long_out'] = data["long_out"];
         request.fields['device_info2'] = data["device_info2"];
+        request.fields['foto_out'] = data["foto_out"];
       }
 
-      if (data["status"] == "add") {
-        request.files.add(http.MultipartFile(
-            'foto_in',
-            data["foto_in"].readAsBytes().asStream(),
-            data["foto_in"].lengthSync(),
-            filename: data["foto_in"].path.split("/").last));
-      } else {
-        request.files.add(http.MultipartFile(
-            'foto_out',
-            data["foto_out"].readAsBytes().asStream(),
-            data["foto_out"].lengthSync(),
-            filename: data["foto_out"].path.split("/").last));
-      }
+      // if (data["status"] == "add") {
+      // request.files.add(http.MultipartFile(
+      //     'foto_in',
+      //     data["foto_in"].readAsBytes().asStream(),
+      //     data["foto_in"].lengthSync(),
+      //     filename: data["foto_in"].path.split("/").last));
+      // } else {
+      // request.files.add(http.MultipartFile(
+      //     'foto_out',
+      //     data["foto_out"].readAsBytes().asStream(),
+      //     data["foto_out"].lengthSync(),
+      //     filename: data["foto_out"].path.split("/").last));
+      // }
 
       var res = await request.send();
 
@@ -842,7 +846,9 @@ class ServiceApi {
       showToast('Tidak ada koneksi internet\nHarap mencoba kembali');
     } catch (e) {
       // print('a');
-      showToast('Tidak ada koneksi internet\nHarap mencoba kembali');
+      // log('print ini');
+      failedDialog(Get.context, 'ERROR', e.toString());
+      // showToast('Tidak ada koneksi internet\nHarap mencoba kembali');
       // debugPrint('$e');
     }
   }

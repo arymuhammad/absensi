@@ -72,7 +72,7 @@ class HomeView extends GetView<HomeController> {
                             height: 80,
                             width: 80,
                             foto: listDataUser!.foto!,
-                            name: listDataUser!.nama!),
+                            name: listDataUser!.nama!, headerProfile: true,),
                       ),
                     ),
                     // const SizedBox(width: 10),

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:developer';
 
@@ -81,7 +82,7 @@ formAbsen(Data dataUser, double latitude, double longitude) async {
             auth.selectedMenu(0);
           },
           btnOkOnPress: () async {
-            // log(absC.selectedShift.value, name: 'SHIFT');
+            // log(absC.stsAbsenSelected.value, name: 'SHIFT');
             if (absC.stsAbsenSelected.isEmpty) {
               showToast("Harap pilih Absen Masuk / Pulang");
             } else if (absC.stsAbsenSelected.value == "Masuk" &&
@@ -172,7 +173,7 @@ formAbsen(Data dataUser, double latitude, double longitude) async {
                             jamPulang: absC.jamPulang.value,
                             jamAbsenMasuk: absC.timeNow.toString(),
                             jamAbsenPulang: '',
-                            fotoMasuk: absC.image!.path.toString(),
+                            fotoMasuk: base64.encode(File(absC.image!.path).readAsBytesSync()),
                             latMasuk: latitude.toString(),
                             longMasuk: longitude.toString(),
                             fotoPulang: '',
@@ -281,6 +282,7 @@ formAbsen(Data dataUser, double latitude, double longitude) async {
                             absC.dateNowServer.isNotEmpty
                                 ? absC.dateNowServer
                                 : absC.dateNow)));
+                    // log(absC.cekAbsen.value.total.toString(), name: 'MASUK');
                     if (absC.cekAbsen.value.total == "0") {
                       absC.stsAbsenSelected.value = "";
                       absC.selectedShift.value = "";
@@ -296,7 +298,7 @@ formAbsen(Data dataUser, double latitude, double longitude) async {
                           dataUser.id!,
                           DateFormat('yyyy-MM-dd')
                               .format(DateTime.parse(absC.dateNowServer)));
-
+// log(absC.cekAbsen.value.total.toString(), name: 'PULANG');
                       if (absC.cekAbsen.value.total == "1") {
                         await absC.uploadFotoAbsen();
                         Get.back();
@@ -314,13 +316,14 @@ formAbsen(Data dataUser, double latitude, double longitude) async {
                                   .format(DateTime.parse(absC.dateNowServer)),
                               "nama": dataUser.nama,
                               "jam_absen_pulang": absC.timeNow.toString(),
-                              "foto_pulang": File(absC.image!.path.toString()),
+                              "foto_pulang": base64.encode(
+                                  File(absC.image!.path).readAsBytesSync()),
                               "lat_pulang": latitude.toString(),
                               "long_pulang": longitude.toString(),
                               "device_info2": absC.devInfo.value
                             };
                             loadingDialog("Mengirim data...", "");
-                            ServiceApi().submitAbsen(data, false);
+                            await ServiceApi().submitAbsen(data, false);
                             // send data to xmor
                             absC.sendDataToXmor(
                                 dataUser.id!,
@@ -350,8 +353,8 @@ formAbsen(Data dataUser, double latitude, double longitude) async {
                             };
                             absC.getAbsenToday(paramAbsenToday);
                             absC.getLimitAbsen(paramLimitAbsen);
-                            absC.startTimer(30);
-                            absC.resend();
+                            // absC.startTimer(30);
+                            // absC.resend();
                             absC.stsAbsenSelected.value = "";
                             absC.selectedShift.value = "";
                             absC.selectedCabang.value = "";
@@ -367,7 +370,8 @@ formAbsen(Data dataUser, double latitude, double longitude) async {
                                           DateTime.parse(absC.dateNowServer)),
                                   "nama": dataUser.nama,
                                   "jam_absen_pulang": absC.timeNow.toString(),
-                                  "foto_pulang": absC.image!.path.toString(),
+                                  "foto_pulang": base64.encode(
+                                      File(absC.image!.path).readAsBytesSync()),
                                   "lat_pulang": latitude.toString(),
                                   "long_pulang": longitude.toString(),
                                   "device_info2": absC.devInfo.value

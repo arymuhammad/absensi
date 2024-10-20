@@ -1,4 +1,6 @@
 
+import 'dart:convert';
+
 import 'package:absensi/app/data/helper/const.dart';
 import 'package:flutter/material.dart';
 
@@ -20,11 +22,9 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
           double.parse(Get.arguments["long_masuk"])),
       child: Card(
         elevation: 10,
-        child: Image.network(
-          "${ServiceApi().baseUrl}${Get.arguments['foto_masuk']}",
+        child:  Image.memory(base64Decode(Get.arguments['foto_masuk']),
           errorBuilder: (context, error, stackTrace) =>Image.asset('assets/image/selfie.png'),
-          fit: BoxFit.cover,
-        ),
+          fit: BoxFit.cover,)
       ),
     ),
   ];
@@ -42,11 +42,9 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
               : "0.0")),
       child: Card(
         elevation: 10,
-        child: Image.network(
-          "${ServiceApi().baseUrl}${Get.arguments['foto_pulang']}",
-  errorBuilder: (context, error, stackTrace) =>Image.asset('assets/image/selfie.png'),
-          fit: BoxFit.cover,
-        ),
+        child:  Image.memory(base64Decode(Get.arguments['foto_pulang']),
+          errorBuilder: (context, error, stackTrace) =>Image.asset('assets/image/selfie.png'),
+          fit: BoxFit.cover,)
       ),
     ),
   ];

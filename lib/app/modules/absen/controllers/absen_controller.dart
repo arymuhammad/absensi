@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:developer';
 import 'dart:io';
+import 'dart:developer';
 import 'package:absensi/app/data/helper/db_helper.dart';
 import 'package:absensi/app/data/model/cek_visit_model.dart';
 import 'package:absensi/app/data/model/user_model.dart';
@@ -228,7 +228,6 @@ class AbsenController extends GetxController {
                 dateNowServer.isNotEmpty ? dateNowServer : dateNow)));
 
         if (cekAbsen.value.total == "0") {
-
           // log('pengulangan kirim absen masuk ${urut.value}',
           //     name: 'PENGULANGAN');
           if (tempDataAbs.isNotEmpty) {
@@ -243,7 +242,8 @@ class AbsenController extends GetxController {
                 "jam_masuk": i.jamMasuk!,
                 "jam_pulang": i.jamPulang!,
                 "jam_absen_masuk": i.jamAbsenMasuk!,
-                "foto_masuk": File(i.fotoMasuk!.toString()),
+                "foto_masuk": i.fotoMasuk!,
+                "foto_pulang":"",
                 "lat_masuk": i.latMasuk!,
                 "long_masuk": i.longMasuk!,
                 "device_info": i.devInfo!
@@ -278,7 +278,7 @@ class AbsenController extends GetxController {
                   "tanggal_pulang": i.tanggalPulang!,
                   "nama": i.nama!,
                   "jam_absen_pulang": i.jamAbsenPulang!,
-                  "foto_pulang": File(i.fotoPulang!.toString()),
+                  "foto_pulang": i.fotoPulang!,
                   "lat_pulang": i.latPulang!,
                   "long_pulang": i.longPulang!,
                   "device_info2": i.devInfo2!
@@ -303,16 +303,22 @@ class AbsenController extends GetxController {
         var tempDataVisit = await SQLHelper.instance
             .getVisitToday(idUser.value, dateNow, '', 0);
 
+        // if (tempDataVisit.isNotEmpty) {
+
         await cekDataVisit(
-            "masukv2",
+            tempDataVisit.isNotEmpty && tempDataVisit.length == 1
+                ? "masuk"
+                : "masukv2",
             idUser.value,
             DateFormat('yyyy-MM-dd').format(DateTime.parse(
                 dateNowServer.isNotEmpty ? dateNowServer : dateNow)),
-            '');
+            tempDataVisit.isNotEmpty && tempDataVisit.length == 1
+                ? tempDataVisit.first.visitIn!
+                : '');
 
-        if (cekVisit.value.total == "0") {
+        if (cekVisit.value.total == "0" ||
+            int.parse(cekVisit.value.total) < tempDataVisit.length) {
           if (tempDataVisit.isNotEmpty) {
-            // if (int.parse(cekVisit.value.total) <= tempDataVisit.length) {
             for (var i in tempDataVisit) {
               var data = {
                 "status": "add",
@@ -321,13 +327,14 @@ class AbsenController extends GetxController {
                 "tgl_visit": i.tglVisit!,
                 "visit_in": i.visitIn!,
                 "jam_in": i.jamIn!,
-                "foto_in": File(i.fotoIn.toString()),
+                // "foto_in": File(i.fotoIn!.toString()),
+                "foto_in": i.fotoIn!,
                 "lat_in": i.latIn!,
                 "long_in": i.longIn!,
                 "device_info": i.deviceInfo!,
                 "is_rnd": i.isRnd!
               };
-              // submit data absensi ke server
+              log(data.toString());
               await ServiceApi().submitVisit(data, true);
             }
             _sub.cancel();
@@ -338,14 +345,14 @@ class AbsenController extends GetxController {
           getLimitVisit(paramLimitVisit);
         } else {
           await cekDataVisit(
-              "pulangv2",
+              tempDataVisit.length == 1 ? "pulang" : "pulangv2",
               idUser.value,
               DateFormat('yyyy-MM-dd').format(DateTime.parse(
                   dateNowServer.isNotEmpty ? dateNowServer : dateNow)),
-              '');
+              tempDataVisit.length == 1 ? tempDataVisit.first.visitIn! : '');
 
           if (int.parse(cekVisit.value.total) > 0) {
-            if (tempDataVisit.isNotEmpty) {
+            if (tempDataVisit.first.jamOut != "") {
               for (var i in tempDataVisit) {
                 var data = {
                   "status": "update",
@@ -356,14 +363,17 @@ class AbsenController extends GetxController {
                   "visit_in": i.visitIn!,
                   "jam_in": i.jamIn!,
                   "jam_out": i.jamOut!,
-                  "foto_out": File(i.fotoOut!.toString()),
+                  // "foto_out": File(i.fotoOut!.toString()),
+                  "foto_out": i.fotoOut!,
                   "lat_out": i.latOut!,
                   "long_out": i.longOut!,
                   "device_info2": i.deviceInfo2!
                 };
+
                 await ServiceApi().submitVisit(data, true);
               }
-
+              getVisitToday(paramSingleVisit);
+              getLimitVisit(paramLimitVisit);
               _sub.cancel();
             } else {
               _sub.cancel();
@@ -371,8 +381,6 @@ class AbsenController extends GetxController {
           } else {
             _sub.cancel();
           }
-          getVisitToday(paramSingleVisit);
-          getLimitVisit(paramLimitVisit);
         }
       }
     });
@@ -422,9 +430,7 @@ class AbsenController extends GetxController {
       // timeNow = DateFormat('HH:mm').format(DateTime.now()).toString();
       // print(DateTime.parse(response['dateTime']).timeZoneName);
       dateNowServer = response['dateTime'];
-    } on HandshakeException catch (_) {
-      // print(e.toString());
-    }
+    } on HandshakeException catch (_) {}
   }
 
   getLoc(Data? dataUser) async {
@@ -900,7 +906,9 @@ class AbsenController extends GetxController {
           .timeout(const Duration(seconds: 20));
 
       final response = await http
-          .head(Uri.parse('http://103.156.15.60/update apk/absensiApp.apk'))
+          .head(Uri.parse(supportedAbi == 'arm64-v8a'
+              ? 'http://103.156.15.60/update apk/absensiApp.arm64v8a.apk'
+              : 'http://103.156.15.60/update apk/absensiApp.apk'))
           .timeout(const Duration(seconds: 20));
       Get.back();
       if (response.statusCode == 200) {
@@ -977,7 +985,7 @@ class AbsenController extends GetxController {
     dataLimitVisit.clear();
 
     var tempLimitVisit =
-        await SQLHelper.instance.getVisitToday(idUser.value, dateNow, '', 1);
+        await SQLHelper.instance.getVisitToday(idUser.value, dateNow, '', 0);
 
     if (tempLimitVisit.isNotEmpty) {
       if (response.isEmpty ||

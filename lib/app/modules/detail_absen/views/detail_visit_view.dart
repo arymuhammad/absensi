@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:absensi/app/data/helper/const.dart';
 import 'package:absensi/app/services/service_api.dart';
 import 'package:flutter/material.dart';
@@ -18,11 +20,15 @@ class DetailVisitView extends GetView {
           double.parse(Get.arguments["long_in"])),
       child: Card(
         elevation: 10,
-        child: Image.network(
-          "${ServiceApi().baseUrl}${Get.arguments['foto_in']}",
+        child: 
+        Image.memory(base64Decode(Get.arguments['foto_in']),
           errorBuilder: (context, error, stackTrace) =>Image.asset('assets/image/selfie.png'),
-          fit: BoxFit.cover,
-        ),
+          fit: BoxFit.cover,)
+        // Image.network(
+        //   "${ServiceApi().baseUrl}${Get.arguments['foto_in']}",
+        //   errorBuilder: (context, error, stackTrace) =>Image.asset('assets/image/selfie.png'),
+        //   fit: BoxFit.cover,
+        // ),
       ),
     ),
   ];
@@ -40,11 +46,15 @@ class DetailVisitView extends GetView {
               : "0.0")),
       child: Card(
         elevation: 10,
-        child: Image.network(
-          "${ServiceApi().baseUrl}${Get.arguments['foto_out']}",
-          fit: BoxFit.cover,
-  errorBuilder: (context, error, stackTrace) =>Image.asset('assets/image/selfie.png'),
-        ),
+        child: 
+        Image.memory(base64Decode(Get.arguments['foto_out']),
+          errorBuilder: (context, error, stackTrace) =>Image.asset('assets/image/selfie.png'),
+          fit: BoxFit.cover,)
+  //       Image.network(
+  //         "${ServiceApi().baseUrl}${Get.arguments['foto_out']}",
+  //         fit: BoxFit.cover,
+  // errorBuilder: (context, error, stackTrace) =>Image.asset('assets/image/selfie.png'),
+  //       ),
       ),
     ),
   ];
