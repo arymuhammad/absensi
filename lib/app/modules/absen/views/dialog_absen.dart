@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:absensi/app/modules/absen/controllers/absen_controller.dart';
@@ -118,7 +119,8 @@ dialogAbsenView(Data dataUser, latitude, longitude) async {
                             .format(DateTime.parse(absC.dateNowServer)),
                         "nama": dataUser.nama,
                         "jam_absen_pulang": absC.timeNow.toString(),
-                        "foto_pulang": File(absC.image!.path.toString()),
+                        "foto_pulang": base64
+                              .encode(File(absC.image!.path).readAsBytesSync()),
                         "lat_pulang": latitude.toString(),
                         "long_pulang": longitude.toString(),
                         "device_info2": absC.devInfo.value
@@ -129,7 +131,8 @@ dialogAbsenView(Data dataUser, latitude, longitude) async {
                             .format(DateTime.parse(absC.dateNowServer)),
                         "nama": dataUser.nama,
                         "jam_absen_pulang": absC.timeNow.toString(),
-                        "foto_pulang": absC.image!.path.toString(),
+                        "foto_pulang": base64
+                              .encode(File(absC.image!.path).readAsBytesSync()),
                         "lat_pulang": latitude.toString(),
                         "long_pulang": longitude.toString(),
                         "device_info2": absC.devInfo.value

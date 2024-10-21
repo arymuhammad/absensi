@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:developer';
 
 import 'package:absensi/app/data/model/login_model.dart';
 import 'package:absensi/app/modules/absen/controllers/absen_controller.dart';
@@ -128,37 +127,36 @@ formAbsen(Data dataUser, double latitude, double longitude) async {
                   if (absC.cekAbsen.value.total == "0") {
                     await absC.uploadFotoAbsen();
                     Get.back();
-                    // await pref.setString("stateStatusAbsen",
-                    //     "Pulang"); //menyimpan status pilihan absen(masuk / pulang) kedalam sharedpreference
-                    // await pref.setString(
-                    //     "stateShiftAbsen",
-                    //     absC.selectedShift
-                    //         .value); //menyimpan status pilihan absen(masuk / pulang) kedalam sharedpreference
+                   
                     if (absC.image != null) {
                       // CEK ABSEN MASUK HARI INI, JIKA HASIL = 0, ABSEN MASUK
 
                       var localDataAbs = await SQLHelper.instance
                           .getAbsenToday(dataUser.id!, absC.dateNow);
                       if (localDataAbs.isEmpty) {
-                        // var data = {
-                        //   "status": "add",
-                        //   "id": dataUser.id,
-                        //   "tanggal_masuk": DateFormat('yyyy-MM-dd')
-                        //       .format(DateTime.parse(absC.dateNowServer)),
-                        //   "kode_cabang": absC.selectedCabang.isNotEmpty
-                        //       ? absC.selectedCabang.value
-                        //       : dataUser.kodeCabang,
-                        //   "nama": dataUser.nama,
-                        //   "id_shift": absC.selectedShift.value,
-                        //   "jam_masuk": absC.jamMasuk.value,
-                        //   "jam_pulang": absC.jamPulang.value,
-                        //   "jam_absen_masuk": absC.timeNow.toString(),
-                        //   "foto_masuk": File(absC.image!.path.toString()),
-                        //   "lat_masuk": latitude.toString(),
-                        //   "long_masuk": longitude.toString(),
-                        //   "device_info": absC.devInfo.value
-                        // };
+                        loadingDialog("Sedang mengirim data...", "");
+                        var data = {
+                          "status": "add",
+                          "id": dataUser.id,
+                          "tanggal_masuk": DateFormat('yyyy-MM-dd')
+                              .format(DateTime.parse(absC.dateNowServer)),
+                          "kode_cabang": absC.selectedCabang.isNotEmpty
+                              ? absC.selectedCabang.value
+                              : dataUser.kodeCabang,
+                          "nama": dataUser.nama,
+                          "id_shift": absC.selectedShift.value,
+                          "jam_masuk": absC.jamMasuk.value,
+                          "jam_pulang": absC.jamPulang.value,
+                          "jam_absen_masuk": absC.timeNow.toString(),
+                          "foto_masuk": base64
+                              .encode(File(absC.image!.path).readAsBytesSync()),
+                          "foto_pulang": "",
+                          "lat_masuk": latitude.toString(),
+                          "long_masuk": longitude.toString(),
+                          "device_info": absC.devInfo.value
+                        };
 
+                        
                         //submit data absensi ke local storage
                         SQLHelper.instance.insertDataAbsen(Absen(
                             idUser: dataUser.id,
@@ -173,7 +171,8 @@ formAbsen(Data dataUser, double latitude, double longitude) async {
                             jamPulang: absC.jamPulang.value,
                             jamAbsenMasuk: absC.timeNow.toString(),
                             jamAbsenPulang: '',
-                            fotoMasuk: base64.encode(File(absC.image!.path).readAsBytesSync()),
+                            fotoMasuk: base64.encode(
+                                File(absC.image!.path).readAsBytesSync()),
                             latMasuk: latitude.toString(),
                             longMasuk: longitude.toString(),
                             fotoPulang: '',
@@ -181,9 +180,9 @@ formAbsen(Data dataUser, double latitude, double longitude) async {
                             longPulang: '',
                             devInfo: absC.devInfo.value,
                             devInfo2: ''));
-                        // submit data absensi ke server
                         // offline first
-                        // ServiceApi().submitAbsen(data, false);
+                        // submit data absensi ke server
+                        await ServiceApi().submitAbsen(data, false);
 
                         absC.sendDataToXmor(
                             dataUser.id!,
@@ -213,7 +212,7 @@ formAbsen(Data dataUser, double latitude, double longitude) async {
                         };
                         absC.getAbsenToday(paramAbsenToday);
                         absC.getLimitAbsen(paramLimitAbsen);
-                        absC.startTimer(30);
+                        absC.startTimer(10);
                         absC.resend();
                         absC.stsAbsenSelected.value = "";
                         absC.selectedShift.value = "";
@@ -222,9 +221,7 @@ formAbsen(Data dataUser, double latitude, double longitude) async {
                         absC.long.value = "";
                       }
                     } else {
-                      // await pref.setString(
-                      //     "stateShiftAbsen", absC.selectedShift.value);
-                      // await pref.setString("stateStatusAbsen", "");
+                 
                       absC.stsAbsenSelected.value = "";
                       absC.selectedShift.value = "";
                       absC.selectedCabang.value = "";
@@ -235,9 +232,7 @@ formAbsen(Data dataUser, double latitude, double longitude) async {
                           Get.context, "Peringatan", "Absen Masuk dibatalkan");
                     }
                   } else {
-                    // await pref.setString(
-                    //     "stateShiftAbsen", absC.selectedShift.value);
-                    // await pref.setString("stateStatusAbsen", "Pulang");
+                   
                     absC.stsAbsenSelected.value = "";
                     absC.selectedShift.value = "";
                     absC.selectedCabang.value = "";
@@ -307,6 +302,7 @@ formAbsen(Data dataUser, double latitude, double longitude) async {
                               .getAbsenToday(dataUser.id!, absC.dateNow);
                           // log(localDataAbs[0].tanggalMasuk!, name: 'MASUK');
                           if (localDataAbs.isEmpty) {
+                            loadingDialog("Mengirim data...", "");
                             var data = {
                               "status": "update",
                               "id": dataUser.id,
@@ -322,7 +318,6 @@ formAbsen(Data dataUser, double latitude, double longitude) async {
                               "long_pulang": longitude.toString(),
                               "device_info2": absC.devInfo.value
                             };
-                            loadingDialog("Mengirim data...", "");
                             await ServiceApi().submitAbsen(data, false);
                             // send data to xmor
                             absC.sendDataToXmor(
@@ -362,6 +357,23 @@ formAbsen(Data dataUser, double latitude, double longitude) async {
                             absC.long.value = "";
                           } else if (localDataAbs.isNotEmpty &&
                               localDataAbs[0].tanggalPulang == null) {
+                            loadingDialog("Mengirim data...", "");
+                            var data = {
+                              "status": "update",
+                              "id": dataUser.id,
+                              "tanggal_masuk": DateFormat('yyyy-MM-dd')
+                                  .format(DateTime.parse(absC.dateNowServer)),
+                              "tanggal_pulang": DateFormat('yyyy-MM-dd')
+                                  .format(DateTime.parse(absC.dateNowServer)),
+                              "nama": dataUser.nama,
+                              "jam_absen_pulang": absC.timeNow.toString(),
+                              "foto_pulang": base64.encode(
+                                  File(absC.image!.path).readAsBytesSync()),
+                              "lat_pulang": latitude.toString(),
+                              "long_pulang": longitude.toString(),
+                              "device_info2": absC.devInfo.value
+                            };
+                            
                             // update data absensi ke local storage
                             SQLHelper.instance.updateDataAbsen(
                                 {
@@ -381,11 +393,8 @@ formAbsen(Data dataUser, double latitude, double longitude) async {
                                     DateTime.parse(absC.dateNowServer)));
 
                             // update data absensi ke server
-                            // offline first
-                            // ServiceApi().submitAbsen(data, false);
-                            // Get.back();
-                            // succesDialog(Get.context, "Y",
-                            //     "Anda berhasil Absen\nHarap periksa kembali home / history page Anda");
+                            await ServiceApi().submitAbsen(data, false);
+                          
 
                             absC.sendDataToXmor(
                                 dataUser.id!,
@@ -415,7 +424,7 @@ formAbsen(Data dataUser, double latitude, double longitude) async {
                             };
                             absC.getAbsenToday(paramAbsenToday);
                             absC.getLimitAbsen(paramLimitAbsen);
-                            absC.startTimer(30);
+                            absC.startTimer(10);
                             absC.resend();
                             absC.stsAbsenSelected.value = "";
                             absC.selectedShift.value = "";
@@ -423,8 +432,6 @@ formAbsen(Data dataUser, double latitude, double longitude) async {
                             absC.lat.value = "";
                             absC.long.value = "";
 
-                            // await pref.setString("stateStatusAbsen", "");
-                            // await pref.setString("stateShiftAbsen", "");
                           } else {
                             absC.stsAbsenSelected.value = "";
                             absC.selectedShift.value = "";

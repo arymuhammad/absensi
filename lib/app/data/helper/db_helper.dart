@@ -129,19 +129,21 @@ class SQLHelper {
     try {
       Database db = await instance.database;
       // await db.insert('absen', todo.toJson());
-      loadingDialog("Sedang mengirim data...", "");
+      //loadingDialog("Sedang mengirim data...", ""); //dipindah kembali ke form_absen.dart
       await db
           .insert('absen', todo.toJson())
-          .timeout(const Duration(minutes: 1))
+          .timeout(const Duration(minutes: 3))
           .then((value) {
-        Get.back();
-        return succesDialog(Get.context, "Y",
-            "Harap tidak menutup aplikasi selama proses syncron data absensi");
+        // Get.back();
+        return showToast('Data saved on local storage');
+        // return succesDialog(Get.context, "Y",
+        //     "Harap tidak menutup aplikasi selama proses syncron data absensi");
       });
     } on TimeoutException catch (e) {
       return showToast(e.toString());
     } catch (e) {
-      return failedDialog(Get.context, 'ERROR', e.toString());
+      return showToast(e.toString());
+      // return failedDialog(Get.context, 'ERROR', e.toString());
     }
   }
 
@@ -149,21 +151,23 @@ class SQLHelper {
       Map<String, dynamic> todo, String idUser, String tglMasuk) async {
     try {
       Database db = await instance.database;
-      loadingDialog("Sedang mengirim data...", "");
+      // loadingDialog("Sedang mengirim data...", "");
       await db
           .update('absen', todo,
               where: 'id_user = ? and tanggal_masuk = ?',
               whereArgs: [idUser, tglMasuk])
-          .timeout(const Duration(minutes: 1))
+          .timeout(const Duration(minutes: 3))
           .then((value) {
-            Get.back();
-            return succesDialog(Get.context, "Y",
-                "Harap tidak menutup aplikasi selama proses syncron data absensi");
+            return showToast('Data is successfully updated on local storage');
+            // Get.back();
+            // return succesDialog(Get.context, "Y",
+            //     "Harap tidak menutup aplikasi selama proses syncron data absensi");
           });
     } on TimeoutException catch (e) {
       return showToast(e.toString());
     } catch (e) {
-      return failedDialog(Get.context, 'ERROR', e.toString());
+      return showToast(e.toString());
+      // return failedDialog(Get.context, 'ERROR', e.toString());
     }
     // return res;
   }
@@ -254,16 +258,18 @@ class SQLHelper {
       Database db = await instance.database;
       await db
           .insert('tbl_visit_area', todo.toJson())
-          .timeout(const Duration(minutes: 1))
+          .timeout(const Duration(minutes: 3))
           .then((value) {
-        Get.back();
-        return succesDialog(Get.context, "Y",
-            "Harap tidak menutup aplikasi selama proses syncron data absensi");
+        // Get.back();
+        return showToast('Data saved on local storage');
+        // return succesDialog(Get.context, "Y",
+        //     "Harap tidak menutup aplikasi selama proses syncron data absensi");
       });
     } on TimeoutException catch (e) {
       return showToast(e.toString());
     } catch (e) {
-      return failedDialog(Get.context, 'ERROR', e.toString());
+      return showToast(e.toString());
+      // return failedDialog(Get.context, 'ERROR', e.toString());
     }
     // return res;
   }
@@ -276,16 +282,18 @@ class SQLHelper {
           .update('tbl_visit_area', todo,
               where: 'id_user=? and tgl_visit=? and visit_in=?',
               whereArgs: [idUser, tglVisit, visitIn])
-          .timeout(const Duration(minutes: 1))
+          .timeout(const Duration(minutes: 3))
           .then((value) {
-            Get.back();
-            return succesDialog(Get.context, "Y",
-                "Harap tidak menutup aplikasi selama proses syncron data absensi");
+            // Get.back();
+            return showToast('Data is successfully updated on local storage');
+            // return succesDialog(Get.context, "Y",
+            //     "Harap tidak menutup aplikasi selama proses syncron data absensi");
           });
     } on TimeoutException catch (e) {
       return showToast(e.toString());
     } catch (e) {
-      return failedDialog(Get.context, 'ERROR', e.toString());
+      return showToast(e.toString());
+      // return failedDialog(Get.context, 'ERROR', e.toString());
     }
     // return res;
   }

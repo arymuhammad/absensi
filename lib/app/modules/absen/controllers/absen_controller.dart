@@ -210,7 +210,6 @@ class AbsenController extends GetxController {
     // Buat Stream yang mengeluarkan tanggal setiap detik
     final dateStream =
         Stream.periodic(const Duration(seconds: 5), (_) => DateTime.now());
-    // var urut = 1.obs;
     // Perbarui nilai tanggal di _dateStream setiap kali Stream mengeluarkan nilai baru
     _sub = dateStream.listen((date) async {
       _dateStream.value = date;
@@ -329,6 +328,7 @@ class AbsenController extends GetxController {
                 "jam_in": i.jamIn!,
                 // "foto_in": File(i.fotoIn!.toString()),
                 "foto_in": i.fotoIn!,
+                "foto_out":"",
                 "lat_in": i.latIn!,
                 "long_in": i.longIn!,
                 "device_info": i.deviceInfo!,

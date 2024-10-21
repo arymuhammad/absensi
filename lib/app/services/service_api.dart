@@ -324,7 +324,8 @@ class ServiceApi {
         Get.back();
         showToast('Terjadi kesalahan saat mengirim data');
       } else {
-        failedDialog(Get.context, 'ERROR', e.toString());
+        showToast('Terjadi kesalahan saat mengirim data');
+        // failedDialog(Get.context, 'ERROR', e.toString());
       }
     }
   }
@@ -770,33 +771,43 @@ class ServiceApi {
       //     filename: data["foto_out"].path.split("/").last));
       // }
 
-      var res = await request.send();
+      await request.send().timeout(const Duration(minutes: 3)).then((value) {
+        if (!isOnInit) {
+          Get.back();
+          succesDialog(Get.context, "Y",
+              "Harap tidak menutup aplikasi selama proses syncron data absensi");
+        } else {
+          showToast('data sukses dikirim');
+        }
+      });
 
-      var responseBytes = await res.stream.toBytes();
-      var responseString = utf8.decode(responseBytes);
+      // var responseBytes = await res.stream.toBytes();
+      // var responseString = utf8.decode(responseBytes);
 
       //debug
       // debugPrint("response code: ${res.statusCode}");
       // debugPrint("response: $responseString");
 
-      final dataDecode = jsonDecode(responseString);
-      debugPrint(dataDecode.toString());
+      // final dataDecode = jsonDecode(responseString);
+      // debugPrint(dataDecode.toString());
 
-      if (!isOnInit) {
-        Get.back();
-        succesDialog(Get.context, "Y", "Anda berhasil Absen");
-      }
-    } on SocketException {
+      } on SocketException {
       if (!isOnInit) {
         Get.back();
         failedDialog(Get.context, 'ERROR',
             'Tidak ada koneksi internet\nHarap mencoba kembali');
       }
+    } on TimeoutException {
+      Get.back();
+      failedDialog(
+          Get.context, 'ERROR', 'Waktu habis. Silahkan mencoba kembali');
     } catch (e) {
       if (!isOnInit) {
         Get.back();
         showToast('Terjadi kesalahan saat mengirim data');
-        debugPrint('$e');
+      } else {
+        showToast('Terjadi kesalahan saat mengirim data');
+        // failedDialog(Get.context, 'ERROR', e.toString());
       }
     }
   }
