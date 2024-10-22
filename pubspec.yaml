@@ -50,7 +50,7 @@ dependencies:
   expansion_tile_group: 2.0.0
   widget_zoom: ^0.0.4
   path: ^1.9.0
-  face_camera: 0.1.2
+  # face_camera: 0.1.2
   flutter: 
     sdk: flutter
 
