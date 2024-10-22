@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'dart:developer';
 import 'package:absensi/app/data/helper/db_helper.dart';
 import 'package:absensi/app/data/model/cek_visit_model.dart';
 import 'package:absensi/app/data/model/user_model.dart';
@@ -332,7 +331,7 @@ class AbsenController extends GetxController {
                 "device_info": i.deviceInfo!,
                 "is_rnd": i.isRnd!
               };
-              log(data.toString());
+              // log(data.toString());
               await ServiceApi().submitVisit(data, true);
             }
             _sub.cancel();
