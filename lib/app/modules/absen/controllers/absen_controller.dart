@@ -242,7 +242,6 @@ class AbsenController extends GetxController {
                 "jam_pulang": i.jamPulang!,
                 "jam_absen_masuk": i.jamAbsenMasuk!,
                 "foto_masuk": i.fotoMasuk!,
-                "foto_pulang":"",
                 "lat_masuk": i.latMasuk!,
                 "long_masuk": i.longMasuk!,
                 "device_info": i.devInfo!
@@ -328,7 +327,6 @@ class AbsenController extends GetxController {
                 "jam_in": i.jamIn!,
                 // "foto_in": File(i.fotoIn!.toString()),
                 "foto_in": i.fotoIn!,
-                "foto_out":"",
                 "lat_in": i.latIn!,
                 "long_in": i.longIn!,
                 "device_info": i.deviceInfo!,

@@ -27,8 +27,8 @@ import '../data/model/users_model.dart';
 import 'app_exceptions.dart';
 
 class ServiceApi {
-  var baseUrl = "https://attendance.urbanco.id/api/"; // poduction
-  // var baseUrl = "http://103.156.15.60/absensi/"; // dev
+  // var baseUrl = "https://attendance.urbanco.id/api/"; // poduction
+  var baseUrl = "http://103.156.15.60/absensi/"; // dev
   var isLoading = false.obs;
 
   Future<Login> loginUser(data) async {
