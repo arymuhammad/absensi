@@ -1,6 +1,7 @@
 import 'package:absensi/app/data/helper/const.dart';
 import 'package:absensi/app/data/model/login_model.dart';
 import 'package:absensi/app/modules/absen/views/absen_view.dart';
+import 'package:absensi/app/modules/absen/views/face_detection.dart';
 import 'package:absensi/app/modules/home/controllers/home_controller.dart';
 import 'package:absensi/app/modules/home/views/home_view.dart';
 import 'package:absensi/app/modules/profil/views/profil_view.dart';
@@ -26,7 +27,9 @@ class BottomNavBar extends GetView {
   Widget build(BuildContext context) {
     final List<Widget> widgetList = <Widget>[
       HomeView(listDataUser: listDataUser),
-      listDataUser.visit=="1"? RiwayatVisitView(userData:listDataUser): SemuaAbsenView(data: listDataUser),
+      listDataUser.visit == "1"
+          ? RiwayatVisitView(userData: listDataUser)
+          : SemuaAbsenView(data: listDataUser),
       AbsenView(data: listDataUser),
       SettingsView(listDataUser: listDataUser),
       ProfilView(listDataUser: listDataUser)
@@ -52,10 +55,14 @@ class BottomNavBar extends GetView {
               loginC.selectedMenu(i);
               loc.isLoading.value = true;
               loc.searchDate.value = "";
-              listDataUser.visit=="1"? loc.getAllVisited(listDataUser.id!): loc.getAllAbsen(listDataUser.id!);
+              listDataUser.visit == "1"
+                  ? loc.getAllVisited(listDataUser.id!)
+                  : loc.getAllAbsen(listDataUser.id!);
             } else if (i == 2) {
               loginC.selectedMenu(i);
-              loc.getLoc(listDataUser);
+              listDataUser.visit == "1"
+                  ? loc.getLoc(listDataUser)
+                  : loc.scanQrLoc(listDataUser);
             } else {
               loginC.selectedMenu(i);
             }

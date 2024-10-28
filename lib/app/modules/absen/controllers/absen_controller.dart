@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 import 'package:absensi/app/data/helper/db_helper.dart';
 import 'package:absensi/app/data/model/cek_visit_model.dart';
@@ -8,7 +9,9 @@ import 'package:absensi/app/data/model/visit_model.dart';
 import 'package:absensi/app/modules/home/views/dialog_update_app.dart';
 
 import 'package:device_marketing_names/device_marketing_names.dart';
+import 'package:face_camera/face_camera.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:flutter_native_timezone_updated_gradle/flutter_native_timezone.dart';
 // import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:http/http.dart' as http;
@@ -20,6 +23,7 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:path/path.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:xml/xml.dart' as xml;
@@ -107,6 +111,7 @@ class AbsenController extends GetxController {
   late StreamSubscription _sub;
   var remainingSec = 60.obs;
   var timerStat = false.obs;
+  File? capturedImage;
 
   @override
   void onInit() async {
@@ -466,6 +471,35 @@ class AbsenController extends GetxController {
     }
   }
 
+  scanQrLoc(Data? dataUser) async {
+    String barcodeScanRes;
+    // Platform messages may fail, so we use a try/catch PlatformException.
+    try {
+      barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
+          '#ff6666', 'Cancel', false, ScanMode.QR);
+      // print(barcodeScanRes);
+      if (barcodeScanRes == "-1") {
+        // cekStokC.cariArtikel.clear();
+      } else {
+        if (barcodeScanRes.contains(dataUser!.lat.toString()) &&
+            barcodeScanRes.contains(dataUser.long.toString())) {
+          List<Placemark> placemarks = await placemarkFromCoordinates(
+              double.parse(barcodeScanRes.split(' ')[0]),
+              double.parse(barcodeScanRes.split(' ')[1]));
+          lokasi.value =
+              '${placemarks[0].street!}, ${placemarks[0].subLocality!}\n${placemarks[0].subAdministrativeArea!}, ${placemarks[0].administrativeArea!}';
+          timeNetwork(await FlutterNativeTimezone.getLocalTimezone());
+          dialogAbsenView(dataUser, double.parse(barcodeScanRes.split(' ')[0]),
+              double.parse(barcodeScanRes.split(' ')[1]));
+        } else {
+          showToast('Lokasi tidak ditemukan');
+        }
+      }
+    } on PlatformException {
+      barcodeScanRes = 'Failed to get platform version.';
+    }
+  }
+
   Future<CekAbsen> cekDataAbsen(
       String status, String id, String tglAbsen) async {
     var data = {
@@ -560,21 +594,14 @@ class AbsenController extends GetxController {
     ));
 
     for (var data in searchAbsen) {
-      var img1 = await http
-          .get(
-            Uri.parse('${ServiceApi().baseUrl}${data.fotoMasuk!}'),
-          )
-          .then((value) => value.bodyBytes);
-
-      pw.MemoryImage imageMasuk = pw.MemoryImage(img1);
+      pw.MemoryImage? imageMasuk;
+      if (data.fotoPulang! != "") {
+        imageMasuk = pw.MemoryImage(base64Decode(data.fotoMasuk!));
+      }
       // // print('${img1.bodyBytes}');
       pw.MemoryImage? imageKeluar;
       if (data.fotoPulang! != "") {
-        final img2 = await http.get(
-          Uri.parse('${ServiceApi().baseUrl}${data.fotoPulang!}'),
-        );
-
-        imageKeluar = pw.MemoryImage(img2.bodyBytes);
+        imageKeluar = pw.MemoryImage(base64Decode(data.fotoPulang!));
       }
 
       rows.add(pw.TableRow(
@@ -593,11 +620,16 @@ class AbsenController extends GetxController {
               textAlign: pw.TextAlign.center, style: pw.TextStyle(font: font)),
           pw.Text(data.jamAbsenMasuk!,
               textAlign: pw.TextAlign.center, style: pw.TextStyle(font: font)),
-          pw.Container(
-            width: 30,
-            height: 30,
-            child: pw.Center(child: pw.Image(imageMasuk)),
-          ),
+          data.fotoMasuk! != ""
+              ? pw.Container(
+                  width: 30,
+                  height: 30,
+                  child: pw.Center(child: pw.Image(imageMasuk!)),
+                )
+              : pw.Container(
+                  width: 30,
+                  height: 30,
+                ),
           pw.Text(
               DateFormat("HH:mm")
                       .parse(data.jamAbsenMasuk!)
@@ -1067,7 +1099,7 @@ class AbsenController extends GetxController {
     var img = "";
     if (image != null) {
       img =
-          "data:image/jpg;base64,${base64.encode(File(image!.path).readAsBytesSync())}";
+          "data:image/jpg;base64,${base64.encode(File(capturedImage!.path).readAsBytesSync())}";
     }
     var data = {
       "emp_id": id,

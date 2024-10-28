@@ -385,11 +385,11 @@ class ServiceApi {
     try {
       final response =
           await http.post(Uri.parse('${baseUrl}cek_absen'), body: data);
-      log('${baseUrl}cek_absen');
-      log(data.toString());
+      // log('${baseUrl}cek_absen');
       switch (response.statusCode) {
         case 200:
           final result = json.decode(response.body)['data'];
+      // log(result.toString());
           return CekAbsen.fromJson(result);
         case 400:
         case 401:
@@ -453,8 +453,8 @@ class ServiceApi {
         case 200:
           List<dynamic> result = json.decode(response.body)['data'];
           dataAbsen = result.map((e) => Absen.fromJson(e)).toList();
-          log('${baseUrl}get_absen', name: 'GET ABSEN');
-          log(paramAbsen.toString());
+          // log('${baseUrl}get_absen', name: 'GET ABSEN');
+          // log(paramAbsen.toString());
         case 400:
         case 401:
         case 402:

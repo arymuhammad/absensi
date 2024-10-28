@@ -279,14 +279,20 @@ class AddPegawaiController extends GetxController {
   void uploadImageProfile() async {
     if (kIsWeb) {
       fileResult = await FilePicker.platform.pickFiles(
+          compressionQuality: 50,
+          allowedExtensions: ['jpg', 'jpeg', 'png'],
           withReadStream: true,
           // // this will return PlatformFile object with read stream
           allowCompression: true);
     } else {
-      image = await picker.pickImage(source: ImageSource.gallery);
+      image = await picker.pickImage(
+          source: ImageSource.gallery,
+          imageQuality: 50,
+          maxHeight: 600,
+          maxWidth: 600);
       if (image != null) {
         update();
-      } else {}
+      } 
     }
   }
 
@@ -376,7 +382,7 @@ class AddPegawaiController extends GetxController {
           } else {
             dialogMsgScsUpd(
                 "Sukses", "Data berhasil disimpan. Silahkan login untuk masuk");
-           
+
             await ServiceApi().addUpdatePegawai(data);
             selectedCabang.value = "";
             username.clear();
