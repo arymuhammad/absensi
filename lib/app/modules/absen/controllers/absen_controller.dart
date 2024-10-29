@@ -112,6 +112,7 @@ class AbsenController extends GetxController {
   var remainingSec = 60.obs;
   var timerStat = false.obs;
   File? capturedImage;
+  var barcodeScanRes = ''.obs;
 
   @override
   void onInit() async {
@@ -436,9 +437,6 @@ class AbsenController extends GetxController {
   }
 
   getLoc(Data? dataUser) async {
-    final String currentTimeZone =
-        await FlutterNativeTimezone.getLocalTimezone();
-
     try {
       final deviceNames = DeviceMarketingNames();
       // DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
@@ -466,35 +464,35 @@ class AbsenController extends GetxController {
       dialogMsgCncl('Peringatan',
           'Anda terdeteksi menggunakan\nlokasi palsu\nHarap matikan lokasi palsu');
     } else {
-      timeNetwork(currentTimeZone);
+      timeNetwork(await FlutterNativeTimezone.getLocalTimezone());
       dialogAbsenView(dataUser!, position.latitude, position.longitude);
     }
   }
 
   scanQrLoc(Data? dataUser) async {
-    String barcodeScanRes;
+    // String barcodeScanRes;
     // Platform messages may fail, so we use a try/catch PlatformException.
     try {
-      barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
+      barcodeScanRes.value = await FlutterBarcodeScanner.scanBarcode(
           '#ff6666', 'Cancel', false, ScanMode.QR);
       // print(barcodeScanRes);
-      if (barcodeScanRes == "-1") {
+      if (barcodeScanRes.value == "-1") {
         // cekStokC.cariArtikel.clear();
       } else {
         // if (barcodeScanRes.contains(dataUser!.lat.toString()) &&
         //     barcodeScanRes.contains(dataUser.long.toString())) {
           List<Placemark> placemarks = await placemarkFromCoordinates(
-              double.parse(barcodeScanRes.split(' ')[0]),
-              double.parse(barcodeScanRes.split(' ')[1]));
+              double.parse(barcodeScanRes.value.split(' ')[0]),
+              double.parse(barcodeScanRes.value.split(' ')[1]));
           lokasi.value =
               '${placemarks[0].street!}, ${placemarks[0].subLocality!}\n${placemarks[0].subAdministrativeArea!}, ${placemarks[0].administrativeArea!}';
           timeNetwork(await FlutterNativeTimezone.getLocalTimezone());
-          dialogAbsenView(dataUser!, double.parse(barcodeScanRes.split(' ')[0]),
-              double.parse(barcodeScanRes.split(' ')[1]));
+          dialogAbsenView(dataUser!, double.parse(barcodeScanRes.value.split(' ')[0]),
+              double.parse(barcodeScanRes.value.split(' ')[1]));
         // } 
       }
     } on PlatformException {
-      barcodeScanRes = 'Failed to get platform version.';
+      barcodeScanRes.value = 'Failed to get platform version.';
     }
   }
 

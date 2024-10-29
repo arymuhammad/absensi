@@ -1,6 +1,9 @@
+// import 'dart:ffi';
+
 import 'package:absensi/app/data/helper/app_colors.dart';
 import 'package:absensi/app/data/helper/loading_dialog.dart';
 import 'package:absensi/app/data/model/login_model.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
@@ -20,46 +23,54 @@ class AbsenView extends GetView<AbsenController> {
 
   @override
   Widget build(BuildContext context) {
-    return  WillPopScope(
-        onWillPop: () async {
-          if (absenC.lastTime == null ||
-              DateTime.now().difference(absenC.lastTime!) > exitTimeout) {
-            absenC.lastTime = DateTime.now();
-            // ScaffoldMessenger.of(context).showSnackBar(
-            //   SnackBar(
-            //     content: Text('Tap back again to exit'),
-            //     duration: exitTimeout,
-            //   ),
-            // );
-            showToast('Tap back again to exit');
-            return false;
-          }
-          return true;
-        },
-        child: Scaffold(
-            appBar: AppBar(
-              title: Text(
-                data!.visit == "1" ? 'VISIT' : 'ABSEN',
-                style: const TextStyle(color: AppColors.mainTextColor1),
-              ),
-              automaticallyImplyLeading: false,
-              centerTitle: true,
-              flexibleSpace: Container(
-                decoration: const BoxDecoration(
-                  image: DecorationImage(
-                    image: AssetImage(
-                        'assets/image/new_bg_app.jpg'), // Gantilah dengan path gambar Anda
-                    fit: BoxFit.cover,
-                  ),
+    return WillPopScope(
+      onWillPop: () async {
+        if (absenC.lastTime == null ||
+            DateTime.now().difference(absenC.lastTime!) > exitTimeout) {
+          absenC.lastTime = DateTime.now();
+          // ScaffoldMessenger.of(context).showSnackBar(
+          //   SnackBar(
+          //     content: Text('Tap back again to exit'),
+          //     duration: exitTimeout,
+          //   ),
+          // );
+          showToast('Tap back again to exit');
+          return false;
+        }
+        return true;
+      },
+      child: Scaffold(
+          appBar: AppBar(
+            title: Text(
+              data!.visit == "1" ? 'VISIT' : 'ABSEN',
+              style: const TextStyle(color: AppColors.mainTextColor1),
+            ),
+            automaticallyImplyLeading: false,
+            centerTitle: true,
+            flexibleSpace: Container(
+              decoration: const BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage(
+                      'assets/image/new_bg_app.jpg'), // Gantilah dengan path gambar Anda
+                  fit: BoxFit.cover,
                 ),
               ),
             ),
-            body: Stack(
+          ),
+          body: Obx(
+            () => Stack(
               children: [
                 FlutterMap(
                   options: MapOptions(
                       initialCenter: LatLng(
-                          double.parse(data!.lat!), double.parse(data!.long!)),
+                          double.parse(absenC.barcodeScanRes.isNotEmpty &&
+                                  absenC.barcodeScanRes.value != "-1"
+                              ? absenC.barcodeScanRes.value.split(' ')[0]
+                              : data!.lat!),
+                          double.parse(absenC.barcodeScanRes.isNotEmpty &&
+                                  absenC.barcodeScanRes.value != "-1"
+                              ? absenC.barcodeScanRes.value.split(' ')[1]
+                              : data!.long!)),
                       initialZoom: 17,
                       maxZoom: 18.4,
                       minZoom: 17),
@@ -73,7 +84,14 @@ class AbsenView extends GetView<AbsenController> {
                       circles: [
                         CircleMarker(
                             point: LatLng(
-                                double.parse(data!.lat!), double.parse(data!.long!)),
+                                double.parse(absenC.barcodeScanRes.isNotEmpty &&
+                                        absenC.barcodeScanRes.value != "-1"
+                                    ? absenC.barcodeScanRes.value.split(' ')[0]
+                                    : data!.lat!),
+                                double.parse(absenC.barcodeScanRes.isNotEmpty &&
+                                        absenC.barcodeScanRes.value != "-1"
+                                    ? absenC.barcodeScanRes.value.split(' ')[1]
+                                    : data!.long!)),
                             radius: 100,
                             useRadiusInMeter: true,
                             color: const Color.fromARGB(71, 16, 134, 230),
@@ -116,12 +134,20 @@ class AbsenView extends GetView<AbsenController> {
                         height: 100,
                         child: Row(
                           children: [
-                            Icon(
-                              Iconsax.map_1_bold,
-                              color: Colors.blueAccent[700],
-                              size: 80,
+                            SizedBox(
+                              width: 70,
+                              child: Icon(
+                                FontAwesome.map_location_dot_solid,
+                                color: Colors.blueAccent[700],
+                                size: 50,
+                              ),
                             ),
-                            Obx(() => Text(absenC.lokasi.value)),
+                            const SizedBox(
+                              width: 10,
+                            ),
+                            SizedBox(
+                                width: Get.mediaQuery.size.width/1.4,
+                                child: Text(absenC.lokasi.value)),
                           ],
                         ),
                       ),
@@ -129,8 +155,8 @@ class AbsenView extends GetView<AbsenController> {
                   ),
                 )
               ],
-            )),
-      
+            ),
+          )),
     );
   }
 }

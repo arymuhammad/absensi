@@ -33,7 +33,7 @@ class AboutView extends GetView {
       ),
       body: ListView(children: [
         ListTile(
-          title: const Text('Check pembaruan aplikasi'),
+          title: const Text('Cek pembaruan aplikasi'),
           onTap: () {
             if (Platform.isAndroid) {
               absC.checkForUpdates("about");
