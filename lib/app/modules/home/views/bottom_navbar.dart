@@ -10,6 +10,7 @@ import 'package:absensi/app/modules/settings/views/settings_view.dart';
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:get/get.dart';
 
 import '../../absen/controllers/absen_controller.dart';
@@ -37,38 +38,125 @@ class BottomNavBar extends GetView {
     return Scaffold(
       body: Obx(() =>
           IndexedStack(index: loginC.selected.value, children: widgetList)),
-      bottomNavigationBar: Obx(
-        () => ConvexAppBar(
-          items: const [
-            TabItem(icon: CupertinoIcons.home, title: 'Home'),
-            TabItem(icon: CupertinoIcons.doc_text_search, title: 'History'),
-            TabItem(icon: CupertinoIcons.camera),
-            TabItem(icon: CupertinoIcons.gear_alt, title: 'Setting'),
-            TabItem(icon: CupertinoIcons.person_crop_circle, title: 'Profile'),
-          ],
-          initialActiveIndex: loginC.selected.value,
-          activeColor: Colors.white,
-          style: TabStyle.fixedCircle,
-          backgroundColor: mainColor,
-          onTap: (i) {
-            if (i == 1) {
-              loginC.selectedMenu(i);
-              loc.isLoading.value = true;
-              loc.searchDate.value = "";
-              listDataUser.visit == "1"
-                  ? loc.getAllVisited(listDataUser.id!)
-                  : loc.getAllAbsen(listDataUser.id!);
-            } else if (i == 2) {
-              loginC.selectedMenu(i);
-              listDataUser.visit == "1"
-                  ? loc.getLoc(listDataUser)
-                  : loc.scanQrLoc(listDataUser);
-            } else {
-              loginC.selectedMenu(i);
-            }
-          },
-        ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButton: SpeedDial(
+        elevation: 20,
+        buttonSize: const Size(65, 65),
+        closeDialOnPop: true,
+        activeIcon: CupertinoIcons.chevron_down,
+        renderOverlay: false,
+        useRotationAnimation: true,
+        switchLabelPosition: true,
+        children: [
+          SpeedDialChild(
+            child: const Icon(
+              CupertinoIcons.camera,
+              color: Colors.white,
+            ),
+            onTap: () {
+              loginC.selected.value = 2;
+              loc.getLoc(listDataUser);
+            },
+            backgroundColor: Colors.greenAccent[700],
+            elevation: 20,
+            label: 'Absen',
+            labelBackgroundColor: Colors.black,
+            labelStyle: const TextStyle(
+              color: Colors.white,
+            ),
+          ),
+          SpeedDialChild(
+            child: const Icon(
+              CupertinoIcons.qrcode_viewfinder,
+              color: Colors.white,
+            ),
+            onTap: () {
+              loginC.selected.value = 2;
+              loc.scanQrLoc(listDataUser);
+            },
+            backgroundColor: Colors.blueAccent[700],
+            elevation: 20,
+            label: 'Scan QR',
+            labelBackgroundColor: Colors.black,
+            labelStyle: const TextStyle(
+              color: Colors.white,
+            ),
+          ),
+        ],
+        child: const Icon(CupertinoIcons.chevron_up),
       ),
+      bottomNavigationBar: Obx(() => BottomNavigationBar(
+                backgroundColor: Colors.blue,
+                selectedItemColor: Colors.white,
+                unselectedItemColor: Colors.grey[400],
+
+                elevation: 10, type: BottomNavigationBarType.fixed,
+                items: const [
+                  BottomNavigationBarItem(
+                      icon: Icon(CupertinoIcons.home), label: 'home'),
+                  BottomNavigationBarItem(
+                      icon: Icon(CupertinoIcons.doc_text_search),
+                      label: 'history'),
+                  BottomNavigationBarItem(
+                      icon: Icon(CupertinoIcons.chevron_up_circle_fill),
+                      label: ''),
+                  BottomNavigationBarItem(
+                      icon: Icon(CupertinoIcons.gear_alt), label: 'Setting'),
+                  BottomNavigationBarItem(
+                      icon: Icon(CupertinoIcons.person_crop_circle),
+                      label: 'Profile'),
+                ],
+
+                currentIndex: loginC.selected.value,
+                onTap: (i) {
+                  if (i == 1) {
+                    loginC.selectedMenu(i);
+                    loc.isLoading.value = true;
+                    loc.searchDate.value = "";
+                    listDataUser.visit == "1"
+                        ? loc.getAllVisited(listDataUser.id!)
+                        : loc.getAllAbsen(listDataUser.id!);
+                  } else {
+                    loginC.selectedMenu(i);
+                  }
+                },
+                // TabItem(icon: CupertinoIcons.home, title: 'Home'),
+                //     TabItem(icon: CupertinoIcons.doc_text_search, title: 'History'),
+                //     TabItem(icon: CupertinoIcons.camera),
+                //     TabItem(icon: CupertinoIcons.gear_alt, title: 'Setting'),
+                //     TabItem(icon: CupertinoIcons.person_crop_circle, title: 'Profile')
+              )
+          // ConvexAppBar(
+          //   items: const [
+          //     TabItem(icon: CupertinoIcons.home, title: 'Home'),
+          //     TabItem(icon: CupertinoIcons.doc_text_search, title: 'History'),
+          //     TabItem(icon: CupertinoIcons.camera),
+          //     TabItem(icon: CupertinoIcons.gear_alt, title: 'Setting'),
+          //     TabItem(icon: CupertinoIcons.person_crop_circle, title: 'Profile'),
+          //   ],
+          //   initialActiveIndex: loginC.selected.value,
+          //   activeColor: Colors.white,
+          //   style: TabStyle.react,
+          //   backgroundColor: mainColor,
+          //   onTap: (i) {
+          //     if (i == 1) {
+          //       loginC.selectedMenu(i);
+          //       loc.isLoading.value = true;
+          //       loc.searchDate.value = "";
+          //       listDataUser.visit == "1"
+          //           ? loc.getAllVisited(listDataUser.id!)
+          //           : loc.getAllAbsen(listDataUser.id!);
+          //     } else if (i == 2) {
+          //       loginC.selectedMenu(i);
+          //       listDataUser.visit == "1"
+          //           ? loc.getLoc(listDataUser)
+          //           : loc.scanQrLoc(listDataUser);
+          //     } else {
+          //       loginC.selectedMenu(i);
+          //     }
+          //   },
+          // ),
+          ),
     );
   }
 }

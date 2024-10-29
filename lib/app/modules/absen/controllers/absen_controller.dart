@@ -481,19 +481,17 @@ class AbsenController extends GetxController {
       if (barcodeScanRes == "-1") {
         // cekStokC.cariArtikel.clear();
       } else {
-        if (barcodeScanRes.contains(dataUser!.lat.toString()) &&
-            barcodeScanRes.contains(dataUser.long.toString())) {
+        // if (barcodeScanRes.contains(dataUser!.lat.toString()) &&
+        //     barcodeScanRes.contains(dataUser.long.toString())) {
           List<Placemark> placemarks = await placemarkFromCoordinates(
               double.parse(barcodeScanRes.split(' ')[0]),
               double.parse(barcodeScanRes.split(' ')[1]));
           lokasi.value =
               '${placemarks[0].street!}, ${placemarks[0].subLocality!}\n${placemarks[0].subAdministrativeArea!}, ${placemarks[0].administrativeArea!}';
           timeNetwork(await FlutterNativeTimezone.getLocalTimezone());
-          dialogAbsenView(dataUser, double.parse(barcodeScanRes.split(' ')[0]),
+          dialogAbsenView(dataUser!, double.parse(barcodeScanRes.split(' ')[0]),
               double.parse(barcodeScanRes.split(' ')[1]));
-        } else {
-          showToast('Lokasi tidak ditemukan');
-        }
+        // } 
       }
     } on PlatformException {
       barcodeScanRes = 'Failed to get platform version.';

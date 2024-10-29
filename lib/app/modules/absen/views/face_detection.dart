@@ -67,6 +67,7 @@ class _FaceDetectionState extends State<FaceDetection> {
       enableAudio: false,
       performanceMode: FaceDetectorMode.accurate,
       defaultCameraLens: CameraLens.front,
+      orientation: CameraOrientation.portraitUp,
       onCapture: (File? image) {
         absC.capturedImage = image;
         Get.back();
@@ -113,6 +114,7 @@ class _FaceDetectionState extends State<FaceDetection> {
             }
             return SmartFaceCamera(
                 controller: controller,
+                showControls: false,                
                 messageBuilder: (context, face) {
                   if (face == null) {
                     return _message('Place your face in the camera');
@@ -127,11 +129,11 @@ class _FaceDetectionState extends State<FaceDetection> {
   }
 
   Widget _message(String msg) => Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 55, vertical: 15),
+        padding: const EdgeInsets.symmetric(horizontal: 55, vertical: 105),
         child: Text(msg,
             textAlign: TextAlign.center,
-            style: const TextStyle(
-                fontSize: 14, height: 1.5, fontWeight: FontWeight.w400)),
+            style: TextStyle(
+                fontSize: 14, height: 1.5, fontWeight: FontWeight.w400, color: Colors.redAccent[700],)),
       );
 
   @override
