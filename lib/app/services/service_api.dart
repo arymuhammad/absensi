@@ -389,7 +389,7 @@ class ServiceApi {
       switch (response.statusCode) {
         case 200:
           final result = json.decode(response.body)['data'];
-      // log(result.toString());
+          // log(result.toString());
           return CekAbsen.fromJson(result);
         case 400:
         case 401:
@@ -453,8 +453,8 @@ class ServiceApi {
         case 200:
           List<dynamic> result = json.decode(response.body)['data'];
           dataAbsen = result.map((e) => Absen.fromJson(e)).toList();
-          // log('${baseUrl}get_absen', name: 'GET ABSEN');
-          // log(paramAbsen.toString());
+        // log('${baseUrl}get_absen', name: 'GET ABSEN');
+        // log(paramAbsen.toString());
         case 400:
         case 401:
         case 402:
@@ -585,7 +585,7 @@ class ServiceApi {
     try {
       final response = await http
           .post(Uri.parse('${baseUrl}get_absen'), body: data)
-          .timeout(const Duration(seconds: 15));
+          .timeout(const Duration(minutes: 1));
       switch (response.statusCode) {
         case 200:
           List<dynamic> result = json.decode(response.body)['data'];
@@ -604,16 +604,19 @@ class ServiceApi {
       }
     } on FetchDataException catch (e) {
       // print('error caught: ${e.message}');
+      Get.back();
       showToast("${e.message}");
     } on TimeoutException catch (_) {
+      Get.back();
       showToast("waktu koneksi ke server habis.\nharap mencoba kembali");
     }
   }
 
   getFilteredVisit(Map<String, dynamic> data) async {
     try {
-      final response =
-          await http.post(Uri.parse('${baseUrl}get_visit'), body: data);
+      final response = await http
+          .post(Uri.parse('${baseUrl}get_visit'), body: data)
+          .timeout(const Duration(minutes: 1));
       // print(data);
       switch (response.statusCode) {
         case 200:
@@ -633,7 +636,12 @@ class ServiceApi {
       }
     } on FetchDataException catch (e) {
       // print('error caught: ${e.message}');
+      Get.back();
       showToast("${e.message}");
+    } on TimeoutException catch (_) {
+      Get.back();
+      // print('error caught: ${e.message}');
+      showToast("Waktu permintaan ke server telah habis, silahkan dicoba lagi");
     }
   }
 
@@ -790,8 +798,7 @@ class ServiceApi {
 
       // final dataDecode = jsonDecode(responseString);
       // debugPrint(dataDecode.toString());
-
-      } on SocketException {
+    } on SocketException {
       if (!isOnInit) {
         Get.back();
         failedDialog(Get.context, 'ERROR',

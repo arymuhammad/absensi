@@ -481,15 +481,17 @@ class AbsenController extends GetxController {
       } else {
         // if (barcodeScanRes.contains(dataUser!.lat.toString()) &&
         //     barcodeScanRes.contains(dataUser.long.toString())) {
-          List<Placemark> placemarks = await placemarkFromCoordinates(
-              double.parse(barcodeScanRes.value.split(' ')[0]),
-              double.parse(barcodeScanRes.value.split(' ')[1]));
-          lokasi.value =
-              '${placemarks[0].street!}, ${placemarks[0].subLocality!}\n${placemarks[0].subAdministrativeArea!}, ${placemarks[0].administrativeArea!}';
-          timeNetwork(await FlutterNativeTimezone.getLocalTimezone());
-          dialogAbsenView(dataUser!, double.parse(barcodeScanRes.value.split(' ')[0]),
-              double.parse(barcodeScanRes.value.split(' ')[1]));
-        // } 
+        List<Placemark> placemarks = await placemarkFromCoordinates(
+            double.parse(barcodeScanRes.value.split(' ')[0]),
+            double.parse(barcodeScanRes.value.split(' ')[1]));
+        lokasi.value =
+            '${placemarks[0].street!}, ${placemarks[0].subLocality!}\n${placemarks[0].subAdministrativeArea!}, ${placemarks[0].administrativeArea!}';
+        timeNetwork(await FlutterNativeTimezone.getLocalTimezone());
+        dialogAbsenView(
+            dataUser!,
+            double.parse(barcodeScanRes.value.split(' ')[0]),
+            double.parse(barcodeScanRes.value.split(' ')[1]));
+        // }
       }
     } on PlatformException {
       barcodeScanRes.value = 'Failed to get platform version.';
@@ -556,34 +558,34 @@ class AbsenController extends GetxController {
     rows.add(pw.TableRow(
       decoration: const pw.BoxDecoration(color: PdfColors.blue700),
       children: [
-        pw.Text('TANGGAL',
+        pw.Text('Tanggal',
             textAlign: pw.TextAlign.center,
             style: pw.TextStyle(color: PdfColors.white, font: font)),
-        pw.Text('CABANG',
+        pw.Text('Cabang',
             textAlign: pw.TextAlign.center,
             style: pw.TextStyle(color: PdfColors.white, font: font)),
-        pw.Text('NAMA',
+        pw.Text('Nama',
             textAlign: pw.TextAlign.center,
             style: pw.TextStyle(color: PdfColors.white, font: font)),
-        pw.Text('SHIFT',
+        pw.Text('Shift',
             textAlign: pw.TextAlign.center,
             style: pw.TextStyle(color: PdfColors.white, font: font)),
-        pw.Text('MASUK',
+        pw.Text('Masuk',
             textAlign: pw.TextAlign.center,
             style: pw.TextStyle(color: PdfColors.white, font: font)),
-        pw.Text('FOTO',
+        pw.Text('Foto',
             textAlign: pw.TextAlign.center,
             style: pw.TextStyle(color: PdfColors.white, font: font)),
-        pw.Text('STATUS MASUK',
+        pw.Text('Status Masuk',
             textAlign: pw.TextAlign.center,
             style: pw.TextStyle(color: PdfColors.white, font: font)),
-        pw.Text('KELUAR',
+        pw.Text('Keluar',
             textAlign: pw.TextAlign.center,
             style: pw.TextStyle(color: PdfColors.white, font: font)),
-        pw.Text('FOTO',
+        pw.Text('Foto',
             textAlign: pw.TextAlign.center,
             style: pw.TextStyle(color: PdfColors.white, font: font)),
-        pw.Text('STATUS KELUAR',
+        pw.Text('Status Keluar',
             textAlign: pw.TextAlign.center,
             style: pw.TextStyle(color: PdfColors.white, font: font)),
       ],
@@ -591,7 +593,7 @@ class AbsenController extends GetxController {
 
     for (var data in searchAbsen) {
       pw.MemoryImage? imageMasuk;
-      if (data.fotoPulang! != "") {
+      if (data.fotoMasuk! != "") {
         imageMasuk = pw.MemoryImage(base64Decode(data.fotoMasuk!));
       }
       // // print('${img1.bodyBytes}');
@@ -601,13 +603,20 @@ class AbsenController extends GetxController {
       }
 
       rows.add(pw.TableRow(
-        decoration: const pw.BoxDecoration(color: PdfColors.grey200),
+        decoration: const pw.BoxDecoration(
+          color: PdfColors.grey200,
+        ),
         children: [
-          pw.Text(
-              DateFormat('dd/MM/yyyy')
-                  .format(DateTime.parse(data.tanggalMasuk!)),
-              textAlign: pw.TextAlign.center,
-              style: pw.TextStyle(font: font)),
+          pw.Padding(
+              padding: const pw.EdgeInsets.all(2),
+              child: pw.Text(
+                  DateFormat('dd/MM/yyyy')
+                      .format(DateTime.parse(data.tanggalMasuk!)),
+                  textAlign: pw.TextAlign.center,
+                  style: pw.TextStyle(
+                    font: font,
+                    fontSize: 12,
+                  ))),
           pw.Text(data.namaCabang!,
               textAlign: pw.TextAlign.center, style: pw.TextStyle(font: font)),
           pw.Text(data.nama!,

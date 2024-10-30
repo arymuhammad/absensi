@@ -68,6 +68,7 @@ class _FaceDetectionState extends State<FaceDetection> {
       performanceMode: FaceDetectorMode.accurate,
       defaultCameraLens: CameraLens.front,
       orientation: CameraOrientation.portraitUp,
+      imageResolution: ImageResolution.low,
       onCapture: (File? image) {
         absC.capturedImage = image;
         Get.back();
@@ -114,13 +115,13 @@ class _FaceDetectionState extends State<FaceDetection> {
             }
             return SmartFaceCamera(
                 controller: controller,
-                showControls: false,                
+                showControls: false,
                 messageBuilder: (context, face) {
                   if (face == null) {
-                    return _message('Place your face in the camera');
+                    return _message('Arahkan wajah Anda menghadap kamera');
                   }
                   if (!face.wellPositioned) {
-                    return _message('Center your face in the square');
+                    return _message('Posisikan wajah Anda pada tengah layar');
                   }
                   return const SizedBox.shrink();
                 });
@@ -133,7 +134,11 @@ class _FaceDetectionState extends State<FaceDetection> {
         child: Text(msg,
             textAlign: TextAlign.center,
             style: TextStyle(
-                fontSize: 14, height: 1.5, fontWeight: FontWeight.w400, color: Colors.redAccent[700],)),
+              fontSize: 14,
+              height: 1.5,
+              fontWeight: FontWeight.w400,
+              color: Colors.redAccent[700],
+            )),
       );
 
   @override
