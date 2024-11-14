@@ -1,7 +1,6 @@
 
-import 'dart:convert';
-
 import 'package:absensi/app/data/helper/const.dart';
+import 'package:absensi/app/modules/shared/rounded_image.dart';
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
@@ -21,11 +20,13 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
       point: LatLng(double.parse(Get.arguments["lat_masuk"]),
           double.parse(Get.arguments["long_masuk"])),
       child: Card(
-        elevation: 10,
-        child:  Image.memory(base64Decode(Get.arguments['foto_masuk']),
-          errorBuilder: (context, error, stackTrace) =>Image.asset('assets/image/selfie.png'),
-          fit: BoxFit.cover,)
-      ),
+          elevation: 10,
+          child: Image.network(
+            "${ServiceApi().baseUrl}${Get.arguments['foto_masuk']}",
+            errorBuilder: (context, error, stackTrace) =>
+                Image.asset('assets/image/selfie.png'),
+            fit: BoxFit.cover,
+          )),
     ),
   ];
 
@@ -41,11 +42,13 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
               ? Get.arguments["long_pulang"]
               : "0.0")),
       child: Card(
-        elevation: 10,
-        child:  Image.memory(base64Decode(Get.arguments['foto_pulang']),
-          errorBuilder: (context, error, stackTrace) =>Image.asset('assets/image/selfie.png'),
-          fit: BoxFit.cover,)
-      ),
+          elevation: 10,
+          child: Image.network(
+            "${ServiceApi().baseUrl}${Get.arguments['foto_pulang']}",
+            errorBuilder: (context, error, stackTrace) =>
+                Image.asset('assets/image/selfie.png'),
+            fit: BoxFit.cover,
+          )),
     ),
   ];
 
@@ -66,7 +69,7 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
       ),
       backgroundColor: backgroundColor,
       body: ListView(
-        padding: const EdgeInsets.only(left:5, top: 10, right: 5, bottom: 10),
+        padding: const EdgeInsets.only(left: 5, top: 10, right: 5, bottom: 10),
         children: [
           Card(
             elevation: 10,
@@ -95,37 +98,17 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
                   ),
                 ),
                 Container(
-                    padding: const EdgeInsets.all(15),
-                    decoration: const BoxDecoration(
-                        borderRadius: BorderRadius.only(
-                            bottomLeft: Radius.circular(10),
-                            bottomRight: Radius.circular(10)),
-                        color: Colors.white),
+                    padding: const EdgeInsets.all(8),
                     child: Column(
                       children: [
                         Row(
                           children: [
-                            ClipOval(
-                              child: Container(
+                            RoundedImage(
                                 height: 75,
                                 width: 75,
-                                color: Colors.white,
-                                child: Center(
-                                  child: Get.arguments['foto_profil']
-                                              .toString()
-                                              .substring(0, 5) ==
-                                          "profi"
-                                      ? Image.network(
-                                          "${ServiceApi().baseUrl}${Get.arguments['foto_profil']}",
-                                          fit: BoxFit.cover,
-                                        )
-                                      : Image.network(
-                                          "https://ui-avatars.com/api/?name=${Get.arguments['foto_profil']}",
-                                          fit: BoxFit.cover,
-                                        ),
-                                ),
-                              ),
-                            ),
+                                foto: Get.arguments['foto_profil'],
+                                name: Get.arguments['foto_profil'],
+                                headerProfile: true),
                             const SizedBox(width: 5),
                             Row(
                               children: [
@@ -313,37 +296,17 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
                     ),
                   ),
                   Container(
-                      padding: const EdgeInsets.all(15),
-                      decoration: const BoxDecoration(
-                          borderRadius: BorderRadius.only(
-                              bottomLeft: Radius.circular(10),
-                              bottomRight: Radius.circular(10)),
-                          color: Colors.white),
+                      padding: const EdgeInsets.all(8),
                       child: Column(
                         children: [
                           Row(
                             children: [
-                              ClipOval(
-                                child: Container(
+                              RoundedImage(
                                   height: 75,
                                   width: 75,
-                                  color: Colors.white,
-                                  child: Center(
-                                    child: Get.arguments['foto_profil']
-                                                .toString()
-                                                .substring(0, 5) ==
-                                            "profi"
-                                        ? Image.network(
-                                            "${ServiceApi().baseUrl}${Get.arguments['foto_profil']}",
-                                            fit: BoxFit.cover,
-                                          )
-                                        : Image.network(
-                                            "https://ui-avatars.com/api/?name=${Get.arguments['foto_profil']}",
-                                            fit: BoxFit.cover,
-                                          ),
-                                  ),
-                                ),
-                              ),
+                                  foto: Get.arguments['foto_profil'],
+                                  name: Get.arguments['foto_profil'],
+                                  headerProfile: true),
                               const SizedBox(width: 5),
                               Row(
                                 children: [
@@ -364,26 +327,26 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
                                         ],
                                       ),
                                       Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        const Text('Shift'),
-                                        const SizedBox(width: 57),
-                                        SizedBox(
-                                          width:
-                                              Get.mediaQuery.size.width * 0.35,
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                ': ${Get.arguments['nama_shift']}',
-                                              ),
-                                            ],
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          const Text('Shift'),
+                                          const SizedBox(width: 57),
+                                          SizedBox(
+                                            width: Get.mediaQuery.size.width *
+                                                0.35,
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  ': ${Get.arguments['nama_shift']}',
+                                                ),
+                                              ],
+                                            ),
                                           ),
-                                        ),
-                                      ],
-                                    ),
+                                        ],
+                                      ),
                                       Row(
                                         children: [
                                           const Text('Pulang'),

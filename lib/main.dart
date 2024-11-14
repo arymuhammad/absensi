@@ -4,7 +4,6 @@ import 'package:absensi/app/data/model/login_model.dart';
 import 'package:absensi/app/modules/home/views/bottom_navbar.dart';
 import 'package:absensi/app/modules/login/controllers/login_controller.dart';
 import 'package:absensi/app/modules/login/views/login_view.dart';
-import 'package:face_camera/face_camera.dart';
 // import 'package:alarm/alarm.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -23,7 +22,6 @@ void main() async {
   ]);
   // await Workmanager().initialize(callbackDispatcher);
   await initializeDateFormatting('id_ID', "");
-  await FaceCamera.initialize();
   // await Alarm.init();
 
   SharedPreferences prefs = await SharedPreferences.getInstance();

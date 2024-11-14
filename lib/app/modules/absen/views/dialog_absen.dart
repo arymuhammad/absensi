@@ -1,10 +1,9 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:absensi/app/modules/absen/controllers/absen_controller.dart';
 import 'package:absensi/app/data/helper/db_helper.dart';
 import 'package:absensi/app/data/helper/loading_dialog.dart';
-import 'package:absensi/app/modules/absen/views/face_detection.dart';
+
 import 'package:absensi/app/modules/absen/views/form_absen.dart';
 import 'package:absensi/app/modules/absen/views/visit.dart';
 import 'package:absensi/app/modules/shared/dropdown_cabang.dart';
@@ -109,11 +108,11 @@ dialogAbsenView(Data dataUser, latitude, longitude) async {
                     absC.long.value = "";
                   } else {
                     // face detection
-                    await Get.to(() => const FaceDetection());
-                    // await absC.uploadFotoAbsen();
-                    // Get.back();
+                    // await Get.to(() => const FaceDetection());
+                    await absC.uploadFotoAbsen();
+                    Get.back();
 
-                    if (absC.capturedImage != null) {
+                    if (absC.image != null) {
                       var data = {
                         "status": "update",
                         "id": dataUser.id,
@@ -122,8 +121,7 @@ dialogAbsenView(Data dataUser, latitude, longitude) async {
                             .format(DateTime.parse(absC.dateNowServer)),
                         "nama": dataUser.nama,
                         "jam_absen_pulang": absC.timeNow.toString(),
-                        "foto_pulang": base64
-                            .encode(File(absC.capturedImage!.path).readAsBytesSync()),
+                        "foto_pulang":  File(absC.image!.path),
                         "lat_pulang": latitude.toString(),
                         "long_pulang": longitude.toString(),
                         "device_info2": absC.devInfo.value
@@ -134,8 +132,7 @@ dialogAbsenView(Data dataUser, latitude, longitude) async {
                             .format(DateTime.parse(absC.dateNowServer)),
                         "nama": dataUser.nama,
                         "jam_absen_pulang": absC.timeNow.toString(),
-                        "foto_pulang": base64
-                            .encode(File(absC.capturedImage!.path).readAsBytesSync()),
+                        "foto_pulang":  File(absC.image!.path).toString(),
                         "lat_pulang": latitude.toString(),
                         "long_pulang": longitude.toString(),
                         "device_info2": absC.devInfo.value

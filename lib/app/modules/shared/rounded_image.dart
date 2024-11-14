@@ -11,14 +11,13 @@ class RoundedImage extends StatelessWidget {
   final String foto;
   final String name;
   final bool headerProfile;
-  const RoundedImage({
-    super.key,
-    required this.height,
-    required this.width,
-    required this.foto,
-    required this.name,
-    required this.headerProfile
-  });
+  const RoundedImage(
+      {super.key,
+      required this.height,
+      required this.width,
+      required this.foto,
+      required this.name,
+      required this.headerProfile});
 
   @override
   Widget build(BuildContext context) {
@@ -44,15 +43,27 @@ class RoundedImage extends StatelessWidget {
                     "https://ui-avatars.com/api/?name=$name",
                     fit: BoxFit.cover,
                   )
-            : foto !=""
-                ? Image.memory(base64Decode(foto),
-                    errorBuilder: (context, error, stackTrace) =>
-                        Image.asset('assets/image/selfie.png'),
-                    fit: BoxFit.cover)
-                : Image.network(
-                    "https://ui-avatars.com/api/?name=$name",
+            : foto != "" && foto.contains('absensi/')
+                ? CachedNetworkImage(
+                    imageUrl: "${ServiceApi().baseUrl}$foto",
                     fit: BoxFit.cover,
-                  ),
+                    progressIndicatorBuilder: (context, url, progress) =>
+                        CircularProgressIndicator(
+                      value: progress.progress,
+                      strokeWidth: 15,
+                    ),
+                    cacheKey:
+                        "${ServiceApi().baseUrl}$foto + ${DateTime.now().day.toString()}",
+                  )
+                : foto != "" && foto.startsWith('/')
+                    ? Image.memory(base64Decode(foto),
+                        errorBuilder: (context, error, stackTrace) =>
+                            Image.asset('assets/image/selfie.png'),
+                        fit: BoxFit.cover)
+                    : Image.network(
+                        "https://ui-avatars.com/api/?name=$name",
+                        fit: BoxFit.cover,
+                      ),
       ),
     );
   }

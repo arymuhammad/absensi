@@ -9,7 +9,6 @@ import 'package:absensi/app/data/model/visit_model.dart';
 import 'package:absensi/app/modules/home/views/dialog_update_app.dart';
 
 import 'package:device_marketing_names/device_marketing_names.dart';
-import 'package:face_camera/face_camera.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:flutter_native_timezone_updated_gradle/flutter_native_timezone.dart';
@@ -109,7 +108,7 @@ class AbsenController extends GetxController {
   DateTime? lastTime;
   final _dateStream = Rx<DateTime?>(null);
   late StreamSubscription _sub;
-  var remainingSec = 60.obs;
+  var remainingSec = 30.obs;
   var timerStat = false.obs;
   File? capturedImage;
   var barcodeScanRes = ''.obs;
@@ -246,12 +245,13 @@ class AbsenController extends GetxController {
                 "jam_masuk": i.jamMasuk!,
                 "jam_pulang": i.jamPulang!,
                 "jam_absen_masuk": i.jamAbsenMasuk!,
-                "foto_masuk": i.fotoMasuk!,
+                "foto_masuk": File(i.fotoMasuk!),
                 "lat_masuk": i.latMasuk!,
                 "long_masuk": i.longMasuk!,
                 "device_info": i.devInfo!
               };
               // submit data absensi ke server
+              log(data.toString());
               await ServiceApi().submitAbsen(data, true);
             }
             _sub.cancel();
@@ -281,7 +281,7 @@ class AbsenController extends GetxController {
                   "tanggal_pulang": i.tanggalPulang!,
                   "nama": i.nama!,
                   "jam_absen_pulang": i.jamAbsenPulang!,
-                  "foto_pulang": i.fotoPulang!,
+                  "foto_pulang": File(i.fotoPulang!),
                   "lat_pulang": i.latPulang!,
                   "long_pulang": i.longPulang!,
                   "device_info2": i.devInfo2!
@@ -331,7 +331,7 @@ class AbsenController extends GetxController {
                 "visit_in": i.visitIn!,
                 "jam_in": i.jamIn!,
                 // "foto_in": File(i.fotoIn!.toString()),
-                "foto_in": i.fotoIn!,
+                "foto_in": File(i.fotoIn!),
                 "lat_in": i.latIn!,
                 "long_in": i.longIn!,
                 "device_info": i.deviceInfo!,
@@ -367,7 +367,7 @@ class AbsenController extends GetxController {
                   "jam_in": i.jamIn!,
                   "jam_out": i.jamOut!,
                   // "foto_out": File(i.fotoOut!.toString()),
-                  "foto_out": i.fotoOut!,
+                  "foto_out": File(i.fotoOut!),
                   "lat_out": i.latOut!,
                   "long_out": i.longOut!,
                   "device_info2": i.deviceInfo2!
@@ -594,12 +594,20 @@ class AbsenController extends GetxController {
     for (var data in searchAbsen) {
       pw.MemoryImage? imageMasuk;
       if (data.fotoMasuk! != "") {
-        imageMasuk = pw.MemoryImage(base64Decode(data.fotoMasuk!));
+        final img1 = await http
+            .get(
+              Uri.parse('${ServiceApi().baseUrl}${data.fotoMasuk!}'),
+            )
+            .then((value) => value.bodyBytes);
+        imageMasuk = pw.MemoryImage(img1);
       }
       // // print('${img1.bodyBytes}');
       pw.MemoryImage? imageKeluar;
       if (data.fotoPulang! != "") {
-        imageKeluar = pw.MemoryImage(base64Decode(data.fotoPulang!));
+        final img2 = await http.get(
+          Uri.parse('${ServiceApi().baseUrl}${data.fotoPulang!}'),
+        );
+        imageKeluar = pw.MemoryImage(img2.bodyBytes);
       }
 
       rows.add(pw.TableRow(
@@ -1104,7 +1112,7 @@ class AbsenController extends GetxController {
     var img = "";
     if (image != null) {
       img =
-          "data:image/jpg;base64,${base64.encode(File(capturedImage!.path).readAsBytesSync())}";
+          "data:image/jpg;base64,${base64.encode(File(image!.path).readAsBytesSync())}";
     }
     var data = {
       "emp_id": id,

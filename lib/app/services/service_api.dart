@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:developer';
+// import 'dart:developer';
 import 'dart:io';
 import 'package:absensi/app/data/model/cabang_model.dart';
 import 'package:absensi/app/data/model/cek_absen_model.dart';
@@ -29,6 +29,7 @@ import 'app_exceptions.dart';
 class ServiceApi {
   var baseUrl = "https://attendance.urbanco.id/api/"; // poduction
   // var baseUrl = "http://103.156.15.60/absensi/"; // dev
+  // var baseUrl = "https://88.222.214.157/"; // dev
   var isLoading = false.obs;
 
   Future<Login> loginUser(data) async {
@@ -235,6 +236,25 @@ class ServiceApi {
     }
   }
 
+  deleteAbsVst(Map<String, dynamic> data) async {
+    try {
+      final response = await http
+          .post(Uri.parse('${baseUrl}delete_abs_vst'), body: data)
+          .timeout(const Duration(minutes: 3));
+      if (response.statusCode == 200) {
+        showToast('Data berhasil di hapus');
+        Get.back();
+      }
+    } on TimeoutException catch (_) {
+      showToast('Waktu koneksi ke server habis\nData gagal di hapus');
+      Get.back();
+    }
+    on Exception catch (_) {
+      showToast('Data gagal di hapus');
+      Get.back();
+    }
+  }
+
   submitAbsen(data, bool isOnInit) async {
     try {
       var request = http.MultipartRequest('POST', Uri.parse('${baseUrl}absen'));
@@ -253,43 +273,43 @@ class ServiceApi {
         request.fields['lat_masuk'] = data["lat_masuk"];
         request.fields['long_masuk'] = data["long_masuk"];
         request.fields['device_info'] = data["device_info"];
-        request.fields['foto_masuk'] = data["foto_masuk"];
+        // request.fields['foto_masuk'] = data["foto_masuk"];
       } else {
         request.fields['tanggal_masuk'] = data["tanggal_masuk"];
         request.fields['tanggal_pulang'] = data["tanggal_pulang"];
         request.fields['jam_absen_pulang'] = data["jam_absen_pulang"];
         request.fields['lat_pulang'] = data["lat_pulang"];
         request.fields['long_pulang'] = data["long_pulang"];
-        request.fields['foto_pulang'] = data["foto_pulang"];
+        // request.fields['foto_pulang'] = data["foto_pulang"];
         request.fields['device_info2'] = data["device_info2"];
       }
 
-      // if (data["status"] == "add") {
-      // if (kIsWeb) {
-      //   // print(data["foto_masuk"]);
-      //   request.files.add(http.MultipartFile("foto_masuk",
-      //       data["foto_masuk"].readStream, data["foto_masuk"].size,
-      //       filename: data["foto_masuk"].name));
-      // } else {
-      //   request.files.add(http.MultipartFile(
-      //       'foto_masuk',
-      //       data["foto_masuk"].readAsBytes().asStream(),
-      //       data["foto_masuk"].lengthSync(),
-      //       filename: data["foto_masuk"].path.split("/").last));
-      // }
-      // } else {
-      //   // if (kIsWeb) {
-      //   //   request.files.add(http.MultipartFile("foto_pulang",
-      //   //       data["foto_pulang"].readStream, data["foto_pulang"].size,
-      //   //       filename: data["foto_pulang"].name));
-      //   // } else {
-      //   //   request.files.add(http.MultipartFile(
-      //   //       'foto_pulang',
-      //   //       data["foto_pulang"].readAsBytes().asStream(),
-      //   //       data["foto_pulang"].lengthSync(),
-      //   //       filename: data["foto_pulang"].path.split("/").last));
-      //   // }
-      // }
+      if (data["status"] == "add") {
+        // if (kIsWeb) {
+        //   // print(data["foto_masuk"]);
+        //   request.files.add(http.MultipartFile("foto_masuk",
+        //       data["foto_masuk"].readStream, data["foto_masuk"].size,
+        //       filename: data["foto_masuk"].name));
+        // } else {
+        request.files.add(http.MultipartFile(
+            "foto_masuk",
+            data["foto_masuk"].readAsBytes().asStream(),
+            data["foto_masuk"].lengthSync(),
+            filename: data["foto_masuk"].path.split("/").last));
+        // }
+      } else {
+        // if (kIsWeb) {
+        //   request.files.add(http.MultipartFile("foto_pulang",
+        //       data["foto_pulang"].readStream, data["foto_pulang"].size,
+        //       filename: data["foto_pulang"].name));
+        // } else {
+        request.files.add(http.MultipartFile(
+            'foto_pulang',
+            data["foto_pulang"].readAsBytes().asStream(),
+            data["foto_pulang"].lengthSync(),
+            filename: data["foto_pulang"].path.split("/").last));
+        // }
+      }
 
       await request.send().timeout(const Duration(minutes: 3)).then((value) {
         if (!isOnInit) {
@@ -324,7 +344,7 @@ class ServiceApi {
         Get.back();
         showToast('Terjadi kesalahan saat mengirim data');
       } else {
-        showToast('Terjadi kesalahan saat mengirim data');
+        showToast('Terjadi kesalahan saat mengirim data\n$e');
         // failedDialog(Get.context, 'ERROR', e.toString());
       }
     }
@@ -455,6 +475,7 @@ class ServiceApi {
           dataAbsen = result.map((e) => Absen.fromJson(e)).toList();
         // log('${baseUrl}get_absen', name: 'GET ABSEN');
         // log(paramAbsen.toString());
+        // log(result.toString());
         case 400:
         case 401:
         case 402:
@@ -716,10 +737,13 @@ class ServiceApi {
     try {
       final response =
           await http.post(Uri.parse('${baseUrl}cek_visit'), body: data);
+      // log('${baseUrl}cek_visit', name: 'LINK');
+      // log(data.toString());
       switch (response.statusCode) {
         case 200:
+          // dynamic result;
           final result = json.decode(response.body)['data'];
-          // print(result);
+          // result ??= {"total":"0","tgl_visit":"","visit_in":"","is_rnd":""};
           return CekVisit.fromJson(result);
         case 400:
         case 401:
@@ -753,7 +777,7 @@ class ServiceApi {
         request.fields['long_in'] = data["long_in"];
         request.fields['device_info'] = data["device_info"];
         request.fields['is_rnd'] = data["is_rnd"];
-        request.fields['foto_in'] = data["foto_in"];
+        // request.fields['foto_in'] = data["foto_in"];
       } else {
         request.fields['visit_in'] = data["visit_in"];
         request.fields['tgl_visit'] = data["tgl_visit"];
@@ -762,22 +786,22 @@ class ServiceApi {
         request.fields['lat_out'] = data["lat_out"];
         request.fields['long_out'] = data["long_out"];
         request.fields['device_info2'] = data["device_info2"];
-        request.fields['foto_out'] = data["foto_out"];
+        // request.fields['foto_out'] = data["foto_out"];
       }
 
-      // if (data["status"] == "add") {
-      // request.files.add(http.MultipartFile(
-      //     'foto_in',
-      //     data["foto_in"].readAsBytes().asStream(),
-      //     data["foto_in"].lengthSync(),
-      //     filename: data["foto_in"].path.split("/").last));
-      // } else {
-      // request.files.add(http.MultipartFile(
-      //     'foto_out',
-      //     data["foto_out"].readAsBytes().asStream(),
-      //     data["foto_out"].lengthSync(),
-      //     filename: data["foto_out"].path.split("/").last));
-      // }
+      if (data["status"] == "add") {
+        request.files.add(http.MultipartFile(
+            'foto_in',
+            data["foto_in"].readAsBytes().asStream(),
+            data["foto_in"].lengthSync(),
+            filename: data["foto_in"].path.split("/").last));
+      } else {
+        request.files.add(http.MultipartFile(
+            'foto_out',
+            data["foto_out"].readAsBytes().asStream(),
+            data["foto_out"].lengthSync(),
+            filename: data["foto_out"].path.split("/").last));
+      }
 
       await request.send().timeout(const Duration(minutes: 3)).then((value) {
         if (!isOnInit) {
@@ -1034,21 +1058,22 @@ class ServiceApi {
 
   sendDataToXmor(data) async {
     String url = "https://xmor.urbanco.id/api";
-    final response = await http.post(Uri.parse('$url/attendance/create'),
+    // final response = 
+    await http.post(Uri.parse('$url/attendance/create'),
         headers: {
           "Accept": "application/json",
           "Authorization":
               "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJuaWsiOiIyMDI0MDcwMDAxIiwicGFzc3dvcmQiOiJhc2Q5OTkiLCJpZCI6MjY1LCJ1c2VyX2lkIjoyfQ.s7rw000BPNeJjrH7z-5pkxw4LZ8eixiXE9Cp913ItBE"
         },
         body: data);
-    if (response.statusCode == 200) {
-      log('$url/attendance/create', name: 'LINK');
-      // print(data);
-      log("kirim data sukses", name: "XMOR");
-    } else {
-      log('$url/attendance/create', name: 'LINK');
-      // print(data);
-      log("gagal kirim data", name: "XMOR");
-    }
+    // if (response.statusCode == 200) {
+    //   log('$url/attendance/create', name: 'LINK');
+    //   // print(data);
+    //   log("kirim data sukses", name: "XMOR");
+    // } else {
+    //   log('$url/attendance/create', name: 'LINK');
+    //   // print(data);
+    //   log("gagal kirim data", name: "XMOR");
+    // }
   }
 }

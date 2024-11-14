@@ -213,7 +213,6 @@ class BackupView extends GetView {
                             await ServiceApi().reSubmitVisit(data);
                           }
                         }
-                        await SQLHelper.instance.truncateShift();
                         showToast(userData!.visit == '0'
                             ? 'Data absen berhasil dikirim ulang'
                             : 'Data visit berhasil dikirim ulang');
@@ -239,7 +238,8 @@ class BackupView extends GetView {
                       ),
                       onPressed: () async {
                         if (userData!.visit == '0') {
-                          var data = {
+                          loadingDialog("menghapus data...", "");
+                          var dataLocal = {
                             // "status": "update",
                             // "id": i.idUser!,
                             // "tanggal_masuk": i.tanggalMasuk!,
@@ -251,12 +251,22 @@ class BackupView extends GetView {
                             "long_pulang": "",
                             "device_info2": ""
                           };
-                          await SQLHelper.instance.deleteDataAbsenPulang(
-                              data,
+                          SQLHelper.instance.deleteDataAbsenPulang(
+                              dataLocal,
                               userData!.id!,
                               DateFormat('yyyy-MM-dd').format(DateTime.now()));
-                          showToast('Data Absen pulang berhasil dihapus');
-                        }else{
+
+                          var dataLive = {
+                            "type": "absen",
+                            "id": userData!.id!,
+                            "tanggal_masuk":
+                                DateFormat('yyyy-MM-dd').format(DateTime.now()),
+                          };
+                          // log(dataLive.toString());
+                          await ServiceApi().deleteAbsVst(dataLive);
+                        } else {
+                          loadingDialog("menghapus data...", "");
+                          
                           var data = {
                             "visit_out": "",
                             "jam_out": "",
@@ -265,11 +275,22 @@ class BackupView extends GetView {
                             "long_out": "",
                             "device_info2": ""
                           };
-                          await SQLHelper.instance.deleteDataVisitPulang(
+                          SQLHelper.instance.deleteDataVisitPulang(
                               data,
                               userData!.id!,
                               DateFormat('yyyy-MM-dd').format(DateTime.now()));
-                          showToast('Data visit pulang berhasil dihapus');
+
+                          var tempDataVisit =
+                              await SQLHelper.instance.getAllDataVisit();
+                          var dataLive = {
+                            "type": "visit",
+                            "id": userData!.id!,
+                            "tgl_visit":
+                                DateFormat('yyyy-MM-dd').format(DateTime.now()),
+                            "visit_in": tempDataVisit.first.visitIn!
+                          };
+                          // log(dataLive.toString());
+                          await ServiceApi().deleteAbsVst(dataLive);
                         }
                       },
                       label: const Text(

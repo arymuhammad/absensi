@@ -56,6 +56,13 @@ class HomeView extends GetView<HomeController> {
                             color: Colors.white,
                           ),
                         ),
+                        Text(
+                          listDataUser!.id!,
+                          style: const TextStyle(
+                            fontSize: 17,
+                            color: Colors.white,
+                          ),
+                        ),
                       ],
                     ),
                     InkWell(
@@ -69,10 +76,12 @@ class HomeView extends GetView<HomeController> {
                             side: const BorderSide(
                                 width: 3, color: Colors.white)),
                         child: RoundedImage(
-                            height: 80,
-                            width: 80,
-                            foto: listDataUser!.foto!,
-                            name: listDataUser!.nama!, headerProfile: true,),
+                          height: 80,
+                          width: 80,
+                          foto: listDataUser!.foto!,
+                          name: listDataUser!.nama!,
+                          headerProfile: true,
+                        ),
                       ),
                     ),
                     // const SizedBox(width: 10),

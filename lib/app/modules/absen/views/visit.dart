@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:absensi/app/modules/absen/controllers/absen_controller.dart';
@@ -243,8 +242,7 @@ visit(Data dataUser, latitude, longitude) async {
                                       : dataUser.kodeCabang
                                   : absC.rndLoc.text,
                           "jam_in": absC.timeNow.toString(),
-                          "foto_in": base64
-                              .encode(File(absC.image!.path).readAsBytesSync()),
+                          "foto_in": File(absC.image!.path),
                           "foto_out": "",
                           "lat_in": latitude.toString(),
                           "long_in": longitude.toString(),
@@ -270,8 +268,7 @@ visit(Data dataUser, latitude, longitude) async {
                             jamIn: absC.timeNow.toString(),
                             visitOut: '',
                             jamOut: '',
-                            fotoIn: base64.encode(
-                                File(absC.image!.path).readAsBytesSync()),
+                            fotoIn: File(absC.image!.path).toString(),
                             latIn: latitude.toString(),
                             longIn: longitude.toString(),
                             fotoOut: '',
@@ -377,8 +374,7 @@ visit(Data dataUser, latitude, longitude) async {
                                       : absC.rndLoc.text,
                               "visit_in": absC.cekVisit.value.kodeStore,
                               "jam_out": absC.timeNow.toString(),
-                              "foto_out": base64.encode(
-                                  File(absC.image!.path).readAsBytesSync()),
+                              "foto_out": File(absC.image!.path),
                               "lat_out": latitude.toString(),
                               "long_out": longitude.toString(),
                               "device_info2": absC.devInfo.value
@@ -394,8 +390,7 @@ visit(Data dataUser, latitude, longitude) async {
                                           : dataUser.kodeCabang
                                       : absC.rndLoc.text,
                                   "jam_out": absC.timeNow.toString(),
-                                  "foto_out": base64.encode(
-                                      File(absC.image!.path).readAsBytesSync()),
+                                  "foto_out": File(absC.image!.path).toString(),
                                   "lat_out": latitude.toString(),
                                   "long_out": longitude.toString(),
                                   "device_info2": absC.devInfo.value
@@ -515,16 +510,14 @@ visit(Data dataUser, latitude, longitude) async {
                                     : absC.rndLoc.text,
                             "visit_in": absC.cekVisit.value.kodeStore,
                             "jam_out": absC.timeNow.toString(),
-                            "foto_out": base64.encode(
-                                    File(absC.image!.path).readAsBytesSync()),
+                            "foto_out": File(absC.image!.path),
                             "lat_out": latitude.toString(),
                             "long_out": longitude.toString(),
                             "device_info2": absC.devInfo.value
                           };
 
-                          
                           // update data visit ke local storage
-                           SQLHelper.instance.updateDataVisit(
+                          SQLHelper.instance.updateDataVisit(
                               {
                                 "visit_out":
                                     absC.optVisitSelected.value == "Store Visit"
@@ -533,8 +526,7 @@ visit(Data dataUser, latitude, longitude) async {
                                             : dataUser.kodeCabang
                                         : absC.rndLoc.text,
                                 "jam_out": absC.timeNow.toString(),
-                                "foto_out": base64.encode(
-                                    File(absC.image!.path).readAsBytesSync()),
+                                "foto_out": File(absC.image!.path).toString(),
                                 "lat_out": latitude.toString(),
                                 "long_out": longitude.toString(),
                                 "device_info2": absC.devInfo.value

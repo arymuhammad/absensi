@@ -1,13 +1,10 @@
-import 'package:absensi/app/data/helper/const.dart';
 import 'package:absensi/app/data/model/login_model.dart';
 import 'package:absensi/app/modules/absen/views/absen_view.dart';
-import 'package:absensi/app/modules/absen/views/face_detection.dart';
 import 'package:absensi/app/modules/home/controllers/home_controller.dart';
 import 'package:absensi/app/modules/home/views/home_view.dart';
 import 'package:absensi/app/modules/profil/views/profil_view.dart';
 import 'package:absensi/app/modules/semua_absen/views/semua_absen_view.dart';
 import 'package:absensi/app/modules/settings/views/settings_view.dart';
-import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
@@ -120,42 +117,8 @@ class BottomNavBar extends GetView {
                     loginC.selectedMenu(i);
                   }
                 },
-                // TabItem(icon: CupertinoIcons.home, title: 'Home'),
-                //     TabItem(icon: CupertinoIcons.doc_text_search, title: 'History'),
-                //     TabItem(icon: CupertinoIcons.camera),
-                //     TabItem(icon: CupertinoIcons.gear_alt, title: 'Setting'),
-                //     TabItem(icon: CupertinoIcons.person_crop_circle, title: 'Profile')
               )
-          // ConvexAppBar(
-          //   items: const [
-          //     TabItem(icon: CupertinoIcons.home, title: 'Home'),
-          //     TabItem(icon: CupertinoIcons.doc_text_search, title: 'History'),
-          //     TabItem(icon: CupertinoIcons.camera),
-          //     TabItem(icon: CupertinoIcons.gear_alt, title: 'Setting'),
-          //     TabItem(icon: CupertinoIcons.person_crop_circle, title: 'Profile'),
-          //   ],
-          //   initialActiveIndex: loginC.selected.value,
-          //   activeColor: Colors.white,
-          //   style: TabStyle.react,
-          //   backgroundColor: mainColor,
-          //   onTap: (i) {
-          //     if (i == 1) {
-          //       loginC.selectedMenu(i);
-          //       loc.isLoading.value = true;
-          //       loc.searchDate.value = "";
-          //       listDataUser.visit == "1"
-          //           ? loc.getAllVisited(listDataUser.id!)
-          //           : loc.getAllAbsen(listDataUser.id!);
-          //     } else if (i == 2) {
-          //       loginC.selectedMenu(i);
-          //       listDataUser.visit == "1"
-          //           ? loc.getLoc(listDataUser)
-          //           : loc.scanQrLoc(listDataUser);
-          //     } else {
-          //       loginC.selectedMenu(i);
-          //     }
-          //   },
-          // ),
+          
           ),
     );
   }

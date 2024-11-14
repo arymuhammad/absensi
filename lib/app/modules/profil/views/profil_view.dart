@@ -32,7 +32,7 @@ class ProfilView extends GetView<ProfilController> {
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
             child: SizedBox(
-              height: 389,
+              height: 415,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
@@ -62,99 +62,110 @@ class ProfilView extends GetView<ProfilController> {
                   const Divider(thickness: 1),
                   Padding(
                     padding: const EdgeInsets.only(left: 12, right: 12),
-                    child: Column(
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    child: SizedBox(
+                      height: 140,
+                      child: MediaQuery.removePadding(
+                        context: context,
+                        removeTop: true,
+                        child: ListView(
+                          scrollDirection: Axis.vertical,
                           children: [
                             Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Icon(FontAwesome.id_badge, color: mainColor),
-                                const SizedBox(width: 5),
-                                const Text('ID'),
+                                Row(
+                                  children: [
+                                    Icon(FontAwesome.id_badge,
+                                        color: mainColor),
+                                    const SizedBox(width: 5),
+                                    const Text('ID'),
+                                  ],
+                                ),
+                                Text(
+                                  '${listDataUser!.id}',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      fontSize: 15, color: subTitleColor),
+                                ),
                               ],
                             ),
-                            Text(
-                              '${listDataUser!.id}',
-                              textAlign: TextAlign.center,
-                              style:
-                                  TextStyle(fontSize: 15, color: subTitleColor),
+                            const Divider(
+                              thickness: 1,
                             ),
-                          ],
-                        ),
-                        const Divider(
-                          thickness: 1,
-                        ),
-                        // const SizedBox(height: 10),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
+                            // const SizedBox(height: 10),
                             Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Icon(TernavIcons.bold.profile,
-                                    color: mainColor),
-                                const SizedBox(width: 5),
-                                const Text('Username'),
+                                Row(
+                                  children: [
+                                    Icon(TernavIcons.bold.profile,
+                                        color: mainColor),
+                                    const SizedBox(width: 5),
+                                    const Text('Username'),
+                                  ],
+                                ),
+                                Text(
+                                  '${listDataUser!.username}',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      fontSize: 15, color: subTitleColor),
+                                ),
                               ],
                             ),
-                            Text(
-                              '${listDataUser!.username}',
-                              textAlign: TextAlign.center,
-                              style:
-                                  TextStyle(fontSize: 15, color: subTitleColor),
-                            ),
-                          ],
-                        ),
 
-                        const Divider(
-                          thickness: 1,
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
+                            const Divider(
+                              thickness: 1,
+                            ),
                             Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Icon(TernavIcons.bold.call, color: mainColor),
-                                const SizedBox(width: 5),
-                                const Text('Telp'),
+                                Row(
+                                  children: [
+                                    Icon(TernavIcons.bold.call,
+                                        color: mainColor),
+                                    const SizedBox(width: 5),
+                                    const Text('Telp'),
+                                  ],
+                                ),
+                                Obx(
+                                  () => Text(
+                                    '${user.newPhone.isNotEmpty ? user.newPhone.value : listDataUser!.noTelp}',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                        fontSize: 15, color: subTitleColor),
+                                  ),
+                                ),
                               ],
                             ),
-                            Obx(
-                              () => Text(
-                                '${user.newPhone.isNotEmpty ? user.newPhone.value : listDataUser!.noTelp}',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                    fontSize: 15, color: subTitleColor),
-                              ),
+                            // const SizedBox(height: 10),
+                            const Divider(
+                              thickness: 1,
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Row(
+                                  children: [
+                                    Icon(FontAwesome.store_solid,
+                                        color: mainColor),
+                                    const SizedBox(width: 5),
+                                    const Text('Store'),
+                                  ],
+                                ),
+                                Text(
+                                  '${listDataUser!.namaCabang}',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      fontSize: 15, color: subTitleColor),
+                                ),
+                              ],
+                            ),
+                            const Divider(
+                              thickness: 1,
                             ),
                           ],
                         ),
-                        // const SizedBox(height: 10),
-                        const Divider(
-                          thickness: 1,
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
-                              children: [
-                                Icon(FontAwesome.store_solid, color: mainColor),
-                                const SizedBox(width: 5),
-                                const Text('Store'),
-                              ],
-                            ),
-                            Text(
-                              '${listDataUser!.namaCabang}',
-                              textAlign: TextAlign.center,
-                              style:
-                                  TextStyle(fontSize: 15, color: subTitleColor),
-                            ),
-                          ],
-                        ),
-                        const Divider(
-                          thickness: 1,
-                        ),
-                      ],
+                      ),
                     ),
                   ),
                 ],

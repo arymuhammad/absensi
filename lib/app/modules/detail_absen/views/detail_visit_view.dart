@@ -1,4 +1,3 @@
-import 'dart:convert';
 
 import 'package:absensi/app/data/helper/const.dart';
 import 'package:absensi/app/services/service_api.dart';
@@ -21,7 +20,7 @@ class DetailVisitView extends GetView {
       child: Card(
         elevation: 10,
         child: 
-        Image.memory(base64Decode(Get.arguments['foto_in']),
+        Image.network("${ServiceApi().baseUrl}${Get.arguments['foto_in']}",
           errorBuilder: (context, error, stackTrace) =>Image.asset('assets/image/selfie.png'),
           fit: BoxFit.cover,)
         // Image.network(
@@ -47,7 +46,7 @@ class DetailVisitView extends GetView {
       child: Card(
         elevation: 10,
         child: 
-        Image.memory(base64Decode(Get.arguments['foto_out']),
+        Image.network("${ServiceApi().baseUrl}${Get.arguments['foto_out']}",
           errorBuilder: (context, error, stackTrace) =>Image.asset('assets/image/selfie.png'),
           fit: BoxFit.cover,)
   //       Image.network(

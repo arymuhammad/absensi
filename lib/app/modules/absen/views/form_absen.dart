@@ -1,9 +1,7 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:absensi/app/data/model/login_model.dart';
 import 'package:absensi/app/modules/absen/controllers/absen_controller.dart';
-import 'package:absensi/app/modules/absen/views/face_detection.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
@@ -117,7 +115,6 @@ formAbsen(Data dataUser, double latitude, double longitude) async {
                 absC.long.value = "";
               } else {
                 if (absC.stsAbsenSelected.value == "Masuk") {
-                 
                   await absC.cekDataAbsen(
                       "masuk",
                       dataUser.id!,
@@ -127,11 +124,11 @@ formAbsen(Data dataUser, double latitude, double longitude) async {
                               : absC.dateNow)));
 
                   if (absC.cekAbsen.value.total == "0") {
-                    await Get.to(() => const FaceDetection());
-                    // await absC.uploadFotoAbsen();
-                    // Get.back();
+                    // await Get.to(() => const FaceDetection());
+                    await absC.uploadFotoAbsen();
+                    Get.back();
 
-                    if (absC.capturedImage != null) {
+                    if (absC.image != null) {
                       // CEK ABSEN MASUK HARI INI, JIKA HASIL = 0, ABSEN MASUK
 
                       var localDataAbs = await SQLHelper.instance
@@ -151,10 +148,7 @@ formAbsen(Data dataUser, double latitude, double longitude) async {
                           "jam_masuk": absC.jamMasuk.value,
                           "jam_pulang": absC.jamPulang.value,
                           "jam_absen_masuk": absC.timeNow.toString(),
-                          // "foto_masuk": base64
-                          //     .encode(File(absC.image!.path).readAsBytesSync()),
-                          "foto_masuk": base64
-                              .encode(File(absC.capturedImage!.path).readAsBytesSync()),
+                          "foto_masuk":  File(absC.image!.path),
                           "foto_pulang": "",
                           "lat_masuk": latitude.toString(),
                           "long_masuk": longitude.toString(),
@@ -175,8 +169,7 @@ formAbsen(Data dataUser, double latitude, double longitude) async {
                             jamPulang: absC.jamPulang.value,
                             jamAbsenMasuk: absC.timeNow.toString(),
                             jamAbsenPulang: '',
-                            fotoMasuk: base64.encode(
-                                File(absC.capturedImage!.path).readAsBytesSync()),
+                            fotoMasuk:  File(absC.image!.path).toString(),
                             latMasuk: latitude.toString(),
                             longMasuk: longitude.toString(),
                             fotoPulang: '',
@@ -223,14 +216,14 @@ formAbsen(Data dataUser, double latitude, double longitude) async {
                         absC.selectedCabang.value = "";
                         absC.lat.value = "";
                         absC.long.value = "";
-                      }else{
+                      } else {
                         absC.stsAbsenSelected.value = "";
-                    absC.selectedShift.value = "";
-                    absC.selectedCabang.value = "";
-                    absC.lat.value = "";
-                    absC.long.value = "";
-                    succesDialog(
-                        Get.context, "Y", "Anda sudah Absen Masuk hari ini.");
+                        absC.selectedShift.value = "";
+                        absC.selectedCabang.value = "";
+                        absC.lat.value = "";
+                        absC.long.value = "";
+                        succesDialog(Get.context, "Y",
+                            "Anda sudah Absen Masuk hari ini.");
                       }
                     } else {
                       absC.stsAbsenSelected.value = "";
@@ -306,10 +299,11 @@ formAbsen(Data dataUser, double latitude, double longitude) async {
 // log(absC.cekAbsen.value.total.toString(), name: 'PULANG');
                       if (absC.cekAbsen.value.total == "1") {
                         // face detection
-                         await Get.to(() => const FaceDetection());
-                        // await absC.uploadFotoAbsen();
-                        // Get.back();
-                        if (absC.capturedImage != null) {
+                        //  await Get.to(() => const FaceDetection());
+                        await absC.uploadFotoAbsen();
+                        Get.back();
+
+                        if (absC.image != null) {
                           var localDataAbs = await SQLHelper.instance
                               .getAbsenToday(dataUser.id!, absC.dateNow);
                           // log(localDataAbs[0].tanggalMasuk!, name: 'MASUK');
@@ -324,8 +318,7 @@ formAbsen(Data dataUser, double latitude, double longitude) async {
                                   .format(DateTime.parse(absC.dateNowServer)),
                               "nama": dataUser.nama,
                               "jam_absen_pulang": absC.timeNow.toString(),
-                              "foto_pulang": base64.encode(
-                                  File(absC.capturedImage!.path).readAsBytesSync()),
+                              "foto_pulang":  File(absC.image!.path),
                               "lat_pulang": latitude.toString(),
                               "long_pulang": longitude.toString(),
                               "device_info2": absC.devInfo.value
@@ -379,8 +372,7 @@ formAbsen(Data dataUser, double latitude, double longitude) async {
                                   .format(DateTime.parse(absC.dateNowServer)),
                               "nama": dataUser.nama,
                               "jam_absen_pulang": absC.timeNow.toString(),
-                              "foto_pulang": base64.encode(
-                                  File(absC.capturedImage!.path).readAsBytesSync()),
+                              "foto_pulang":  File(absC.image!.path),
                               "lat_pulang": latitude.toString(),
                               "long_pulang": longitude.toString(),
                               "device_info2": absC.devInfo.value
@@ -394,8 +386,7 @@ formAbsen(Data dataUser, double latitude, double longitude) async {
                                           DateTime.parse(absC.dateNowServer)),
                                   "nama": dataUser.nama,
                                   "jam_absen_pulang": absC.timeNow.toString(),
-                                  "foto_pulang": base64.encode(
-                                      File(absC.capturedImage!.path).readAsBytesSync()),
+                                  "foto_pulang": File(absC.image!.path).toString(),
                                   "lat_pulang": latitude.toString(),
                                   "long_pulang": longitude.toString(),
                                   "device_info2": absC.devInfo.value

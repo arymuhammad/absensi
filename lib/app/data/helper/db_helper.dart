@@ -7,6 +7,7 @@ import 'package:absensi/app/data/model/shift_kerja_model.dart';
 import 'package:get/get.dart';
 // import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
+import '../model/server_model.dart';
 import '../model/visit_model.dart';
 import 'loading_dialog.dart';
 
@@ -113,6 +114,11 @@ class SQLHelper {
         long_pulang TEXT DEFAULT '',
         device_info TEXT,
         device_info2 TEXT DEFAULT ''
+      )
+      """);
+      await db.execute("""CREATE TABLE IF NOT EXISTS server(
+        id INTEGER PRIMARY KEY NOT NULL,
+        server TEXT
       )
       """);
   }
@@ -354,8 +360,28 @@ class SQLHelper {
 
   Future<List<Visit>> getAllDataVisit() async {
     Database db = await instance.database;
-    var res = await db.query('tbl_visit_area', orderBy: "tgl_visit DESC");
+    var res = await db.query('tbl_visit_area', orderBy: "tgl_visit DESC, jam_in DESC");
     return res.map((json) => Visit.fromJson(json)).toList();
+  }
+
+    Future<void> insertServer(Srv todo) async {
+    Database db = await instance.database;
+    await db.insert('server', todo.toJson());
+    // return res;
+  }
+
+  Future<void> updateServer(
+      Map<String, dynamic> todo, String id) async {
+    Database db = await instance.database;
+    await db.update('server', todo,
+        where: 'id=?', whereArgs: [id]);
+    // return res;
+  }
+
+  Future<List<Srv>> getServer() async {
+    Database db = await database;
+    var res = await db.query('server');
+    return res.map((e) => Srv.fromJson(e)).toList();
   }
 
   Future close() async => _database!.close();
