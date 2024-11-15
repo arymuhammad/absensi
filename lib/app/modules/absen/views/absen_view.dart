@@ -63,14 +63,18 @@ class AbsenView extends GetView<AbsenController> {
                 FlutterMap(
                   options: MapOptions(
                       initialCenter: LatLng(
-                          double.parse(absenC.barcodeScanRes.isNotEmpty &&
-                                  absenC.barcodeScanRes.value != "-1"
-                              ? absenC.barcodeScanRes.value.split(' ')[0]
-                              : data!.lat!),
-                          double.parse(absenC.barcodeScanRes.isNotEmpty &&
-                                  absenC.barcodeScanRes.value != "-1"
-                              ? absenC.barcodeScanRes.value.split(' ')[1]
-                              : data!.long!)),
+                          absenC.barcodeScanRes.value.isAlphabetOnly
+                              ? 0.0
+                              : double.parse(absenC.barcodeScanRes.isNotEmpty &&
+                                      absenC.barcodeScanRes.value != "-1"
+                                  ? absenC.barcodeScanRes.value.split(' ')[0]
+                                  : data!.lat!),
+                          absenC.barcodeScanRes.value.isAlphabetOnly
+                              ? 0.0
+                              : double.parse(absenC.barcodeScanRes.isNotEmpty &&
+                                      absenC.barcodeScanRes.value != "-1"
+                                  ? absenC.barcodeScanRes.value.split(' ')[1]
+                                  : data!.long!)),
                       initialZoom: 17,
                       maxZoom: 18.4,
                       minZoom: 17),
@@ -84,14 +88,22 @@ class AbsenView extends GetView<AbsenController> {
                       circles: [
                         CircleMarker(
                             point: LatLng(
-                                double.parse(absenC.barcodeScanRes.isNotEmpty &&
-                                        absenC.barcodeScanRes.value != "-1"
-                                    ? absenC.barcodeScanRes.value.split(' ')[0]
-                                    : data!.lat!),
-                                double.parse(absenC.barcodeScanRes.isNotEmpty &&
-                                        absenC.barcodeScanRes.value != "-1"
-                                    ? absenC.barcodeScanRes.value.split(' ')[1]
-                                    : data!.long!)),
+                                absenC.barcodeScanRes.value.isAlphabetOnly
+                                    ? 0.0
+                                    : double.parse(absenC
+                                                .barcodeScanRes.isNotEmpty &&
+                                            absenC.barcodeScanRes.value != "-1"
+                                        ? absenC.barcodeScanRes.value
+                                            .split(' ')[0]
+                                        : data!.lat!),
+                                absenC.barcodeScanRes.value.isAlphabetOnly
+                                    ? 0.0
+                                    : double.parse(absenC
+                                                .barcodeScanRes.isNotEmpty &&
+                                            absenC.barcodeScanRes.value != "-1"
+                                        ? absenC.barcodeScanRes.value
+                                            .split(' ')[1]
+                                        : data!.long!)),
                             radius: 100,
                             useRadiusInMeter: true,
                             color: const Color.fromARGB(71, 16, 134, 230),
@@ -146,7 +158,7 @@ class AbsenView extends GetView<AbsenController> {
                               width: 10,
                             ),
                             SizedBox(
-                                width: Get.mediaQuery.size.width/1.4,
+                                width: Get.mediaQuery.size.width / 1.4,
                                 child: Text(absenC.lokasi.value)),
                           ],
                         ),

@@ -481,16 +481,20 @@ class AbsenController extends GetxController {
       } else {
         // if (barcodeScanRes.contains(dataUser!.lat.toString()) &&
         //     barcodeScanRes.contains(dataUser.long.toString())) {
-        List<Placemark> placemarks = await placemarkFromCoordinates(
-            double.parse(barcodeScanRes.value.split(' ')[0]),
-            double.parse(barcodeScanRes.value.split(' ')[1]));
-        lokasi.value =
-            '${placemarks[0].street!}, ${placemarks[0].subLocality!}\n${placemarks[0].subAdministrativeArea!}, ${placemarks[0].administrativeArea!}';
-        timeNetwork(await FlutterNativeTimezone.getLocalTimezone());
-        dialogAbsenView(
-            dataUser!,
-            double.parse(barcodeScanRes.value.split(' ')[0]),
-            double.parse(barcodeScanRes.value.split(' ')[1]));
+        if (barcodeScanRes.value.isAlphabetOnly) {
+          showToast("QR tidak dikenal");
+        } else {
+          List<Placemark> placemarks = await placemarkFromCoordinates(
+              double.parse(barcodeScanRes.value.split(' ')[0]),
+              double.parse(barcodeScanRes.value.split(' ')[1]));
+          lokasi.value =
+              '${placemarks[0].street!}, ${placemarks[0].subLocality!}\n${placemarks[0].subAdministrativeArea!}, ${placemarks[0].administrativeArea!}';
+          timeNetwork(await FlutterNativeTimezone.getLocalTimezone());
+          dialogAbsenView(
+              dataUser!,
+              double.parse(barcodeScanRes.value.split(' ')[0]),
+              double.parse(barcodeScanRes.value.split(' ')[1]));
+        }
         // }
       }
     } on PlatformException {
