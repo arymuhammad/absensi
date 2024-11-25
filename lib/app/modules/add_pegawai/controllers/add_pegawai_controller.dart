@@ -443,7 +443,7 @@ class AddPegawaiController extends GetxController {
                 : dataUser.level,
             "level_user":
                 levelName.value != "" ? levelName.value : dataUser.levelUser,
-            "foto": image!.path.toString(),
+            "foto": File(image!.path).toString(),
             "visit": vst.value != "" ? vst.value : dataUser.visit,
             "cek_stok": cekStok.value != "" ? cekStok.value : dataUser.cekStok
           }, dataUser.id!, dataUser.username!);

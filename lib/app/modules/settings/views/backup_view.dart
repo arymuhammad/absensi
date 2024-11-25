@@ -238,35 +238,83 @@ class BackupView extends GetView {
                       ),
                       onPressed: () async {
                         if (userData!.visit == '0') {
+                          // cek data absen
                           loadingDialog("menghapus data...", "");
-                          var dataLocal = {
-                            // "status": "update",
-                            // "id": i.idUser!,
-                            // "tanggal_masuk": i.tanggalMasuk!,
-                            "tanggal_pulang": null,
-                            // "nama": i.nama!,
-                            "jam_absen_pulang": "",
-                            "foto_pulang": "",
-                            "lat_pulang": "",
-                            "long_pulang": "",
-                            "device_info2": ""
-                          };
-                          SQLHelper.instance.deleteDataAbsenPulang(
-                              dataLocal,
-                              userData!.id!,
-                              DateFormat('yyyy-MM-dd').format(DateTime.now()));
+                          var tempDataAbs = await SQLHelper.instance
+                              .getAbsenToday(
+                                  userData!.id!,
+                                  DateFormat('yyyy-MM-dd')
+                                      .format(DateTime.now()));
+                          if (tempDataAbs.isNotEmpty &&
+                              tempDataAbs.first.tanggalMasuk != null &&
+                              tempDataAbs.first.tanggalPulang == null) {
+                            SQLHelper.instance.deleteDataAbsenMasuk(
+                                tempDataAbs.first.idUser!,
+                                tempDataAbs.first.tanggalMasuk!);
 
-                          var dataLive = {
-                            "type": "absen",
-                            "id": userData!.id!,
-                            "tanggal_masuk":
-                                DateFormat('yyyy-MM-dd').format(DateTime.now()),
-                          };
-                          // log(dataLive.toString());
-                          await ServiceApi().deleteAbsVst(dataLive);
+                            var dataLive = {
+                              "type": "absen",
+                              "status": "masuk",
+                              "id": userData!.id!,
+                              "tanggal_masuk": DateFormat('yyyy-MM-dd')
+                                  .format(DateTime.now()),
+                            };
+
+                            await ServiceApi().deleteAbsVst(dataLive);
+                          } else {
+                            var dataLocal = {
+                              "tanggal_pulang": null,
+                              "jam_absen_pulang": "",
+                              "foto_pulang": "",
+                              "lat_pulang": "",
+                              "long_pulang": "",
+                              "device_info2": ""
+                            };
+                            SQLHelper.instance.deleteDataAbsenPulang(
+                                dataLocal,
+                                userData!.id!,
+                                DateFormat('yyyy-MM-dd')
+                                    .format(DateTime.now()));
+
+                            var dataLive = {
+                              "type": "absen",
+                              "status": "pulang",
+                              "id": userData!.id!,
+                              "tanggal_masuk": DateFormat('yyyy-MM-dd')
+                                  .format(DateTime.now()),
+                            };
+                            // log(dataLive.toString());
+                            await ServiceApi().deleteAbsVst(dataLive);
+                          }
                         } else {
+                          // cek data visit
                           loadingDialog("menghapus data...", "");
-                          
+                          var tempDataVisit =
+                              await SQLHelper.instance.getVisitToday(
+                            userData!.id!,
+                            DateFormat('yyyy-MM-dd').format(DateTime.now()),"",0
+                          );
+                          if (tempDataVisit.isNotEmpty &&
+                              tempDataVisit.first.tglVisit != null &&
+                              tempDataVisit.first.visitIn != "" &&
+                              tempDataVisit.first.jamIn != "" &&
+                              tempDataVisit.first.visitOut == "" &&
+                              tempDataVisit.first.jamOut == "") {
+                            SQLHelper.instance.deleteDataVisitMasuk(
+                                tempDataVisit.first.id!,
+                                tempDataVisit.first.tglVisit!,
+                                tempDataVisit.first.visitIn!);
+
+                            var dataLive = {
+                              "type": "visit",
+                              "status": "masuk",
+                              "id": userData!.id!,
+                              "tgl_visit": DateFormat('yyyy-MM-dd')
+                                  .format(DateTime.now()),
+                              "visit_in": tempDataVisit.first.visitIn!
+                            };
+                            await ServiceApi().deleteAbsVst(dataLive);
+                          }
                           var data = {
                             "visit_out": "",
                             "jam_out": "",
@@ -280,10 +328,9 @@ class BackupView extends GetView {
                               userData!.id!,
                               DateFormat('yyyy-MM-dd').format(DateTime.now()));
 
-                          var tempDataVisit =
-                              await SQLHelper.instance.getAllDataVisit();
                           var dataLive = {
                             "type": "visit",
+                            "status": "pulang",
                             "id": userData!.id!,
                             "tgl_visit":
                                 DateFormat('yyyy-MM-dd').format(DateTime.now()),

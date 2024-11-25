@@ -268,7 +268,7 @@ visit(Data dataUser, latitude, longitude) async {
                             jamIn: absC.timeNow.toString(),
                             visitOut: '',
                             jamOut: '',
-                            fotoIn: File(absC.image!.path).toString(),
+                            fotoIn: absC.image!.path,
                             latIn: latitude.toString(),
                             longIn: longitude.toString(),
                             fotoOut: '',
@@ -390,7 +390,7 @@ visit(Data dataUser, latitude, longitude) async {
                                           : dataUser.kodeCabang
                                       : absC.rndLoc.text,
                                   "jam_out": absC.timeNow.toString(),
-                                  "foto_out": File(absC.image!.path).toString(),
+                                  "foto_out": absC.image!.path,
                                   "lat_out": latitude.toString(),
                                   "long_out": longitude.toString(),
                                   "device_info2": absC.devInfo.value
@@ -526,7 +526,7 @@ visit(Data dataUser, latitude, longitude) async {
                                             : dataUser.kodeCabang
                                         : absC.rndLoc.text,
                                 "jam_out": absC.timeNow.toString(),
-                                "foto_out": File(absC.image!.path).toString(),
+                                "foto_out": absC.image!.path,
                                 "lat_out": latitude.toString(),
                                 "long_out": longitude.toString(),
                                 "device_info2": absC.devInfo.value

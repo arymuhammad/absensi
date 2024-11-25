@@ -7,7 +7,6 @@ import 'package:absensi/app/data/model/cek_visit_model.dart';
 import 'package:absensi/app/data/model/user_model.dart';
 import 'package:absensi/app/data/model/visit_model.dart';
 import 'package:absensi/app/modules/home/views/dialog_update_app.dart';
-
 import 'package:device_marketing_names/device_marketing_names.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
@@ -22,7 +21,6 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:path/path.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:xml/xml.dart' as xml;
@@ -37,6 +35,7 @@ import 'package:pdf/pdf.dart';
 import 'package:printing/printing.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:device_info_null_safety/device_info_null_safety.dart';
+
 
 class AbsenController extends GetxController {
   var isLoading = true.obs;
@@ -92,6 +91,7 @@ class AbsenController extends GetxController {
   final TextEditingController filterVisit = TextEditingController();
   final ImagePicker picker = ImagePicker();
   XFile? image;
+  
   var searchDate = "".obs;
   var dateNow = DateFormat('yyyy-MM-dd').format(DateTime.now());
   var thisMonth =
@@ -194,7 +194,10 @@ class AbsenController extends GetxController {
 
     _startDateStream(paramSingle, paramLimit, paramSingleVisit, paramLimitVisit,
         dataUserLogin);
+
+   
   }
+
 
   void startTimer(int sec) {
     Timer.periodic(const Duration(seconds: 1), (timer) {
@@ -231,8 +234,7 @@ class AbsenController extends GetxController {
                 dateNowServer.isNotEmpty ? dateNowServer : dateNow)));
 
         if (cekAbsen.value.total == "0") {
-          // log('pengulangan kirim absen masuk ${urut.value}',
-          //     name: 'PENGULANGAN');
+
           if (tempDataAbs.isNotEmpty) {
             for (var i in tempDataAbs) {
               var data = {
@@ -267,10 +269,8 @@ class AbsenController extends GetxController {
               idUser.value,
               DateFormat('yyyy-MM-dd').format(DateTime.parse(
                   dateNowServer.isNotEmpty ? dateNowServer : dateNow)));
-          // log(tempDataAbs.first.tanggalPulang!, name:'tanggal pulang');
           if (cekAbsen.value.total == "1") {
-            // log('pengulangan kirim absen pulang ${urut.value}',
-            //     name: 'PENGULANGAN');
+      
             if (tempDataAbs.isNotEmpty &&
                 tempDataAbs.first.tanggalPulang != null) {
               for (var i in tempDataAbs) {
@@ -695,7 +695,9 @@ class AbsenController extends GetxController {
       // var img = base64.encode(File(image!.path).readAsBytesSync());
       // log(image!.path, name: 'PATH');
       update();
-    } else {}
+    } else {
+      return;
+    }
   }
 
   Future<Position> determinePosition() async {

@@ -132,7 +132,7 @@ dialogAbsenView(Data dataUser, latitude, longitude) async {
                             .format(DateTime.parse(absC.dateNowServer)),
                         "nama": dataUser.nama,
                         "jam_absen_pulang": absC.timeNow.toString(),
-                        "foto_pulang":  File(absC.image!.path).toString(),
+                        "foto_pulang": absC.image!.path,
                         "lat_pulang": latitude.toString(),
                         "long_pulang": longitude.toString(),
                         "device_info2": absC.devInfo.value

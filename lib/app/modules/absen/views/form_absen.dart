@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:absensi/app/data/model/login_model.dart';
 import 'package:absensi/app/modules/absen/controllers/absen_controller.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
@@ -148,8 +147,7 @@ formAbsen(Data dataUser, double latitude, double longitude) async {
                           "jam_masuk": absC.jamMasuk.value,
                           "jam_pulang": absC.jamPulang.value,
                           "jam_absen_masuk": absC.timeNow.toString(),
-                          "foto_masuk":  File(absC.image!.path),
-                          "foto_pulang": "",
+                          "foto_masuk": File(absC.image!.path),
                           "lat_masuk": latitude.toString(),
                           "long_masuk": longitude.toString(),
                           "device_info": absC.devInfo.value
@@ -169,7 +167,7 @@ formAbsen(Data dataUser, double latitude, double longitude) async {
                             jamPulang: absC.jamPulang.value,
                             jamAbsenMasuk: absC.timeNow.toString(),
                             jamAbsenPulang: '',
-                            fotoMasuk:  File(absC.image!.path).toString(),
+                            fotoMasuk: absC.image!.path,
                             latMasuk: latitude.toString(),
                             longMasuk: longitude.toString(),
                             fotoPulang: '',
@@ -298,7 +296,7 @@ formAbsen(Data dataUser, double latitude, double longitude) async {
                               .format(DateTime.parse(absC.dateNowServer)));
 // log(absC.cekAbsen.value.total.toString(), name: 'PULANG');
                       if (absC.cekAbsen.value.total == "1") {
-                        // face detection
+                        // face detectionhr
                         //  await Get.to(() => const FaceDetection());
                         await absC.uploadFotoAbsen();
                         Get.back();
@@ -318,11 +316,12 @@ formAbsen(Data dataUser, double latitude, double longitude) async {
                                   .format(DateTime.parse(absC.dateNowServer)),
                               "nama": dataUser.nama,
                               "jam_absen_pulang": absC.timeNow.toString(),
-                              "foto_pulang":  File(absC.image!.path),
+                              "foto_pulang": File(absC.image!.path),
                               "lat_pulang": latitude.toString(),
                               "long_pulang": longitude.toString(),
                               "device_info2": absC.devInfo.value
                             };
+                           
                             await ServiceApi().submitAbsen(data, false);
                             // send data to xmor
                             absC.sendDataToXmor(
@@ -372,7 +371,7 @@ formAbsen(Data dataUser, double latitude, double longitude) async {
                                   .format(DateTime.parse(absC.dateNowServer)),
                               "nama": dataUser.nama,
                               "jam_absen_pulang": absC.timeNow.toString(),
-                              "foto_pulang":  File(absC.image!.path),
+                              "foto_pulang": File(absC.image!.path),
                               "lat_pulang": latitude.toString(),
                               "long_pulang": longitude.toString(),
                               "device_info2": absC.devInfo.value
@@ -386,7 +385,7 @@ formAbsen(Data dataUser, double latitude, double longitude) async {
                                           DateTime.parse(absC.dateNowServer)),
                                   "nama": dataUser.nama,
                                   "jam_absen_pulang": absC.timeNow.toString(),
-                                  "foto_pulang": File(absC.image!.path).toString(),
+                                  "foto_pulang": absC.image!.path,
                                   "lat_pulang": latitude.toString(),
                                   "long_pulang": longitude.toString(),
                                   "device_info2": absC.devInfo.value

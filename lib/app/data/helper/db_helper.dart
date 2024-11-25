@@ -4,7 +4,6 @@ import 'package:absensi/app/data/model/absen_model.dart';
 import 'package:absensi/app/data/model/cabang_model.dart';
 import 'package:absensi/app/data/model/login_offline_model.dart';
 import 'package:absensi/app/data/model/shift_kerja_model.dart';
-import 'package:get/get.dart';
 // import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 import '../model/server_model.dart';
@@ -178,12 +177,27 @@ class SQLHelper {
     // return res;
   }
 
+  Future<void> deleteDataAbsenMasuk(String idUser, String tglMasuk) async {
+    Database db = await instance.database;
+    await db.delete('absen',
+        where: 'id_user = ? and tanggal_masuk = ?',
+        whereArgs: [idUser, tglMasuk]);
+    // return res;
+  }
+  
   Future<void> deleteDataAbsenPulang(
       Map<String, dynamic> todo, String idUser, String tglMasuk) async {
     Database db = await instance.database;
     await db.update('absen', todo,
         where: 'id_user = ? and tanggal_masuk = ?',
         whereArgs: [idUser, tglMasuk]);
+    // return res;
+  }
+
+  Future<void> deleteDataVisitMasuk(String idUser, String tglMasuk, String visitIn) async {
+    Database db = await instance.database;
+    await db.delete('tbl_visit_area',
+        where: 'id_user = ? and tgl_visit = ? and visit_in', whereArgs: [idUser, tglMasuk, visitIn]);
     // return res;
   }
 
@@ -194,6 +208,7 @@ class SQLHelper {
         where: 'id_user = ? and tgl_visit = ?', whereArgs: [idUser, tglMasuk]);
     // return res;
   }
+  
 
   Future<void> insertShift(ShiftKerja todo) async {
     Database db = await instance.database;
@@ -320,7 +335,7 @@ class SQLHelper {
     }
     Database db = await instance.database;
     var res = await db.rawQuery(
-        " SELECT A.*, B.nama_cabang FROM tbl_visit_area A LEFT JOIN tbl_cabang B ON B.kode_cabang = A.visit_in WHERE id_user =  '$idUser'  AND tgl_visit ='$date' $cbg ORDER BY tgl_visit, jam_in DESC $lmt");
+        " SELECT A.*, B.nama_cabang FROM tbl_visit_area A LEFT JOIN tbl_cabang B ON B.kode_cabang = A.visit_in WHERE id_user =  '$idUser'  AND tgl_visit ='$date' $cbg ORDER BY tgl_visit DESC, jam_in DESC $lmt");
     return res.map((e) => Visit.fromJson(e)).toList();
   }
 
