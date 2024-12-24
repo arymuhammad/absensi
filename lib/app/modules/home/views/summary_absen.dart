@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 import 'package:absensi/app/modules/absen/controllers/absen_controller.dart';
 import 'package:absensi/app/data/helper/const.dart';
@@ -337,8 +338,8 @@ class SummaryAbsen extends GetView {
                     children: [
                       const Text(
                         'Riwayat kehadiran',
-                        style:
-                            TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 16),
                       ),
                       Obx(
                         () => CsElevatedButtonIcon(
@@ -354,8 +355,8 @@ class SummaryAbsen extends GetView {
                                   loadingDialog("Sending data", "");
                                   absenC.startTimer(30);
                                   absenC.resend();
-                                  await Future.delayed(const Duration(seconds: 2),
-                                      () {
+                                  await Future.delayed(
+                                      const Duration(seconds: 2), () {
                                     Get.back();
                                   });
                                 },
@@ -509,8 +510,9 @@ class SummaryAbsen extends GetView {
                                                       jamMenit: absenC
                                                           .dataLimitAbsen[i]
                                                           .jamAbsenPulang!)
-                                                  .isBefore(FormatWaktu.formatJamMenit(
-                                                      jamMenit: "08:01"))
+                                                  .isBefore(
+                                                      FormatWaktu.formatJamMenit(
+                                                          jamMenit: "08:01"))
                                           ? "Lembur"
                                           : FormatWaktu.formatJamMenit(
                                                       jamMenit: absenC
@@ -522,15 +524,17 @@ class SummaryAbsen extends GetView {
                                               : FormatWaktu.formatJamMenit(jamMenit: absenC.dataLimitAbsen[i].jamAbsenPulang!).isAtSameMomentAs(FormatWaktu.formatJamMenit(jamMenit: absenC.dataLimitAbsen[i].jamPulang!))
                                                   ? 'Tepat Waktu'
                                                   : "Lembur";
+                                  log(absenC.dataLimitAbsen[i].fotoMasuk!);
                                   return InkWell(
                                     onTap: () => Get.to(() => DetailAbsenView(),
                                         arguments: {
                                           "foto_profil": userData!.foto != ""
                                               ? userData!.foto
                                               : userData!.nama,
-                                          "nama": absenC.dataLimitAbsen[i].nama!,
-                                          "nama_shift":
-                                              absenC.dataLimitAbsen[i].namaShift!,
+                                          "nama":
+                                              absenC.dataLimitAbsen[i].nama!,
+                                          "nama_shift": absenC
+                                              .dataLimitAbsen[i].namaShift!,
                                           "id_user":
                                               absenC.dataLimitAbsen[i].idUser!,
                                           "tanggal_masuk": absenC
@@ -547,33 +551,35 @@ class SummaryAbsen extends GetView {
                                           "jam_absen_masuk": absenC
                                               .dataLimitAbsen[i].jamAbsenMasuk!,
                                           "jam_absen_pulang": absenC
-                                              .dataLimitAbsen[i].jamAbsenPulang!,
-                                          "foto_masuk":
-                                              absenC.dataLimitAbsen[i].fotoMasuk!,
+                                              .dataLimitAbsen[i]
+                                              .jamAbsenPulang!,
+                                          "foto_masuk": absenC
+                                              .dataLimitAbsen[i].fotoMasuk!,
                                           "foto_pulang": absenC
                                               .dataLimitAbsen[i].fotoPulang!,
-                                          "lat_masuk":
-                                              absenC.dataLimitAbsen[i].latMasuk!,
-                                          "long_masuk":
-                                              absenC.dataLimitAbsen[i].longMasuk!,
-                                          "lat_pulang":
-                                              absenC.dataLimitAbsen[i].latPulang!,
+                                          "lat_masuk": absenC
+                                              .dataLimitAbsen[i].latMasuk!,
+                                          "long_masuk": absenC
+                                              .dataLimitAbsen[i].longMasuk!,
+                                          "lat_pulang": absenC
+                                              .dataLimitAbsen[i].latPulang!,
                                           "long_pulang": absenC
                                               .dataLimitAbsen[i].longPulang!,
                                           "device_info":
                                               absenC.dataLimitAbsen[i].devInfo!,
-                                          "device_info2":
-                                              absenC.dataLimitAbsen[i].devInfo2!,
+                                          "device_info2": absenC
+                                              .dataLimitAbsen[i].devInfo2!,
                                         },
                                         transition: Transition.cupertino),
                                     child: Card(
                                       shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(6)),
+                                          borderRadius:
+                                              BorderRadius.circular(6)),
                                       child: SizedBox(
-                                        height:
-                                            i == 0 && absenC.statsCon.value != ""
-                                                ? 147
-                                                : 110,
+                                        height: i == 0 &&
+                                                absenC.statsCon.value != ""
+                                            ? 147
+                                            : 110,
                                         child: Padding(
                                           padding: const EdgeInsets.all(8.0),
                                           child: Column(
@@ -589,7 +595,8 @@ class SummaryAbsen extends GetView {
                                                     FormatWaktu.formatIndo(
                                                         tanggal: DateTime.parse(
                                                             absenC
-                                                                .dataLimitAbsen[i]
+                                                                .dataLimitAbsen[
+                                                                    i]
                                                                 .tanggalMasuk!)),
                                                     style: const TextStyle(
                                                         fontWeight:
@@ -600,7 +607,8 @@ class SummaryAbsen extends GetView {
                                                     children: [
                                                       CsContainer(
                                                         title: stsMasuk,
-                                                        color: stsMasuk == "Telat"
+                                                        color: stsMasuk ==
+                                                                "Telat"
                                                             ? Colors
                                                                 .redAccent[700]!
                                                             : Colors.greenAccent[
@@ -638,18 +646,20 @@ class SummaryAbsen extends GetView {
                                                 children: [
                                                   Row(
                                                     crossAxisAlignment:
-                                                        CrossAxisAlignment.start,
+                                                        CrossAxisAlignment
+                                                            .start,
                                                     children: [
                                                       RoundedImage(
-                                                          height: 50,
-                                                          width: 50,
-                                                          foto: absenC
-                                                              .dataLimitAbsen[i]
-                                                              .fotoMasuk!,
-                                                          name: absenC
-                                                              .dataLimitAbsen[i]
-                                                              .nama!,
-                                                              headerProfile: false,),
+                                                        height: 50,
+                                                        width: 50,
+                                                        foto: absenC
+                                                            .dataLimitAbsen[i]
+                                                            .fotoMasuk!,
+                                                        name: absenC
+                                                            .dataLimitAbsen[i]
+                                                            .nama!,
+                                                        headerProfile: false,
+                                                      ),
                                                       const SizedBox(
                                                         width: 10,
                                                       ),
@@ -660,10 +670,12 @@ class SummaryAbsen extends GetView {
                                                                   fontWeight:
                                                                       FontWeight
                                                                           .bold,
-                                                                  fontSize: 16)),
+                                                                  fontSize:
+                                                                      16)),
                                                           Text(
                                                             absenC
-                                                                .dataLimitAbsen[i]
+                                                                .dataLimitAbsen[
+                                                                    i]
                                                                 .jamAbsenMasuk!,
                                                             style: TextStyle(
                                                                 color: stsMasuk ==
@@ -681,17 +693,20 @@ class SummaryAbsen extends GetView {
                                                   ),
                                                   Row(
                                                     crossAxisAlignment:
-                                                        CrossAxisAlignment.start,
+                                                        CrossAxisAlignment
+                                                            .start,
                                                     children: [
                                                       RoundedImage(
-                                                          height: 50,
-                                                          width: 50,
-                                                          foto: absenC
-                                                              .dataLimitAbsen[i]
-                                                              .fotoPulang!,
-                                                          name: absenC
-                                                              .dataLimitAbsen[i]
-                                                              .nama!, headerProfile: false,),
+                                                        height: 50,
+                                                        width: 50,
+                                                        foto: absenC
+                                                            .dataLimitAbsen[i]
+                                                            .fotoPulang!,
+                                                        name: absenC
+                                                            .dataLimitAbsen[i]
+                                                            .nama!,
+                                                        headerProfile: false,
+                                                      ),
                                                       const SizedBox(
                                                         width: 10,
                                                       ),
@@ -702,10 +717,12 @@ class SummaryAbsen extends GetView {
                                                                   fontWeight:
                                                                       FontWeight
                                                                           .bold,
-                                                                  fontSize: 16)),
+                                                                  fontSize:
+                                                                      16)),
                                                           Text(
                                                             absenC
-                                                                .dataLimitAbsen[i]
+                                                                .dataLimitAbsen[
+                                                                    i]
                                                                 .jamAbsenPulang!,
                                                             style: TextStyle(
                                                                 color: stsPulang ==
@@ -729,20 +746,22 @@ class SummaryAbsen extends GetView {
                                                 height: 2,
                                               ),
                                               i == 0 &&
-                                                      absenC.statsCon.value != ""
+                                                      absenC.statsCon.value !=
+                                                          ""
                                                   ? Container(
-                                                      width: Get
-                                                          .mediaQuery.size.width,
+                                                      width: Get.mediaQuery.size
+                                                          .width,
                                                       decoration: BoxDecoration(
                                                           color: const Color
-                                                              .fromARGB(
-                                                              118, 255, 139, 128),
+                                                              .fromARGB(118,
+                                                              255, 139, 128),
                                                           borderRadius:
                                                               BorderRadius
                                                                   .circular(5)),
                                                       child: Padding(
                                                         padding:
-                                                            const EdgeInsets.only(
+                                                            const EdgeInsets
+                                                                .only(
                                                                 left: 8.0),
                                                         child: Text(
                                                           absenC.statsCon.value,

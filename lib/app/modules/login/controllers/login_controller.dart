@@ -8,6 +8,7 @@ import 'package:get/get.dart';
 import 'package:rive/rive.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:crypto/crypto.dart';
+import '../../../data/model/foto_profil_model.dart';
 import '../../../services/service_api.dart';
 import '../../../data/model/login_model.dart';
 
@@ -91,6 +92,9 @@ class LoginController extends GetxController {
     //get data from local storage
     var dataOffline = await SQLHelper.instance.loginUserOffline(
         username.text, md5.convert(utf8.encode(password.text)).toString());
+    FotoProfil foto =
+        await ServiceApi().getFotoProfil({'id': dataOffline.first.id!});
+
     //checking data
     if (dataOffline.isNotEmpty) {
       await pref.setString(
@@ -104,7 +108,7 @@ class LoginController extends GetxController {
               namaCabang: dataOffline[0].namaCabang,
               lat: dataOffline[0].lat,
               long: dataOffline[0].long,
-              foto: dataOffline[0].foto,
+              foto: foto.foto! != "" ? foto.foto! : dataOffline[0].foto,
               noTelp: dataOffline[0].noTelp,
               level: dataOffline[0].level,
               levelUser: dataOffline[0].levelUser,

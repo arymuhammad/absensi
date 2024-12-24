@@ -138,7 +138,7 @@ void succesDialog(context, pageAbsen, desc) {
 void promptDialog(context, desc) {
   AwesomeDialog(
           context: context,
-          dialogType: DialogType.info,
+          dialogType: DialogType.question,
           dismissOnTouchOutside: false,
           dismissOnBackKeyPress: false,
           // onDismissCallback: (type) {
@@ -150,7 +150,7 @@ void promptDialog(context, desc) {
           // },
           headerAnimationLoop: false,
           animType: AnimType.bottomSlide,
-          title: 'INFO',
+          title: 'LOGOUT',
           desc: desc,
           btnCancelOnPress: () {},
           btnOkOnPress: () {

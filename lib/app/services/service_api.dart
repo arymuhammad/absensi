@@ -27,8 +27,8 @@ import '../data/model/users_model.dart';
 import 'app_exceptions.dart';
 
 class ServiceApi {
-  var baseUrl = "https://attendance.urbanco.id/api/"; // poduction
-  // var baseUrl = "http://103.156.15.60/absensi/"; // dev
+  // var baseUrl = "https://attendance.urbanco.id/api/"; // poduction
+  var baseUrl = "http://103.156.15.60/absensi/"; // dev
   // var baseUrl = "https://88.222.214.157/"; // dev
   var isLoading = false.obs;
 
@@ -108,6 +108,7 @@ class ServiceApi {
     try {
       final response =
           await http.post(Uri.parse('${baseUrl}cabang'), body: data);
+
       switch (response.statusCode) {
         case 200:
           List<dynamic> result = json.decode(response.body)['data'];
@@ -124,9 +125,11 @@ class ServiceApi {
   getLevel() async {
     try {
       final response = await http.get(Uri.parse('${baseUrl}level'));
+
       switch (response.statusCode) {
         case 200:
           List<dynamic> result = json.decode(response.body)['data'];
+
           List<Level> data = result.map((e) => Level.fromJson(e)).toList();
           return data;
         default:
@@ -248,8 +251,7 @@ class ServiceApi {
     } on TimeoutException catch (_) {
       showToast('Waktu koneksi ke server habis\nData gagal di hapus');
       Get.back();
-    }
-    on Exception catch (_) {
+    } on Exception catch (_) {
       showToast('Data gagal di hapus');
       Get.back();
     }
@@ -406,6 +408,7 @@ class ServiceApi {
       final response =
           await http.post(Uri.parse('${baseUrl}cek_absen'), body: data);
       // log('${baseUrl}cek_absen');
+      // log(data.toString());
       switch (response.statusCode) {
         case 200:
           final result = json.decode(response.body)['data'];
@@ -1058,7 +1061,7 @@ class ServiceApi {
 
   sendDataToXmor(data) async {
     String url = "https://xmor.urbanco.id/api";
-    // final response = 
+    // final response =
     await http.post(Uri.parse('$url/attendance/create'),
         headers: {
           "Accept": "application/json",

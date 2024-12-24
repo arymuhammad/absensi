@@ -166,10 +166,6 @@ class AdjustPresenceController extends GetxController {
     succesDialog(Get.context!, 'N', 'Data berhasil diupdate');
   }
 
-  @override
-  void onClose() {
-    super.onClose();
-  }
 
   Future<List<Dept>> getDeptVisit() async {
     final response = await ServiceApi().getDeptVisit();

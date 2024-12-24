@@ -7,6 +7,7 @@ import 'package:absensi/app/data/helper/db_helper.dart';
 import 'package:absensi/app/services/service_api.dart';
 import 'package:absensi/app/data/model/level_model.dart';
 import 'package:absensi/app/modules/profil/views/update_password.dart';
+import 'package:device_info_null_safety/device_info_null_safety.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -61,7 +62,7 @@ class AddPegawaiController extends GetxController {
   var latestVer = "";
   var backup = false.obs;
   var restore = false.obs;
-
+  var supportedAbi = "";
   @override
   void onInit() async {
     super.onInit();
@@ -81,6 +82,11 @@ class AddPegawaiController extends GetxController {
       currVer = packageInfo.version;
       // String buildNumber = packageInfo.buildNumber;
     });
+
+    final DeviceInfoNullSafety deviceInfoNullSafety = DeviceInfoNullSafety();
+    Map<String, dynamic> abiInfo = await deviceInfoNullSafety.abiInfo;
+    var abi = abiInfo.entries.toList();
+    supportedAbi = abi[1].value;
   }
 
   @override
@@ -110,8 +116,10 @@ class AddPegawaiController extends GetxController {
           .get(Uri.parse('http://103.156.15.60/update apk/updateLog.xml'));
 
       final response = await http
-          .head(Uri.parse('http://103.156.15.60/update apk/absensiApp.apk'))
-          .timeout(const Duration(seconds: 3));
+          .head(Uri.parse(supportedAbi == 'arm64-v8a'
+              ? 'http://103.156.15.60/update apk/absensiApp.arm64v8a.apk'
+              : 'http://103.156.15.60/update apk/absensiApp.apk'))
+          .timeout(const Duration(seconds: 20));
       Get.back();
       if (response.statusCode == 200) {
         //parsing readDoc
@@ -223,7 +231,9 @@ class AddPegawaiController extends GetxController {
                   //LINK CONTAINS APK OF FLUTTER HELLO WORLD FROM FLUTTER SDK EXAMPLES
                   OtaUpdate()
                       .execute(
-                    'http://103.156.15.60/update apk/absensiApp.apk',
+                    supportedAbi == 'arm64-v8a'
+                        ? 'http://103.156.15.60/update apk/absensiApp.arm64v8a.apk'
+                        : 'http://103.156.15.60/update apk/absensiApp.apk',
                     // OPTIONAL
                     // destinationFilename: '/',
                     //OPTIONAL, ANDROID ONLY - ABILITY TO VALIDATE CHECKSUM OF FILE:
@@ -292,7 +302,7 @@ class AddPegawaiController extends GetxController {
           maxWidth: 600);
       if (image != null) {
         update();
-      } 
+      }
     }
   }
 
@@ -443,7 +453,7 @@ class AddPegawaiController extends GetxController {
                 : dataUser.level,
             "level_user":
                 levelName.value != "" ? levelName.value : dataUser.levelUser,
-            "foto": File(image!.path).toString(),
+            "foto": image!.path,
             "visit": vst.value != "" ? vst.value : dataUser.visit,
             "cek_stok": cekStok.value != "" ? cekStok.value : dataUser.cekStok
           }, dataUser.id!, dataUser.username!);
@@ -459,7 +469,7 @@ class AddPegawaiController extends GetxController {
           FotoProfil foto = await ServiceApi().getFotoProfil(idUser);
           SharedPreferences pref = await SharedPreferences.getInstance();
           await pref.setString("fotoProfil", foto.foto!);
-          fotoProfil.value = pref.getString("fotoProfil")!;
+          // fotoProfil.value = pref.getString("fotoProfil")!;
           selectedCabang.value = "";
           cvrArea.value = "";
           lat.value = "";

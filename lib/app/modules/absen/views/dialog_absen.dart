@@ -50,7 +50,7 @@ dialogAbsenView(Data dataUser, latitude, longitude) async {
     // if (isBefore9AM) {
     if (isBefore9AM) {
       await absC.cekDataAbsen("pulang", dataUser.id!, previous);
-      if (absC.cekAbsen.value.total == "1" && absC.cekAbsen.value.idShift != "1") {
+      if (absC.cekAbsen.value.total == "1" && absC.cekAbsen.value.idShift != "0") {
         // CEK ABSEN PULANG DITANGGAL H+1
         AwesomeDialog(
                 context: Get.context!,

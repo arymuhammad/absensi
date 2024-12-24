@@ -5,9 +5,7 @@ import 'package:absensi/app/modules/profil/views/profil_view.dart';
 import 'package:absensi/app/modules/shared/background_image_header.dart';
 import 'package:absensi/app/modules/shared/rounded_image.dart';
 import 'package:flutter/material.dart';
-
 import 'package:get/get.dart';
-
 import '../controllers/home_controller.dart';
 
 class HomeView extends GetView<HomeController> {

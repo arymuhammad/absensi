@@ -340,9 +340,9 @@ class BackupView extends GetView {
                           await ServiceApi().deleteAbsVst(dataLive);
                         }
                       },
-                      label: const Text(
-                        'Hapus data absen pulang',
-                        style: TextStyle(color: Colors.black),
+                      label: Text(
+                        'Hapus data ${userData!.visit == '0'? 'absen':'visit'} masuk / pulang',
+                        style: const TextStyle(color: Colors.black),
                       ),
                     ),
                     const SizedBox(

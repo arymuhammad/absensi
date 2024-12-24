@@ -1,4 +1,3 @@
-import 'dart:convert';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -55,8 +54,8 @@ class RoundedImage extends StatelessWidget {
                     cacheKey:
                         "${ServiceApi().baseUrl}$foto + ${DateTime.now().day.toString()}",
                   )
-                : foto != "" && foto.startsWith('/')
-                    ? Image.memory(base64Decode(foto),
+                : foto != "" && foto.contains('/data')
+                    ? Image.asset(foto,
                         errorBuilder: (context, error, stackTrace) =>
                             Image.asset('assets/image/selfie.png'),
                         fit: BoxFit.cover)

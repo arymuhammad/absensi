@@ -36,7 +36,6 @@ import 'package:printing/printing.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:device_info_null_safety/device_info_null_safety.dart';
 
-
 class AbsenController extends GetxController {
   var isLoading = true.obs;
   var ascending = true.obs;
@@ -91,7 +90,7 @@ class AbsenController extends GetxController {
   final TextEditingController filterVisit = TextEditingController();
   final ImagePicker picker = ImagePicker();
   XFile? image;
-  
+
   var searchDate = "".obs;
   var dateNow = DateFormat('yyyy-MM-dd').format(DateTime.now());
   var thisMonth =
@@ -194,10 +193,7 @@ class AbsenController extends GetxController {
 
     _startDateStream(paramSingle, paramLimit, paramSingleVisit, paramLimitVisit,
         dataUserLogin);
-
-   
   }
-
 
   void startTimer(int sec) {
     Timer.periodic(const Duration(seconds: 1), (timer) {
@@ -234,7 +230,6 @@ class AbsenController extends GetxController {
                 dateNowServer.isNotEmpty ? dateNowServer : dateNow)));
 
         if (cekAbsen.value.total == "0") {
-
           if (tempDataAbs.isNotEmpty) {
             for (var i in tempDataAbs) {
               var data = {
@@ -253,7 +248,7 @@ class AbsenController extends GetxController {
                 "device_info": i.devInfo!
               };
               // submit data absensi ke server
-              log(data.toString());
+              // log(data.toString());
               await ServiceApi().submitAbsen(data, true);
             }
             _sub.cancel();
@@ -270,7 +265,6 @@ class AbsenController extends GetxController {
               DateFormat('yyyy-MM-dd').format(DateTime.parse(
                   dateNowServer.isNotEmpty ? dateNowServer : dateNow)));
           if (cekAbsen.value.total == "1") {
-      
             if (tempDataAbs.isNotEmpty &&
                 tempDataAbs.first.tanggalPulang != null) {
               for (var i in tempDataAbs) {
@@ -958,6 +952,7 @@ class AbsenController extends GetxController {
               ? 'http://103.156.15.60/update apk/absensiApp.arm64v8a.apk'
               : 'http://103.156.15.60/update apk/absensiApp.apk'))
           .timeout(const Duration(seconds: 20));
+      log(supportedAbi);
       Get.back();
       if (response.statusCode == 200) {
         //parsing readDoc
