@@ -92,11 +92,12 @@ class LoginController extends GetxController {
     //get data from local storage
     var dataOffline = await SQLHelper.instance.loginUserOffline(
         username.text, md5.convert(utf8.encode(password.text)).toString());
-    FotoProfil foto =
-        await ServiceApi().getFotoProfil({'id': dataOffline.first.id!});
 
     //checking data
     if (dataOffline.isNotEmpty) {
+      FotoProfil foto =
+          await ServiceApi().getFotoProfil({'id': dataOffline.first.id!});
+          
       await pref.setString(
           'userDataLogin',
           jsonEncode(Data(
