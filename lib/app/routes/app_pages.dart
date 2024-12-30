@@ -54,7 +54,7 @@ class AppPages {
         transition: Transition.fadeIn),
     GetPage(
         name: _Paths.DETAIL_ABSEN,
-        page: () => DetailAbsenView(),
+        page: () => DetailAbsenView(const {}),
         binding: DetailAbsenBinding(),
         transition: Transition.fadeIn),
     GetPage(

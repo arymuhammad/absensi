@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:io';
 import 'package:absensi/app/modules/absen/controllers/absen_controller.dart';
 import 'package:absensi/app/data/helper/const.dart';
@@ -524,53 +523,52 @@ class SummaryAbsen extends GetView {
                                               : FormatWaktu.formatJamMenit(jamMenit: absenC.dataLimitAbsen[i].jamAbsenPulang!).isAtSameMomentAs(FormatWaktu.formatJamMenit(jamMenit: absenC.dataLimitAbsen[i].jamPulang!))
                                                   ? 'Tepat Waktu'
                                                   : "Lembur";
-                                  log(absenC.dataLimitAbsen[i].fotoMasuk!);
+                               
                                   return InkWell(
-                                    onTap: () => Get.to(() => DetailAbsenView(),
-                                        arguments: {
-                                          "foto_profil": userData!.foto != ""
-                                              ? userData!.foto
-                                              : userData!.nama,
-                                          "nama":
-                                              absenC.dataLimitAbsen[i].nama!,
-                                          "nama_shift": absenC
-                                              .dataLimitAbsen[i].namaShift!,
-                                          "id_user":
-                                              absenC.dataLimitAbsen[i].idUser!,
-                                          "tanggal_masuk": absenC
-                                              .dataLimitAbsen[i].tanggalMasuk!,
-                                          "tanggal_pulang": absenC
-                                                      .dataLimitAbsen[i]
-                                                      .tanggalPulang !=
-                                                  null
-                                              ? absenC.dataLimitAbsen[i]
-                                                  .tanggalPulang!
-                                              : "",
-                                          "jam_masuk": stsMasuk,
-                                          "jam_pulang": stsPulang,
-                                          "jam_absen_masuk": absenC
-                                              .dataLimitAbsen[i].jamAbsenMasuk!,
-                                          "jam_absen_pulang": absenC
-                                              .dataLimitAbsen[i]
-                                              .jamAbsenPulang!,
-                                          "foto_masuk": absenC
-                                              .dataLimitAbsen[i].fotoMasuk!,
-                                          "foto_pulang": absenC
-                                              .dataLimitAbsen[i].fotoPulang!,
-                                          "lat_masuk": absenC
-                                              .dataLimitAbsen[i].latMasuk!,
-                                          "long_masuk": absenC
-                                              .dataLimitAbsen[i].longMasuk!,
-                                          "lat_pulang": absenC
-                                              .dataLimitAbsen[i].latPulang!,
-                                          "long_pulang": absenC
-                                              .dataLimitAbsen[i].longPulang!,
-                                          "device_info":
-                                              absenC.dataLimitAbsen[i].devInfo!,
-                                          "device_info2": absenC
-                                              .dataLimitAbsen[i].devInfo2!,
-                                        },
-                                        transition: Transition.cupertino),
+                                    onTap: () => Get.to(() {
+                                      var detailData = {
+                                        "foto_profil": userData!.foto != ""
+                                            ? userData!.foto
+                                            : userData!.nama,
+                                        "nama": absenC.dataLimitAbsen[i].nama!,
+                                        "nama_shift":
+                                            absenC.dataLimitAbsen[i].namaShift!,
+                                        "id_user":
+                                            absenC.dataLimitAbsen[i].idUser!,
+                                        "tanggal_masuk": absenC
+                                            .dataLimitAbsen[i].tanggalMasuk!,
+                                        "tanggal_pulang": absenC
+                                                    .dataLimitAbsen[i]
+                                                    .tanggalPulang !=
+                                                null
+                                            ? absenC.dataLimitAbsen[i]
+                                                .tanggalPulang!
+                                            : "",
+                                        "jam_masuk": stsMasuk,
+                                        "jam_pulang": stsPulang,
+                                        "jam_absen_masuk": absenC
+                                            .dataLimitAbsen[i].jamAbsenMasuk!,
+                                        "jam_absen_pulang": absenC
+                                            .dataLimitAbsen[i].jamAbsenPulang!,
+                                        "foto_masuk":
+                                            absenC.dataLimitAbsen[i].fotoMasuk!,
+                                        "foto_pulang": absenC
+                                            .dataLimitAbsen[i].fotoPulang!,
+                                        "lat_masuk":
+                                            absenC.dataLimitAbsen[i].latMasuk!,
+                                        "long_masuk":
+                                            absenC.dataLimitAbsen[i].longMasuk!,
+                                        "lat_pulang":
+                                            absenC.dataLimitAbsen[i].latPulang!,
+                                        "long_pulang": absenC
+                                            .dataLimitAbsen[i].longPulang!,
+                                        "device_info":
+                                            absenC.dataLimitAbsen[i].devInfo!,
+                                        "device_info2":
+                                            absenC.dataLimitAbsen[i].devInfo2!,
+                                      };
+                                      return DetailAbsenView(detailData);
+                                    }, transition: Transition.cupertino),
                                     child: Card(
                                       shape: RoundedRectangleBorder(
                                           borderRadius:

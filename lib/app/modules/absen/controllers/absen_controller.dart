@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:developer';
+// import 'dart:developer';
 import 'dart:io';
 import 'package:absensi/app/data/helper/db_helper.dart';
 import 'package:absensi/app/data/model/cek_visit_model.dart';
@@ -952,7 +952,7 @@ class AbsenController extends GetxController {
               ? 'http://103.156.15.60/update apk/absensiApp.arm64v8a.apk'
               : 'http://103.156.15.60/update apk/absensiApp.apk'))
           .timeout(const Duration(seconds: 20));
-      log(supportedAbi);
+     
       Get.back();
       if (response.statusCode == 200) {
         //parsing readDoc

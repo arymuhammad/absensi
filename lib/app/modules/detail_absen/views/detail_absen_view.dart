@@ -1,5 +1,5 @@
-
 import 'package:absensi/app/data/helper/const.dart';
+import 'package:absensi/app/modules/detail_absen/views/widget/note.dart';
 import 'package:absensi/app/modules/shared/rounded_image.dart';
 import 'package:flutter/material.dart';
 
@@ -11,18 +11,24 @@ import '../controllers/detail_absen_controller.dart';
 import 'package:flutter_map/flutter_map.dart'; // Suitable for most situations
 
 class DetailAbsenView extends GetView<DetailAbsenController> {
-  DetailAbsenView({super.key});
+  const DetailAbsenView(this.detailData, {super.key});
+  final Map<String, dynamic> detailData;
 
-  final markersMasuk = <Marker>[
+ 
+
+  @override
+  Widget build(BuildContext context) {
+
+     final markersMasuk = <Marker>[
     Marker(
       width: 80,
       height: 80,
-      point: LatLng(double.parse(Get.arguments["lat_masuk"]),
-          double.parse(Get.arguments["long_masuk"])),
+      point: LatLng(double.parse(detailData["lat_masuk"]),
+          double.parse(detailData["long_masuk"])),
       child: Card(
           elevation: 10,
           child: Image.network(
-            "${ServiceApi().baseUrl}${Get.arguments['foto_masuk']}",
+            "${ServiceApi().baseUrl}${detailData['foto_masuk']}",
             errorBuilder: (context, error, stackTrace) =>
                 Image.asset('assets/image/selfie.png'),
             fit: BoxFit.cover,
@@ -35,25 +41,22 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
       width: 80,
       height: 80,
       point: LatLng(
-          double.parse(Get.arguments["lat_pulang"] != ""
-              ? Get.arguments["lat_pulang"]
+          double.parse(detailData["lat_pulang"] != ""
+              ? detailData["lat_pulang"]
               : "0.0"),
-          double.parse(Get.arguments["long_pulang"] != ""
-              ? Get.arguments["long_pulang"]
+          double.parse(detailData["long_pulang"] != ""
+              ? detailData["long_pulang"]
               : "0.0")),
       child: Card(
           elevation: 10,
           child: Image.network(
-            "${ServiceApi().baseUrl}${Get.arguments['foto_pulang']}",
+            "${ServiceApi().baseUrl}${detailData['foto_pulang']}",
             errorBuilder: (context, error, stackTrace) =>
                 Image.asset('assets/image/selfie.png'),
             fit: BoxFit.cover,
           )),
     ),
   ];
-
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('DETAIL ABSEN'),
@@ -92,7 +95,7 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
                   child: Center(
                     child: Text(
                       DateFormat("EEEE, d MMMM yyyy", "id_ID").format(
-                          DateTime.parse(Get.arguments['tanggal_masuk'])),
+                          DateTime.parse(detailData['tanggal_masuk'])),
                       style: const TextStyle(fontSize: 18, color: Colors.white),
                     ),
                   ),
@@ -106,8 +109,8 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
                             RoundedImage(
                                 height: 75,
                                 width: 75,
-                                foto: Get.arguments['foto_profil'],
-                                name: Get.arguments['foto_profil'],
+                                foto: detailData['foto_profil'],
+                                name: detailData['foto_profil'],
                                 headerProfile: true),
                             const SizedBox(width: 5),
                             Row(
@@ -123,7 +126,7 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
                                         ),
                                         const SizedBox(width: 44),
                                         Text(
-                                          ': ${Get.arguments["nama"].toString().capitalize}',
+                                          ': ${detailData["nama"].toString().capitalize}',
                                         ),
                                       ],
                                     ),
@@ -141,7 +144,7 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
                                                 CrossAxisAlignment.start,
                                             children: [
                                               Text(
-                                                ': ${Get.arguments['nama_shift']}',
+                                                ': ${detailData['nama_shift']}',
                                               ),
                                             ],
                                           ),
@@ -153,7 +156,7 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
                                         const Text('Masuk'),
                                         const SizedBox(width: 45),
                                         Text(
-                                          ': ${Get.arguments['jam_absen_masuk']}',
+                                          ': ${detailData['jam_absen_masuk']}',
                                         ),
                                       ],
                                     ),
@@ -169,7 +172,7 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
                                               borderRadius:
                                                   BorderRadius.circular(5),
                                               color:
-                                                  Get.arguments['jam_masuk'] ==
+                                                  detailData['jam_masuk'] ==
                                                           "Telat"
                                                       ? Colors.redAccent[700]
                                                       : Colors
@@ -182,7 +185,7 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
                                           ),
                                           child: Center(
                                             child: Text(
-                                                "${Get.arguments['jam_masuk']}",
+                                                "${detailData['jam_masuk']}",
                                                 style: const TextStyle(
                                                     color: Colors.white)),
                                           ),
@@ -206,7 +209,7 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
                                                 0.3,
                                           ),
                                           child: Text(
-                                            ": ${Get.arguments['device_info']}",
+                                            ": ${detailData['device_info']}",
                                           ),
                                         ),
                                       ],
@@ -226,8 +229,8 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
                     child: FlutterMap(
                       options: MapOptions(
                         initialCenter: LatLng(
-                            double.parse(Get.arguments["lat_masuk"]),
-                            double.parse(Get.arguments["long_masuk"])),
+                            double.parse(detailData["lat_masuk"]),
+                            double.parse(detailData["long_masuk"])),
                         initialZoom: 15,
                       ),
                       nonRotatedChildren: [
@@ -257,7 +260,7 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
           ),
           const SizedBox(height: 20),
           Visibility(
-              visible: Get.arguments['tanggal_pulang'] == "" ? true : false,
+              visible: detailData['tanggal_pulang'] == "" ? true : false,
               child: const Center(
                   child: Padding(
                 padding: EdgeInsets.all(8.0),
@@ -265,7 +268,7 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
                     style: TextStyle(fontSize: 18)),
               ))),
           Visibility(
-            visible: Get.arguments['tanggal_pulang'] != "" ? true : false,
+            visible: detailData['tanggal_pulang'] != "" ? true : false,
             child: Card(
               elevation: 10,
               shape: const RoundedRectangleBorder(
@@ -286,9 +289,9 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
                     ),
                     child: Center(
                       child: Text(
-                        Get.arguments['tanggal_pulang'] != ""
+                        detailData['tanggal_pulang'] != ""
                             ? DateFormat("EEEE, d MMMM yyyy", "id_ID").format(
-                                DateTime.parse(Get.arguments['tanggal_pulang']))
+                                DateTime.parse(detailData['tanggal_pulang']))
                             : "",
                         style:
                             const TextStyle(fontSize: 18, color: Colors.white),
@@ -304,8 +307,8 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
                               RoundedImage(
                                   height: 75,
                                   width: 75,
-                                  foto: Get.arguments['foto_profil'],
-                                  name: Get.arguments['foto_profil'],
+                                  foto: detailData['foto_profil'],
+                                  name: detailData['foto_profil'],
                                   headerProfile: true),
                               const SizedBox(width: 5),
                               Row(
@@ -322,7 +325,7 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
                                           ),
                                           const SizedBox(width: 44),
                                           Text(
-                                            ': ${Get.arguments["nama"].toString().capitalize}',
+                                            ': ${detailData["nama"].toString().capitalize}',
                                           ),
                                         ],
                                       ),
@@ -340,7 +343,7 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
                                                   CrossAxisAlignment.start,
                                               children: [
                                                 Text(
-                                                  ': ${Get.arguments['nama_shift']}',
+                                                  ': ${detailData['nama_shift']}',
                                                 ),
                                               ],
                                             ),
@@ -352,7 +355,7 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
                                           const Text('Pulang'),
                                           const SizedBox(width: 42),
                                           Text(
-                                            ': ${Get.arguments['jam_absen_pulang'] != "" ? Get.arguments['jam_absen_pulang'] : "-"}',
+                                            ': ${detailData['jam_absen_pulang'] != "" ? detailData['jam_absen_pulang'] : "-"}',
                                           ),
                                         ],
                                       ),
@@ -373,17 +376,17 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
                                             decoration: BoxDecoration(
                                                 borderRadius:
                                                     BorderRadius.circular(5),
-                                                color: Get.arguments[
+                                                color: detailData[
                                                                 'jam_pulang'] ==
                                                             "Belum Absen" ||
-                                                        Get.arguments[
+                                                        detailData[
                                                                 'jam_pulang'] ==
                                                             "Pulang Cepat"
                                                     ? Colors.redAccent[700]
                                                     : Colors.greenAccent[700]),
                                             child: Center(
                                               child: Text(
-                                                  "${Get.arguments['jam_pulang']}",
+                                                  "${detailData['jam_pulang']}",
                                                   style: const TextStyle(
                                                       color: Colors.white)),
                                             ),
@@ -392,7 +395,7 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
                                       ),
                                       Visibility(
                                         visible:
-                                            Get.arguments['jam_absen_pulang'] !=
+                                            detailData['jam_absen_pulang'] !=
                                                     ""
                                                 ? true
                                                 : false,
@@ -414,7 +417,7 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
                                                     0.3,
                                               ),
                                               child: Text(
-                                                ": ${Get.arguments['device_info2']}",
+                                                ": ${detailData['device_info2']}",
                                               ),
                                             ),
                                           ],
@@ -433,7 +436,7 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
                       )),
                   Visibility(
                     visible:
-                        Get.arguments['jam_absen_pulang'] != "" ? true : false,
+                        detailData['jam_absen_pulang'] != "" ? true : false,
                     child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: SizedBox(
@@ -441,8 +444,8 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
                             child: FlutterMap(
                               options: MapOptions(
                                 initialCenter: LatLng(
-                                    double.parse(Get.arguments["lat_masuk"]),
-                                    double.parse(Get.arguments["long_masuk"])),
+                                    double.parse(detailData["lat_masuk"]),
+                                    double.parse(detailData["long_masuk"])),
                                 initialZoom: 15,
                               ),
                               nonRotatedChildren: [
@@ -472,6 +475,11 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
           )
         ],
       ),
+      floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            note();
+          },
+          child: Icon(Icons.message_rounded)),
     );
   }
 }

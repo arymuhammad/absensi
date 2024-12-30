@@ -115,7 +115,7 @@ class SQLHelper {
         device_info2 TEXT DEFAULT ''
       )
       """);
-      await db.execute("""CREATE TABLE IF NOT EXISTS server(
+    await db.execute("""CREATE TABLE IF NOT EXISTS server(
         id INTEGER PRIMARY KEY NOT NULL,
         server TEXT
       )
@@ -184,7 +184,7 @@ class SQLHelper {
         whereArgs: [idUser, tglMasuk]);
     // return res;
   }
-  
+
   Future<void> deleteDataAbsenPulang(
       Map<String, dynamic> todo, String idUser, String tglMasuk) async {
     Database db = await instance.database;
@@ -194,10 +194,12 @@ class SQLHelper {
     // return res;
   }
 
-  Future<void> deleteDataVisitMasuk(String idUser, String tglMasuk, String visitIn) async {
+  Future<void> deleteDataVisitMasuk(
+      String idUser, String tglMasuk, String visitIn) async {
     Database db = await instance.database;
     await db.delete('tbl_visit_area',
-        where: 'id_user = ? and tgl_visit = ? and visit_in', whereArgs: [idUser, tglMasuk, visitIn]);
+        where: 'id_user = ? and tgl_visit = ? and visit_in',
+        whereArgs: [idUser, tglMasuk, visitIn]);
     // return res;
   }
 
@@ -208,7 +210,6 @@ class SQLHelper {
         where: 'id_user = ? and tgl_visit = ?', whereArgs: [idUser, tglMasuk]);
     // return res;
   }
-  
 
   Future<void> insertShift(ShiftKerja todo) async {
     Database db = await instance.database;
@@ -222,6 +223,16 @@ class SQLHelper {
       'shift_kerja',
     );
     return res.map((e) => ShiftKerja.fromJson(e)).toList();
+  }
+
+  Future truncateUser() async {
+    try {
+      Database db = await instance.database;
+      await db.delete('tbl_user');
+      return showToast('Data berhasil dihapus');
+    } on Exception catch (e) {
+      showToast(e.toString());
+    }
   }
 
   Future truncateShift() async {
@@ -375,21 +386,20 @@ class SQLHelper {
 
   Future<List<Visit>> getAllDataVisit() async {
     Database db = await instance.database;
-    var res = await db.query('tbl_visit_area', orderBy: "tgl_visit DESC, jam_in DESC");
+    var res = await db.query('tbl_visit_area',
+        orderBy: "tgl_visit DESC, jam_in DESC");
     return res.map((json) => Visit.fromJson(json)).toList();
   }
 
-    Future<void> insertServer(Srv todo) async {
+  Future<void> insertServer(Srv todo) async {
     Database db = await instance.database;
     await db.insert('server', todo.toJson());
     // return res;
   }
 
-  Future<void> updateServer(
-      Map<String, dynamic> todo, String id) async {
+  Future<void> updateServer(Map<String, dynamic> todo, String id) async {
     Database db = await instance.database;
-    await db.update('server', todo,
-        where: 'id=?', whereArgs: [id]);
+    await db.update('server', todo, where: 'id=?', whereArgs: [id]);
     // return res;
   }
 

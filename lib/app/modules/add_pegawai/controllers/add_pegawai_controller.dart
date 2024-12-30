@@ -350,7 +350,7 @@ class AddPegawaiController extends GetxController {
                 "Username dan No Telp sudah terdaftar\nSilahkan ubah Username dan No Telp ");
           } else if (lstUser.contains(username.text)) {
             dialogMsg("",
-                "Username sudah terdaftar\nSilahkan ubah dengan Username lain");
+                "Username sudah terdaftar\nSilahkan gunakan username lain");
           } else if (lstPhone.contains(telp.text)) {
             dialogMsg("",
                 "No Telp ini sudah terdaftar pada akun lain\nSilahkan masukkan No Telp lain");

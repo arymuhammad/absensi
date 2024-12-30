@@ -55,7 +55,7 @@ class HomeView extends GetView<HomeController> {
                           ),
                         ),
                         Text(
-                          listDataUser!.id!,
+                          listDataUser!.namaCabang!,
                           style: const TextStyle(
                             fontSize: 17,
                             color: Colors.white,
