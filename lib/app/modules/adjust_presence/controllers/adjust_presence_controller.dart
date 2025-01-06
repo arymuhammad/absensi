@@ -1,5 +1,6 @@
 import 'package:absensi/app/data/helper/loading_dialog.dart';
 import 'package:absensi/app/data/model/absen_model.dart';
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -163,7 +164,7 @@ class AdjustPresenceController extends GetxController {
     };
     await ServiceApi().updateAbsen(data);
     selectedShift.value = "";
-    succesDialog(Get.context!, 'N', 'Data berhasil diupdate');
+    succesDialog(Get.context!, 'N', 'Data berhasil diupdate', DialogType.success, 'SUKSES');
   }
 
 
@@ -210,7 +211,7 @@ class AdjustPresenceController extends GetxController {
     };
     if (data.isNotEmpty) {
       await ServiceApi().updateAbsen(data);
-      succesDialog(Get.context!, 'N', 'Data berhasil diupdate');
+      succesDialog(Get.context!, 'N', 'Data berhasil diupdate', DialogType.success, 'SUKSES');
     }
   }
 }

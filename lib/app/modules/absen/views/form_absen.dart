@@ -221,7 +221,7 @@ formAbsen(Data dataUser, double latitude, double longitude) async {
                         absC.lat.value = "";
                         absC.long.value = "";
                         succesDialog(Get.context, "Y",
-                            "Anda sudah Absen Masuk hari ini.");
+                            "Anda sudah Absen Masuk hari ini.", DialogType.info, 'INFO');
                       }
                     } else {
                       absC.stsAbsenSelected.value = "";
@@ -240,7 +240,7 @@ formAbsen(Data dataUser, double latitude, double longitude) async {
                     absC.lat.value = "";
                     absC.long.value = "";
                     succesDialog(
-                        Get.context, "Y", "Anda sudah Absen Masuk hari ini.");
+                        Get.context, "Y", "Anda sudah Absen Masuk hari ini.", DialogType.info, 'INFO');
                   }
                 } else {
                   //absen pulang
@@ -439,7 +439,7 @@ formAbsen(Data dataUser, double latitude, double longitude) async {
                             absC.lat.value = "";
                             absC.long.value = "";
                             succesDialog(Get.context, "Y",
-                                "Anda sudah Absen Pulang hari ini.");
+                                "Anda sudah Absen Pulang hari ini.", DialogType.info, 'INFO');
                           }
                         } else {
                           absC.stsAbsenSelected.value = "";
@@ -458,7 +458,7 @@ formAbsen(Data dataUser, double latitude, double longitude) async {
                         absC.lat.value = "";
                         absC.long.value = "";
                         succesDialog(Get.context, "Y",
-                            "Anda sudah Absen Pulang hari ini.");
+                            "Anda sudah Absen Pulang hari ini.", DialogType.info, 'INFO');
                       }
                     }
                   }

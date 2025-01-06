@@ -22,7 +22,7 @@ class UpdateProfil extends GetView {
     return Scaffold(
       appBar: AppBar(
         iconTheme: const IconThemeData(color: Colors.white),
-        title: const Text('UPDATE PROFILE',
+        title: const Text('PROFILE',
             style: TextStyle(color: AppColors.mainTextColor1)),
         centerTitle: true,
         flexibleSpace: Container(
@@ -75,7 +75,7 @@ class UpdateProfil extends GetView {
                         decoration: BoxDecoration(color: Colors.grey[300]),
                         child: userData!.foto != ""
                             ? Image.network(
-                                "${ServiceApi().baseUrl}${userData!.foto}")
+                                "${ServiceApi().baseUrlPath}${userData!.foto}", fit: BoxFit.fill,)
                             : Image.network(
                                 "https://ui-avatars.com/api/?name=${userData!.nama}",
                                 fit: BoxFit.cover,
@@ -275,7 +275,7 @@ class UpdateProfil extends GetView {
                   
                 },
                 child: const Text(
-                  'UPDATE PROFILE',
+                  'UPDATE',
                   style: TextStyle(color: AppColors.mainTextColor1),
                 )),
           )

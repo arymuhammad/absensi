@@ -1,4 +1,6 @@
 
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
@@ -28,15 +30,15 @@ class RoundedImage extends StatelessWidget {
         child: headerProfile
             ? foto != ""
                 ? CachedNetworkImage(
-                    imageUrl: "${ServiceApi().baseUrl}$foto",
-                    fit: BoxFit.cover,
+                    imageUrl: "${ServiceApi().baseUrlPath}$foto",
+                    fit: BoxFit.fill,
                     progressIndicatorBuilder: (context, url, progress) =>
                         CircularProgressIndicator(
                       value: progress.progress,
                       strokeWidth: 15,
                     ),
                     cacheKey:
-                        "${ServiceApi().baseUrl}$foto + ${DateTime.now().day.toString()}",
+                        "${ServiceApi().baseUrlPath}$foto + ${DateTime.now().day.toString()}",
                   )
                 : Image.network(
                     "https://ui-avatars.com/api/?name=$name",
@@ -44,7 +46,7 @@ class RoundedImage extends StatelessWidget {
                   )
             : foto != "" && foto.contains('absensi/')
                 ? CachedNetworkImage(
-                    imageUrl: "${ServiceApi().baseUrl}$foto",
+                    imageUrl: "${ServiceApi().baseUrlPath}$foto",
                     fit: BoxFit.cover,
                     progressIndicatorBuilder: (context, url, progress) =>
                         CircularProgressIndicator(
@@ -52,10 +54,10 @@ class RoundedImage extends StatelessWidget {
                       strokeWidth: 15,
                     ),
                     cacheKey:
-                        "${ServiceApi().baseUrl}$foto + ${DateTime.now().day.toString()}",
+                        "${ServiceApi().baseUrlPath}$foto + ${DateTime.now().day.toString()}",
                   )
                 : foto != "" && foto.contains('/data')
-                    ? Image.asset(foto,
+                    ? Image.file(File(foto),
                         errorBuilder: (context, error, stackTrace) =>
                             Image.asset('assets/image/selfie.png'),
                         fit: BoxFit.cover)

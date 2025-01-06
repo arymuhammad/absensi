@@ -10,7 +10,6 @@ import 'package:absensi/app/modules/shared/elevated_button_icon.dart';
 import 'package:absensi/app/modules/shared/rounded_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:intl/intl.dart';
@@ -46,14 +45,12 @@ class SummaryAbsen extends GetView {
             absenC.isLoading.value = true;
             await absenC.getAbsenToday(paramSingle);
             await absenC.getLimitAbsen(paramLimit);
-
-            showToast("Halaman Disegarkan.");
+            // log(BASEURL.URL, name: 'Base Url');
+            // log(BASEURL.PATH, name: 'Base Url path');
+            showToast("Page Refreshed");
           });
         },
         child: Column(
-          // padding: const EdgeInsets.only(top: 20),
-          // shrinkWrap: true,
-          // physics: const NeverScrollableScrollPhysics(),
           children: [
             Card(
               elevation: 10,
@@ -348,16 +345,22 @@ class SummaryAbsen extends GetView {
                           ),
                           label:
                               'Resend ${absenC.timerStat.value == true ? '(${absenC.remainingSec.value})' : ''}',
-                          onPressed: absenC.timerStat.value == true
+                          onPressed: absenC.timerStat.value == true ||
+                                  absenC.dataAbsen.isEmpty
                               ? null
                               : () async {
-                                  loadingDialog("Sending data", "");
-                                  absenC.startTimer(30);
-                                  absenC.resend();
-                                  await Future.delayed(
-                                      const Duration(seconds: 2), () {
-                                    Get.back();
-                                  });
+                                  if (absenC.dataAbsen.isEmpty) {
+                                    absenC.startTimer(0);
+                                    showToast("Tidak ada data absen hari ini");
+                                  } else {
+                                    loadingDialog("Sending data", "");
+                                    absenC.startTimer(20);
+                                    absenC.resend();
+                                    await Future.delayed(
+                                        const Duration(seconds: 2), () {
+                                      Get.back();
+                                    });
+                                  }
                                 },
                           size: Size(
                               absenC.timerStat.value == true ? 130 : 105, 18),
@@ -523,7 +526,7 @@ class SummaryAbsen extends GetView {
                                               : FormatWaktu.formatJamMenit(jamMenit: absenC.dataLimitAbsen[i].jamAbsenPulang!).isAtSameMomentAs(FormatWaktu.formatJamMenit(jamMenit: absenC.dataLimitAbsen[i].jamPulang!))
                                                   ? 'Tepat Waktu'
                                                   : "Lembur";
-                               
+
                                   return InkWell(
                                     onTap: () => Get.to(() {
                                       var detailData = {

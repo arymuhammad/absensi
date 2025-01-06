@@ -1,36 +1,26 @@
 {
   "project_info": {
-    "project_number": "956466772545",
-    "project_id": "absensi-fd78c",
-    "storage_bucket": "absensi-fd78c.appspot.com"
+    "project_number": "653258167041",
+    "project_id": "presence-app-1d30c",
+    "storage_bucket": "presence-app-1d30c.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:956466772545:android:344c171c3f179b124764c0",
+        "mobilesdk_app_id": "1:653258167041:android:a6c7684f2bcf75c2dc8100",
         "android_client_info": {
-          "package_name": "com.muhammadary.absensi"
+          "package_name": "com.absensi.urbanco"
         }
       },
-      "oauth_client": [
-        {
-          "client_id": "956466772545-onkka9u51ovmmkoqlo1fn1ft2bf5kbmn.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
+      "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyBCwHiAtWHWgbhqV4Lj5A565E7XvfAg2f0"
+          "current_key": "AIzaSyBtmOBNEt4rSzcU4MlqzlYuyIGvpJe6pcU"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "956466772545-onkka9u51ovmmkoqlo1fn1ft2bf5kbmn.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
+          "other_platform_oauth_client": []
         }
       }
     }

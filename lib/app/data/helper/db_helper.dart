@@ -3,10 +3,10 @@ import 'dart:async';
 import 'package:absensi/app/data/model/absen_model.dart';
 import 'package:absensi/app/data/model/cabang_model.dart';
 import 'package:absensi/app/data/model/login_offline_model.dart';
+import 'package:absensi/app/data/model/server_api_model.dart';
 import 'package:absensi/app/data/model/shift_kerja_model.dart';
 // import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
-import '../model/server_model.dart';
 import '../model/visit_model.dart';
 import 'loading_dialog.dart';
 
@@ -116,8 +116,11 @@ class SQLHelper {
       )
       """);
     await db.execute("""CREATE TABLE IF NOT EXISTS server(
-        id INTEGER PRIMARY KEY NOT NULL,
-        server TEXT
+        id TEXT,
+        server_name TEXT,
+        base_url TEXT,
+        path TEXT,
+        status TEXT
       )
       """);
   }
@@ -198,7 +201,7 @@ class SQLHelper {
       String idUser, String tglMasuk, String visitIn) async {
     Database db = await instance.database;
     await db.delete('tbl_visit_area',
-        where: 'id_user = ? and tgl_visit = ? and visit_in',
+        where: 'id_user = ? and tgl_visit = ? and visit_in = ?',
         whereArgs: [idUser, tglMasuk, visitIn]);
     // return res;
   }
@@ -235,11 +238,42 @@ class SQLHelper {
     }
   }
 
+  Future truncateAbsen() async {
+    Database db = await instance.database;
+    var res = await db.delete('absen');
+    return res;
+  }
+
+  Future truncateVisit() async {
+    Database db = await instance.database;
+    var res = await db.delete('tbl_visit_area');
+    return res;
+  }
+  
   Future truncateShift() async {
     Database db = await instance.database;
     var res = await db.delete('shift_kerja');
     return res;
   }
+  
+  Future truncateLevel() async {
+    Database db = await instance.database;
+    var res = await db.delete('tbl_level_user');
+    return res;
+  }
+
+  Future truncateCabang() async {
+    Database db = await instance.database;
+    var res = await db.delete('tbl_cabang');
+    return res;
+  }
+  
+  Future truncateServer() async {
+    Database db = await instance.database;
+    var res = await db.delete('server');
+    return res;
+  }
+
 
   Future<void> insertCabang(Cabang todo) async {
     Database db = await instance.database;
@@ -255,11 +289,7 @@ class SQLHelper {
     return res.map((e) => Cabang.fromJson(e)).toList();
   }
 
-  Future truncateCabang() async {
-    Database db = await instance.database;
-    var res = await db.delete('tbl_cabang');
-    return res;
-  }
+  
 
   Future<List<Absen>> getAbsenToday(String idUser, String today) async {
     Database db = await instance.database;
@@ -391,7 +421,7 @@ class SQLHelper {
     return res.map((json) => Visit.fromJson(json)).toList();
   }
 
-  Future<void> insertServer(Srv todo) async {
+  Future<void> insertServer(ServerApi todo) async {
     Database db = await instance.database;
     await db.insert('server', todo.toJson());
     // return res;
@@ -403,10 +433,10 @@ class SQLHelper {
     // return res;
   }
 
-  Future<List<Srv>> getServer() async {
+  Future<List<ServerApi>> getServer() async {
     Database db = await database;
     var res = await db.query('server');
-    return res.map((e) => Srv.fromJson(e)).toList();
+    return res.map((e) => ServerApi.fromJson(e)).toList();
   }
 
   Future close() async => _database!.close();

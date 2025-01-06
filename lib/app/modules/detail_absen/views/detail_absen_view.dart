@@ -1,5 +1,4 @@
 import 'package:absensi/app/data/helper/const.dart';
-import 'package:absensi/app/modules/detail_absen/views/widget/note.dart';
 import 'package:absensi/app/modules/shared/rounded_image.dart';
 import 'package:flutter/material.dart';
 
@@ -28,7 +27,7 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
       child: Card(
           elevation: 10,
           child: Image.network(
-            "${ServiceApi().baseUrl}${detailData['foto_masuk']}",
+            "${ServiceApi().baseUrlPath}${detailData['foto_masuk']}",
             errorBuilder: (context, error, stackTrace) =>
                 Image.asset('assets/image/selfie.png'),
             fit: BoxFit.cover,
@@ -50,7 +49,7 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
       child: Card(
           elevation: 10,
           child: Image.network(
-            "${ServiceApi().baseUrl}${detailData['foto_pulang']}",
+            "${ServiceApi().baseUrlPath}${detailData['foto_pulang']}",
             errorBuilder: (context, error, stackTrace) =>
                 Image.asset('assets/image/selfie.png'),
             fit: BoxFit.cover,
@@ -475,11 +474,11 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
           )
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            note();
-          },
-          child: Icon(Icons.message_rounded)),
+      // floatingActionButton: FloatingActionButton(
+      //     onPressed: () {
+      //       note();
+      //     },
+      //     child: Icon(Icons.message_rounded)),
     );
   }
 }

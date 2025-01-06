@@ -48,7 +48,7 @@ class UpdatePassword extends GetView {
                             fit: BoxFit.cover,
                           )
                         : Image.network(
-                            "${ServiceApi().baseUrl}${Get.arguments["foto"]}"),
+                            "${ServiceApi().baseUrlPath}${Get.arguments["foto"]}"),
                   ),
                 ),
               ],

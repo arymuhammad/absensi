@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:absensi/app/modules/absen/controllers/absen_controller.dart';
 import 'package:absensi/app/data/helper/const.dart';
 import 'package:absensi/app/data/helper/loading_dialog.dart';
@@ -11,7 +10,6 @@ import 'package:get/get.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:intl/intl.dart';
 import 'package:shimmer/shimmer.dart';
-
 import '../../shared/elevated_button_icon.dart';
 import 'tools_menu.dart';
 
@@ -316,16 +314,21 @@ class SummaryAbsenArea extends GetView {
                           ),
                           label:
                               'Resend ${absenC.timerStat.value == true ? '(${absenC.remainingSec.value})' : ''}',
-                          onPressed: absenC.timerStat.value == true
+                          onPressed: absenC.timerStat.value == true ||absenC.dataVisit.isEmpty
                               ? null
                               : () async {
-                                  loadingDialog("Sending data", "");
-                                  absenC.startTimer(30);
-                                  absenC.resend();
-                                  await Future.delayed(
-                                      const Duration(seconds: 2), () {
-                                    Get.back();
-                                  });
+                                  if (absenC.dataVisit.isEmpty) {
+                                    absenC.startTimer(0);
+                                    showToast("Tidak ada data visit hari ini");
+                                  } else {
+                                    loadingDialog("Sending data", "");
+                                    absenC.startTimer(20);
+                                    absenC.resend();
+                                    await Future.delayed(
+                                        const Duration(seconds: 2), () {
+                                      Get.back();
+                                    });
+                                  }
                                 },
                           size: Size(
                               absenC.timerStat.value == true ? 130 : 105, 18),
@@ -528,8 +531,8 @@ class SummaryAbsenArea extends GetView {
                                                   children: [
                                                     Text(
                                                       DateFormat('MMM')
-                                                          .format(DateTime.parse(
-                                                              absenC
+                                                          .format(DateTime
+                                                              .parse(absenC
                                                                   .dataLimitVisit[
                                                                       i]
                                                                   .tglVisit!))
@@ -558,8 +561,8 @@ class SummaryAbsenArea extends GetView {
                                                       CrossAxisAlignment.start,
                                                   children: [
                                                     Text(
-                                                        DateFormat(
-                                                                "EEEE", "id_ID")
+                                                        DateFormat("EEEE",
+                                                                "id_ID")
                                                             .format(DateTime
                                                                 .parse(absenC
                                                                     .dataLimitVisit[
@@ -589,8 +592,8 @@ class SummaryAbsenArea extends GetView {
                                                                       i]
                                                                   .namaCabang!,
                                                               textAlign:
-                                                                  TextAlign.left),
-                                                                  
+                                                                  TextAlign
+                                                                      .left),
                                                         ],
                                                       ),
                                                     ),
@@ -607,9 +610,11 @@ class SummaryAbsenArea extends GetView {
                                                       children: [
                                                         const Icon(
                                                           Icons.timer_sharp,
-                                                          color: Colors.lightBlue,
+                                                          color:
+                                                              Colors.lightBlue,
                                                         ),
-                                                        const SizedBox(width: 5),
+                                                        const SizedBox(
+                                                            width: 5),
                                                         Text(
                                                             '${absenC.dataLimitVisit[i].jamOut != "" ? diffHours.inHours : '-'} jam ${absenC.dataLimitVisit[i].jamOut != "" ? diffHours.inMinutes % 60 : '-'} menit'),
                                                       ],
@@ -627,7 +632,8 @@ class SummaryAbsenArea extends GetView {
                                                           const Text('Masuk'),
                                                           Text(
                                                             absenC
-                                                                .dataLimitVisit[i]
+                                                                .dataLimitVisit[
+                                                                    i]
                                                                 .jamIn!,
                                                             style: TextStyle(
                                                                 fontWeight:
@@ -669,7 +675,7 @@ class SummaryAbsenArea extends GetView {
                                                 ),
                                               ],
                                             ),
-                                             const SizedBox(
+                                            const SizedBox(
                                               height: 4,
                                             ),
                                             i == 0 &&

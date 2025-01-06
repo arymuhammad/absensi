@@ -34,9 +34,9 @@ void showToast(message) {
       webPosition: 'center');
 }
 
-dialogMsg(code, msg) {
+dialogMsg(title, msg) {
   Get.defaultDialog(
-      title: code,
+      title: title,
       middleText: msg,
       confirmTextColor: Colors.white,
       textConfirm: 'Tutup',
@@ -88,15 +88,15 @@ void dialogMsgAbsen(code, msg) {
       barrierDismissible: false);
 }
 
-void succesDialog(context, pageAbsen, desc) {
+void succesDialog(context, String pageAbsen, String desc, DialogType type, String title) {
   AwesomeDialog(
     context: context,
     animType: AnimType.scale,
     headerAnimationLoop: false,
-    dialogType: DialogType.success,
+    dialogType: type,
     dismissOnTouchOutside: false,
     dismissOnBackKeyPress: false,
-    title: 'Succes',
+    title: title,
     desc: desc,
     btnOkOnPress: () {
       if (pageAbsen == "Y") {

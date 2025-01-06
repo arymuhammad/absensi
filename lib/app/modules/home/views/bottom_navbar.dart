@@ -83,43 +83,38 @@ class BottomNavBar extends GetView {
         child: const Icon(CupertinoIcons.chevron_up),
       ),
       bottomNavigationBar: Obx(() => BottomNavigationBar(
-                backgroundColor: Colors.blue,
-                selectedItemColor: Colors.white,
-                unselectedItemColor: Colors.grey[400],
-
-                elevation: 10, type: BottomNavigationBarType.fixed,
-                items: const [
-                  BottomNavigationBarItem(
-                      icon: Icon(CupertinoIcons.home), label: 'home'),
-                  BottomNavigationBarItem(
-                      icon: Icon(CupertinoIcons.doc_text_search),
-                      label: 'history'),
-                  BottomNavigationBarItem(
-                      icon: Icon(CupertinoIcons.chevron_up_circle_fill),
-                      label: ''),
-                  BottomNavigationBarItem(
-                      icon: Icon(CupertinoIcons.gear_alt), label: 'Setting'),
-                  BottomNavigationBarItem(
-                      icon: Icon(CupertinoIcons.person_crop_circle),
-                      label: 'Profile'),
-                ],
-
-                currentIndex: loginC.selected.value,
-                onTap: (i) {
-                  if (i == 1) {
-                    loginC.selectedMenu(i);
-                    loc.isLoading.value = true;
-                    loc.searchDate.value = "";
-                    listDataUser.visit == "1"
-                        ? loc.getAllVisited(listDataUser.id!)
-                        : loc.getAllAbsen(listDataUser.id!);
-                  } else {
-                    loginC.selectedMenu(i);
-                  }
-                },
-              )
-          
-          ),
+            backgroundColor: Colors.blue,
+            selectedItemColor: Colors.white,
+            unselectedItemColor: Colors.grey[400],
+            elevation: 10,
+            type: BottomNavigationBarType.fixed,
+            items: const [
+              BottomNavigationBarItem(
+                  icon: Icon(CupertinoIcons.home), label: 'Home'),
+              BottomNavigationBarItem(
+                  icon: Icon(CupertinoIcons.doc_text_search), label: 'History'),
+              BottomNavigationBarItem(
+                  icon: Icon(CupertinoIcons.chevron_up_circle_fill), label: ''),
+              BottomNavigationBarItem(
+                  icon: Icon(CupertinoIcons.gear_alt), label: 'Setting'),
+              BottomNavigationBarItem(
+                  icon: Icon(CupertinoIcons.person_crop_circle),
+                  label: 'Profile'),
+            ],
+            currentIndex: loginC.selected.value,
+            onTap: (i) {
+              if (i == 1) {
+                loginC.selectedMenu(i);
+                loc.isLoading.value = true;
+                loc.searchDate.value = "";
+                listDataUser.visit == "1"
+                    ? loc.getAllVisited(listDataUser.id!)
+                    : loc.getAllAbsen(listDataUser.id!);
+              } else {
+                loginC.selectedMenu(i);
+              }
+            },
+          )),
     );
   }
 }

@@ -1,24 +1,23 @@
 import 'dart:io';
-
 import 'package:absensi/app/data/helper/const.dart';
 import 'package:absensi/app/data/helper/db_helper.dart';
 import 'package:absensi/app/data/helper/loading_dialog.dart';
 import 'package:absensi/app/data/model/login_model.dart';
 import 'package:absensi/app/modules/add_pegawai/controllers/add_pegawai_controller.dart';
+import 'package:absensi/app/modules/login/controllers/login_controller.dart';
 import 'package:flutter/material.dart';
-
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:lottie/lottie.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:sqflite/sqflite.dart';
-
 import '../../../services/service_api.dart';
 
 class BackupView extends GetView {
   BackupView({super.key, this.userData});
   final Data? userData;
   final ctrl = Get.put(AddPegawaiController());
+  final auth = Get.put(LoginController());
 
   @override
   Widget build(BuildContext context) {
@@ -38,8 +37,11 @@ class BackupView extends GetView {
         ),
         body: Center(
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            // mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
+              const SizedBox(
+                height: 10,
+              ),
               Obx(() => !ctrl.backup.value && !ctrl.restore.value
                   ? Icon(
                       Icons.cloud_sync_outlined,
@@ -47,8 +49,15 @@ class BackupView extends GetView {
                       color: mainColor,
                     )
                   : ctrl.backup.value && !ctrl.restore.value
-                      ? Lottie.asset('assets/animation/backup.json')
-                      : Lottie.asset('assets/animation/restore.json')),
+                      ? SizedBox(
+                          height: 150,
+                          width: 150,
+                          child: Lottie.asset('assets/animation/backup.json'))
+                      : SizedBox(
+                          height: 150,
+                          width: 150,
+                          child:
+                              Lottie.asset('assets/animation/restore.json'))),
               const SizedBox(
                 height: 20,
               ),
@@ -146,9 +155,15 @@ class BackupView extends GetView {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'Tools',
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                    const Row(
+                      children: [
+                        Icon(Icons.build_circle_rounded),
+                        Text(
+                          'Tools',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 17),
+                        ),
+                      ],
                     ),
                     const Divider(),
                     OutlinedButton.icon(
@@ -289,11 +304,14 @@ class BackupView extends GetView {
                         } else {
                           // cek data visit
                           loadingDialog("menghapus data...", "");
-                          var tempDataVisit =
-                              await SQLHelper.instance.getVisitToday(
-                            userData!.id!,
-                            DateFormat('yyyy-MM-dd').format(DateTime.now()),"",0
-                          );
+                          var tempDataVisit = await SQLHelper.instance
+                              .getVisitToday(
+                                  userData!.id!,
+                                  DateFormat('yyyy-MM-dd')
+                                      .format(DateTime.now()),
+                                  "",
+                                  0);
+
                           if (tempDataVisit.isNotEmpty &&
                               tempDataVisit.first.tglVisit != null &&
                               tempDataVisit.first.visitIn != "" &&
@@ -314,34 +332,36 @@ class BackupView extends GetView {
                               "visit_in": tempDataVisit.first.visitIn!
                             };
                             await ServiceApi().deleteAbsVst(dataLive);
-                          }
-                          var data = {
-                            "visit_out": "",
-                            "jam_out": "",
-                            "foto_out": "",
-                            "lat_out": "",
-                            "long_out": "",
-                            "device_info2": ""
-                          };
-                          SQLHelper.instance.deleteDataVisitPulang(
-                              data,
-                              userData!.id!,
-                              DateFormat('yyyy-MM-dd').format(DateTime.now()));
+                          } else {
+                            var data = {
+                              "visit_out": "",
+                              "jam_out": "",
+                              "foto_out": "",
+                              "lat_out": "",
+                              "long_out": "",
+                              "device_info2": ""
+                            };
+                            SQLHelper.instance.deleteDataVisitPulang(
+                                data,
+                                userData!.id!,
+                                DateFormat('yyyy-MM-dd')
+                                    .format(DateTime.now()));
 
-                          var dataLive = {
-                            "type": "visit",
-                            "status": "pulang",
-                            "id": userData!.id!,
-                            "tgl_visit":
-                                DateFormat('yyyy-MM-dd').format(DateTime.now()),
-                            "visit_in": tempDataVisit.first.visitIn!
-                          };
-                          // log(dataLive.toString());
-                          await ServiceApi().deleteAbsVst(dataLive);
+                            var dataLive = {
+                              "type": "visit",
+                              "status": "pulang",
+                              "id": userData!.id!,
+                              "tgl_visit": DateFormat('yyyy-MM-dd')
+                                  .format(DateTime.now()),
+                              "visit_in": tempDataVisit.first.visitIn ?? ""
+                            };
+                            // log(dataLive.toString());
+                            await ServiceApi().deleteAbsVst(dataLive);
+                          }
                         }
                       },
                       label: Text(
-                        'Hapus data ${userData!.visit == '0'? 'absen':'visit'} masuk / pulang',
+                        'Hapus data ${userData!.visit == '0' ? 'absen' : 'visit'} masuk / pulang',
                         style: const TextStyle(color: Colors.black),
                       ),
                     ),
@@ -384,6 +404,39 @@ class BackupView extends GetView {
                       },
                       label: const Text(
                         'Hapus data cabang',
+                        style: TextStyle(color: Colors.black),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 5,
+                    ),
+                    OutlinedButton.icon(
+                      style: ButtonStyle(
+                          shape: MaterialStateProperty.all(
+                              RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20)))),
+                      icon: Icon(
+                        Icons.delete_sweep_rounded,
+                        color: red,
+                      ),
+                      onPressed: () async {
+                        await SQLHelper.instance.truncateCabang();
+                        await SQLHelper.instance.truncateShift();
+                        await SQLHelper.instance.truncateUser();
+                        await SQLHelper.instance.truncateAbsen();
+                        await SQLHelper.instance.truncateVisit();
+                        await SQLHelper.instance.truncateLevel();
+                        await SQLHelper.instance.truncateServer();
+                        await dialogMsg('Hapus Data',
+                            'Semua data berhasil dihapus\nSilahkan Login ulang');
+                        Future.delayed(const Duration(seconds: 1), () {
+                          auth.logout();
+                          Get.back(closeOverlays: true);
+                        });
+                        showToast('Data berhasil dihapus');
+                      },
+                      label: const Text(
+                        'Hapus Semua Data',
                         style: TextStyle(color: Colors.black),
                       ),
                     ),

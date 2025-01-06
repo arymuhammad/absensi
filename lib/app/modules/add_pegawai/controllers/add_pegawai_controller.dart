@@ -2,12 +2,14 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 import 'package:absensi/app/data/model/login_model.dart';
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:crypto/crypto.dart';
 import 'package:absensi/app/data/helper/db_helper.dart';
 import 'package:absensi/app/services/service_api.dart';
 import 'package:absensi/app/data/model/level_model.dart';
 import 'package:absensi/app/modules/profil/views/update_password.dart';
 import 'package:device_info_null_safety/device_info_null_safety.dart';
+import 'package:dynamic_base_url/dynamic_base_url.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -113,12 +115,12 @@ class AddPegawaiController extends GetxController {
 
     try {
       final readDoc = await http
-          .get(Uri.parse('http://103.156.15.60/update apk/updateLog.xml'));
+          .get(Uri.parse('${BASEURL.URL}/update apk/updateLog.xml'));
 
       final response = await http
           .head(Uri.parse(supportedAbi == 'arm64-v8a'
-              ? 'http://103.156.15.60/update apk/absensiApp.arm64v8a.apk'
-              : 'http://103.156.15.60/update apk/absensiApp.apk'))
+              ? '${BASEURL.URL}/update apk/absensiApp.arm64v8a.apk'
+              : '${BASEURL.URL}/update apk/absensiApp.apk'))
           .timeout(const Duration(seconds: 20));
       Get.back();
       if (response.statusCode == 200) {
@@ -141,7 +143,7 @@ class AddPegawaiController extends GetxController {
         //end loop item on readDoc
         if (latestVer == currVer) {
           // Get.back();
-          succesDialog(context, "N", "Tidak ada pembaruan sistem");
+          succesDialog(context, "N", "Tidak ada pembaruan sistem", DialogType.info, 'INFO');
           // dialogMsgScsUpd("", "Tidak ada pembaruan sistem");
         } else {
           Get.defaultDialog(
@@ -232,8 +234,8 @@ class AddPegawaiController extends GetxController {
                   OtaUpdate()
                       .execute(
                     supportedAbi == 'arm64-v8a'
-                        ? 'http://103.156.15.60/update apk/absensiApp.arm64v8a.apk'
-                        : 'http://103.156.15.60/update apk/absensiApp.apk',
+                        ? '${BASEURL.URL}/update apk/absensiApp.arm64v8a.apk'
+                        : '${BASEURL.URL}/update apk/absensiApp.apk',
                     // OPTIONAL
                     // destinationFilename: '/',
                     //OPTIONAL, ANDROID ONLY - ABILITY TO VALIDATE CHECKSUM OF FILE:
@@ -355,7 +357,7 @@ class AddPegawaiController extends GetxController {
             dialogMsg("",
                 "No Telp ini sudah terdaftar pada akun lain\nSilahkan masukkan No Telp lain");
           } else {
-            succesDialog(context, "N", "Data berhasil disimpan");
+            succesDialog(context, "N", "Data berhasil disimpan", DialogType.success, 'SUKSES');
             await ServiceApi().addUpdatePegawai(data);
             selectedCabang.value = "";
             username.clear();
@@ -596,7 +598,7 @@ class AddPegawaiController extends GetxController {
       final response = await ServiceApi().updatePasswordUser(data);
       Future.delayed(Duration.zero, () {
         succesDialog(context, "N",
-            "Password berhasil diperbarui\nSilahkan melakukan login ulang");
+            "Password berhasil diperbarui\nSilahkan melakukan login ulang", DialogType.success, 'SUKSES');
       });
       cekDataUser.value = response;
 

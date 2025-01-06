@@ -48,16 +48,18 @@ class HomeView extends GetView<HomeController> {
                               fontWeight: FontWeight.bold),
                         ),
                         Text(
-                          listDataUser!.levelUser.toString().capitalize!,
+                          listDataUser!.levelUser!,
                           style: const TextStyle(
-                            fontSize: 17,
+                            fontSize: 15,
                             color: Colors.white,
                           ),
                         ),
                         Text(
-                          listDataUser!.namaCabang!,
+                          listDataUser!.namaCabang!,  overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                          softWrap: true,
                           style: const TextStyle(
-                            fontSize: 17,
+                            fontSize: 10,
                             color: Colors.white,
                           ),
                         ),

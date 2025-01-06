@@ -103,10 +103,11 @@ class LoginView extends GetView<LoginController> {
                                 controller.isHandsUp?.change(false);
                                 if (controller.username.text != "" &&
                                     controller.password.text != "") {
+                                  // throw Exception();
                                   controller.login();
-                                  controller.successTrigger?.fire();
                                 } else {
-                                  controller.failTrigger?.fire();
+                                  showToast(
+                                      'Username dan Password tidak boleh kosong');
                                 }
                               },
                               child: const Text(

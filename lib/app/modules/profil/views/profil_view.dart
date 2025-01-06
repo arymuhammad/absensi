@@ -191,11 +191,11 @@ class ProfilView extends GetView<ProfilController> {
                 child: WidgetZoom(
                     heroAnimationTag: 'customTag',
                     zoomWidget: Image.network(
-                        '${ServiceApi().baseUrl}${listDataUser!.foto!}',
-                        fit: BoxFit.fitWidth,
+                        '${ServiceApi().baseUrlPath}${listDataUser!.foto!}',
+                        fit: BoxFit.fill,
                         errorBuilder: (context, error, stackTrace) => Image.network(
                             "https://ui-avatars.com/api/?name=${listDataUser!.nama}",
-                            fit: BoxFit.cover),
+                            fit: BoxFit.fill),
                         loadingBuilder: (context, child, loadingProgress) {
                           if (loadingProgress == null) return child;
                           return Center(
@@ -212,7 +212,7 @@ class ProfilView extends GetView<ProfilController> {
                     //       ? Obx(
                     //           () => CachedNetworkImage(
                     //             imageUrl:
-                    //                 "${ServiceApi().baseUrl}${user.fotoProfil.value != "" ? user.fotoProfil.value : listDataUser!.foto}",
+                    //                 "${ServiceApi().baseUrlPath}${user.fotoProfil.value != "" ? user.fotoProfil.value : listDataUser!.foto}",
                     //             fit: BoxFit.cover,
                     //             progressIndicatorBuilder:
                     //                 (context, url, progress) =>
@@ -222,7 +222,7 @@ class ProfilView extends GetView<ProfilController> {
                     //             ),
                     //             errorWidget: (context, url, error) {
                     //               return Image.network(
-                    //                   "${ServiceApi().baseUrl}${user.fotoProfil.value}");
+                    //                   "${ServiceApi().baseUrlPath}${user.fotoProfil.value}");
                     //             },
                     //           ),
                     //         )
@@ -230,7 +230,7 @@ class ProfilView extends GetView<ProfilController> {
                     //       //       backgroundDecoration: BoxDecoration(
                     //       //           color: Colors.grey[200]),
                     //       //       imageProvider: NetworkImage(
-                    //       //           "${ServiceApi().baseUrl}${userFoto.fotoProfil.value !="" ? userFoto.fotoProfil.value : listDataUser![5]}"),
+                    //       //           "${ServiceApi().baseUrlPath}${userFoto.fotoProfil.value !="" ? userFoto.fotoProfil.value : listDataUser![5]}"),
 
                     //       //     ),
                     //       // )

@@ -95,9 +95,11 @@ class LoginController extends GetxController {
 
     //checking data
     if (dataOffline.isNotEmpty) {
+      successTrigger?.fire();
+
       FotoProfil foto =
           await ServiceApi().getFotoProfil({'id': dataOffline.first.id!});
-          
+
       await pref.setString(
           'userDataLogin',
           jsonEncode(Data(
@@ -126,6 +128,7 @@ class LoginController extends GetxController {
       isAuth.value = await pref.setBool("is_login", true);
       username.clear();
       password.clear();
+
       showToast("Selamat datang ${dataOffline[0].nama}");
     } else {
       var response = await ServiceApi().loginUser(data);
@@ -133,6 +136,7 @@ class LoginController extends GetxController {
       // dataUser.value = response;
       if (response.success == true) {
         successTrigger?.fire();
+
         await pref.setString(
             'userDataLogin',
             jsonEncode(Data(
@@ -183,14 +187,16 @@ class LoginController extends GetxController {
 
         username.clear();
         password.clear();
+
         showToast("Selamat datang ${response.data!.nama}");
-        Get.back();
+        
       } else {
         failTrigger?.fire();
         showToast("User tidak ditemukan\nHarap periksa username dan password");
       }
     }
   }
+    
 
   logout() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
