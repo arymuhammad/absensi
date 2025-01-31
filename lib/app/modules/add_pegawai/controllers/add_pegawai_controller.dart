@@ -114,8 +114,8 @@ class AddPegawaiController extends GetxController {
     }
 
     try {
-      final readDoc = await http
-          .get(Uri.parse('${BASEURL.URL}/update apk/updateLog.xml'));
+      final readDoc =
+          await http.get(Uri.parse('${BASEURL.URL}/update apk/updateLog.xml'));
 
       final response = await http
           .head(Uri.parse(supportedAbi == 'arm64-v8a'
@@ -143,7 +143,8 @@ class AddPegawaiController extends GetxController {
         //end loop item on readDoc
         if (latestVer == currVer) {
           // Get.back();
-          succesDialog(context, "N", "Tidak ada pembaruan sistem", DialogType.info, 'INFO');
+          succesDialog(context, "N", "Tidak ada pembaruan sistem",
+              DialogType.info, 'INFO');
           // dialogMsgScsUpd("", "Tidak ada pembaruan sistem");
         } else {
           Get.defaultDialog(
@@ -348,17 +349,20 @@ class AddPegawaiController extends GetxController {
           };
 
           if (lstUser.contains(username.text) && lstPhone.contains(telp.text)) {
+            Get.back();
             dialogMsg("",
                 "Username dan No Telp sudah terdaftar\nSilahkan ubah Username dan No Telp ");
           } else if (lstUser.contains(username.text)) {
-            dialogMsg("",
-                "Username sudah terdaftar\nSilahkan gunakan username lain");
+            Get.back();
+            dialogMsg(
+                "", "Username sudah terdaftar\nSilahkan gunakan username lain");
           } else if (lstPhone.contains(telp.text)) {
+            Get.back();
             dialogMsg("",
-                "No Telp ini sudah terdaftar pada akun lain\nSilahkan masukkan No Telp lain");
+                "No Telp ini sudah terdaftar\nSilahkan masukkan No Telp lain");
           } else {
-            succesDialog(context, "N", "Data berhasil disimpan", DialogType.success, 'SUKSES');
-            await ServiceApi().addUpdatePegawai(data);
+            // succesDialog(context, "N", "Data berhasil disimpan", DialogType.success, 'SUKSES');
+            await ServiceApi().addUpdatePegawai(data, mode);
             selectedCabang.value = "";
             username.clear();
             store.clear();
@@ -383,19 +387,20 @@ class AddPegawaiController extends GetxController {
             "level": selectedLevel.value,
           };
           if (lstUser.contains(username.text) && lstPhone.contains(telp.text)) {
+            Get.back();
             dialogMsg("",
                 "Username dan No Telp sudah terdaftar\nSilahkan ubah Username dan No Telp ");
           } else if (lstUser.contains(username.text)) {
+            Get.back();
             dialogMsg("",
                 "Username sudah terdaftar\nSilahkan ubah dengan Username lain");
           } else if (lstPhone.contains(telp.text)) {
+            Get.back();
             dialogMsg("",
                 "No Telp ini sudah terdaftar\nSilahkan masukkan No Telp lain");
           } else {
-            dialogMsgScsUpd(
-                "Sukses", "Data berhasil disimpan. Silahkan login untuk masuk");
 
-            await ServiceApi().addUpdatePegawai(data);
+            await ServiceApi().addUpdatePegawai(data, mode);
             selectedCabang.value = "";
             username.clear();
             store.clear();
@@ -410,6 +415,7 @@ class AddPegawaiController extends GetxController {
           }
         }
       } else {
+        Get.back();
         dialogMsg("Kesalahan", "Harap mengisi data pada semua kolom");
       }
     } else {
@@ -433,6 +439,7 @@ class AddPegawaiController extends GetxController {
         };
 
         if (lstPhone.contains(telp.text)) {
+          Get.back();
           dialogMsg("",
               "No Telp ini sudah terdaftar\nSilahkan masukkan No Telp lain");
         } else {
@@ -461,10 +468,10 @@ class AddPegawaiController extends GetxController {
           }, dataUser.id!, dataUser.username!);
           //end of update
 
-          await ServiceApi().addUpdatePegawai(data);
-          Get.back();
-          dialogMsgScsUpd(
-              "Sukses", "Data berhasil disimpan\nSilahkan login ulang");
+          await ServiceApi().addUpdatePegawai(data, mode);
+          // Get.back();
+          // dialogMsgScsUpd(
+          //     "Sukses", "Data berhasil disimpan\nSilahkan login ulang");
           newPhone.value = telp.text;
 
           var idUser = {"id": dataUser.id};
@@ -503,6 +510,7 @@ class AddPegawaiController extends GetxController {
               selectedLevel.value != "" ? selectedLevel.value : dataUser.level
         };
         if (lstPhone.contains(telp.text)) {
+          Get.back();
           dialogMsg("",
               "No Telp ini sudah terdaftar\nSilahkan masukkan No Telp lain");
         } else {
@@ -530,11 +538,11 @@ class AddPegawaiController extends GetxController {
           }, dataUser.id!, dataUser.username!);
           //end of update
 
-          await ServiceApi().addUpdatePegawai(data);
+          await ServiceApi().addUpdatePegawai(data, mode);
 
-          Get.back();
-          dialogMsgScsUpd(
-              "Sukses", "Data berhasil disimpan\nSilahkan login ulang");
+          // Get.back();
+          // dialogMsgScsUpd(
+          //     "Sukses", "Data berhasil disimpan\nSilahkan login ulang");
 
           newPhone.value = telp.text;
 
@@ -597,8 +605,12 @@ class AddPegawaiController extends GetxController {
 
       final response = await ServiceApi().updatePasswordUser(data);
       Future.delayed(Duration.zero, () {
-        succesDialog(context, "N",
-            "Password berhasil diperbarui\nSilahkan melakukan login ulang", DialogType.success, 'SUKSES');
+        succesDialog(
+            context,
+            "N",
+            "Password berhasil diperbarui\nSilahkan melakukan login ulang",
+            DialogType.success,
+            'SUKSES');
       });
       cekDataUser.value = response;
 

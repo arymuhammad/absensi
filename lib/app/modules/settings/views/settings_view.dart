@@ -5,7 +5,6 @@ import 'package:absensi/app/modules/settings/views/about_view.dart';
 import 'package:absensi/app/modules/settings/views/backup_view.dart';
 import 'package:absensi/app/modules/profil/views/update_profil.dart';
 import 'package:absensi/app/modules/profil/views/verifikasi_update_password.dart';
-import 'package:absensi/app/modules/settings/views/change_server.dart';
 import 'package:absensi/app/modules/shared/background_image_header.dart';
 import 'package:absensi/app/routes/app_pages.dart';
 import 'package:flutter/cupertino.dart';
@@ -118,31 +117,6 @@ class SettingsView extends GetView<SettingsController> {
                                 color: titleColor, fontWeight: FontWeight.bold),
                           ),
                           subtitle: Text('Backup & Restore Database',
-                              style: TextStyle(
-                                  color: subTitleColor, fontSize: 13)),
-                          trailing: Icon(Icons.keyboard_arrow_right_rounded,
-                              color: subTitleColor),
-                        ),
-                        ListTile(
-                          onTap: () {
-                            Get.to(() => ChangeServer(),
-                                transition: Transition.cupertino);
-                          },
-                          leading: Container(
-                            height: 40,
-                            width: 40,
-                            decoration: BoxDecoration(
-                                color: bgContainer,
-                                borderRadius: BorderRadius.circular(8)),
-                            child: Icon(FontAwesome.server_solid,
-                                color: mainColor),
-                          ),
-                          title: Text(
-                            'Server',
-                            style: TextStyle(
-                                color: titleColor, fontWeight: FontWeight.bold),
-                          ),
-                          subtitle: Text('Change Server',
                               style: TextStyle(
                                   color: subTitleColor, fontSize: 13)),
                           trailing: Icon(Icons.keyboard_arrow_right_rounded,

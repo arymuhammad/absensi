@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
 // import 'dart:developer';
 import 'dart:io';
 import 'package:absensi/app/data/helper/db_helper.dart';
@@ -37,6 +38,7 @@ import 'package:pdf/pdf.dart';
 import 'package:printing/printing.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:device_info_null_safety/device_info_null_safety.dart';
+
 
 class AbsenController extends GetxController {
   var isLoading = true.obs;
@@ -174,7 +176,7 @@ class AbsenController extends GetxController {
 
     if (Platform.isAndroid) {
       final readDoc = await http
-          .get(Uri.parse('${BASEURL.URL}/update apk/updateLog.xml'));
+          .get(Uri.parse('http://103.156.15.61/update apk/updateLog.xml'));
 
       if (readDoc.statusCode == 200) {
         //parsing readDoc
@@ -191,6 +193,7 @@ class AbsenController extends GetxController {
       Map<String, dynamic> abiInfo = await deviceInfoNullSafety.abiInfo;
       var abi = abiInfo.entries.toList();
       supportedAbi = abi[1].value;
+      log(abiInfo.toString());
     }
 
     _startDateStream(paramSingle, paramLimit, paramSingleVisit, paramLimitVisit,
@@ -598,7 +601,7 @@ class AbsenController extends GetxController {
       if (data.fotoMasuk! != "") {
         final img1 = await http
             .get(
-              Uri.parse('${ServiceApi().baseUrlPath}${data.fotoMasuk!}'),
+              Uri.parse('${ServiceApi().baseUrl}${data.fotoMasuk!}'),
             )
             .then((value) => value.bodyBytes);
         imageMasuk = pw.MemoryImage(img1);
@@ -607,7 +610,7 @@ class AbsenController extends GetxController {
       pw.MemoryImage? imageKeluar;
       if (data.fotoPulang! != "") {
         final img2 = await http.get(
-          Uri.parse('${ServiceApi().baseUrlPath}${data.fotoPulang!}'),
+          Uri.parse('${ServiceApi().baseUrl}${data.fotoPulang!}'),
         );
         imageKeluar = pw.MemoryImage(img2.bodyBytes);
       }
@@ -808,8 +811,8 @@ class AbsenController extends GetxController {
     final response = await ServiceApi().getAbsen(paramLimitAbsen);
     dataLimitAbsen.clear();
     isLoading.value = true;
-    var tempSingleAbs =
-        await SQLHelper.instance.getLimitDataAbsen(idUser.value, initDate1, initDate2);
+    var tempSingleAbs = await SQLHelper.instance
+        .getLimitDataAbsen(idUser.value, initDate1, initDate2);
 
     if (tempSingleAbs.isNotEmpty) {
       if (response.isEmpty ||
@@ -948,13 +951,13 @@ class AbsenController extends GetxController {
 
     try {
       final readDoc = await http
-          .get(Uri.parse('${BASEURL.URL}/update apk/updateLog.xml'))
+          .get(Uri.parse('http://103.156.15.61/update apk/updateLog.xml'))
           .timeout(const Duration(seconds: 20));
 
       final response = await http
           .head(Uri.parse(supportedAbi == 'arm64-v8a'
-              ? '${BASEURL.URL}/update apk/absensiApp.arm64v8a.apk'
-              : '${BASEURL.URL}/update apk/absensiApp.apk'))
+              ? 'http://103.156.15.61/update apk/absensiApp.arm64v8a.apk'
+              : 'http://103.156.15.61/update apk/absensiApp.apk'))
           .timeout(const Duration(seconds: 20));
 
       Get.back();
@@ -980,13 +983,15 @@ class AbsenController extends GetxController {
             int.parse(currVer.replaceAll('.', ''))) {
           if (status != "onInit") {
             Get.back(closeOverlays: true);
-            succesDialog(Get.context!, "N", "Tidak ada pembaruan sistem", DialogType.info, 'INFO');
+            succesDialog(Get.context!, "N", "Tidak ada pembaruan sistem",
+                DialogType.info, 'INFO');
           }
         } else {
           dialogUpdateApp();
         }
       } else {
-        succesDialog(Get.context!, "N", "Tidak ada pembaruan sistem", DialogType.info, 'INFO');
+        succesDialog(Get.context!, "N", "Tidak ada pembaruan sistem",
+            DialogType.info, 'INFO');
       }
     } on SocketException catch (e) {
       Get.back(closeOverlays: true);

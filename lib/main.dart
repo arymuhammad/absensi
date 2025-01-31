@@ -35,19 +35,19 @@ void main() async {
     FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
     return true;
   };
-  var debug = "";
-  var url = "";
-  var serverName = await ServiceApi().getServer();
-  serverName.map((e) {
-    if (e.status == "1") {
-      debug = e.baseUrl! + e.path!;
-    url = e.baseUrl!;
-      // BASEURL.URL = e.baseUrl!;
-      // print(BASEURL.URL);
-    }
-  }).toList();
-  BASEURL.init(
-      debug: debug, prod: 'https://attendance.urbanco.id/api/', path: debug, url: url);
+  // var debug = "";
+  // var url = "";
+  // var serverName = await ServiceApi().getServer();
+  // serverName.map((e) {
+  //   if (e.status == "1") {
+  //     debug = e.baseUrl! + e.path!;
+  //   url = e.baseUrl!;
+  //     // BASEURL.URL = e.baseUrl!;
+  //     // print(BASEURL.URL);
+  //   }
+  // }).toList();
+  // BASEURL.init(
+  //     debug: debug, prod: 'https://attendance.urbanco.id/api/', path: debug, url: url);
 
   await initializeDateFormatting('id_ID', "");
 

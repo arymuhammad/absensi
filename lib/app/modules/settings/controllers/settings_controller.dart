@@ -1,5 +1,5 @@
 import 'package:absensi/app/data/model/server_api_model.dart';
-import 'package:absensi/app/services/service_api.dart';
+// import 'package:absensi/app/services/service_api.dart';
 import 'package:get/get.dart';
 
 class SettingsController extends GetxController {
@@ -9,7 +9,7 @@ class SettingsController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    getServerList();
+    // getServerList();
   }
 
   // @override
@@ -22,9 +22,9 @@ class SettingsController extends GetxController {
   //   super.onClose();
   // }
 
-  Future<List<ServerApi>> getServerList() async {
-    final response = await ServiceApi().getServer();
-    serverList.value = response;
-    return serverList;
-  }
+  // Future<List<ServerApi>> getServerList() async {
+  //   final response = await ServiceApi().getServer();
+  //   serverList.value = response;
+  //   return serverList;
+  // }
 }

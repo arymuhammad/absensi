@@ -191,7 +191,7 @@ class ProfilView extends GetView<ProfilController> {
                 child: WidgetZoom(
                     heroAnimationTag: 'customTag',
                     zoomWidget: Image.network(
-                        '${ServiceApi().baseUrlPath}${listDataUser!.foto!}',
+                        '${ServiceApi().baseUrl}${listDataUser!.foto!}',
                         fit: BoxFit.fill,
                         errorBuilder: (context, error, stackTrace) => Image.network(
                             "https://ui-avatars.com/api/?name=${listDataUser!.nama}",
@@ -212,7 +212,7 @@ class ProfilView extends GetView<ProfilController> {
                     //       ? Obx(
                     //           () => CachedNetworkImage(
                     //             imageUrl:
-                    //                 "${ServiceApi().baseUrlPath}${user.fotoProfil.value != "" ? user.fotoProfil.value : listDataUser!.foto}",
+                    //                 "${ServiceApi().baseUrl}${user.fotoProfil.value != "" ? user.fotoProfil.value : listDataUser!.foto}",
                     //             fit: BoxFit.cover,
                     //             progressIndicatorBuilder:
                     //                 (context, url, progress) =>
@@ -222,7 +222,7 @@ class ProfilView extends GetView<ProfilController> {
                     //             ),
                     //             errorWidget: (context, url, error) {
                     //               return Image.network(
-                    //                   "${ServiceApi().baseUrlPath}${user.fotoProfil.value}");
+                    //                   "${ServiceApi().baseUrl}${user.fotoProfil.value}");
                     //             },
                     //           ),
                     //         )
@@ -230,7 +230,7 @@ class ProfilView extends GetView<ProfilController> {
                     //       //       backgroundDecoration: BoxDecoration(
                     //       //           color: Colors.grey[200]),
                     //       //       imageProvider: NetworkImage(
-                    //       //           "${ServiceApi().baseUrlPath}${userFoto.fotoProfil.value !="" ? userFoto.fotoProfil.value : listDataUser![5]}"),
+                    //       //           "${ServiceApi().baseUrl}${userFoto.fotoProfil.value !="" ? userFoto.fotoProfil.value : listDataUser![5]}"),
 
                     //       //     ),
                     //       // )

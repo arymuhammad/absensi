@@ -179,7 +179,7 @@ class ExpandedDataAbsen extends StatelessWidget {
                               height: 5,
                             ),
                             CsTextField(
-                                controller: ctrl.foto..text = data.fotoMasuk!,
+                                controller: ctrl.foto..text = data.fotoPulang! !="" ?data.fotoPulang!:'',
                                 label: 'Foto'),
                             const SizedBox(
                               height: 5,

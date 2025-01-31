@@ -20,13 +20,13 @@ class DetailVisitView extends GetView {
       child: Card(
           elevation: 10,
           child: Image.network(
-            "${ServiceApi().baseUrlPath}${Get.arguments['foto_in']}",
+            "${ServiceApi().baseUrl}${Get.arguments['foto_in']}",
             errorBuilder: (context, error, stackTrace) =>
                 Image.asset('assets/image/selfie.png'),
             fit: BoxFit.cover,
           )
           // Image.network(
-          //   "${ServiceApi().baseUrlPath}${Get.arguments['foto_in']}",
+          //   "${ServiceApi().baseUrl}${Get.arguments['foto_in']}",
           //   errorBuilder: (context, error, stackTrace) =>Image.asset('assets/image/selfie.png'),
           //   fit: BoxFit.cover,
           // ),
@@ -48,13 +48,13 @@ class DetailVisitView extends GetView {
       child: Card(
           elevation: 10,
           child: Image.network(
-            "${ServiceApi().baseUrlPath}${Get.arguments['foto_out']}",
+            "${ServiceApi().baseUrl}${Get.arguments['foto_out']}",
             errorBuilder: (context, error, stackTrace) =>
                 Image.asset('assets/image/selfie.png'),
             fit: BoxFit.cover,
           )
           //       Image.network(
-          //         "${ServiceApi().baseUrlPath}${Get.arguments['foto_out']}",
+          //         "${ServiceApi().baseUrl}${Get.arguments['foto_out']}",
           //         fit: BoxFit.cover,
           // errorBuilder: (context, error, stackTrace) =>Image.asset('assets/image/selfie.png'),
           //       ),

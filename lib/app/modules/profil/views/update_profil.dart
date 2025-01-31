@@ -75,7 +75,9 @@ class UpdateProfil extends GetView {
                         decoration: BoxDecoration(color: Colors.grey[300]),
                         child: userData!.foto != ""
                             ? Image.network(
-                                "${ServiceApi().baseUrlPath}${userData!.foto}", fit: BoxFit.fill,)
+                                "${ServiceApi().baseUrl}${userData!.foto}",
+                                fit: BoxFit.fill,
+                              )
                             : Image.network(
                                 "https://ui-avatars.com/api/?name=${userData!.nama}",
                                 fit: BoxFit.cover,
@@ -127,7 +129,7 @@ class UpdateProfil extends GetView {
 
                   return TypeAheadFormField<String>(
                     textFieldConfiguration: TextFieldConfiguration(
-                      controller: ctr.store,
+                      controller: ctr.store..text = userData!.namaCabang!,
                       decoration: const InputDecoration(
                         labelText: 'Cabang',
                         border: OutlineInputBorder(),
@@ -189,7 +191,7 @@ class UpdateProfil extends GetView {
 
                 return TypeAheadFormField<String>(
                   textFieldConfiguration: TextFieldConfiguration(
-                    controller: ctr.level,
+                    controller: ctr.level..text = userData!.levelUser!,
                     decoration: const InputDecoration(
                       labelText: 'Level User',
                       border: OutlineInputBorder(),
@@ -238,7 +240,7 @@ class UpdateProfil extends GetView {
             height: 20,
           ),
           TextField(
-            controller: ctr.name,
+            controller: ctr.name..text = userData!.nama!,
             decoration: const InputDecoration(
               labelText: 'Nama',
               border: OutlineInputBorder(),
@@ -251,11 +253,12 @@ class UpdateProfil extends GetView {
           ),
           TextField(
             controller: ctr.telp,
-            decoration: const InputDecoration(
+            decoration:  InputDecoration(
                 labelText: 'No Telp',
+                hintText: userData!.noTelp!,
                 filled: true,
                 fillColor: Colors.white,
-                border: OutlineInputBorder()),
+                border: const OutlineInputBorder()),
             keyboardType: TextInputType.phone,
           ),
           const SizedBox(
@@ -269,10 +272,9 @@ class UpdateProfil extends GetView {
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(50)),
                     minimumSize: Size(Get.size.width / 2, 50)),
-                onPressed: () async {
+                onPressed: () {
                   loadingDialog("updating data", "");
-                  await ctr.addUpdatePegawai(context, "update", userData!);
-                  
+                  ctr.addUpdatePegawai(context, "update", userData!);
                 },
                 child: const Text(
                   'UPDATE',

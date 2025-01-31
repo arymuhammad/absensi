@@ -27,7 +27,7 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
       child: Card(
           elevation: 10,
           child: Image.network(
-            "${ServiceApi().baseUrlPath}${detailData['foto_masuk']}",
+            "${ServiceApi().baseUrl}${detailData['foto_masuk']}",
             errorBuilder: (context, error, stackTrace) =>
                 Image.asset('assets/image/selfie.png'),
             fit: BoxFit.cover,
@@ -49,7 +49,7 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
       child: Card(
           elevation: 10,
           child: Image.network(
-            "${ServiceApi().baseUrlPath}${detailData['foto_pulang']}",
+            "${ServiceApi().baseUrl}${detailData['foto_pulang']}",
             errorBuilder: (context, error, stackTrace) =>
                 Image.asset('assets/image/selfie.png'),
             fit: BoxFit.cover,

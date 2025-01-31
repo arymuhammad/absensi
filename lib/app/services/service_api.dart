@@ -26,15 +26,15 @@ import '../data/model/absen_model.dart';
 import '../data/model/dept_model.dart';
 import '../data/model/foto_profil_model.dart';
 import '../data/model/login_model.dart';
-import '../data/model/server_api_model.dart';
+// import '../data/model/server_api_model.dart';
 import '../data/model/users_model.dart';
 import 'app_exceptions.dart';
 
 class ServiceApi {
   // var baseUrlPath = "https://attendance.urbanco.id/api/"; // poduction
   // var baseUrlPath = "https://88.222.214.157/"; // dev
-  var baseUrl = BASEURL.URL; // dev
-  var baseUrlPath = BASEURL.PATH; // dev
+  var baseUrl = "http://103.156.15.61/api-absensi/"; // dev
+  // var baseUrlPath = BASEURL.PATH; // dev
 
   var isLoading = false.obs;
 
@@ -44,7 +44,7 @@ class ServiceApi {
       loadingWithIcon();
 
       final response =
-          await http.post(Uri.parse('${baseUrlPath}auth'), body: data).timeout(
+          await http.post(Uri.parse('${baseUrl}auth'), body: data).timeout(
         const Duration(seconds: 30),
         onTimeout: () {
           SmartDialog.dismiss();
@@ -96,8 +96,8 @@ class ServiceApi {
 
   getBrandCabang() async {
     try {
-      final response = await http.get(Uri.parse('${baseUrlPath}brand_cabang'));
-      // log('${baseUrlPath}brand_cabang');
+      final response = await http.get(Uri.parse('${baseUrl}brand_cabang'));
+      // log('${baseUrl}brand_cabang');
       switch (response.statusCode) {
         case 200:
           List<dynamic> result = json.decode(response.body)['data'];
@@ -114,7 +114,7 @@ class ServiceApi {
   getCabang(Map<String, dynamic>? data) async {
     try {
       final response =
-          await http.post(Uri.parse('${baseUrlPath}cabang'), body: data);
+          await http.post(Uri.parse('${baseUrl}cabang'), body: data);
 
       switch (response.statusCode) {
         case 200:
@@ -131,7 +131,7 @@ class ServiceApi {
 
   getLevel() async {
     try {
-      final response = await http.get(Uri.parse('${baseUrlPath}level'));
+      final response = await http.get(Uri.parse('${baseUrl}level'));
 
       switch (response.statusCode) {
         case 200:
@@ -149,7 +149,7 @@ class ServiceApi {
 
   getShift() async {
     try {
-      final response = await http.get(Uri.parse('${baseUrlPath}get_shift'));
+      final response = await http.get(Uri.parse('${baseUrl}get_shift'));
       switch (response.statusCode) {
         case 200:
           List<dynamic> result = json.decode(response.body)['data'];
@@ -164,10 +164,10 @@ class ServiceApi {
     }
   }
 
-  addUpdatePegawai(data) async {
+  addUpdatePegawai(Map<String, dynamic> data, String mode) async {
     try {
       var request =
-          http.MultipartRequest('POST', Uri.parse('${baseUrlPath}add_user'));
+          http.MultipartRequest('POST', Uri.parse('${baseUrl}add_user'));
 
       // request.headers.addAll(headers);
       request.fields['status'] = data["status"];
@@ -238,9 +238,24 @@ class ServiceApi {
       final dataDecode = jsonDecode(responseString);
       // debugPrint(dataDecode.toString());
 
-      if (res.statusCode == 200) {
-        // return showDialogSuccess('Sukses', 'Event Berhasil Dibuat');
-      } else {}
+      if (res.statusCode == 200 && mode == "add") {
+        succesDialog(Get.context!, "N", "Data berhasil disimpan",
+            DialogType.success, 'SUKSES');
+      } else {
+        if (mode == "update") {
+          Get.back();
+          succesDialog(
+              Get.context!,
+              "N",
+              "Data berhasil disimpan\nSilahkan login ulang",
+              DialogType.success,
+              'SUKSES');
+          Future.delayed(const Duration(seconds: 1), () {
+            auth.logout();
+            Get.back(closeOverlays: true);
+          });
+        }
+      }
     } catch (e) {
       debugPrint('$e');
     }
@@ -249,7 +264,7 @@ class ServiceApi {
   deleteAbsVst(Map<String, dynamic> data) async {
     try {
       final response = await http
-          .post(Uri.parse('${baseUrlPath}delete_abs_vst'), body: data)
+          .post(Uri.parse('${baseUrl}delete_abs_vst'), body: data)
           .timeout(const Duration(minutes: 3));
       if (response.statusCode == 200) {
         showToast('Data berhasil di hapus');
@@ -266,7 +281,8 @@ class ServiceApi {
 
   submitAbsen(data, bool isOnInit) async {
     try {
-      var request = http.MultipartRequest('POST', Uri.parse('${baseUrlPath}absen'));
+      var request =
+          http.MultipartRequest('POST', Uri.parse('${baseUrl}absen'));
 
       // request.headers.addAll(headers);
       request.fields['status'] = data["status"];
@@ -366,7 +382,7 @@ class ServiceApi {
   reSubmitAbsen(data) async {
     try {
       var request =
-          http.MultipartRequest('POST', Uri.parse('${baseUrlPath}reabsen'));
+          http.MultipartRequest('POST', Uri.parse('${baseUrl}reabsen'));
 
       request.fields['tanggal_masuk'] = data["tanggal_masuk"];
       request.fields['tanggal_pulang'] = data["tanggal_pulang"];
@@ -417,8 +433,8 @@ class ServiceApi {
   cekDataAbsen(Map<String, dynamic> data) async {
     try {
       final response =
-          await http.post(Uri.parse('${baseUrlPath}cek_absen'), body: data);
-      // log('${baseUrlPath}cek_absen');
+          await http.post(Uri.parse('${baseUrl}cek_absen'), body: data);
+      // log('${baseUrl}cek_absen');
       // log(data.toString());
       switch (response.statusCode) {
         case 200:
@@ -446,7 +462,7 @@ class ServiceApi {
     var dataAbsen = Absen();
     try {
       final response = await http
-          .post(Uri.parse('${baseUrlPath}get_adjust'), body: paramAbsen)
+          .post(Uri.parse('${baseUrl}get_adjust'), body: paramAbsen)
           .timeout(const Duration(seconds: 5));
       switch (response.statusCode) {
         case 200:
@@ -483,16 +499,16 @@ class ServiceApi {
     try {
       // var bs = await SQLHelper.instance.getServer();
       // if (bs.isNotEmpty) {
-      //   baseUrlPath = bs.first.url!;
-        
+      //   baseUrl = bs.first.url!;
+
       // }
-      final response =
-          await http.post(Uri.parse('${baseUrlPath}get_absen'), body: paramAbsen);
+      final response = await http.post(Uri.parse('${baseUrl}get_absen'),
+          body: paramAbsen);
       switch (response.statusCode) {
         case 200:
           List<dynamic> result = json.decode(response.body)['data'];
           dataAbsen = result.map((e) => Absen.fromJson(e)).toList();
-          log('${baseUrlPath}get_absen', name: 'GET ABSEN');
+          log('${baseUrl}get_absen', name: 'GET ABSEN');
         // log(paramAbsen.toString());
         // log(result.toString());
         case 400:
@@ -515,8 +531,8 @@ class ServiceApi {
 
   getFotoProfil(idUser) async {
     try {
-      final response =
-          await http.post(Uri.parse('${baseUrlPath}get_foto_profil'), body: idUser);
+      final response = await http
+          .post(Uri.parse('${baseUrl}get_foto_profil'), body: idUser);
       switch (response.statusCode) {
         case 200:
           final result = json.decode(response.body)['data'];
@@ -542,7 +558,7 @@ class ServiceApi {
 
   getUser() async {
     try {
-      final response = await http.get(Uri.parse('${baseUrlPath}get_user'));
+      final response = await http.get(Uri.parse('${baseUrl}get_user'));
       switch (response.statusCode) {
         case 200:
           List<dynamic> result = json.decode(response.body)['data'];
@@ -570,7 +586,7 @@ class ServiceApi {
   cekUser(Map<String, String> data) async {
     try {
       final response =
-          await http.post(Uri.parse('${baseUrlPath}cek_user'), body: data);
+          await http.post(Uri.parse('${baseUrl}cek_user'), body: data);
       switch (response.statusCode) {
         case 200:
           List<dynamic> result = json.decode(response.body)['data'];
@@ -596,8 +612,8 @@ class ServiceApi {
 
   updatePasswordUser(Map<String, String> data) async {
     try {
-      final response =
-          await http.post(Uri.parse('${baseUrlPath}update_password'), body: data);
+      final response = await http
+          .post(Uri.parse('${baseUrl}update_password'), body: data);
       switch (response.statusCode) {
         case 200:
           List<dynamic> result = json.decode(response.body)['data'];
@@ -624,7 +640,7 @@ class ServiceApi {
   getFilteredAbsen(Map<String, dynamic> data) async {
     try {
       final response = await http
-          .post(Uri.parse('${baseUrlPath}get_absen'), body: data)
+          .post(Uri.parse('${baseUrl}get_absen'), body: data)
           .timeout(const Duration(minutes: 1));
       switch (response.statusCode) {
         case 200:
@@ -655,7 +671,7 @@ class ServiceApi {
   getFilteredVisit(Map<String, dynamic> data) async {
     try {
       final response = await http
-          .post(Uri.parse('${baseUrlPath}get_visit'), body: data)
+          .post(Uri.parse('${baseUrl}get_visit'), body: data)
           .timeout(const Duration(minutes: 1));
       // print(data);
       switch (response.statusCode) {
@@ -688,7 +704,7 @@ class ServiceApi {
   getDataStok(data) async {
     try {
       final response =
-          await http.post(Uri.parse('${baseUrlPath}cek_stok'), body: data);
+          await http.post(Uri.parse('${baseUrl}cek_stok'), body: data);
       switch (response.statusCode) {
         case 200:
           List<dynamic> result = json.decode(response.body)['data'];
@@ -715,7 +731,7 @@ class ServiceApi {
     var dataSales = <ReportSales>[];
     try {
       final response = await http
-          .post(Uri.parse('${baseUrlPath}report_sales'), body: data)
+          .post(Uri.parse('${baseUrl}report_sales'), body: data)
           .timeout(const Duration(minutes: 5));
       switch (response.statusCode) {
         case 200:
@@ -755,8 +771,8 @@ class ServiceApi {
   cekDataVisit(Map<String, String> data) async {
     try {
       final response =
-          await http.post(Uri.parse('${baseUrlPath}cek_visit'), body: data);
-      // log('${baseUrlPath}cek_visit', name: 'LINK');
+          await http.post(Uri.parse('${baseUrl}cek_visit'), body: data);
+      // log('${baseUrl}cek_visit', name: 'LINK');
       // log(data.toString());
       switch (response.statusCode) {
         case 200:
@@ -783,7 +799,8 @@ class ServiceApi {
 
   submitVisit(Map<String, dynamic> data, bool isOnInit) async {
     try {
-      var request = http.MultipartRequest('POST', Uri.parse('${baseUrlPath}visit'));
+      var request =
+          http.MultipartRequest('POST', Uri.parse('${baseUrl}visit'));
       // request.headers.addAll(headers);
       request.fields['status'] = data["status"];
       request.fields['id'] = data["id"];
@@ -869,7 +886,7 @@ class ServiceApi {
   reSubmitVisit(Map<String, dynamic> data) async {
     try {
       var request =
-          http.MultipartRequest('POST', Uri.parse('${baseUrlPath}revisit'));
+          http.MultipartRequest('POST', Uri.parse('${baseUrl}revisit'));
       // request.headers.addAll(headers);
       request.fields['id'] = data["id"];
       request.fields['nama'] = data["nama"];
@@ -922,7 +939,7 @@ class ServiceApi {
     // List<Visit> dataVisit = [];
     try {
       final response = await http
-          .post(Uri.parse('${baseUrlPath}get_visit'), body: paramSingleVisit)
+          .post(Uri.parse('${baseUrl}get_visit'), body: paramSingleVisit)
           .timeout(const Duration(seconds: 10));
       switch (response.statusCode) {
         case 200:
@@ -958,7 +975,7 @@ class ServiceApi {
       Map<String, dynamic> paramLimitVisit) async {
     List<Visit> dataVisit = [];
     try {
-      final response = await http.post(Uri.parse('${baseUrlPath}get_visit'),
+      final response = await http.post(Uri.parse('${baseUrl}get_visit'),
           body: paramLimitVisit);
       switch (response.statusCode) {
         case 200:
@@ -987,8 +1004,8 @@ class ServiceApi {
   getUserCabang(idStore) async {
     var param = {"idCabang": idStore};
     try {
-      final response =
-          await http.post(Uri.parse('${baseUrlPath}get_user_cabang'), body: param);
+      final response = await http
+          .post(Uri.parse('${baseUrl}get_user_cabang'), body: param);
       switch (response.statusCode) {
         case 200:
           List<dynamic> result = json.decode(response.body)['data'];
@@ -1015,7 +1032,7 @@ class ServiceApi {
   updateAbsen(Map<String, dynamic> data) async {
     try {
       await http
-          .post(Uri.parse('${baseUrlPath}get_adjust'), body: data)
+          .post(Uri.parse('${baseUrl}get_adjust'), body: data)
           .timeout(const Duration(seconds: 5));
     } on FetchDataException catch (e) {
       // print('error caught: ${e.message}');
@@ -1027,7 +1044,8 @@ class ServiceApi {
 
   getDeptVisit() async {
     try {
-      final response = await http.get(Uri.parse('${baseUrlPath}get_dept_visit'));
+      final response =
+          await http.get(Uri.parse('${baseUrl}get_dept_visit'));
 
       switch (response.statusCode) {
         case 200:
@@ -1054,8 +1072,8 @@ class ServiceApi {
   getUserVisit(idDept) async {
     var data = {"idDept": idDept};
     try {
-      final response =
-          await http.post(Uri.parse('${baseUrlPath}get_user_visit'), body: data);
+      final response = await http
+          .post(Uri.parse('${baseUrl}get_user_visit'), body: data);
 
       switch (response.statusCode) {
         case 200:
@@ -1100,31 +1118,31 @@ class ServiceApi {
     // }
   }
 
-  Future<List<ServerApi>> getServer() async {
-    List<ServerApi> baseUrlPath = [];
-    try {
-      final response = await http
-          .get(Uri.parse('https://attendance.urbanco.id/api/get_server'));
-      switch (response.statusCode) {
-        case 200:
-          List<dynamic> result = json.decode(response.body)['data'];
-          baseUrlPath = result.map((e) => ServerApi.fromJson(e)).toList();
+  // Future<List<ServerApi>> getServer() async {
+  //   List<ServerApi> baseUrl = [];
+  //   try {
+  //     final response = await http
+  //         .get(Uri.parse('https://attendance.urbanco.id/api/get_server'));
+  //     switch (response.statusCode) {
+  //       case 200:
+  //         List<dynamic> result = json.decode(response.body)['data'];
+  //         baseUrl = result.map((e) => ServerApi.fromJson(e)).toList();
 
-        case 400:
-        case 401:
-        case 402:
-        case 404:
-          final result = json.decode(response.body);
-          throw FetchDataException(result["message"]);
-        default:
-          throw FetchDataException(
-            'Something went wrong.',
-          );
-      }
-    } on FetchDataException catch (e) {
-      // print('error caught: ${e.message}');
-      showToast("${e.message}");
-    }
-    return baseUrlPath;
-  }
+  //       case 400:
+  //       case 401:
+  //       case 402:
+  //       case 404:
+  //         final result = json.decode(response.body);
+  //         throw FetchDataException(result["message"]);
+  //       default:
+  //         throw FetchDataException(
+  //           'Something went wrong.',
+  //         );
+  //     }
+  //   } on FetchDataException catch (e) {
+  //     // print('error caught: ${e.message}');
+  //     showToast("${e.message}");
+  //   }
+  //   return baseUrl;
+  // }
 }

@@ -16,6 +16,7 @@ import 'package:ternav_icons/ternav_icons.dart';
 
 import '../../../data/helper/format_waktu.dart';
 import '../../../routes/app_pages.dart';
+import '../../detail_absen/views/detail_absen_view.dart';
 import '../../shared/container.dart';
 import '../../shared/rounded_image.dart';
 import '../controllers/semua_absen_controller.dart';
@@ -363,66 +364,66 @@ class SemuaAbsenView extends GetView<SemuaAbsenController> {
                                                           : "Lembur";
                                           return InkWell(
                                               onTap: () {
-                                                absenC.searchAbsen;
-                                                Get.toNamed(Routes.DETAIL_ABSEN,
-                                                    arguments: {
-                                                      "foto_profil":
-                                                          data!.foto != ""
-                                                              ? data!.foto
-                                                              : data!.nama,
-                                                      "nama": absenC
-                                                          .searchAbsen[i].nama!,
-                                                      "nama_shift": absenC
-                                                          .searchAbsen[i]
-                                                          .namaShift!,
-                                                      "id_user": absenC
-                                                          .searchAbsen[i]
-                                                          .idUser!,
-                                                      "tanggal_masuk": absenC
-                                                          .searchAbsen[i]
-                                                          .tanggalMasuk!,
-                                                      "tanggal_pulang": absenC
-                                                                  .searchAbsen[
-                                                                      i]
-                                                                  .tanggalPulang !=
-                                                              null
-                                                          ? absenC
+                                                // absenC.searchAbsen;
+                                                var detailData = {
+                                                  "foto_profil":
+                                                      data!.foto != ""
+                                                          ? data!.foto
+                                                          : data!.nama,
+                                                  "nama": absenC
+                                                      .searchAbsen[i].nama!,
+                                                  "nama_shift": absenC
+                                                      .searchAbsen[i]
+                                                      .namaShift!,
+                                                  "id_user": absenC
+                                                      .searchAbsen[i].idUser!,
+                                                  "tanggal_masuk": absenC
+                                                      .searchAbsen[i]
+                                                      .tanggalMasuk!,
+                                                  "tanggal_pulang": absenC
                                                               .searchAbsen[i]
-                                                              .tanggalPulang!
-                                                          : "",
-                                                      "jam_masuk": stsMasuk,
-                                                      "jam_pulang": stsPulang,
-                                                      "jam_absen_masuk": absenC
-                                                          .searchAbsen[i]
-                                                          .jamAbsenMasuk!,
-                                                      "jam_absen_pulang": absenC
-                                                          .searchAbsen[i]
-                                                          .jamAbsenPulang!,
-                                                      "foto_masuk": absenC
-                                                          .searchAbsen[i]
-                                                          .fotoMasuk!,
-                                                      "foto_pulang": absenC
-                                                          .searchAbsen[i]
-                                                          .fotoPulang!,
-                                                      "lat_masuk": absenC
-                                                          .searchAbsen[i]
-                                                          .latMasuk!,
-                                                      "long_masuk": absenC
-                                                          .searchAbsen[i]
-                                                          .longMasuk!,
-                                                      "lat_pulang": absenC
-                                                          .searchAbsen[i]
-                                                          .latPulang!,
-                                                      "long_pulang": absenC
-                                                          .searchAbsen[i]
-                                                          .longPulang!,
-                                                      "device_info": absenC
-                                                          .searchAbsen[i]
-                                                          .devInfo!,
-                                                      "device_info2": absenC
-                                                          .searchAbsen[i]
-                                                          .devInfo2!,
-                                                    });
+                                                              .tanggalPulang !=
+                                                          null
+                                                      ? absenC.searchAbsen[i]
+                                                          .tanggalPulang!
+                                                      : "",
+                                                  "jam_masuk": stsMasuk,
+                                                  "jam_pulang": stsPulang,
+                                                  "jam_absen_masuk": absenC
+                                                      .searchAbsen[i]
+                                                      .jamAbsenMasuk!,
+                                                  "jam_absen_pulang": absenC
+                                                      .searchAbsen[i]
+                                                      .jamAbsenPulang!,
+                                                  "foto_masuk": absenC
+                                                      .searchAbsen[i]
+                                                      .fotoMasuk!,
+                                                  "foto_pulang": absenC
+                                                      .searchAbsen[i]
+                                                      .fotoPulang!,
+                                                  "lat_masuk": absenC
+                                                      .searchAbsen[i].latMasuk!,
+                                                  "long_masuk": absenC
+                                                      .searchAbsen[i]
+                                                      .longMasuk!,
+                                                  "lat_pulang": absenC
+                                                      .searchAbsen[i]
+                                                      .latPulang!,
+                                                  "long_pulang": absenC
+                                                      .searchAbsen[i]
+                                                      .longPulang!,
+                                                  "device_info": absenC
+                                                      .searchAbsen[i].devInfo!,
+                                                  "device_info2": absenC
+                                                      .searchAbsen[i].devInfo2!,
+                                                };
+                                                Get.to(() {
+                                                  return DetailAbsenView(
+                                                      detailData);
+                                                },
+                                                    transition:
+                                                        Transition.cupertino);
+                                               
                                                 absenC.filterAbsen.clear();
                                                 absenC.filterDataAbsen("");
                                               },
@@ -864,7 +865,8 @@ class SemuaAbsenView extends GetView<SemuaAbsenController> {
                   backgroundColor: Colors.redAccent[700],
                   onPressed: () async {
                     if (absenC.searchAbsen.isNotEmpty) {
-                      loadingDialog('Mohon menunggu hingga', 'Data siap dicetak');
+                      loadingDialog(
+                          'Mohon menunggu hingga', 'Data siap dicetak');
                       await absenC.exportPdf();
                       Get.back();
                     } else {
