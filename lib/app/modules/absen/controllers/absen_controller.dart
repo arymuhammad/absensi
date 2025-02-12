@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:developer';
 // import 'dart:developer';
 import 'dart:io';
 import 'package:absensi/app/data/helper/db_helper.dart';
@@ -10,7 +9,6 @@ import 'package:absensi/app/data/model/visit_model.dart';
 import 'package:absensi/app/modules/home/views/dialog_update_app.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:device_marketing_names/device_marketing_names.dart';
-import 'package:dynamic_base_url/dynamic_base_url.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:flutter_native_timezone_updated_gradle/flutter_native_timezone.dart';
@@ -38,7 +36,6 @@ import 'package:pdf/pdf.dart';
 import 'package:printing/printing.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:device_info_null_safety/device_info_null_safety.dart';
-
 
 class AbsenController extends GetxController {
   var isLoading = true.obs;
@@ -193,7 +190,6 @@ class AbsenController extends GetxController {
       Map<String, dynamic> abiInfo = await deviceInfoNullSafety.abiInfo;
       var abi = abiInfo.entries.toList();
       supportedAbi = abi[1].value;
-      log(abiInfo.toString());
     }
 
     _startDateStream(paramSingle, paramLimit, paramSingleVisit, paramLimitVisit,
@@ -945,6 +941,7 @@ class AbsenController extends GetxController {
   }
 
   checkForUpdates(status) async {
+    
     if (status != "onInit") {
       loadingDialog("Memeriksa pembaruan...", "");
     }
@@ -953,7 +950,6 @@ class AbsenController extends GetxController {
       final readDoc = await http
           .get(Uri.parse('http://103.156.15.61/update apk/updateLog.xml'))
           .timeout(const Duration(seconds: 20));
-
       final response = await http
           .head(Uri.parse(supportedAbi == 'arm64-v8a'
               ? 'http://103.156.15.61/update apk/absensiApp.arm64v8a.apk'

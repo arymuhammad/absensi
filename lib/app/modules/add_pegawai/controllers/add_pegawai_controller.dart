@@ -9,7 +9,6 @@ import 'package:absensi/app/services/service_api.dart';
 import 'package:absensi/app/data/model/level_model.dart';
 import 'package:absensi/app/modules/profil/views/update_password.dart';
 import 'package:device_info_null_safety/device_info_null_safety.dart';
-import 'package:dynamic_base_url/dynamic_base_url.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -115,12 +114,12 @@ class AddPegawaiController extends GetxController {
 
     try {
       final readDoc =
-          await http.get(Uri.parse('${BASEURL.URL}/update apk/updateLog.xml'));
+          await http.get(Uri.parse('http://103.156.15.61/update apk/updateLog.xml'));
 
       final response = await http
           .head(Uri.parse(supportedAbi == 'arm64-v8a'
-              ? '${BASEURL.URL}/update apk/absensiApp.arm64v8a.apk'
-              : '${BASEURL.URL}/update apk/absensiApp.apk'))
+              ? 'http://103.156.15.61/update apk/absensiApp.arm64v8a.apk'
+              : 'http://103.156.15.61/update apk/absensiApp.apk'))
           .timeout(const Duration(seconds: 20));
       Get.back();
       if (response.statusCode == 200) {
@@ -235,8 +234,8 @@ class AddPegawaiController extends GetxController {
                   OtaUpdate()
                       .execute(
                     supportedAbi == 'arm64-v8a'
-                        ? '${BASEURL.URL}/update apk/absensiApp.arm64v8a.apk'
-                        : '${BASEURL.URL}/update apk/absensiApp.apk',
+                        ? 'http://103.156.15.61/update apk/absensiApp.arm64v8a.apk'
+                        : 'http://103.156.15.61/update apk/absensiApp.apk',
                     // OPTIONAL
                     // destinationFilename: '/',
                     //OPTIONAL, ANDROID ONLY - ABILITY TO VALIDATE CHECKSUM OF FILE:

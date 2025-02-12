@@ -14,7 +14,6 @@ import 'package:absensi/app/data/model/shift_kerja_model.dart';
 import 'package:absensi/app/data/model/user_model.dart';
 import 'package:absensi/app/data/model/visit_model.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
-import 'package:dynamic_base_url/dynamic_base_url.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';

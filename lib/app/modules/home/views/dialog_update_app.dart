@@ -11,6 +11,7 @@ import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 final absC = Get.put(AbsenController());
 final logC = Get.put(LoginController());
@@ -66,7 +67,42 @@ dialogUpdateApp() {
                   style: TextStyle(color: Colors.grey[500]),
                 ),
                 const SizedBox(
+                  height: 20,
+                ),
+                const Text('Download langsung via browser (install manual)\nHarap tekan salah satu link'),
+                const SizedBox(
+                  height: 10,
+                ),
+                TextButton(
+                  onPressed: () {
+                    launchUrl(Uri.parse(
+                        'http://103.156.15.61/update apk/absensiApp.apk'));
+                  },
+                  child: Row(
+                    children: [
+                      const Icon(Icons.file_download_outlined),
+                      const SizedBox(width: 5,),
+                      Text('Download',
+                          style: TextStyle(color: Colors.blue[500])),
+                    ],
+                  ),
+                ),
+                const SizedBox(
                   height: 5,
+                ),
+                TextButton(
+                  onPressed: () {
+                    launchUrl(Uri.parse(
+                        'http://103.156.15.61/update apk/absensiApp.arm64v8a.apk'));
+                  },
+                  child: Row(
+                    children: [
+                      const Icon(Icons.file_download_outlined),
+                      const SizedBox(width: 5,),
+                      Text('Download\br(opsional, jika link diatas tidak support di hp anda)',
+                          style: TextStyle(color: Colors.blue[500])),
+                    ],
+                  ),
                 ),
               ],
             )
@@ -132,8 +168,8 @@ dialogUpdateApp() {
           OtaUpdate()
               .execute(
             absC.supportedAbi == 'arm64-v8a'
-                ? 'http://103.156.15.60/update apk/absensiApp.arm64v8a.apk'
-                : 'http://103.156.15.60/update apk/absensiApp.apk',
+                ? 'http://103.156.15.61/update apk/absensiApp.arm64v8a.apk'
+                : 'http://103.156.15.61/update apk/absensiApp.apk',
             // OPTIONAL
             // destinationFilename: '/',
             // OPTIONAL, ANDROID ONLY - ABILITY TO VALIDATE CHECKSUM OF FILE:

@@ -220,8 +220,12 @@ formAbsen(Data dataUser, double latitude, double longitude) async {
                         absC.selectedCabang.value = "";
                         absC.lat.value = "";
                         absC.long.value = "";
-                        succesDialog(Get.context, "Y",
-                            "Anda sudah Absen Masuk hari ini.", DialogType.info, 'INFO');
+                        succesDialog(
+                            Get.context,
+                            "Y",
+                            "Anda sudah Absen Masuk hari ini.",
+                            DialogType.info,
+                            'INFO');
                       }
                     } else {
                       absC.stsAbsenSelected.value = "";
@@ -240,7 +244,11 @@ formAbsen(Data dataUser, double latitude, double longitude) async {
                     absC.lat.value = "";
                     absC.long.value = "";
                     succesDialog(
-                        Get.context, "Y", "Anda sudah Absen Masuk hari ini.", DialogType.info, 'INFO');
+                        Get.context,
+                        "Y",
+                        "Anda sudah Absen Masuk hari ini.",
+                        DialogType.info,
+                        'INFO');
                   }
                 } else {
                   //absen pulang
@@ -289,177 +297,191 @@ formAbsen(Data dataUser, double latitude, double longitude) async {
                       failedDialog(Get.context, "Peringatan",
                           "Data absen masuk tidak ditemukan\nHarap absen masuk terlebih dahulu");
                     } else {
-                      await absC.cekDataAbsen(
-                          "pulang",
-                          dataUser.id!,
-                          DateFormat('yyyy-MM-dd')
-                              .format(DateTime.parse(absC.dateNowServer)));
-// log(absC.cekAbsen.value.total.toString(), name: 'PULANG');
-                      if (absC.cekAbsen.value.total == "1") {
-                        // face detectionhr
-                        //  await Get.to(() => const FaceDetection());
-                        await absC.uploadFotoAbsen();
-                        Get.back();
+                      // await absC.cekDataAbsen(
+                      //     "pulang",
+                      //     dataUser.id!,
+                      //     DateFormat('yyyy-MM-dd')
+                      //         .format(DateTime.parse(absC.dateNowServer)));
 
-                        if (absC.image != null) {
-                          var localDataAbs = await SQLHelper.instance
-                              .getAbsenToday(dataUser.id!, absC.dateNow);
-                          // log(localDataAbs[0].tanggalMasuk!, name: 'MASUK');
-                          if (localDataAbs.isEmpty) {
-                            loadingDialog("Mengirim data...", "");
-                            var data = {
-                              "status": "update",
-                              "id": dataUser.id,
-                              "tanggal_masuk": DateFormat('yyyy-MM-dd')
+                      // OLD STATEMENT (CHECKING DATA CHECKOUT, IF CHECKOUT == 1, THEN CONTINUE CAPTURE IMG)
+                      // if (absC.cekAbsen.value.total == "1") {
+                      // face detectionhr
+                      //  await Get.to(() => const FaceDetection());
+                      await absC.uploadFotoAbsen();
+                      Get.back();
+
+                      if (absC.image != null) {
+                        var localDataAbs = await SQLHelper.instance
+                            .getAbsenToday(dataUser.id!, absC.dateNow);
+
+                        if (localDataAbs.isEmpty) {
+                          loadingDialog("Mengirim data...", "");
+                          var data = {
+                            "status": "update",
+                            "id": dataUser.id,
+                            "tanggal_masuk": DateFormat('yyyy-MM-dd')
+                                .format(DateTime.parse(absC.dateNowServer)),
+                            "tanggal_pulang": DateFormat('yyyy-MM-dd')
+                                .format(DateTime.parse(absC.dateNowServer)),
+                            "nama": dataUser.nama,
+                            "jam_absen_pulang": absC.timeNow.toString(),
+                            "foto_pulang": File(absC.image!.path),
+                            "lat_pulang": latitude.toString(),
+                            "long_pulang": longitude.toString(),
+                            "device_info2": absC.devInfo.value
+                          };
+
+                          await ServiceApi().submitAbsen(data, false);
+                          // send data to xmor
+                          absC.sendDataToXmor(
+                              dataUser.id!,
+                              "clock_out",
+                              DateFormat('yyyy-MM-dd HH:mm:ss')
                                   .format(DateTime.parse(absC.dateNowServer)),
-                              "tanggal_pulang": DateFormat('yyyy-MM-dd')
-                                  .format(DateTime.parse(absC.dateNowServer)),
-                              "nama": dataUser.nama,
-                              "jam_absen_pulang": absC.timeNow.toString(),
-                              "foto_pulang": File(absC.image!.path),
-                              "lat_pulang": latitude.toString(),
-                              "long_pulang": longitude.toString(),
-                              "device_info2": absC.devInfo.value
-                            };
-                           
-                            await ServiceApi().submitAbsen(data, false);
-                            // send data to xmor
-                            absC.sendDataToXmor(
-                                dataUser.id!,
-                                "clock_out",
-                                DateFormat('yyyy-MM-dd HH:mm:ss')
-                                    .format(DateTime.parse(absC.dateNowServer)),
-                                absC.cekAbsen.value.idShift!,
-                                latitude.toString(),
-                                longitude.toString(),
-                                absC.lokasi.value,
-                                dataUser.namaCabang!,
-                                dataUser.kodeCabang!,
-                                absC.devInfo.value);
+                              absC.cekAbsen.value.idShift!,
+                              latitude.toString(),
+                              longitude.toString(),
+                              absC.lokasi.value,
+                              dataUser.namaCabang!,
+                              dataUser.kodeCabang!,
+                              absC.devInfo.value);
 
-                            var paramAbsenToday = {
-                              "mode": "single",
-                              "id_user": dataUser.id,
-                              "tanggal_masuk": DateFormat('yyyy-MM-dd')
-                                  .format(DateTime.parse(absC.dateNowServer))
-                            };
+                          var paramAbsenToday = {
+                            "mode": "single",
+                            "id_user": dataUser.id,
+                            "tanggal_masuk": DateFormat('yyyy-MM-dd')
+                                .format(DateTime.parse(absC.dateNowServer))
+                          };
 
-                            var paramLimitAbsen = {
-                              "mode": "limit",
-                              "id_user": dataUser.id,
-                              "tanggal1": absC.initDate1,
-                              "tanggal2": absC.initDate2
-                            };
-                            absC.getAbsenToday(paramAbsenToday);
-                            absC.getLimitAbsen(paramLimitAbsen);
-                            // absC.startTimer(30);
-                            // absC.resend();
-                            absC.stsAbsenSelected.value = "";
-                            absC.selectedShift.value = "";
-                            absC.selectedCabang.value = "";
-                            absC.lat.value = "";
-                            absC.long.value = "";
-                          } else if (localDataAbs.isNotEmpty &&
-                              localDataAbs[0].tanggalPulang == null) {
-                            loadingDialog("Mengirim data...", "");
-                            var data = {
-                              "status": "update",
-                              "id": dataUser.id,
-                              "tanggal_masuk": DateFormat('yyyy-MM-dd')
-                                  .format(DateTime.parse(absC.dateNowServer)),
-                              "tanggal_pulang": DateFormat('yyyy-MM-dd')
-                                  .format(DateTime.parse(absC.dateNowServer)),
-                              "nama": dataUser.nama,
-                              "jam_absen_pulang": absC.timeNow.toString(),
-                              "foto_pulang": File(absC.image!.path),
-                              "lat_pulang": latitude.toString(),
-                              "long_pulang": longitude.toString(),
-                              "device_info2": absC.devInfo.value
-                            };
-
-                            // update data absensi ke local storage
-                            SQLHelper.instance.updateDataAbsen(
-                                {
-                                  "tanggal_pulang": DateFormat('yyyy-MM-dd')
-                                      .format(
-                                          DateTime.parse(absC.dateNowServer)),
-                                  "nama": dataUser.nama,
-                                  "jam_absen_pulang": absC.timeNow.toString(),
-                                  "foto_pulang": absC.image!.path,
-                                  "lat_pulang": latitude.toString(),
-                                  "long_pulang": longitude.toString(),
-                                  "device_info2": absC.devInfo.value
-                                },
-                                dataUser.id!,
-                                DateFormat('yyyy-MM-dd').format(
-                                    DateTime.parse(absC.dateNowServer)));
-
-                            // update data absensi ke server
-                            await ServiceApi().submitAbsen(data, false);
-
-                            absC.sendDataToXmor(
-                                dataUser.id!,
-                                "clock_out",
-                                DateFormat('yyyy-MM-dd HH:mm:ss')
-                                    .format(DateTime.parse(absC.dateNowServer)),
-                                absC.cekAbsen.value.idShift!,
-                                latitude.toString(),
-                                longitude.toString(),
-                                absC.lokasi.value,
-                                dataUser.namaCabang!,
-                                dataUser.kodeCabang!,
-                                absC.devInfo.value);
-
-                            var paramAbsenToday = {
-                              "mode": "single",
-                              "id_user": dataUser.id,
-                              "tanggal_masuk": DateFormat('yyyy-MM-dd')
-                                  .format(DateTime.parse(absC.dateNowServer))
-                            };
-
-                            var paramLimitAbsen = {
-                              "mode": "limit",
-                              "id_user": dataUser.id,
-                              "tanggal1": absC.initDate1,
-                              "tanggal2": absC.initDate2
-                            };
-                            absC.getAbsenToday(paramAbsenToday);
-                            absC.getLimitAbsen(paramLimitAbsen);
-                            absC.startTimer(10);
-                            absC.resend();
-                            absC.stsAbsenSelected.value = "";
-                            absC.selectedShift.value = "";
-                            absC.selectedCabang.value = "";
-                            absC.lat.value = "";
-                            absC.long.value = "";
-                          } else {
-                            absC.stsAbsenSelected.value = "";
-                            absC.selectedShift.value = "";
-                            absC.selectedCabang.value = "";
-                            absC.lat.value = "";
-                            absC.long.value = "";
-                            succesDialog(Get.context, "Y",
-                                "Anda sudah Absen Pulang hari ini.", DialogType.info, 'INFO');
-                          }
-                        } else {
+                          var paramLimitAbsen = {
+                            "mode": "limit",
+                            "id_user": dataUser.id,
+                            "tanggal1": absC.initDate1,
+                            "tanggal2": absC.initDate2
+                          };
+                          absC.getAbsenToday(paramAbsenToday);
+                          absC.getLimitAbsen(paramLimitAbsen);
+                          // absC.startTimer(30);
+                          // absC.resend();
                           absC.stsAbsenSelected.value = "";
                           absC.selectedShift.value = "";
                           absC.selectedCabang.value = "";
                           absC.lat.value = "";
                           absC.long.value = "";
-                          Get.back();
-                          failedDialog(Get.context, "Peringatan",
-                              "Absen Pulang dibatalkan");
+                        } else if (localDataAbs.isNotEmpty) {
+                          // OLD STATEMENT
+                          // && localDataAbs[0].tanggalPulang == null
+
+                          loadingDialog("Mengirim data...", "");
+                          var data = {
+                            "status": "update",
+                            "id": dataUser.id,
+                            "tanggal_masuk": DateFormat('yyyy-MM-dd')
+                                .format(DateTime.parse(absC.dateNowServer)),
+                            "tanggal_pulang": DateFormat('yyyy-MM-dd')
+                                .format(DateTime.parse(absC.dateNowServer)),
+                            "nama": dataUser.nama,
+                            "jam_absen_pulang": absC.timeNow.toString(),
+                            "foto_pulang": File(absC.image!.path),
+                            "lat_pulang": latitude.toString(),
+                            "long_pulang": longitude.toString(),
+                            "device_info2": absC.devInfo.value
+                          };
+
+                          // update data absensi ke local storage
+                          SQLHelper.instance.updateDataAbsen(
+                              {
+                                "tanggal_pulang": DateFormat('yyyy-MM-dd')
+                                    .format(DateTime.parse(absC.dateNowServer)),
+                                "nama": dataUser.nama,
+                                "jam_absen_pulang": absC.timeNow.toString(),
+                                "foto_pulang": absC.image!.path,
+                                "lat_pulang": latitude.toString(),
+                                "long_pulang": longitude.toString(),
+                                "device_info2": absC.devInfo.value
+                              },
+                              dataUser.id!,
+                              DateFormat('yyyy-MM-dd')
+                                  .format(DateTime.parse(absC.dateNowServer)));
+
+                          // update data absensi ke server
+                          await ServiceApi().submitAbsen(data, false);
+
+                          absC.sendDataToXmor(
+                              dataUser.id!,
+                              "clock_out",
+                              DateFormat('yyyy-MM-dd HH:mm:ss')
+                                  .format(DateTime.parse(absC.dateNowServer)),
+                              absC.cekAbsen.value.idShift!,
+                              latitude.toString(),
+                              longitude.toString(),
+                              absC.lokasi.value,
+                              dataUser.namaCabang!,
+                              dataUser.kodeCabang!,
+                              absC.devInfo.value);
+
+                          var paramAbsenToday = {
+                            "mode": "single",
+                            "id_user": dataUser.id,
+                            "tanggal_masuk": DateFormat('yyyy-MM-dd')
+                                .format(DateTime.parse(absC.dateNowServer))
+                          };
+
+                          var paramLimitAbsen = {
+                            "mode": "limit",
+                            "id_user": dataUser.id,
+                            "tanggal1": absC.initDate1,
+                            "tanggal2": absC.initDate2
+                          };
+                          absC.getAbsenToday(paramAbsenToday);
+                          absC.getLimitAbsen(paramLimitAbsen);
+                          absC.startTimer(10);
+                          absC.resend();
+                          absC.stsAbsenSelected.value = "";
+                          absC.selectedShift.value = "";
+                          absC.selectedCabang.value = "";
+                          absC.lat.value = "";
+                          absC.long.value = "";
                         }
+                        // OLD ELSE STATEMENT
+                        //  else {
+                        //   absC.stsAbsenSelected.value = "";
+                        //   absC.selectedShift.value = "";
+                        //   absC.selectedCabang.value = "";
+                        //   absC.lat.value = "";
+                        //   absC.long.value = "";
+                        //   succesDialog(
+                        //       Get.context,
+                        //       "Y",
+                        //       "Anda sudah Absen Pulang hari ini.",
+                        //       DialogType.info,
+                        //       'INFO');
+                        // }
                       } else {
                         absC.stsAbsenSelected.value = "";
                         absC.selectedShift.value = "";
                         absC.selectedCabang.value = "";
                         absC.lat.value = "";
                         absC.long.value = "";
-                        succesDialog(Get.context, "Y",
-                            "Anda sudah Absen Pulang hari ini.", DialogType.info, 'INFO');
+                        Get.back();
+                        failedDialog(Get.context, "Peringatan",
+                            "Absen Pulang dibatalkan");
                       }
+
+                      // OLD STATEMENT CHECKING DATA CHECKOUT IF CHECKOUT == 0 (TIDAK ADA DATA ABSEN PULANG KOSONG)
+                      // } else {
+                      //   absC.stsAbsenSelected.value = "";
+                      //   absC.selectedShift.value = "";
+                      //   absC.selectedCabang.value = "";
+                      //   absC.lat.value = "";
+                      //   absC.long.value = "";
+                      //   succesDialog(
+                      //       Get.context,
+                      //       "Y",
+                      //       "Anda sudah Absen Pulang hari ini.",
+                      //       DialogType.info,
+                      //       'INFO');
+                      // }
                     }
                   }
                 }

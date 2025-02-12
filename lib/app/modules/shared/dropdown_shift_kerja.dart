@@ -1,3 +1,4 @@
+import 'package:absensi/app/data/helper/format_waktu.dart';
 import 'package:absensi/app/modules/absen/controllers/absen_controller.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -15,7 +16,7 @@ class CsDropdownShiftKerja extends StatelessWidget {
   Widget build(BuildContext context) {
     return FutureBuilder(
       future: absC.getShift(),
-      builder: (context, snapshot) {
+      builder: (ctx, snapshot) {
         if (snapshot.hasData) {
           var dataShift = snapshot.data!;
           return DropdownButtonFormField(
@@ -23,23 +24,34 @@ class CsDropdownShiftKerja extends StatelessWidget {
                 border: OutlineInputBorder(), hintText: 'Pilih Shift Absen'),
             value: value,
             onChanged: (data) {
-              absC.selectedShift.value = data!;
+              // absC.selectedShift.value = data!;
 
-              if (absC.selectedShift.value == "5") {
-                absC.jamMasuk.value = absC.timeNow;
-                absC.jamPulang.value = DateFormat("HH:mm").format(
-                    DateTime.parse(absC.dateNowServer)
-                        .add(const Duration(hours: 8)));
+              if (data == "5") {
+                if (FormatWaktu.formatJamMenit(jamMenit: absC.timeNow)
+                    .isBefore(FormatWaktu.formatJamMenit(jamMenit: '15:00'))) {
+                  absC.selectedShift.value = "";
+                  dialogMsg('INFO',
+                      'Tidak dapat memilih shift ini sebelum\npukul 15:00 waktu setempat.\n\nSilahkan pilih shift yang lain');
+                } else {
+                  absC.selectedShift.value = data!;
+                  absC.jamMasuk.value = absC.timeNow;
+                  absC.jamPulang.value = DateFormat("HH:mm").format(
+                      DateTime.parse(absC.dateNowServer)
+                          .add(const Duration(hours: 8)));
+                  dialogMsg('INFO',
+                      'Pastikan Shift Kerja yang dipilih\nsudah sesuai');
+                }
               } else {
                 for (int i = 0; i < dataShift.length; i++) {
                   if (dataShift[i].id == data) {
+                    absC.selectedShift.value = data!;
                     absC.jamMasuk.value = dataShift[i].jamMasuk!;
                     absC.jamPulang.value = dataShift[i].jamPulang!;
                   }
                 }
+                dialogMsg(
+                    'INFO', 'Pastikan Shift Kerja yang dipilih\nsudah sesuai');
               }
-              dialogMsg(
-                  'Info', 'Pastikan Shift Kerja yang dipilih\nsudah sesuai');
             },
             items: dataShift
                 .map((e) => DropdownMenuItem(

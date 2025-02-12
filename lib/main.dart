@@ -4,9 +4,7 @@ import 'package:absensi/app/data/model/login_model.dart';
 import 'package:absensi/app/modules/home/views/bottom_navbar.dart';
 import 'package:absensi/app/modules/login/controllers/login_controller.dart';
 import 'package:absensi/app/modules/login/views/login_view.dart';
-import 'package:absensi/app/services/service_api.dart';
 import 'package:absensi/firebase_options.dart';
-import 'package:dynamic_base_url/dynamic_base_url.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
@@ -35,20 +33,7 @@ void main() async {
     FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
     return true;
   };
-  // var debug = "";
-  // var url = "";
-  // var serverName = await ServiceApi().getServer();
-  // serverName.map((e) {
-  //   if (e.status == "1") {
-  //     debug = e.baseUrl! + e.path!;
-  //   url = e.baseUrl!;
-  //     // BASEURL.URL = e.baseUrl!;
-  //     // print(BASEURL.URL);
-  //   }
-  // }).toList();
-  // BASEURL.init(
-  //     debug: debug, prod: 'https://attendance.urbanco.id/api/', path: debug, url: url);
-
+ 
   await initializeDateFormatting('id_ID', "");
 
   SharedPreferences prefs = await SharedPreferences.getInstance();
