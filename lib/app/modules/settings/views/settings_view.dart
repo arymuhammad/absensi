@@ -1,6 +1,8 @@
 import 'package:absensi/app/data/helper/const.dart';
-import 'package:absensi/app/data/helper/loading_dialog.dart';
+import 'package:absensi/app/data/helper/custom_dialog.dart';
 import 'package:absensi/app/data/model/login_model.dart';
+import 'package:absensi/app/modules/add_pegawai/controllers/add_pegawai_controller.dart';
+import 'package:absensi/app/modules/profil/views/face_data_view.dart';
 import 'package:absensi/app/modules/settings/views/about_view.dart';
 import 'package:absensi/app/modules/settings/views/backup_view.dart';
 import 'package:absensi/app/modules/profil/views/update_profil.dart';
@@ -9,17 +11,16 @@ import 'package:absensi/app/modules/shared/background_image_header.dart';
 import 'package:absensi/app/routes/app_pages.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
 import 'package:get/get.dart';
 import 'package:icons_plus/icons_plus.dart';
-import 'package:ternav_icons/ternav_icons.dart';
 
 // import '../../alarm/views/alarm_view.dart';
 import '../controllers/settings_controller.dart';
 
 class SettingsView extends GetView<SettingsController> {
-  const SettingsView({super.key, this.listDataUser});
+  SettingsView({super.key, this.listDataUser});
   final Data? listDataUser;
+  final ctrl = Get.put(AddPegawaiController());
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -60,7 +61,7 @@ class SettingsView extends GetView<SettingsController> {
                             decoration: BoxDecoration(
                                 color: bgContainer,
                                 borderRadius: BorderRadius.circular(8)),
-                            child: Icon(TernavIcons.bold.profile,
+                            child: Icon(Iconsax.profile_circle_bold,
                                 color: mainColor),
                           ),
                           trailing:
@@ -74,6 +75,37 @@ class SettingsView extends GetView<SettingsController> {
                           },
                         ),
                         ListTile(
+                          title: Text(
+                            'Data Wajah',
+                            style: TextStyle(
+                                color: titleColor, fontWeight: FontWeight.bold),
+                          ),
+                          subtitle: Text(
+                            'Data Wajah Pengguna',
+                            style:
+                                TextStyle(color: subTitleColor, fontSize: 13),
+                          ),
+                          leading: Container(
+                            height: 40,
+                            width: 40,
+                            decoration: BoxDecoration(
+                                color: bgContainer,
+                                borderRadius: BorderRadius.circular(8)),
+                            child:
+                                Icon(FontAwesome.face_smile, color: mainColor),
+                          ),
+                          trailing:
+                              const Icon(Icons.keyboard_arrow_right_rounded),
+                          onTap: () {
+                            Get.to(() {
+                              ctrl.getFaceData(listDataUser!.id!);
+                              return FaceDataView(
+                                idUser: listDataUser!.id!,
+                              );
+                            }, transition: Transition.cupertino);
+                          },
+                        ),
+                        ListTile(
                           onTap: () {
                             Get.to(() => VerifikasiUpdatePassword(),
                                 transition: Transition.cupertino);
@@ -84,7 +116,7 @@ class SettingsView extends GetView<SettingsController> {
                             decoration: BoxDecoration(
                                 color: bgContainer,
                                 borderRadius: BorderRadius.circular(8)),
-                            child: Icon(TernavIcons.bold.key, color: mainColor),
+                            child: Icon(Iconsax.key_bulk, color: mainColor),
                           ),
                           title: Text(
                             'Security',
@@ -160,7 +192,7 @@ class SettingsView extends GetView<SettingsController> {
                               decoration: BoxDecoration(
                                   color: bgContainer,
                                   borderRadius: BorderRadius.circular(8)),
-                              child: Icon(TernavIcons.bold.add_user,
+                              child: Icon(Iconsax.user_add_bold,
                                   color: mainColor),
                             ),
                             title: Text(
@@ -188,7 +220,7 @@ class SettingsView extends GetView<SettingsController> {
                                 color: bgContainer,
                                 borderRadius: BorderRadius.circular(8)),
                             child:
-                                Icon(TernavIcons.bold.info_1, color: mainColor),
+                                Icon(Iconsax.info_circle_bold, color: mainColor),
                           ),
                           title: Text(
                             'Info',

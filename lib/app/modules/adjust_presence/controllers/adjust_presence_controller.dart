@@ -1,5 +1,6 @@
-import 'package:absensi/app/data/helper/loading_dialog.dart';
+import 'package:absensi/app/data/helper/custom_dialog.dart';
 import 'package:absensi/app/data/model/absen_model.dart';
+import 'package:absensi/app/data/model/req_app_model.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -13,7 +14,8 @@ import '../../../data/model/users_model.dart';
 import '../../../data/model/visit_model.dart';
 import '../../../services/service_api.dart';
 
-class AdjustPresenceController extends GetxController {
+class AdjustPresenceController extends GetxController
+    with GetTickerProviderStateMixin {
   var isLoading = true.obs;
   var cabang = <Cabang>[].obs;
   var selectedCabang = "".obs;
@@ -46,14 +48,38 @@ class AdjustPresenceController extends GetxController {
       dept,
       userDept,
       visit,
-      device;
+      device,
+      keteranganApp;
 
   var resultData = Absen().obs;
   var shiftKerja = <ShiftKerja>[].obs;
+  late TabController tabController;
+  var listReqUpt = <ReqApp>[].obs;
+  var selectedType = "".obs;
+  var typeReqApp = [
+    {
+      "update_masuk": "Update Masuk",
+    },
+    {"update_pulang": "Update Pulang"},
+    {"update_data_absen": "Update Data Absen"},
+    {"update_shift": "Update Shift"}
+  ];
+
+  var selectedStatus = "".obs;
+  var statusReqApp = [
+    {
+      "0": "Reject",
+    },
+    {
+      "1": "Accept",
+    }
+  ];
 
   @override
   void onInit() {
     super.onInit();
+    tabController = TabController(length: 2, vsync: this);
+
     date1 = TextEditingController();
     datePulangupd = TextEditingController();
     jamMasukUpdate = TextEditingController();
@@ -69,7 +95,22 @@ class AdjustPresenceController extends GetxController {
     dept = TextEditingController();
     userDept = TextEditingController();
     visit = TextEditingController();
+    keteranganApp = TextEditingController();
     getCabang();
+    getReqAppUpt('', '');
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    tabController.dispose();
+  }
+
+  getReqAppUpt(String? accept, String? type) async {
+    final response = await ServiceApi().getReqUptAbs(accept, type);
+    listReqUpt.value = response;
+    isLoading.value = false;
+    return listReqUpt;
   }
 
   Future<List<Cabang>> getCabang() async {
@@ -164,9 +205,9 @@ class AdjustPresenceController extends GetxController {
     };
     await ServiceApi().updateAbsen(data);
     selectedShift.value = "";
-    succesDialog(Get.context!, 'N', 'Data berhasil diupdate', DialogType.success, 'SUKSES');
+    succesDialog(Get.context!, 'N', 'Data berhasil diupdate',
+        DialogType.success, 'SUKSES');
   }
-
 
   Future<List<Dept>> getDeptVisit() async {
     final response = await ServiceApi().getDeptVisit();
@@ -211,7 +252,20 @@ class AdjustPresenceController extends GetxController {
     };
     if (data.isNotEmpty) {
       await ServiceApi().updateAbsen(data);
-      succesDialog(Get.context!, 'N', 'Data berhasil diupdate', DialogType.success, 'SUKSES');
+      succesDialog(Get.context!, 'N', 'Data berhasil diupdate',
+          DialogType.success, 'SUKSES');
     }
+  }
+
+  appAbs(
+      Map<String, dynamic> dataUptApp, Map<String, dynamic>? dataUptAbs) async {
+    // print(dataUptApp['accept']);
+    if (dataUptApp['accept'] == "1") {
+      await ServiceApi().updateReqApp(dataUptApp);
+      await ServiceApi().updateReqAdjAbs(dataUptAbs!);
+    } else {
+      await ServiceApi().updateReqApp(dataUptApp);
+    }
+    keteranganApp.clear();
   }
 }

@@ -1,4 +1,5 @@
 import 'package:absensi/app/data/helper/const.dart';
+import 'package:absensi/app/modules/detail_absen/views/widget/edit_data_absen.dart';
 import 'package:absensi/app/modules/shared/rounded_image.dart';
 import 'package:flutter/material.dart';
 
@@ -13,49 +14,46 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
   const DetailAbsenView(this.detailData, {super.key});
   final Map<String, dynamic> detailData;
 
- 
-
   @override
   Widget build(BuildContext context) {
+    final markersMasuk = <Marker>[
+      Marker(
+        width: 80,
+        height: 80,
+        point: LatLng(double.parse(detailData["lat_masuk"]),
+            double.parse(detailData["long_masuk"])),
+        child: Card(
+            elevation: 10,
+            child: Image.network(
+              "${ServiceApi().baseUrl}${detailData['foto_masuk']}",
+              errorBuilder: (context, error, stackTrace) =>
+                  Image.asset('assets/image/selfie.png'),
+              fit: BoxFit.cover,
+            )),
+      ),
+    ];
 
-     final markersMasuk = <Marker>[
-    Marker(
-      width: 80,
-      height: 80,
-      point: LatLng(double.parse(detailData["lat_masuk"]),
-          double.parse(detailData["long_masuk"])),
-      child: Card(
-          elevation: 10,
-          child: Image.network(
-            "${ServiceApi().baseUrl}${detailData['foto_masuk']}",
-            errorBuilder: (context, error, stackTrace) =>
-                Image.asset('assets/image/selfie.png'),
-            fit: BoxFit.cover,
-          )),
-    ),
-  ];
-
-  final markersPulang = <Marker>[
-    Marker(
-      width: 80,
-      height: 80,
-      point: LatLng(
-          double.parse(detailData["lat_pulang"] != ""
-              ? detailData["lat_pulang"]
-              : "0.0"),
-          double.parse(detailData["long_pulang"] != ""
-              ? detailData["long_pulang"]
-              : "0.0")),
-      child: Card(
-          elevation: 10,
-          child: Image.network(
-            "${ServiceApi().baseUrl}${detailData['foto_pulang']}",
-            errorBuilder: (context, error, stackTrace) =>
-                Image.asset('assets/image/selfie.png'),
-            fit: BoxFit.cover,
-          )),
-    ),
-  ];
+    final markersPulang = <Marker>[
+      Marker(
+        width: 80,
+        height: 80,
+        point: LatLng(
+            double.parse(detailData["lat_pulang"] != ""
+                ? detailData["lat_pulang"]
+                : "0.0"),
+            double.parse(detailData["long_pulang"] != ""
+                ? detailData["long_pulang"]
+                : "0.0")),
+        child: Card(
+            elevation: 10,
+            child: Image.network(
+              "${ServiceApi().baseUrl}${detailData['foto_pulang']}",
+              errorBuilder: (context, error, stackTrace) =>
+                  Image.asset('assets/image/selfie.png'),
+              fit: BoxFit.cover,
+            )),
+      ),
+    ];
     return Scaffold(
       appBar: AppBar(
         title: const Text('DETAIL ABSEN'),
@@ -93,8 +91,8 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
                   ),
                   child: Center(
                     child: Text(
-                      DateFormat("EEEE, d MMMM yyyy", "id_ID").format(
-                          DateTime.parse(detailData['tanggal_masuk'])),
+                      DateFormat("EEEE, d MMMM yyyy", "id_ID")
+                          .format(DateTime.parse(detailData['tanggal_masuk'])),
                       style: const TextStyle(fontSize: 18, color: Colors.white),
                     ),
                   ),
@@ -170,12 +168,10 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
                                           decoration: BoxDecoration(
                                               borderRadius:
                                                   BorderRadius.circular(5),
-                                              color:
-                                                  detailData['jam_masuk'] ==
-                                                          "Telat"
-                                                      ? Colors.redAccent[700]
-                                                      : Colors
-                                                          .greenAccent[700]),
+                                              color: detailData['jam_masuk'] ==
+                                                      "Telat"
+                                                  ? Colors.redAccent[700]
+                                                  : Colors.greenAccent[700]),
                                           constraints: BoxConstraints(
                                             maxWidth: MediaQuery.of(context)
                                                     .size
@@ -394,8 +390,7 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
                                       ),
                                       Visibility(
                                         visible:
-                                            detailData['jam_absen_pulang'] !=
-                                                    ""
+                                            detailData['jam_absen_pulang'] != ""
                                                 ? true
                                                 : false,
                                         child: Row(
@@ -474,11 +469,15 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
           )
         ],
       ),
-      // floatingActionButton: FloatingActionButton(
-      //     onPressed: () {
-      //       note();
-      //     },
-      //     child: Icon(Icons.message_rounded)),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+           Get.bottomSheet(EditDataAbsen(data:detailData));
+        },
+        label: const Text('Edit Data'),
+        icon: const Icon(Icons.edit),
+      ),
     );
   }
+
+ 
 }

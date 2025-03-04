@@ -41,10 +41,8 @@ dependencies:
   rive: ^0.13.13
   shared_preferences: ^2.2.2
   shimmer: ^3.0.0
-  sliding_up_panel2: 3.3.0+1
   splash_screen_view: any
   sqflite: ^2.3.3+1
-  ternav_icons: 1.0.0
   xml: ^6.2.2
   expansion_tile_group: 2.0.0
   widget_zoom: ^0.0.4
@@ -55,6 +53,10 @@ dependencies:
   flutter: 
     sdk: flutter
   url_launcher: ^6.3.1
+  flutter_face_api: ^6.4.875
+  google_ml_vision: ^0.0.8
+  day_night_time_picker: ^1.3.1
+  
 
 dev_dependencies: 
   flutter_lints: ^4.0.0

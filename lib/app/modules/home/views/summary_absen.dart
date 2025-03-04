@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:absensi/app/modules/absen/controllers/absen_controller.dart';
 import 'package:absensi/app/data/helper/const.dart';
 import 'package:absensi/app/data/helper/format_waktu.dart';
-import 'package:absensi/app/data/helper/loading_dialog.dart';
+import 'package:absensi/app/data/helper/custom_dialog.dart';
 import 'package:absensi/app/data/model/login_model.dart';
 import 'package:absensi/app/modules/detail_absen/views/detail_absen_view.dart';
 import 'package:absensi/app/modules/shared/container.dart';
@@ -503,8 +503,7 @@ class SummaryAbsen extends GetView {
                                                           .jamMasuk!))
                                           ? "Tepat Waktu"
                                           : "Telat";
-                                  var stsPulang = absenC.dataLimitAbsen[i]
-                                              .jamAbsenPulang! ==
+                                  var stsPulang = absenC.dataLimitAbsen[i].jamAbsenPulang! ==
                                           ""
                                       ? "Belum Absen"
                                       : DateTime.parse(absenC.dataLimitAbsen[i].tanggalPulang!).isAfter(DateTime.parse(absenC.dataLimitAbsen[i].tanggalMasuk!)) &&
@@ -512,16 +511,15 @@ class SummaryAbsen extends GetView {
                                                       jamMenit: absenC
                                                           .dataLimitAbsen[i]
                                                           .jamAbsenPulang!)
-                                                  .isBefore(
-                                                      FormatWaktu.formatJamMenit(
-                                                          jamMenit: "08:01"))
+                                                  .isAfter(FormatWaktu.formatJamMenit(jamMenit: absenC.dataLimitAbsen[i].jamAbsenMasuk!).add(
+                                                      const Duration(hours: 8)))
                                           ? "Lembur"
-                                          : FormatWaktu.formatJamMenit(
-                                                      jamMenit: absenC
-                                                          .dataLimitAbsen[i]
-                                                          .jamAbsenPulang!)
-                                                  .isBefore(
-                                                      FormatWaktu.formatJamMenit(jamMenit: absenC.dataLimitAbsen[i].jamPulang!))
+                                          : DateTime.parse(absenC.dataLimitAbsen[i].tanggalPulang!).isAtSameMomentAs(DateTime.parse(absenC.dataLimitAbsen[i].tanggalMasuk!)) &&
+                                                  FormatWaktu.formatJamMenit(
+                                                          jamMenit: absenC
+                                                              .dataLimitAbsen[i]
+                                                              .jamAbsenPulang!)
+                                                      .isBefore(FormatWaktu.formatJamMenit(jamMenit: absenC.dataLimitAbsen[i].jamPulang!))
                                               ? "Pulang Cepat"
                                               : FormatWaktu.formatJamMenit(jamMenit: absenC.dataLimitAbsen[i].jamAbsenPulang!).isAtSameMomentAs(FormatWaktu.formatJamMenit(jamMenit: absenC.dataLimitAbsen[i].jamPulang!))
                                                   ? 'Tepat Waktu'

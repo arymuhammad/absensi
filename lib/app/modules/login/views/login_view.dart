@@ -1,7 +1,7 @@
 import 'package:absensi/app/data/helper/app_colors.dart';
 import 'package:absensi/app/data/helper/const.dart';
 import 'package:absensi/app/data/helper/db_helper.dart';
-import 'package:absensi/app/data/helper/loading_dialog.dart';
+import 'package:absensi/app/data/helper/custom_dialog.dart';
 import 'package:absensi/app/modules/profil/views/verifikasi_update_password.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';

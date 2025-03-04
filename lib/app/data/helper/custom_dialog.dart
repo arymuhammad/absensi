@@ -1,5 +1,5 @@
+import 'package:absensi/app/data/helper/const.dart';
 import 'package:absensi/app/modules/login/controllers/login_controller.dart';
-import 'package:absensi/app/modules/report_sales/controllers/report_sales_controller.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
@@ -7,7 +7,6 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 
 final auth = Get.put(LoginController());
-final salesCtr = Get.put(ReportSalesController());
 
 defaultSnackBar(context, message) {
   var snackBar = SnackBar(
@@ -22,7 +21,7 @@ defaultSnackBar(context, message) {
   ScaffoldMessenger.of(context).showSnackBar(snackBar);
 }
 
-void showToast(message) {
+ showToast(message) {
   Fluttertoast.showToast(
       msg: message,
       // backgroundColor: Colors.grey[700],
@@ -88,7 +87,8 @@ void dialogMsgAbsen(code, msg) {
       barrierDismissible: false);
 }
 
-void succesDialog(context, String pageAbsen, String desc, DialogType type, String title) {
+void succesDialog(
+    context, String pageAbsen, String desc, DialogType type, String title) {
   AwesomeDialog(
     context: context,
     animType: AnimType.scale,
@@ -115,7 +115,7 @@ void succesDialog(context, String pageAbsen, String desc, DialogType type, Strin
   ).show();
 }
 
- failedDialog(context, title, desc) {
+failedDialog(context, title, desc) {
   AwesomeDialog(
     context: context,
     animType: AnimType.scale,
@@ -129,6 +129,26 @@ void succesDialog(context, String pageAbsen, String desc, DialogType type, Strin
     btnOkIcon: Icons.cancel,
     btnOkText: 'Tutup',
     btnOkColor: Colors.redAccent[700],
+    onDismissCallback: (type) {
+      debugPrint('Dialog Dissmiss from callback $type');
+    },
+  ).show();
+}
+
+infoDialog(BuildContext context, String title, String desc, String confirmText,  Function()? btnOkOnPress) {
+  AwesomeDialog(
+    context: context,
+    animType: AnimType.scale,
+    headerAnimationLoop: false,
+    dialogType: DialogType.info,
+    dismissOnTouchOutside: false,
+    dismissOnBackKeyPress: false,
+    title: title,
+    desc: desc,
+    btnOkOnPress: btnOkOnPress,
+    btnOkIcon: Icons.camera_front,
+    btnOkText: confirmText,
+    btnOkColor: mainColor,
     onDismissCallback: (type) {
       debugPrint('Dialog Dissmiss from callback $type');
     },
@@ -197,7 +217,7 @@ loadingWithIcon() {
       // Lottie.asset('assets/image/loader.json', repeat: true)
       RotationTransition(
         alignment: Alignment.center,
-        turns: salesCtr.ctrAnimated,
+        turns: auth.ctrAnimated,
         child: Image.asset(
           'assets/image/circle_loading.png',
           height: 80,

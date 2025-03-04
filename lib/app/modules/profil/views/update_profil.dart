@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:get/get.dart';
 
-import '../../../data/helper/loading_dialog.dart';
+import '../../../data/helper/custom_dialog.dart';
 import '../../../services/service_api.dart';
 
 class UpdateProfil extends GetView {
@@ -192,12 +192,18 @@ class UpdateProfil extends GetView {
                 return TypeAheadFormField<String>(
                   textFieldConfiguration: TextFieldConfiguration(
                     controller: ctr.level..text = userData!.levelUser!,
-                    decoration: const InputDecoration(
-                      labelText: 'Level User',
-                      border: OutlineInputBorder(),
-                      filled: true,
-                      fillColor: Colors.white,
-                    ),
+                    decoration: InputDecoration(
+                        labelText: 'Level User',
+                        border: const OutlineInputBorder(),
+                        filled: true,
+                        fillColor: Colors.white,
+                        suffixIcon: IconButton(
+                            onPressed: () {
+                              ctr.level.clear();
+                            },
+                            icon: const Icon(
+                              Icons.highlight_remove_rounded,
+                            ))),
                   ),
                   suggestionsCallback: (pattern) {
                     return allLevel.where((option) =>
@@ -253,7 +259,7 @@ class UpdateProfil extends GetView {
           ),
           TextField(
             controller: ctr.telp,
-            decoration:  InputDecoration(
+            decoration: InputDecoration(
                 labelText: 'No Telp',
                 hintText: userData!.noTelp!,
                 filled: true,

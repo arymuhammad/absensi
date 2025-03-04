@@ -10,7 +10,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../data/helper/db_helper.dart';
-import '../../../data/helper/loading_dialog.dart';
+import '../../../data/helper/custom_dialog.dart';
 import '../../../data/model/login_model.dart';
 import '../../../data/model/visit_model.dart';
 

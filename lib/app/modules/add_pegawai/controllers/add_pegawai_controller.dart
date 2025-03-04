@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
+import 'package:absensi/app/data/model/data_wajah_model.dart';
 import 'package:absensi/app/data/model/login_model.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:crypto/crypto.dart';
@@ -21,10 +22,11 @@ import 'package:xml/xml.dart' as xml;
 import 'package:image_picker/image_picker.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../../data/helper/loading_dialog.dart';
+import '../../../data/helper/custom_dialog.dart';
 import '../../../data/model/cabang_model.dart';
 import '../../../data/model/cek_user_model.dart';
 import '../../../data/model/foto_profil_model.dart';
+import 'package:google_ml_vision/google_ml_vision.dart';
 
 class AddPegawaiController extends GetxController {
   late TextEditingController nip, name, username, pass, store, telp, level;
@@ -40,7 +42,8 @@ class AddPegawaiController extends GetxController {
   Map<String, dynamic> imgUpl = {};
   Uint8List webImage = Uint8List(0);
   String fileName = "";
-
+  var isLoading = false.obs;
+  var faceDatas = DataWajah().obs;
   var cabang = <Cabang>[].obs;
   var levelUser = <Level>[].obs;
   var selectedCabang = "".obs;
@@ -113,8 +116,8 @@ class AddPegawaiController extends GetxController {
     }
 
     try {
-      final readDoc =
-          await http.get(Uri.parse('http://103.156.15.61/update apk/updateLog.xml'));
+      final readDoc = await http
+          .get(Uri.parse('http://103.156.15.61/update apk/updateLog.xml'));
 
       final response = await http
           .head(Uri.parse(supportedAbi == 'arm64-v8a'
@@ -398,7 +401,6 @@ class AddPegawaiController extends GetxController {
             dialogMsg("",
                 "No Telp ini sudah terdaftar\nSilahkan masukkan No Telp lain");
           } else {
-
             await ServiceApi().addUpdatePegawai(data, mode);
             selectedCabang.value = "";
             username.clear();
@@ -623,5 +625,63 @@ class AddPegawaiController extends GetxController {
     } else {
       showToast("Anda belum mengisi kolom Password");
     }
+  }
+
+  Future<void> uploadFaceData() async {
+    image = await picker.pickImage(
+        source: ImageSource.camera,
+        imageQuality: 70,
+        maxHeight: 600,
+        maxWidth: 600);
+
+    if (image != null) {
+      // var img = base64.encode(File(image!.path).readAsBytesSync());
+      // log(image!.path, name: 'PATH');
+      update();
+    } else {
+      return;
+    }
+  }
+
+  addFaceData(String idUser) async {
+    await uploadFaceData();
+    var faceData = "";
+    if (image != null) {
+      final googleVisionImage = GoogleVisionImage.fromFilePath(image!.path);
+
+      /// Buat objek FaceDetector
+      final faceDetector = GoogleVision.instance.faceDetector(
+          const FaceDetectorOptions(
+              enableClassification: true,
+              minFaceSize: 0.1,
+              mode: FaceDetectorMode.accurate,
+              enableContours: true,
+              enableLandmarks: true,
+              enableTracking: true));
+      final faces = await faceDetector.processImage(googleVisionImage);
+
+      /// Tampilkan pesan apakah wajahnya terdeteksi atau tidak
+      if (faces.isEmpty) {
+        failedDialog(Get.context!, 'ERROR', 'Wajah tidak terdeteksi');
+      } else {
+        // loadingDialog('Wajah terdeteksi','');
+        loadingDialog("Menyimpan data...", "");
+        faceData = base64Encode(File(image!.path).readAsBytesSync());
+        var data = {"data_wajah": faceData, "id_user": idUser};
+        var dataLocal = {"data_wajah": faceData};
+        await ServiceApi().faceData(data, 'post');
+        await SQLHelper.instance.updateFaceData(dataLocal, idUser);
+        Get.back();
+      }
+    }
+  }
+
+  getFaceData(String idUser) async {
+    isLoading.value = true;
+    var data = {"id_user": idUser};
+    var response = await ServiceApi().faceData(data, '');
+    faceDatas.value = response;
+    isLoading.value = false;
+    return faceDatas;
   }
 }

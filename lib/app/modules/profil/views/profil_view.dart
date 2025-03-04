@@ -7,9 +7,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icons_plus/icons_plus.dart';
-import 'package:ternav_icons/ternav_icons.dart';
 import 'package:widget_zoom/widget_zoom.dart';
-import '../../../data/helper/loading_dialog.dart';
+import '../../../data/helper/custom_dialog.dart';
 import '../../add_pegawai/controllers/add_pegawai_controller.dart';
 import '../controllers/profil_controller.dart';
 
@@ -98,7 +97,7 @@ class ProfilView extends GetView<ProfilController> {
                               children: [
                                 Row(
                                   children: [
-                                    Icon(TernavIcons.bold.profile,
+                                    Icon(Iconsax.profile_circle_bold,
                                         color: mainColor),
                                     const SizedBox(width: 5),
                                     const Text('Username'),
@@ -121,8 +120,7 @@ class ProfilView extends GetView<ProfilController> {
                               children: [
                                 Row(
                                   children: [
-                                    Icon(TernavIcons.bold.call,
-                                        color: mainColor),
+                                    Icon(Iconsax.call_bold, color: mainColor),
                                     const SizedBox(width: 5),
                                     const Text('Telp'),
                                   ],
@@ -205,42 +203,7 @@ class ProfilView extends GetView<ProfilController> {
                                     loadingProgress.expectedTotalBytes!
                                 : null,
                           ));
-                        })
-
-                    // ClipRect(
-                    //   child: listDataUser!.foto != ""
-                    //       ? Obx(
-                    //           () => CachedNetworkImage(
-                    //             imageUrl:
-                    //                 "${ServiceApi().baseUrl}${user.fotoProfil.value != "" ? user.fotoProfil.value : listDataUser!.foto}",
-                    //             fit: BoxFit.cover,
-                    //             progressIndicatorBuilder:
-                    //                 (context, url, progress) =>
-                    //                     CircularProgressIndicator(
-                    //               value: progress.progress,
-                    //               strokeWidth: 15,
-                    //             ),
-                    //             errorWidget: (context, url, error) {
-                    //               return Image.network(
-                    //                   "${ServiceApi().baseUrl}${user.fotoProfil.value}");
-                    //             },
-                    //           ),
-                    //         )
-                    //       // PhotoView(
-                    //       //       backgroundDecoration: BoxDecoration(
-                    //       //           color: Colors.grey[200]),
-                    //       //       imageProvider: NetworkImage(
-                    //       //           "${ServiceApi().baseUrl}${userFoto.fotoProfil.value !="" ? userFoto.fotoProfil.value : listDataUser![5]}"),
-
-                    //       //     ),
-                    //       // )
-                    //       : Image.network(
-                    //           "https://ui-avatars.com/api/?name=${listDataUser!.nama}",
-                    //           fit: BoxFit.cover,
-                    //         ),
-                    // ),
-
-                    ),
+                        })),
               ),
             ),
           ),
@@ -281,7 +244,7 @@ class ProfilView extends GetView<ProfilController> {
                       promptDialog(context, 'Anda yakin ingin keluar?');
                     },
                     icon: const Icon(
-                      Icons.logout_rounded,
+                      Iconsax.logout_1_outline,
                       color: Colors.white,
                       size: 35,
                     ))

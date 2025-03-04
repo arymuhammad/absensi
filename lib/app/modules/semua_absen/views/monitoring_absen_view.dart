@@ -478,7 +478,7 @@ class MonitoringAbsenView extends GetView {
         onPressed: () {
           searchForm();
         },
-        child: const Icon(FontAwesome.searchengin_brand),
+        child: const Icon(Iconsax.calendar_search_outline),
       ),
     );
   }

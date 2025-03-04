@@ -1,16 +1,16 @@
 import 'package:absensi/app/modules/absen/controllers/absen_controller.dart';
 import 'package:absensi/app/data/helper/app_colors.dart';
 import 'package:absensi/app/data/helper/const.dart';
-import 'package:absensi/app/data/helper/loading_dialog.dart';
+import 'package:absensi/app/data/helper/custom_dialog.dart';
 import 'package:absensi/app/data/model/login_model.dart';
 import 'package:absensi/app/modules/detail_absen/views/detail_visit_view.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
+import 'package:icons_plus/icons_plus.dart';
 import 'package:intl/intl.dart';
 import 'package:shimmer/shimmer.dart';
-import 'package:ternav_icons/ternav_icons.dart';
 
 class RiwayatVisitView extends GetView {
   RiwayatVisitView({super.key, this.userData});
@@ -445,8 +445,8 @@ class RiwayatVisitView extends GetView {
           onPressed: () {
             formFilter(userData!.id);
           },
-          child: Icon(
-            TernavIcons.lightOutline.calender_3,
+          child: const Icon(
+            Iconsax.calendar_tick_outline,
             color: AppColors.mainTextColor1,
           )),
     );
@@ -470,11 +470,11 @@ class RiwayatVisitView extends GetView {
                     child: DateTimeField(
                       controller: visitC.date1,
                       style: const TextStyle(fontSize: 14),
-                      decoration: InputDecoration(
-                          contentPadding: const EdgeInsets.all(0.5),
-                          prefixIcon: Icon(TernavIcons.lightOutline.calender_3),
+                      decoration: const InputDecoration(
+                          contentPadding: EdgeInsets.all(0.5),
+                          prefixIcon: Icon(Iconsax.calendar_edit_outline),
                           hintText: 'Tanggal Awal',
-                          border: const OutlineInputBorder()),
+                          border: OutlineInputBorder()),
                       format: DateFormat("yyyy-MM-dd"),
                       onShowPicker: (context, currentValue) {
                         return showDatePicker(
@@ -492,11 +492,11 @@ class RiwayatVisitView extends GetView {
                     child: DateTimeField(
                       controller: visitC.date2,
                       style: const TextStyle(fontSize: 14),
-                      decoration: InputDecoration(
-                          contentPadding: const EdgeInsets.all(0.5),
-                          prefixIcon: Icon(TernavIcons.lightOutline.calender_3),
+                      decoration: const InputDecoration(
+                          contentPadding: EdgeInsets.all(0.5),
+                          prefixIcon: Icon(Iconsax.calendar_edit_outline),
                           hintText: 'Tanggal Akhir',
-                          border: const OutlineInputBorder()),
+                          border: OutlineInputBorder()),
                       format: DateFormat("yyyy-MM-dd"),
                       onShowPicker: (context, currentValue) {
                         return showDatePicker(

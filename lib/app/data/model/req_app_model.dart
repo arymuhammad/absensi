@@ -1,0 +1,62 @@
+class ReqApp {
+  late String idUser;
+  late String nama;
+  late String tglMasuk;
+  String? tglPulang;
+  String? idShift;
+  String? jamMasuk;
+  String? jamPulang;
+  String? jamAbsenMasuk;
+  String? jamAbsenPulang;
+  String? fotoMasuk;
+  String? fotoPulang;
+  String? latOut;
+  String? longOut;
+  String? devInfo;
+  String? status;
+  String? accept;
+  String? keterangan;
+  String? namaShift;
+
+  ReqApp({
+    required this.idUser,
+    required this.nama,
+    required this.tglMasuk,
+    this.tglPulang,
+    this.idShift,
+    this.jamMasuk,
+    this.jamPulang,
+    this.jamAbsenMasuk,
+    this.jamAbsenPulang,
+    this.fotoMasuk,
+    this.fotoPulang,
+    this.latOut,
+    this.longOut,
+    this.devInfo,
+    this.status,
+    this.accept,
+    this.keterangan,
+    this.namaShift
+  });
+
+  ReqApp.fromJson(Map<String, dynamic> json) {
+    idUser = json['id_user'];
+    nama = json['nama']??'';
+    tglMasuk = json['tgl_masuk'];
+    tglPulang = json['tgl_pulang']??'';
+    idShift = json['id_shift']??'';
+    jamMasuk = json['jam_masuk']??'';
+    jamPulang = json['jam_pulang']??'';
+    jamAbsenMasuk = json['jam_absen_masuk']??'';
+    jamAbsenPulang = json['jam_absen_pulang']??'';
+    fotoMasuk = json['foto_masuk']??'';
+    fotoPulang = json['foto_pulang']??'';
+    status = json['status']??'';
+    latOut = json['lat_out']??'';
+    longOut = json['long_out']??'';
+    devInfo = json['device_info2']??'';
+    accept = json['accept']??'';
+    keterangan = json['keterangan']??'';
+    namaShift = json['nama_shift']??'';
+  }
+}

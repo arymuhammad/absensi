@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:absensi/app/data/helper/db_helper.dart';
-import 'package:absensi/app/data/helper/loading_dialog.dart';
+import 'package:absensi/app/data/helper/custom_dialog.dart';
 import 'package:absensi/app/data/model/login_offline_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -12,7 +12,8 @@ import '../../../data/model/foto_profil_model.dart';
 import '../../../services/service_api.dart';
 import '../../../data/model/login_model.dart';
 
-class LoginController extends GetxController {
+class LoginController extends GetxController 
+    with GetTickerProviderStateMixin{
   late TextEditingController email, username, password;
   var isLoading = false.obs;
   // var dataUser = Login().obs;
@@ -28,9 +29,21 @@ class LoginController extends GetxController {
   SMINumber? lookNum;
   StateMachineController? stateMachineController;
   var artboard = Artboard().obs;
+  late AnimationController ctrAnimated;
 
   @override
   void onInit() async {
+    ctrAnimated = AnimationController(
+      duration: const Duration(milliseconds: 800),
+      vsync: this,
+    );
+    ctrAnimated.forward();
+    ctrAnimated.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        ctrAnimated.reset();
+        ctrAnimated.forward();
+      }
+    });
     await RiveFile.initialize();
     rootBundle.load(animationLink).then((value) {
       final file = RiveFile.import(value);
@@ -189,14 +202,12 @@ class LoginController extends GetxController {
         password.clear();
 
         showToast("Selamat datang ${response.data!.nama}");
-        
       } else {
         failTrigger?.fire();
         showToast("User tidak ditemukan\nHarap periksa username dan password");
       }
     }
   }
-    
 
   logout() async {
     SharedPreferences pref = await SharedPreferences.getInstance();

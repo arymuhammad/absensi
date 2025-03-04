@@ -1,13 +1,9 @@
 import 'package:absensi/app/data/helper/const.dart';
-import 'package:absensi/app/data/helper/loading_dialog.dart';
 import 'package:absensi/app/data/model/login_model.dart';
 import 'package:absensi/app/modules/cek_stok/views/cek_stok_view.dart';
-import 'package:absensi/app/modules/report_sales/controllers/report_sales_controller.dart';
-import 'package:absensi/app/modules/report_sales/views/report_sales_view.dart';
 import 'package:absensi/app/modules/semua_absen/views/monitoring_absen_view.dart';
 import 'package:absensi/app/modules/semua_absen/views/search_form.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:icons_plus/icons_plus.dart';
 
@@ -16,7 +12,6 @@ import '../../adjust_presence/views/adjust_presence_view.dart';
 class CardInfoMenu extends GetView {
   CardInfoMenu({super.key, this.userData});
   final Data? userData;
-  final reportC = Get.put(ReportSalesController());
 
   @override
   Widget build(BuildContext context) {
@@ -101,19 +96,19 @@ class CardInfoMenu extends GetView {
                           : false,
                       child: Column(
                         children: [
-                          IconButton(
-                              onPressed: () async {
-                                Get.to(() => ReportSalesView(),
-                                    transition: Transition.cupertino);
-                                loadingWithIcon();
-                                await reportC.fetchSalesReport();
-                                SmartDialog.dismiss();
-                              },
-                              icon: Icon(
-                                FontAwesome.circle_dollar_to_slot_solid,
-                                color: mainColor,
-                                size: 30,
-                              )),
+                          // IconButton(
+                          //     onPressed: () async {
+                          //       Get.to(() => ReportSalesView(),
+                          //           transition: Transition.cupertino);
+                          //       loadingWithIcon();
+                          //       await reportC.fetchSalesReport();
+                          //       SmartDialog.dismiss();
+                          //     },
+                          //     icon: Icon(
+                          //       FontAwesome.circle_dollar_to_slot_solid,
+                          //       color: mainColor,
+                          //       size: 30,
+                          //     )),
                           const Text(
                             'Laporan\nSales',
                             style: TextStyle(fontWeight: FontWeight.bold),

@@ -1,4 +1,3 @@
-import 'package:absensi/app/data/helper/loading_dialog.dart';
 import 'package:absensi/app/services/service_api.dart';
 import 'package:absensi/app/data/model/cek_stok_model.dart';
 import 'package:flutter/material.dart';
@@ -25,7 +24,7 @@ class CekStokController extends GetxController {
   }
 
   Future<List<CekStok>> fetchDataStok(cabang) async {
-    loadingWithIcon();
+  
     var tgl1 = DateFormat('yyyy-MM-dd')
         .format(DateTime(DateTime.now().year, DateTime.now().month, 1));
     var tgl2 = DateFormat('yyyy-MM-dd')

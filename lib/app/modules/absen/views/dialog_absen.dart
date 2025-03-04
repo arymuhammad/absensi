@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:absensi/app/modules/absen/controllers/absen_controller.dart';
 import 'package:absensi/app/data/helper/db_helper.dart';
-import 'package:absensi/app/data/helper/loading_dialog.dart';
+import 'package:absensi/app/data/helper/custom_dialog.dart';
 
 import 'package:absensi/app/modules/absen/views/form_absen.dart';
 import 'package:absensi/app/modules/absen/views/visit.dart';

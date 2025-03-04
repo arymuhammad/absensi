@@ -17,8 +17,6 @@ import '../modules/login/bindings/login_binding.dart';
 import '../modules/login/views/login_view.dart';
 import '../modules/profil/bindings/profil_binding.dart';
 import '../modules/profil/views/profil_view.dart';
-import '../modules/report_sales/bindings/report_sales_binding.dart';
-import '../modules/report_sales/views/report_sales_view.dart';
 import '../modules/semua_absen/bindings/semua_absen_binding.dart';
 import '../modules/semua_absen/views/semua_absen_view.dart';
 import '../modules/settings/bindings/settings_binding.dart';
@@ -72,13 +70,8 @@ class AppPages {
       page: () => AbsenView(),
     ),
     GetPage(
-        name: _Paths.CEK_SALES,
-        page: () => ReportSalesView(),
-        binding: ReportSalesBinding(),
-        transition: Transition.cupertino),
-    GetPage(
       name: _Paths.SETTINGS,
-      page: () => const SettingsView(),
+      page: () => SettingsView(),
       binding: SettingsBinding(),
     ),
     // GetPage(

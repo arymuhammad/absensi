@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:absensi/app/modules/absen/controllers/absen_controller.dart';
 import 'package:absensi/app/data/helper/const.dart';
-import 'package:absensi/app/data/helper/loading_dialog.dart';
+import 'package:absensi/app/data/helper/custom_dialog.dart';
 import 'package:absensi/app/data/model/login_model.dart';
 import 'package:absensi/app/modules/detail_absen/views/detail_visit_view.dart';
 import 'package:flutter/cupertino.dart';

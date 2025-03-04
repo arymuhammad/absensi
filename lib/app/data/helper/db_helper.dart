@@ -8,7 +8,7 @@ import 'package:absensi/app/data/model/shift_kerja_model.dart';
 // import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 import '../model/visit_model.dart';
-import 'loading_dialog.dart';
+import 'custom_dialog.dart';
 
 class SQLHelper {
   final _databaseName = "/absensi.db";
@@ -40,6 +40,7 @@ class SQLHelper {
         lat TEXT,
         long TEXT,
         foto TEXT,
+        data_wajah BLOB,
         no_telp TEXT,
         level TEXT,
         level_user TEXT,
@@ -249,13 +250,13 @@ class SQLHelper {
     var res = await db.delete('tbl_visit_area');
     return res;
   }
-  
+
   Future truncateShift() async {
     Database db = await instance.database;
     var res = await db.delete('shift_kerja');
     return res;
   }
-  
+
   Future truncateLevel() async {
     Database db = await instance.database;
     var res = await db.delete('tbl_level_user');
@@ -267,13 +268,12 @@ class SQLHelper {
     var res = await db.delete('tbl_cabang');
     return res;
   }
-  
+
   Future truncateServer() async {
     Database db = await instance.database;
     var res = await db.delete('server');
     return res;
   }
-
 
   Future<void> insertCabang(Cabang todo) async {
     Database db = await instance.database;
@@ -288,8 +288,6 @@ class SQLHelper {
     );
     return res.map((e) => Cabang.fromJson(e)).toList();
   }
-
-  
 
   Future<List<Absen>> getAbsenToday(String idUser, String today) async {
     Database db = await instance.database;
@@ -437,6 +435,28 @@ class SQLHelper {
     Database db = await database;
     var res = await db.query('server');
     return res.map((e) => ServerApi.fromJson(e)).toList();
+  }
+
+  Future<void> updateFaceData(Map<String, dynamic> data, String id) async {
+    try {
+      Database db = await instance.database;
+      await db
+          .update('tbl_user', data, where: 'id=?', whereArgs: [id])
+          .timeout(const Duration(minutes: 3))
+          .then((value) {
+            return showToast('Data wajah tersimpan di local storage');
+          });
+    } on TimeoutException catch (e) {
+      return showToast(e.toString());
+    } catch (e) {
+      return showToast(e.toString());
+    }
+  }
+
+  Future<List> getFaceData(String id) async {
+    Database db = await database;
+    var res = await db.query('tbl_user', columns: ["data_wajah"], where: 'id=?', whereArgs: [id]);
+    return res.map((e) => e).toList();
   }
 
   Future close() async => _database!.close();

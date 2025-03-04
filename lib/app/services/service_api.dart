@@ -8,11 +8,14 @@ import 'package:absensi/app/data/model/cek_absen_model.dart';
 import 'package:absensi/app/data/model/cek_stok_model.dart';
 import 'package:absensi/app/data/model/cek_user_model.dart';
 import 'package:absensi/app/data/model/cek_visit_model.dart';
+import 'package:absensi/app/data/model/data_wajah_model.dart';
 import 'package:absensi/app/data/model/level_model.dart';
 import 'package:absensi/app/data/model/report_sales_model.dart';
+import 'package:absensi/app/data/model/req_app_model.dart';
 import 'package:absensi/app/data/model/shift_kerja_model.dart';
 import 'package:absensi/app/data/model/user_model.dart';
 import 'package:absensi/app/data/model/visit_model.dart';
+import 'package:absensi/app/modules/adjust_presence/views/widget/adjust_data.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -20,7 +23,7 @@ import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 
-import '../data/helper/loading_dialog.dart';
+import '../data/helper/custom_dialog.dart';
 import '../data/model/absen_model.dart';
 import '../data/model/dept_model.dart';
 import '../data/model/foto_profil_model.dart';
@@ -280,8 +283,7 @@ class ServiceApi {
 
   submitAbsen(data, bool isOnInit) async {
     try {
-      var request =
-          http.MultipartRequest('POST', Uri.parse('${baseUrl}absen'));
+      var request = http.MultipartRequest('POST', Uri.parse('${baseUrl}absen'));
 
       // request.headers.addAll(headers);
       request.fields['status'] = data["status"];
@@ -501,8 +503,8 @@ class ServiceApi {
       //   baseUrl = bs.first.url!;
 
       // }
-      final response = await http.post(Uri.parse('${baseUrl}get_absen'),
-          body: paramAbsen);
+      final response =
+          await http.post(Uri.parse('${baseUrl}get_absen'), body: paramAbsen);
       switch (response.statusCode) {
         case 200:
           List<dynamic> result = json.decode(response.body)['data'];
@@ -530,8 +532,8 @@ class ServiceApi {
 
   getFotoProfil(idUser) async {
     try {
-      final response = await http
-          .post(Uri.parse('${baseUrl}get_foto_profil'), body: idUser);
+      final response =
+          await http.post(Uri.parse('${baseUrl}get_foto_profil'), body: idUser);
       switch (response.statusCode) {
         case 200:
           final result = json.decode(response.body)['data'];
@@ -611,8 +613,8 @@ class ServiceApi {
 
   updatePasswordUser(Map<String, String> data) async {
     try {
-      final response = await http
-          .post(Uri.parse('${baseUrl}update_password'), body: data);
+      final response =
+          await http.post(Uri.parse('${baseUrl}update_password'), body: data);
       switch (response.statusCode) {
         case 200:
           List<dynamic> result = json.decode(response.body)['data'];
@@ -798,8 +800,7 @@ class ServiceApi {
 
   submitVisit(Map<String, dynamic> data, bool isOnInit) async {
     try {
-      var request =
-          http.MultipartRequest('POST', Uri.parse('${baseUrl}visit'));
+      var request = http.MultipartRequest('POST', Uri.parse('${baseUrl}visit'));
       // request.headers.addAll(headers);
       request.fields['status'] = data["status"];
       request.fields['id'] = data["id"];
@@ -1003,8 +1004,8 @@ class ServiceApi {
   getUserCabang(idStore) async {
     var param = {"idCabang": idStore};
     try {
-      final response = await http
-          .post(Uri.parse('${baseUrl}get_user_cabang'), body: param);
+      final response =
+          await http.post(Uri.parse('${baseUrl}get_user_cabang'), body: param);
       switch (response.statusCode) {
         case 200:
           List<dynamic> result = json.decode(response.body)['data'];
@@ -1043,8 +1044,7 @@ class ServiceApi {
 
   getDeptVisit() async {
     try {
-      final response =
-          await http.get(Uri.parse('${baseUrl}get_dept_visit'));
+      final response = await http.get(Uri.parse('${baseUrl}get_dept_visit'));
 
       switch (response.statusCode) {
         case 200:
@@ -1071,8 +1071,8 @@ class ServiceApi {
   getUserVisit(idDept) async {
     var data = {"idDept": idDept};
     try {
-      final response = await http
-          .post(Uri.parse('${baseUrl}get_user_visit'), body: data);
+      final response =
+          await http.post(Uri.parse('${baseUrl}get_user_visit'), body: data);
 
       switch (response.statusCode) {
         case 200:
@@ -1115,6 +1115,202 @@ class ServiceApi {
     //   // print(data);
     //   log("gagal kirim data", name: "XMOR");
     // }
+  }
+
+  faceData(Map<String, String>? data, mode) async {
+    switch (mode) {
+      case 'post':
+        try {
+          await http
+              .post(Uri.parse('${baseUrl}post_face_data'), body: data!)
+              .timeout(const Duration(seconds: 30));
+        } on FetchDataException catch (e) {
+          // print('error caught: ${e.message}');
+          showToast("${e.message}");
+        } on TimeoutException catch (_) {
+          showToast("waktu koneksi ke server habis");
+        }
+        break;
+      default:
+        try {
+          var response = await http.get(
+              Uri.parse('${baseUrl}get_face_data?id_user=${data!['id_user']}'));
+          dynamic result = json.decode(response.body)['data'];
+          DataWajah face = DataWajah.fromJson(result);
+          return face;
+        } on FormatException catch (e) {
+          showToast(e.toString());
+        } catch (e) {
+          showToast(e.toString());
+        }
+        break;
+    }
+  }
+
+  reqUpdateAbs(Map<String, dynamic> data) async {
+    try {
+      Map<String, String> headers = {
+        'Content-Type': 'application/json; charset=UTF-8',
+      };
+      var request =
+          http.MultipartRequest('POST', Uri.parse('${baseUrl}req_update_data'));
+      request.headers.addAll(headers);
+      request.fields['status'] = data["status"];
+      request.fields['id_user'] = data["id_user"];
+      request.fields['nama'] = data["nama"];
+      if (data["status"] == "update_masuk") {
+        request.fields['tgl_masuk'] = data["tgl_masuk"];
+        request.fields['jam_absen_masuk'] = data["jam_absen_masuk"];
+      } else if (data["status"] == "update_pulang") {
+        request.fields['tgl_masuk'] = data["tgl_masuk"];
+        request.fields['tgl_pulang'] = data["tgl_pulang"];
+        request.fields['jam_absen_pulang'] = data["jam_absen_pulang"];
+        request.fields['lat_out'] = data["lat_out"];
+        request.fields['long_out'] = data["long_out"];
+        request.fields['device_info2'] = data["device_info2"];
+      } else if (data["status"] == "update_data_absen") {
+        request.fields['tgl_masuk'] = data["tgl_masuk"];
+        request.fields['tgl_pulang'] = data["tgl_pulang"];
+        request.fields['jam_absen_masuk'] = data["jam_absen_masuk"];
+        request.fields['jam_absen_pulang'] = data["jam_absen_pulang"];
+        request.fields['lat_out'] = data["lat_out"];
+        request.fields['long_out'] = data["long_out"];
+        request.fields['device_info2'] = data["device_info2"];
+      } else {
+        request.fields['tgl_masuk'] = data["tgl_masuk"];
+        request.fields['id_shift'] = data["id_shift"];
+        request.fields['jam_masuk'] = data["jam_masuk"];
+        request.fields['jam_pulang'] = data["jam_pulang"];
+      }
+
+      if (data["status"] == "update_masuk") {
+        request.files.add(http.MultipartFile(
+            "foto_masuk",
+            File(data["foto_masuk"]).readAsBytes().asStream(),
+            File(data["foto_masuk"]).lengthSync(),
+            filename: File(data["foto_masuk"]).path.split("/").last));
+      } else if (data["status"] == "update_pulang") {
+        request.files.add(http.MultipartFile(
+            "foto_pulang",
+            File(data["foto_pulang"]).readAsBytes().asStream(),
+            File(data["foto_pulang"]).lengthSync(),
+            filename: File(data["foto_pulang"]).path.split("/").last));
+      } else if (data["status"] == "update_data_absen") {
+        request.files.add(http.MultipartFile(
+            "foto_masuk",
+            File(data["foto_masuk"]).readAsBytes().asStream(),
+            File(data["foto_masuk"]).lengthSync(),
+            filename: File(data["foto_masuk"]).path.split("/").last));
+
+        request.files.add(http.MultipartFile(
+            "foto_pulang",
+            File(data["foto_pulang"]).readAsBytes().asStream(),
+            File(data["foto_pulang"]).lengthSync(),
+            filename: File(data["foto_pulang"]).path.split("/").last));
+      } else {}
+
+      await request.send().timeout(const Duration(minutes: 1)).then((val) {
+        if (val.statusCode == 200) {
+          Get.back();
+          succesDialog(
+              Get.context!,
+              'N',
+              'Data berhasil dikirim\nMenunggu persetujuan IT untuk perubahan data',
+              DialogType.success,
+              'SUKSES');
+        } else {
+          Get.back();
+          failedDialog(Get.context!, 'ERROR',
+              '${val.request!.url}\n${val.statusCode} ${val.reasonPhrase}');
+        }
+      });
+    } on TimeoutException catch (_) {
+      Get.back();
+      failedDialog(Get.context!, 'ERROR',
+          'Waktu koneksi ke server telah habis\nSilahkan coba lagi nanti');
+    } on Exception catch (e) {
+      showToast(e.toString());
+    }
+  }
+
+  getReqUptAbs(String? accept, String? type) async {
+    try {
+      final response = await http
+          .get(Uri.parse('${baseUrl}get_reqUptAbs?accept=$accept&type=$type'))
+          .timeout(const Duration(minutes: 1));
+      switch (response.statusCode) {
+        case 200:
+          List<dynamic> listData = json.decode(response.body)['data'];
+          List<ReqApp> result =
+              listData.map((e) => ReqApp.fromJson(e)).toList();
+          return result;
+        case 400:
+        case 401:
+        case 402:
+        case 404:
+          final result = json.decode(response.body);
+          throw FetchDataException(result["data"]);
+        default:
+          throw FetchDataException(
+            'Something went wrong.',
+          );
+      }
+    } on FetchDataException catch (e) {
+      // print('error caught: ${e.message}');
+      showToast("${e.message}");
+    }
+  }
+
+  updateReqApp(Map<String,dynamic>data)async{
+    try {
+      final response = await http
+          .post(Uri.parse('${baseUrl}update_reqapp'), body: data)
+          .timeout(const Duration(minutes: 1));
+      if (response.statusCode == 200) {
+        // Get.back();
+        succesDialog(
+            Get.context!,
+            'N',
+            'Data berhasil diupdate',
+            DialogType.success,
+            'SUKSES');
+      } else {
+        failedDialog(
+            Get.context!, 'ERROR', 'Terjadi kesalahan\n${response.body}');
+      }
+    } on TimeoutException catch (_) {
+      // Get.back();
+      failedDialog(Get.context!, 'ERROR',
+          'Waktu koneksi ke server telah habis\nSilahkan coba lagi nanti');
+    } on Exception catch (e) {
+      showToast(e.toString());
+    }
+  }
+
+  updateReqAdjAbs(Map<String, dynamic> data) async {
+    try {
+      final response = await http
+          .post(Uri.parse('${baseUrl}update_presence_data'), body: data)
+          .timeout(const Duration(minutes: 1));
+      if (response.statusCode == 200) {
+        Get.back();
+        succesDialog(
+            Get.context!,
+            'N',
+            'Data berhasil diupdate',
+            DialogType.success,
+            'SUKSES');
+      } else {
+        failedDialog(
+            Get.context!, 'ERROR', 'Terjadi kesalahan\n${response.body}');
+      }
+    } on TimeoutException catch (_) {
+      Get.back();
+      failedDialog(Get.context!, 'ERROR',
+          'Waktu koneksi ke server telah habis\nSilahkan coba lagi nanti');
+    } on Exception catch (e) {
+      showToast(e.toString());
+    }
   }
 
   // Future<List<ServerApi>> getServer() async {

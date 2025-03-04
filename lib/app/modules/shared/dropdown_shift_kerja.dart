@@ -1,15 +1,14 @@
-import 'package:absensi/app/data/helper/format_waktu.dart';
 import 'package:absensi/app/modules/absen/controllers/absen_controller.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 
-import '../../data/helper/loading_dialog.dart';
 
 class CsDropdownShiftKerja extends StatelessWidget {
   final String? value;
-  CsDropdownShiftKerja({super.key, this.value});
+  final Function(String?)? onChanged;
+  final String page;
+  CsDropdownShiftKerja({super.key, this.value, this.onChanged, required this.page});
 
   final absC = Get.find<AbsenController>();
   @override
@@ -23,37 +22,39 @@ class CsDropdownShiftKerja extends StatelessWidget {
             decoration: const InputDecoration(
                 border: OutlineInputBorder(), hintText: 'Pilih Shift Absen'),
             value: value,
-            onChanged: (data) {
-              // absC.selectedShift.value = data!;
-
-              if (data == "5") {
-                if (FormatWaktu.formatJamMenit(jamMenit: absC.timeNow)
-                    .isBefore(FormatWaktu.formatJamMenit(jamMenit: '15:00'))) {
-                  absC.selectedShift.value = "";
-                  dialogMsg('INFO',
-                      'Tidak dapat memilih shift ini sebelum\npukul 15:00 waktu setempat.\n\nSilahkan pilih shift yang lain');
-                } else {
-                  absC.selectedShift.value = data!;
-                  absC.jamMasuk.value = absC.timeNow;
-                  absC.jamPulang.value = DateFormat("HH:mm").format(
-                      DateTime.parse(absC.dateNowServer)
-                          .add(const Duration(hours: 8)));
-                  dialogMsg('INFO',
-                      'Pastikan Shift Kerja yang dipilih\nsudah sesuai');
-                }
-              } else {
-                for (int i = 0; i < dataShift.length; i++) {
-                  if (dataShift[i].id == data) {
-                    absC.selectedShift.value = data!;
-                    absC.jamMasuk.value = dataShift[i].jamMasuk!;
-                    absC.jamPulang.value = dataShift[i].jamPulang!;
-                  }
-                }
-                dialogMsg(
-                    'INFO', 'Pastikan Shift Kerja yang dipilih\nsudah sesuai');
-              }
-            },
+            onChanged:
+                // (data) {
+                // absC.selectedShift.value = data!;
+                onChanged,
+            // if (data == "5") {
+            //   if (FormatWaktu.formatJamMenit(jamMenit: absC.timeNow)
+            //       .isBefore(FormatWaktu.formatJamMenit(jamMenit: '15:00'))) {
+            //     absC.selectedShift.value = "";
+            //     dialogMsg('INFO',
+            //         'Tidak dapat memilih shift ini sebelum\npukul 15:00 waktu setempat.\n\nSilahkan pilih shift yang lain');
+            //   } else {
+            //     absC.selectedShift.value = data!;
+            //     absC.jamMasuk.value = absC.timeNow;
+            //     absC.jamPulang.value = DateFormat("HH:mm").format(
+            //         DateTime.parse(absC.dateNowServer)
+            //             .add(const Duration(hours: 8)));
+            //     dialogMsg('INFO',
+            //         'Pastikan Shift Kerja yang dipilih\nsudah sesuai');
+            //   }
+            // } else {
+            //   for (int i = 0; i < dataShift.length; i++) {
+            //     if (dataShift[i].id == data) {
+            //       absC.selectedShift.value = data!;
+            //       absC.jamMasuk.value = dataShift[i].jamMasuk!;
+            //       absC.jamPulang.value = dataShift[i].jamPulang!;
+            //     }
+            //   }
+            //   dialogMsg(
+            //       'INFO', 'Pastikan Shift Kerja yang dipilih\nsudah sesuai');
+            // }
+            // },
             items: dataShift
+                .where((val) => page == "edit_data_absen" ?  val.id != '5':  val.id != '0')
                 .map((e) => DropdownMenuItem(
                     value: e.id,
                     child: Row(

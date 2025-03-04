@@ -1,12 +1,13 @@
 import 'dart:io';
 
 import 'package:absensi/app/modules/absen/controllers/absen_controller.dart';
-import 'package:absensi/app/data/helper/loading_dialog.dart';
+import 'package:absensi/app/data/helper/custom_dialog.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:get/get.dart';
+import 'package:icons_plus/icons_plus.dart';
 import 'package:intl/intl.dart';
 
 final absC = Get.put(AbsenController());
@@ -28,7 +29,7 @@ searchForm() {
               children: [
                 const Row(
                   children: [
-                    Icon(Icons.search_sharp),
+                    Icon(Iconsax.search_zoom_out_outline),
                     SizedBox(
                       width: 5,
                     ),
@@ -63,7 +64,7 @@ searchForm() {
                               decoration: const InputDecoration(
                                   contentPadding: EdgeInsets.all(0.5),
                                   prefixIcon:
-                                      Icon(Icons.calendar_month_outlined),
+                                      Icon(Iconsax.calendar_edit_outline),
                                   hintText: 'Tanggal Awal',
                                   filled: true,
                                   fillColor: Colors.white,
@@ -85,7 +86,7 @@ searchForm() {
                               decoration: const InputDecoration(
                                   contentPadding: EdgeInsets.all(0.5),
                                   prefixIcon:
-                                      Icon(Icons.calendar_month_outlined),
+                                      Icon(Iconsax.calendar_edit_outline),
                                   hintText: 'Tanggal Akhir',
                                   filled: true,
                                   fillColor: Colors.white,

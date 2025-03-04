@@ -1,5 +1,4 @@
 import 'package:absensi/app/modules/absen/controllers/absen_controller.dart';
-import 'package:absensi/app/modules/report_sales/controllers/report_sales_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icons_plus/icons_plus.dart';
@@ -15,7 +14,6 @@ class ToolsMenu extends StatelessWidget {
   ToolsMenu({super.key, this.userData});
 
   final absC = Get.find<AbsenController>();
-  final reportC = Get.put(ReportSalesController());
 
   @override
   Widget build(BuildContext context) {

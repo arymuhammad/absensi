@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
-import '../../../data/helper/loading_dialog.dart';
+import '../../../data/helper/custom_dialog.dart';
 import '../../../data/model/absen_model.dart';
 import '../../shared/elevated_button_icon.dart';
 import '../../shared/text_field.dart';
