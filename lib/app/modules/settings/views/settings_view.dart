@@ -26,8 +26,7 @@ class SettingsView extends GetView<SettingsController> {
     return Scaffold(
         body: Stack(
       children: [
-        const CsBgImgHeader(
-          height: 380,
+        const CsBgImg(
         ),
         Padding(
           padding: const EdgeInsets.only(top: 110, left: 15.0, right: 15.0),
@@ -266,7 +265,7 @@ class SettingsView extends GetView<SettingsController> {
             ),
           ),
         ),
-        const Positioned(
+        Positioned(
             top: 60,
             left: 20,
             right: 0,
@@ -275,23 +274,20 @@ class SettingsView extends GetView<SettingsController> {
               // mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Padding(
+                const Padding(
                   padding: EdgeInsets.only(top: 1.0),
                   child: Icon(
                     CupertinoIcons.gear_alt_fill,
                     size: 25,
-                    color: Colors.white,
+                    color: Colors.black,
                   ),
                 ),
-                SizedBox(
+                const SizedBox(
                   width: 5,
                 ),
                 Text(
                   'Setting',
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold),
+                  style: titleTextStyle.copyWith(fontSize: 20)
                 ),
               ],
             ))

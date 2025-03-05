@@ -1,5 +1,6 @@
 import 'package:absensi/app/data/helper/const.dart';
 import 'package:absensi/app/modules/detail_absen/views/widget/edit_data_absen.dart';
+import 'package:absensi/app/modules/shared/background_image_header.dart';
 import 'package:absensi/app/modules/shared/rounded_image.dart';
 import 'package:flutter/material.dart';
 
@@ -55,345 +56,145 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
       ),
     ];
     return Scaffold(
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: const Text('DETAIL ABSEN'),
+        title:  Text('DETAIL ABSEN', style: titleTextStyle.copyWith(fontSize: 20, color: Colors.black,)),
+        backgroundColor: Colors.transparent.withOpacity(0.2),
+        elevation: 0.0,
+        iconTheme: const IconThemeData(color: Colors.black,),
         centerTitle: true,
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage('assets/image/new_bg_app.jpg'),
-              fit: BoxFit.cover,
-            ),
-          ),
-        ),
+        
       ),
-      backgroundColor: backgroundColor,
-      body: ListView(
-        padding: const EdgeInsets.only(left: 5, top: 10, right: 5, bottom: 10),
+      resizeToAvoidBottomInset: false,
+     
+      body: Stack(
         children: [
-          Card(
-            elevation: 10,
-            shape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(15),
-                    topRight: Radius.circular(15),
-                    bottomLeft: Radius.circular(10),
-                    bottomRight: Radius.circular(10))),
-            child: Column(
-              children: [
-                Container(
-                  height: 40,
-                  decoration: BoxDecoration(
-                    borderRadius: const BorderRadius.only(
+          const CsBgImg(),
+          ListView(
+            padding:
+                const EdgeInsets.only(left:12, top: 100, right: 12, bottom: 10),
+            children: [
+              Card(
+                elevation: 10,
+                shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.only(
                         topLeft: Radius.circular(15),
-                        topRight: Radius.circular(15)),
-                    color: mainColor,
-                  ),
-                  child: Center(
-                    child: Text(
-                      DateFormat("EEEE, d MMMM yyyy", "id_ID")
-                          .format(DateTime.parse(detailData['tanggal_masuk'])),
-                      style: const TextStyle(fontSize: 18, color: Colors.white),
+                        topRight: Radius.circular(15),
+                        bottomLeft: Radius.circular(10),
+                        bottomRight: Radius.circular(10))),
+                child: Column(
+                  children: [
+                    Container(
+                      height: 40,
+                      decoration: BoxDecoration(
+                        borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(15),
+                            topRight: Radius.circular(15)),
+                        color: mainColor,
+                      ),
+                      child: Center(
+                        child: Text(
+                          DateFormat("EEEE, d MMMM yyyy", "id_ID").format(
+                              DateTime.parse(detailData['tanggal_masuk'])),
+                          style:
+                              const TextStyle(fontSize: 18, color: Colors.white),
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-                Container(
-                    padding: const EdgeInsets.all(8),
-                    child: Column(
-                      children: [
-                        Row(
+                    Container(
+                        padding: const EdgeInsets.all(8),
+                        child: Column(
                           children: [
-                            RoundedImage(
-                                height: 75,
-                                width: 75,
-                                foto: detailData['foto_profil'],
-                                name: detailData['foto_profil'],
-                                headerProfile: true),
-                            const SizedBox(width: 5),
                             Row(
                               children: [
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                RoundedImage(
+                                    height: 75,
+                                    width: 75,
+                                    foto: detailData['foto_profil'],
+                                    name: detailData['foto_profil'],
+                                    headerProfile: true),
+                                const SizedBox(width: 5),
+                                Row(
                                   children: [
-                                    Row(
-                                      children: [
-                                        const Text('Nama'),
-                                        const SizedBox(
-                                          width: 5,
-                                        ),
-                                        const SizedBox(width: 44),
-                                        Text(
-                                          ': ${detailData["nama"].toString().capitalize}',
-                                        ),
-                                      ],
-                                    ),
-                                    Row(
+                                    Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        const Text('Shift'),
-                                        const SizedBox(width: 57),
-                                        SizedBox(
-                                          width:
-                                              Get.mediaQuery.size.width * 0.35,
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                ': ${detailData['nama_shift']}',
+                                        Row(
+                                          children: [
+                                            const Text('Nama'),
+                                            const SizedBox(
+                                              width: 5,
+                                            ),
+                                            const SizedBox(width: 44),
+                                            Text(
+                                              ': ${detailData["nama"].toString().capitalize}',
+                                            ),
+                                          ],
+                                        ),
+                                        Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            const Text('Shift'),
+                                            const SizedBox(width: 57),
+                                            SizedBox(
+                                              width: Get.mediaQuery.size.width *
+                                                  0.35,
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    ': ${detailData['nama_shift']}',
+                                                  ),
+                                                ],
                                               ),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    Row(
-                                      children: [
-                                        const Text('Masuk'),
-                                        const SizedBox(width: 45),
-                                        Text(
-                                          ': ${detailData['jam_absen_masuk']}',
-                                        ),
-                                      ],
-                                    ),
-                                    Row(
-                                      children: [
-                                        const Text('Status Masuk'),
-                                        const SizedBox(
-                                          width: 5,
-                                        ),
-                                        Container(
-                                          height: 25,
-                                          decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(5),
-                                              color: detailData['jam_masuk'] ==
-                                                      "Telat"
-                                                  ? Colors.redAccent[700]
-                                                  : Colors.greenAccent[700]),
-                                          constraints: BoxConstraints(
-                                            maxWidth: MediaQuery.of(context)
-                                                    .size
-                                                    .width *
-                                                0.3,
-                                          ),
-                                          child: Center(
-                                            child: Text(
-                                                "${detailData['jam_masuk']}",
-                                                style: const TextStyle(
-                                                    color: Colors.white)),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.end,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        const Text('Device Info'),
-                                        const SizedBox(
-                                          width: 16,
-                                        ),
-                                        Container(
-                                          constraints: BoxConstraints(
-                                            maxWidth: MediaQuery.of(context)
-                                                    .size
-                                                    .width *
-                                                0.3,
-                                          ),
-                                          child: Text(
-                                            ": ${detailData['device_info']}",
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ],
-                    )),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: SizedBox(
-                    height: 200,
-                    child: FlutterMap(
-                      options: MapOptions(
-                        initialCenter: LatLng(
-                            double.parse(detailData["lat_masuk"]),
-                            double.parse(detailData["long_masuk"])),
-                        initialZoom: 15,
-                      ),
-                      nonRotatedChildren: [
-                        RichAttributionWidget(
-                          attributions: [
-                            TextSourceAttribution(
-                              'OpenStreetMap contributors',
-                              onTap: () {},
-                            )
-                          ],
-                        ),
-                      ],
-                      children: [
-                        TileLayer(
-                          urlTemplate:
-                              'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                          userAgentPackageName:
-                              'dev.fleaflet.flutter_map.example',
-                        ),
-                        MarkerLayer(markers: markersMasuk),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 20),
-          Visibility(
-              visible: detailData['tanggal_pulang'] == "" ? true : false,
-              child: const Center(
-                  child: Padding(
-                padding: EdgeInsets.all(8.0),
-                child: Text('Tidak ada data absen pulang',
-                    style: TextStyle(fontSize: 18)),
-              ))),
-          Visibility(
-            visible: detailData['tanggal_pulang'] != "" ? true : false,
-            child: Card(
-              elevation: 10,
-              shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(15),
-                      topRight: Radius.circular(15),
-                      bottomLeft: Radius.circular(10),
-                      bottomRight: Radius.circular(10))),
-              child: Column(
-                children: [
-                  Container(
-                    height: 40,
-                    decoration: BoxDecoration(
-                      borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(15),
-                          topRight: Radius.circular(15)),
-                      color: mainColor,
-                    ),
-                    child: Center(
-                      child: Text(
-                        detailData['tanggal_pulang'] != ""
-                            ? DateFormat("EEEE, d MMMM yyyy", "id_ID").format(
-                                DateTime.parse(detailData['tanggal_pulang']))
-                            : "",
-                        style:
-                            const TextStyle(fontSize: 18, color: Colors.white),
-                      ),
-                    ),
-                  ),
-                  Container(
-                      padding: const EdgeInsets.all(8),
-                      child: Column(
-                        children: [
-                          Row(
-                            children: [
-                              RoundedImage(
-                                  height: 75,
-                                  width: 75,
-                                  foto: detailData['foto_profil'],
-                                  name: detailData['foto_profil'],
-                                  headerProfile: true),
-                              const SizedBox(width: 5),
-                              Row(
-                                children: [
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          const Text('Nama'),
-                                          const SizedBox(
-                                            width: 5,
-                                          ),
-                                          const SizedBox(width: 44),
-                                          Text(
-                                            ': ${detailData["nama"].toString().capitalize}',
-                                          ),
-                                        ],
-                                      ),
-                                      Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          const Text('Shift'),
-                                          const SizedBox(width: 57),
-                                          SizedBox(
-                                            width: Get.mediaQuery.size.width *
-                                                0.35,
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  ': ${detailData['nama_shift']}',
-                                                ),
-                                              ],
                                             ),
-                                          ),
-                                        ],
-                                      ),
-                                      Row(
-                                        children: [
-                                          const Text('Pulang'),
-                                          const SizedBox(width: 42),
-                                          Text(
-                                            ': ${detailData['jam_absen_pulang'] != "" ? detailData['jam_absen_pulang'] : "-"}',
-                                          ),
-                                        ],
-                                      ),
-                                      Row(
-                                        children: [
-                                          const Text('Status Pulang'),
-                                          const SizedBox(
-                                            width: 5,
-                                          ),
-                                          Container(
-                                            height: 25,
-                                            constraints: BoxConstraints(
-                                              maxWidth: MediaQuery.of(context)
-                                                      .size
-                                                      .width *
-                                                  0.3,
+                                          ],
+                                        ),
+                                        Row(
+                                          children: [
+                                            const Text('Masuk'),
+                                            const SizedBox(width: 45),
+                                            Text(
+                                              ': ${detailData['jam_absen_masuk']}',
                                             ),
-                                            decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(5),
-                                                color: detailData[
-                                                                'jam_pulang'] ==
-                                                            "Belum Absen" ||
-                                                        detailData[
-                                                                'jam_pulang'] ==
-                                                            "Pulang Cepat"
-                                                    ? Colors.redAccent[700]
-                                                    : Colors.greenAccent[700]),
-                                            child: Center(
-                                              child: Text(
-                                                  "${detailData['jam_pulang']}",
-                                                  style: const TextStyle(
-                                                      color: Colors.white)),
+                                          ],
+                                        ),
+                                        Row(
+                                          children: [
+                                            const Text('Status Masuk'),
+                                            const SizedBox(
+                                              width: 5,
                                             ),
-                                          ),
-                                        ],
-                                      ),
-                                      Visibility(
-                                        visible:
-                                            detailData['jam_absen_pulang'] != ""
-                                                ? true
-                                                : false,
-                                        child: Row(
+                                            Container(
+                                              height: 25,
+                                              decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(5),
+                                                  color:
+                                                      detailData['jam_masuk'] ==
+                                                              "Telat"
+                                                          ? Colors.redAccent[700]
+                                                          : Colors
+                                                              .greenAccent[700]),
+                                              constraints: BoxConstraints(
+                                                maxWidth: MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.3,
+                                              ),
+                                              child: Center(
+                                                child: Text(
+                                                    "${detailData['jam_masuk']}",
+                                                    style: const TextStyle(
+                                                        color: Colors.white)),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        Row(
                                           mainAxisAlignment:
                                               MainAxisAlignment.end,
                                           crossAxisAlignment:
@@ -411,73 +212,283 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
                                                     0.3,
                                               ),
                                               child: Text(
-                                                ": ${detailData['device_info2']}",
+                                                ": ${detailData['device_info']}",
                                               ),
                                             ),
                                           ],
                                         ),
-                                      )
-                                    ],
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(
-                                width: 50,
-                              ),
-                            ],
-                          ),
-                        ],
-                      )),
-                  Visibility(
-                    visible:
-                        detailData['jam_absen_pulang'] != "" ? true : false,
-                    child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: SizedBox(
-                            height: 200,
-                            child: FlutterMap(
-                              options: MapOptions(
-                                initialCenter: LatLng(
-                                    double.parse(detailData["lat_masuk"]),
-                                    double.parse(detailData["long_masuk"])),
-                                initialZoom: 15,
-                              ),
-                              nonRotatedChildren: [
-                                RichAttributionWidget(
-                                  attributions: [
-                                    TextSourceAttribution(
-                                      'OpenStreetMap contributors',
-                                      onTap: () {},
-                                    )
+                                      ],
+                                    ),
                                   ],
                                 ),
                               ],
-                              children: [
-                                TileLayer(
-                                  urlTemplate:
-                                      'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                                  userAgentPackageName:
-                                      'dev.fleaflet.flutter_map.example',
-                                ),
-                                MarkerLayer(markers: markersPulang),
+                            ),
+                          ],
+                        )),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: SizedBox(
+                        height: 200,
+                        child: FlutterMap(
+                          options: MapOptions(
+                            initialCenter: LatLng(
+                                double.parse(detailData["lat_masuk"]),
+                                double.parse(detailData["long_masuk"])),
+                            initialZoom: 15,
+                          ),
+                          nonRotatedChildren: [
+                            RichAttributionWidget(
+                              attributions: [
+                                TextSourceAttribution(
+                                  'OpenStreetMap contributors',
+                                  onTap: () {},
+                                )
                               ],
-                            ))),
-                  )
-                ],
+                            ),
+                          ],
+                          children: [
+                            TileLayer(
+                              urlTemplate:
+                                  'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                              userAgentPackageName:
+                                  'dev.fleaflet.flutter_map.example',
+                            ),
+                            MarkerLayer(markers: markersMasuk),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          )
+              const SizedBox(height: 20),
+              Visibility(
+                  visible: detailData['tanggal_pulang'] == "" ? true : false,
+                  child: const Center(
+                      child: Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Text('Tidak ada data absen pulang',
+                        style: TextStyle(fontSize: 18)),
+                  ))),
+              Visibility(
+                visible: detailData['tanggal_pulang'] != "" ? true : false,
+                child: Card(
+                  elevation: 10,
+                  shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(15),
+                          topRight: Radius.circular(15),
+                          bottomLeft: Radius.circular(10),
+                          bottomRight: Radius.circular(10))),
+                  child: Column(
+                    children: [
+                      Container(
+                        height: 40,
+                        decoration: BoxDecoration(
+                          borderRadius: const BorderRadius.only(
+                              topLeft: Radius.circular(15),
+                              topRight: Radius.circular(15)),
+                          color: mainColor,
+                        ),
+                        child: Center(
+                          child: Text(
+                            detailData['tanggal_pulang'] != ""
+                                ? DateFormat("EEEE, d MMMM yyyy", "id_ID").format(
+                                    DateTime.parse(detailData['tanggal_pulang']))
+                                : "",
+                            style: const TextStyle(
+                                fontSize: 18, color: Colors.white),
+                          ),
+                        ),
+                      ),
+                      Container(
+                          padding: const EdgeInsets.all(8),
+                          child: Column(
+                            children: [
+                              Row(
+                                children: [
+                                  RoundedImage(
+                                      height: 75,
+                                      width: 75,
+                                      foto: detailData['foto_profil'],
+                                      name: detailData['foto_profil'],
+                                      headerProfile: true),
+                                  const SizedBox(width: 5),
+                                  Row(
+                                    children: [
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            children: [
+                                              const Text('Nama'),
+                                              const SizedBox(
+                                                width: 5,
+                                              ),
+                                              const SizedBox(width: 44),
+                                              Text(
+                                                ': ${detailData["nama"].toString().capitalize}',
+                                              ),
+                                            ],
+                                          ),
+                                          Row(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              const Text('Shift'),
+                                              const SizedBox(width: 57),
+                                              SizedBox(
+                                                width: Get.mediaQuery.size.width *
+                                                    0.35,
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      ': ${detailData['nama_shift']}',
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          Row(
+                                            children: [
+                                              const Text('Pulang'),
+                                              const SizedBox(width: 42),
+                                              Text(
+                                                ': ${detailData['jam_absen_pulang'] != "" ? detailData['jam_absen_pulang'] : "-"}',
+                                              ),
+                                            ],
+                                          ),
+                                          Row(
+                                            children: [
+                                              const Text('Status Pulang'),
+                                              const SizedBox(
+                                                width: 5,
+                                              ),
+                                              Container(
+                                                height: 25,
+                                                constraints: BoxConstraints(
+                                                  maxWidth: MediaQuery.of(context)
+                                                          .size
+                                                          .width *
+                                                      0.3,
+                                                ),
+                                                decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.circular(5),
+                                                    color: detailData[
+                                                                    'jam_pulang'] ==
+                                                                "Belum Absen" ||
+                                                            detailData[
+                                                                    'jam_pulang'] ==
+                                                                "Pulang Cepat"
+                                                        ? Colors.redAccent[700]
+                                                        : Colors
+                                                            .greenAccent[700]),
+                                                child: Center(
+                                                  child: Text(
+                                                      "${detailData['jam_pulang']}",
+                                                      style: const TextStyle(
+                                                          color: Colors.white)),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          Visibility(
+                                            visible:
+                                                detailData['jam_absen_pulang'] !=
+                                                        ""
+                                                    ? true
+                                                    : false,
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.end,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                const Text('Device Info'),
+                                                const SizedBox(
+                                                  width: 16,
+                                                ),
+                                                Container(
+                                                  constraints: BoxConstraints(
+                                                    maxWidth:
+                                                        MediaQuery.of(context)
+                                                                .size
+                                                                .width *
+                                                            0.3,
+                                                  ),
+                                                  child: Text(
+                                                    ": ${detailData['device_info2']}",
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(
+                                    width: 50,
+                                  ),
+                                ],
+                              ),
+                            ],
+                          )),
+                      Visibility(
+                        visible:
+                            detailData['jam_absen_pulang'] != "" ? true : false,
+                        child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: SizedBox(
+                                height: 200,
+                                child: FlutterMap(
+                                  options: MapOptions(
+                                    initialCenter: LatLng(
+                                        double.parse(detailData["lat_masuk"]),
+                                        double.parse(detailData["long_masuk"])),
+                                    initialZoom: 15,
+                                  ),
+                                  nonRotatedChildren: [
+                                    RichAttributionWidget(
+                                      attributions: [
+                                        TextSourceAttribution(
+                                          'OpenStreetMap contributors',
+                                          onTap: () {},
+                                        )
+                                      ],
+                                    ),
+                                  ],
+                                  children: [
+                                    TileLayer(
+                                      urlTemplate:
+                                          'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                                      userAgentPackageName:
+                                          'dev.fleaflet.flutter_map.example',
+                                    ),
+                                    MarkerLayer(markers: markersPulang),
+                                  ],
+                                ))),
+                      )
+                    ],
+                  ),
+                ),
+              )
+            ],
+          ),
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-           Get.bottomSheet(EditDataAbsen(data:detailData));
+          Get.bottomSheet(EditDataAbsen(data: detailData));
         },
         label: const Text('Edit Data'),
         icon: const Icon(Icons.edit),
       ),
     );
   }
-
- 
 }

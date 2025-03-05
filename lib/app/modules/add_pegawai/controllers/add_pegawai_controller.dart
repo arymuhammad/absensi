@@ -326,6 +326,7 @@ class AddPegawaiController extends GetxController {
       lstPhone.add(e.notelp!);
     }).toList();
     if (mode == "add") {
+      loadingDialog("Mengirim data...", "Harap menunggu");
       if (selectedCabang.isNotEmpty &&
           username.text != "" &&
           pass.text != "" &&
@@ -352,15 +353,15 @@ class AddPegawaiController extends GetxController {
 
           if (lstUser.contains(username.text) && lstPhone.contains(telp.text)) {
             Get.back();
-            dialogMsg("",
+            failedDialog(Get.context!, "Kesalahan",
                 "Username dan No Telp sudah terdaftar\nSilahkan ubah Username dan No Telp ");
           } else if (lstUser.contains(username.text)) {
             Get.back();
-            dialogMsg(
-                "", "Username sudah terdaftar\nSilahkan gunakan username lain");
+            failedDialog(Get.context!, "Kesalahan",
+                "Username sudah terdaftar\nSilahkan gunakan username lain");
           } else if (lstPhone.contains(telp.text)) {
             Get.back();
-            dialogMsg("",
+            failedDialog(Get.context!, "Kesalahan",
                 "No Telp ini sudah terdaftar\nSilahkan masukkan No Telp lain");
           } else {
             // succesDialog(context, "N", "Data berhasil disimpan", DialogType.success, 'SUKSES');
@@ -390,15 +391,15 @@ class AddPegawaiController extends GetxController {
           };
           if (lstUser.contains(username.text) && lstPhone.contains(telp.text)) {
             Get.back();
-            dialogMsg("",
+            failedDialog(Get.context!, "Kesalahan",
                 "Username dan No Telp sudah terdaftar\nSilahkan ubah Username dan No Telp ");
           } else if (lstUser.contains(username.text)) {
             Get.back();
-            dialogMsg("",
+            failedDialog(Get.context!, "Kesalahan",
                 "Username sudah terdaftar\nSilahkan ubah dengan Username lain");
           } else if (lstPhone.contains(telp.text)) {
             Get.back();
-            dialogMsg("",
+            failedDialog(Get.context!, "Kesalahan",
                 "No Telp ini sudah terdaftar\nSilahkan masukkan No Telp lain");
           } else {
             await ServiceApi().addUpdatePegawai(data, mode);
@@ -417,9 +418,12 @@ class AddPegawaiController extends GetxController {
         }
       } else {
         Get.back();
-        dialogMsg("Kesalahan", "Harap mengisi data pada semua kolom");
+        failedDialog(
+            Get.context!, "Kesalahan", "Harap mengisi data pada semua kolom");
       }
     } else {
+      loadingDialog("Memperbarui data", "Harap menunggu");
+
       if (image != null && image!.name.split(".").last == "jpg" ||
           image != null && image!.name.split(".").last == "jpeg" ||
           image != null && image!.name.split(".").last == "png" ||
@@ -441,10 +445,10 @@ class AddPegawaiController extends GetxController {
 
         if (lstPhone.contains(telp.text)) {
           Get.back();
-          dialogMsg("",
+          failedDialog(Get.context!, "Kesalahan",
               "No Telp ini sudah terdaftar\nSilahkan masukkan No Telp lain");
         } else {
-          // loadingDialog("updating data", "");
+          
           //start update local db for tbl_user
           SQLHelper.instance.updateDataUser({
             "nama": name.text != "" ? name.text : dataUser.nama,
@@ -512,7 +516,7 @@ class AddPegawaiController extends GetxController {
         };
         if (lstPhone.contains(telp.text)) {
           Get.back();
-          dialogMsg("",
+          failedDialog(Get.context!, "Kesalahan",
               "No Telp ini sudah terdaftar\nSilahkan masukkan No Telp lain");
         } else {
           // loadingDialog("updating data", "");

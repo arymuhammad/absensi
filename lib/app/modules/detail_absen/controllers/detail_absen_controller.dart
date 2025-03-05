@@ -5,7 +5,6 @@ import 'package:day_night_time_picker/day_night_time_picker.dart';
 import 'package:device_marketing_names/device_marketing_names.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -60,7 +59,7 @@ class DetailAbsenController extends GetxController {
 
   void pickImg() async {
     image =
-        await picker.pickImage(source: ImageSource.gallery, imageQuality: 50);
+        await picker.pickImage(source: ImageSource.gallery, imageQuality: 8);
 
     if (image != null) {
       update();
@@ -82,9 +81,6 @@ class DetailAbsenController extends GetxController {
 
   submitApproval(String id, String nama) async {
     if (jamAbsenMasuk.text != "" && jamAbsenPulang.text == "") {
-      // if (selectedShift.value == "") {
-      //   showToast("Shift Absen tidak boleh kosong");
-      // } else {
       if (image == null) {
         failedDialog(Get.context!, "Kesalahan",
             "Harap lampirkan bukti foto absen masuk");
@@ -99,6 +95,8 @@ class DetailAbsenController extends GetxController {
         };
         loadingDialog("Mengirim data...", "");
         await ServiceApi().reqUpdateAbs(data);
+        jamAbsenMasuk.clear();
+        image == null;
       }
     } else if (jamAbsenPulang.text != "" && jamAbsenMasuk.text == "") {
       if (tglPulang.text == "") {
@@ -123,6 +121,9 @@ class DetailAbsenController extends GetxController {
             "device_info2": devInfo.value,
           };
           await ServiceApi().reqUpdateAbs(data);
+          tglPulang.clear();
+          jamAbsenPulang.clear();
+          image2 == null;
         }
       }
     } else if (jamAbsenMasuk.text != "" &&
@@ -154,6 +155,11 @@ class DetailAbsenController extends GetxController {
             "device_info2": devInfo.value,
           };
           await ServiceApi().reqUpdateAbs(data);
+          tglPulang.clear();
+          jamAbsenMasuk.clear();
+          jamAbsenMasuk.clear();
+          image == null;
+          image2 == null;
         }
       }
     } else if (selectedShift.isNotEmpty &&
@@ -170,7 +176,9 @@ class DetailAbsenController extends GetxController {
       };
       loadingDialog("Mengirim data...", "");
       await ServiceApi().reqUpdateAbs(data);
-      // showToast("update shift successfully");
+      selectedShift.value = "";
+      jamMasuk.value = "";
+      jamPulang.value = "";
     } else {
       failedDialog(
           Get.context!, "Kesalahan", "Harap isi bagian yang ingi diperbarui");
@@ -180,16 +188,10 @@ class DetailAbsenController extends GetxController {
   getLoc() async {
     try {
       final deviceNames = DeviceMarketingNames();
-      // DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-      // if (Platform.isAndroid) {
+     
       devInfo.value = await deviceNames.getSingleName();
-      // AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-      // devInfo.value = '${androidInfo.brand} ${androidInfo.model}';
-      // } else {
-      //   IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
-      //   devInfo.value = '${iosInfo.name} ${iosInfo.model}';
-      // }
-      // ignore: empty_catches
+     
+    // ignore: empty_catches
     } on PlatformException {}
 
     Position position = await determinePosition();

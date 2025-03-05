@@ -23,11 +23,11 @@ class UptShift extends StatelessWidget {
               children: [
                 Text(
                   'STATUS',
-                  style: subtiteTextStyle,
+                  style: subtitleTextStyle,
                 ),
                 Text(
                   data.status!.replaceAll('_', ' ').toUpperCase(),
-                  style: titeTextStyle,
+                  style: titleTextStyle,
                 ),
                 Row(
                   children: [
@@ -37,7 +37,7 @@ class UptShift extends StatelessWidget {
                     ),
                     Text(
                       data.namaShift!,
-                      style: titeTextStyle,
+                      style: titleTextStyle,
                     ),
                   ],
                 )
@@ -68,6 +68,7 @@ class UptShift extends StatelessWidget {
                 color: Colors.greenAccent[700]!,
                 onPressed: () {
                   var dataUptApp = {
+                    "uid":data.id,
                     "accept": "1",
                     "keterangan": adjCtrl.keteranganApp.text,
                     "id_user": data.idUser,
@@ -92,6 +93,7 @@ class UptShift extends StatelessWidget {
                 color: Colors.redAccent[700]!,
                 onPressed: () {
                    var dataUptApp = {
+                    "uid":data.id,
                     "accept": "0",
                     "keterangan": adjCtrl.keteranganApp.text,
                     "id_user": data.idUser,

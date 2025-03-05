@@ -1,18 +1,7 @@
-import 'dart:io';
 
-import 'package:absensi/app/modules/adjust_presence/views/expanded_data_absen.dart';
-import 'package:absensi/app/modules/adjust_presence/views/expanded_data_visit.dart';
 import 'package:absensi/app/modules/adjust_presence/views/widget/adjust_data.dart';
-import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_typeahead/flutter_typeahead.dart';
-
 import 'package:get/get.dart';
-import 'package:icons_plus/icons_plus.dart';
-import 'package:intl/intl.dart';
-
-import '../../../data/helper/custom_dialog.dart';
 import '../controllers/adjust_presence_controller.dart';
 import 'widget/req_app_update.dart';
 
@@ -58,7 +47,7 @@ class AdjustPresenceView extends GetView<AdjustPresenceController> {
                 ),
                 labelColor: Colors.white,
                 unselectedLabelColor: Colors.black,
-                tabs: [
+                tabs: const [
                   // first tab [you can add an icon using the icon property]
                   Tab(
                     text: 'Adjust Presence Data',

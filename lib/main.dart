@@ -4,10 +4,6 @@ import 'package:absensi/app/data/model/login_model.dart';
 import 'package:absensi/app/modules/home/views/bottom_navbar.dart';
 import 'package:absensi/app/modules/login/controllers/login_controller.dart';
 import 'package:absensi/app/modules/login/views/login_view.dart';
-import 'package:absensi/firebase_options.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
-import 'package:flutter/foundation.dart';
 
 // import 'package:alarm/alarm.dart';
 import 'package:flutter/material.dart';
@@ -26,13 +22,6 @@ void main() async {
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
-
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
-  PlatformDispatcher.instance.onError = (error, stack) {
-    FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
-    return true;
-  };
  
   await initializeDateFormatting('id_ID', "");
 
@@ -58,7 +47,7 @@ void main() async {
         primarySwatch: mainColor,
         primaryColor: Colors.white,
         fontFamily: 'Nunito',
-        canvasColor: backgroundColor),
+        ),
     home: SplashScreenView(
       navigateRoute: Obx(() => auth.isAuth.value
           ? BottomNavBar(listDataUser: auth.logUser.value)

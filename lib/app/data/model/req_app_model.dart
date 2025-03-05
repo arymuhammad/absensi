@@ -1,4 +1,5 @@
 class ReqApp {
+  late String id;
   late String idUser;
   late String nama;
   late String tglMasuk;
@@ -19,6 +20,7 @@ class ReqApp {
   String? namaShift;
 
   ReqApp({
+    required this.id,
     required this.idUser,
     required this.nama,
     required this.tglMasuk,
@@ -40,6 +42,7 @@ class ReqApp {
   });
 
   ReqApp.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
     idUser = json['id_user'];
     nama = json['nama']??'';
     tglMasuk = json['tgl_masuk'];

@@ -1,5 +1,5 @@
 name: absensi
-version: 2.3.34+28
+version: 2.3.36+30
 publish_to: none
 description: URBAN&CO SPOT
 environment: 
@@ -48,8 +48,6 @@ dependencies:
   widget_zoom: ^0.0.4
   path: ^1.9.0
   flutter_speed_dial: 7.0.0
-  firebase_core: ^3.4.0
-  firebase_crashlytics: ^4.1.0
   flutter: 
     sdk: flutter
   url_launcher: ^6.3.1

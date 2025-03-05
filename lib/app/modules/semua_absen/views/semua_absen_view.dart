@@ -31,8 +31,7 @@ class SemuaAbsenView extends GetView<SemuaAbsenController> {
     return Scaffold(
       body: Stack(
         children: [
-          const CsBgImgHeader(
-            height: 380,
+          const CsBgImg(
           ),
           Padding(
             padding: const EdgeInsets.only(top: 110, left: 7.0, right: 7.0),
@@ -625,7 +624,7 @@ class SemuaAbsenView extends GetView<SemuaAbsenController> {
               ),
             ),
           ),
-          const Positioned(
+          Positioned(
               top: 60,
               left: 20,
               right: 20,
@@ -634,23 +633,20 @@ class SemuaAbsenView extends GetView<SemuaAbsenController> {
                 // mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Padding(
+                  const Padding(
                     padding: EdgeInsets.only(top: 1.0),
                     child: Icon(
                       CupertinoIcons.doc_text_search,
                       size: 25,
-                      color: Colors.white,
+                      color: Colors.black,
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     width: 5,
                   ),
                   Text(
                     'History',
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold),
+                    style: titleTextStyle.copyWith(fontSize: 20),
                   ),
                 ],
               ))

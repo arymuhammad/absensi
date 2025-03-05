@@ -23,7 +23,7 @@ class ProfilView extends GetView<ProfilController> {
     return Scaffold(
         body: Stack(
       children: [
-        const CsBgImgHeader(height: 380),
+        const CsBgImg(),
         Padding(
           padding: const EdgeInsets.only(top: 190, left: 15.0, right: 15.0),
           child: Card(
@@ -217,25 +217,19 @@ class ProfilView extends GetView<ProfilController> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Row(
+                Row(
                   children: [
-                    Padding(
-                      padding: EdgeInsets.only(top: 1.0),
-                      child: Icon(
-                        CupertinoIcons.person_alt_circle,
-                        size: 25,
-                        color: Colors.white,
-                      ),
+                    const Icon(
+                      CupertinoIcons.person_alt_circle,
+                      size: 25,
+                      color: Colors.black,
                     ),
-                    SizedBox(
+                    const SizedBox(
                       width: 5,
                     ),
                     Text(
                       'Profile',
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold),
+                      style: titleTextStyle.copyWith(fontSize: 20),
                     ),
                   ],
                 ),
@@ -245,8 +239,8 @@ class ProfilView extends GetView<ProfilController> {
                     },
                     icon: const Icon(
                       Iconsax.logout_1_outline,
-                      color: Colors.white,
-                      size: 35,
+                      color: Colors.black,
+                      size:30,
                     ))
               ],
             ))

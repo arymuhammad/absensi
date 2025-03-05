@@ -30,11 +30,11 @@ class UptDataAbsen extends StatelessWidget {
               children: [
                 Text(
                   'STATUS',
-                  style: subtiteTextStyle,
+                  style: subtitleTextStyle,
                 ),
                 Text(
                   data.status!.replaceAll('_', ' ').toUpperCase(),
-                  style: titeTextStyle,
+                  style: titleTextStyle,
                 ),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -45,7 +45,7 @@ class UptDataAbsen extends StatelessWidget {
                     ),
                     Text(
                       '${data.jamAbsenMasuk!} (IN)',
-                      style: titeTextStyle,
+                      style: titleTextStyle,
                     ),
                   ],
                 )
@@ -79,7 +79,7 @@ class UptDataAbsen extends StatelessWidget {
                     ),
                     Text(
                       '${data.jamAbsenPulang!} (OUT)',
-                      style: titeTextStyle,
+                      style: titleTextStyle,
                     ),
                   ],
                 )
@@ -115,11 +115,11 @@ class UptDataAbsen extends StatelessWidget {
               children: [
                 Text(
                   'Keterangan',
-                  style: titeTextStyle.copyWith(fontSize: 18),
+                  style: titleTextStyle.copyWith(fontSize: 18),
                 ),
                 Text(
                   data.keterangan!,
-                  style: subtiteTextStyle,
+                  style: subtitleTextStyle,
                 ),
               ],
             )),
@@ -137,6 +137,7 @@ class UptDataAbsen extends StatelessWidget {
                 color: Colors.greenAccent[700]!,
                 onPressed: () {
                   var dataUptApp = {
+                    "uid": data.id,
                     "accept": "1",
                     "keterangan": adjCtrl.keteranganApp.text,
                     "id_user": data.idUser,
@@ -150,15 +151,13 @@ class UptDataAbsen extends StatelessWidget {
                     "id_user": data.idUser,
                     "tgl_masuk": data.tglMasuk,
                     "tgl_pulang": data.tglPulang,
-                    "jam_absen_masuk" : data.jamAbsenMasuk,
-                    "foto_masuk":data.fotoMasuk,
-                    "jam_absen_pulang" : data.jamAbsenPulang,
-                    "foto_pulang":data.fotoPulang,
-                    "lat_out":data.latOut,
-                    "long_out":data.longOut,
-                    "device_info2":data.devInfo
-
-
+                    "jam_absen_masuk": data.jamAbsenMasuk,
+                    "foto_masuk": data.fotoMasuk,
+                    "jam_absen_pulang": data.jamAbsenPulang,
+                    "foto_pulang": data.fotoPulang,
+                    "lat_out": data.latOut,
+                    "long_out": data.longOut,
+                    "device_info2": data.devInfo
                   };
                   adjCtrl.appAbs(dataUptApp, dataUptAbs);
                 },
@@ -169,6 +168,7 @@ class UptDataAbsen extends StatelessWidget {
                 color: Colors.redAccent[700]!,
                 onPressed: () {
                   var dataUptApp = {
+                    "uid": data.id,
                     "accept": "0",
                     "keterangan": adjCtrl.keteranganApp.text,
                     "id_user": data.idUser,

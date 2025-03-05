@@ -1,3 +1,4 @@
+import 'package:absensi/app/data/helper/const.dart';
 import 'package:absensi/app/data/model/login_model.dart';
 import 'package:absensi/app/modules/home/views/summary_absen.dart';
 import 'package:absensi/app/modules/home/views/summary_absen_area.dart';
@@ -15,11 +16,10 @@ class HomeView extends GetView<HomeController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: Stack(
         children: [
-          const CsBgImgHeader(
-            height: 350,
-          ),
+         const CsBgImg(),
           Padding(
             padding: const EdgeInsets.only(left: 15.0, top: 60.0, right: 15.0),
             child: Column(
@@ -42,26 +42,17 @@ class HomeView extends GetView<HomeController> {
                           overflow: TextOverflow.ellipsis,
                           maxLines: 1,
                           softWrap: true,
-                          style: const TextStyle(
-                              fontSize: 22,
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold),
+                          style: titleTextStyle.copyWith(fontSize: 22),
                         ),
                         Text(
                           listDataUser!.levelUser!,
-                          style: const TextStyle(
-                            fontSize: 15,
-                            color: Colors.white,
-                          ),
+                          style: subtitleTextStyle.copyWith(fontSize: 15)
                         ),
                         Text(
                           listDataUser!.namaCabang!,  overflow: TextOverflow.ellipsis,
                           maxLines: 1,
                           softWrap: true,
-                          style: const TextStyle(
-                            fontSize: 10,
-                            color: Colors.white,
-                          ),
+                          style: subtitleTextStyle.copyWith(fontSize: 12)
                         ),
                       ],
                     ),

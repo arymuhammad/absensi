@@ -15,7 +15,6 @@ import 'package:absensi/app/data/model/req_app_model.dart';
 import 'package:absensi/app/data/model/shift_kerja_model.dart';
 import 'package:absensi/app/data/model/user_model.dart';
 import 'package:absensi/app/data/model/visit_model.dart';
-import 'package:absensi/app/modules/adjust_presence/views/widget/adjust_data.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -241,6 +240,7 @@ class ServiceApi {
       // debugPrint(dataDecode.toString());
 
       if (res.statusCode == 200 && mode == "add") {
+        Get.back();
         succesDialog(Get.context!, "N", "Data berhasil disimpan",
             DialogType.success, 'SUKSES');
       } else {
@@ -1261,19 +1261,15 @@ class ServiceApi {
     }
   }
 
-  updateReqApp(Map<String,dynamic>data)async{
+  updateReqApp(Map<String, dynamic> data) async {
     try {
       final response = await http
           .post(Uri.parse('${baseUrl}update_reqapp'), body: data)
           .timeout(const Duration(minutes: 1));
       if (response.statusCode == 200) {
         // Get.back();
-        succesDialog(
-            Get.context!,
-            'N',
-            'Data berhasil diupdate',
-            DialogType.success,
-            'SUKSES');
+        succesDialog(Get.context!, 'N', 'Data berhasil diupdate',
+            DialogType.success, 'SUKSES');
       } else {
         failedDialog(
             Get.context!, 'ERROR', 'Terjadi kesalahan\n${response.body}');
@@ -1294,12 +1290,8 @@ class ServiceApi {
           .timeout(const Duration(minutes: 1));
       if (response.statusCode == 200) {
         Get.back();
-        succesDialog(
-            Get.context!,
-            'N',
-            'Data berhasil diupdate',
-            DialogType.success,
-            'SUKSES');
+        succesDialog(Get.context!, 'N', 'Data berhasil diupdate',
+            DialogType.success, 'SUKSES');
       } else {
         failedDialog(
             Get.context!, 'ERROR', 'Terjadi kesalahan\n${response.body}');

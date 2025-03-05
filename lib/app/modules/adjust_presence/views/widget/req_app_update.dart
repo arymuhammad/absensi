@@ -103,11 +103,11 @@ class ReqAppUpdate extends GetView {
                                   ExpansionTileItem(
                                     title: Text(
                                       i.nama,
-                                      style: titeTextStyle,
+                                      style: titleTextStyle,
                                     ),
                                     subtitle: Text(
                                       i.idUser,
-                                      style: subtiteTextStyle,
+                                      style: subtitleTextStyle,
                                     ),
                                     border: Border.all(),
                                     isHasBottomBorder: true,

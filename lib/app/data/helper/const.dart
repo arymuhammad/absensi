@@ -10,8 +10,8 @@ var bgContainer = Colors.blue[50];
 var red = Colors.redAccent[700];
 var green = Colors.greenAccent[700]!;
 
-var titeTextStyle = const TextStyle(fontSize: 16, fontWeight: FontWeight.bold);
-var subtiteTextStyle = TextStyle(
+var titleTextStyle = const TextStyle(fontSize: 16, fontWeight: FontWeight.bold);
+var subtitleTextStyle = TextStyle(
   fontSize: 14,
   fontWeight: FontWeight.bold,
   color: Colors.grey[600],

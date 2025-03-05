@@ -30,11 +30,11 @@ class UptMasukPulang extends StatelessWidget {
               children: [
                 Text(
                   'STATUS',
-                  style: subtiteTextStyle,
+                  style: subtitleTextStyle,
                 ),
                 Text(
                   data.status!.replaceAll('_', ' ').toUpperCase(),
-                  style: titeTextStyle,
+                  style: titleTextStyle,
                 ),
                 Row(
                   children: [
@@ -46,7 +46,7 @@ class UptMasukPulang extends StatelessWidget {
                       data.status == "update_masuk"
                           ? data.jamAbsenMasuk!
                           : data.jamAbsenPulang!,
-                      style: titeTextStyle,
+                      style: titleTextStyle,
                     ),
                   ],
                 ),
@@ -60,7 +60,7 @@ class UptMasukPulang extends StatelessWidget {
                       ),
                       Text(
                         data.tglPulang!,
-                        style: titeTextStyle,
+                        style: titleTextStyle,
                       ),
                     ],
                   ),
@@ -95,10 +95,10 @@ class UptMasukPulang extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Keterangan', style: titeTextStyle.copyWith(fontSize: 18),),
+                Text('Keterangan', style: titleTextStyle.copyWith(fontSize: 18),),
                 Text(
                   data.keterangan!,
-                  style: subtiteTextStyle,
+                  style: subtitleTextStyle,
                 ),
               ],
             )),
@@ -116,6 +116,7 @@ class UptMasukPulang extends StatelessWidget {
                 color: Colors.greenAccent[700]!,
                 onPressed: () {
                   var dataUptApp = {
+                    "uid":data.id,
                     "accept": "1",
                     "keterangan": adjCtrl.keteranganApp.text,
                     "id_user": data.idUser,
@@ -157,6 +158,7 @@ class UptMasukPulang extends StatelessWidget {
                 color: Colors.redAccent[700]!,
                 onPressed: () {
                   var dataUptApp = {
+                    "uid":data.id,
                     "accept": "0",
                     "keterangan": adjCtrl.keteranganApp.text,
                     "id_user": data.idUser,
