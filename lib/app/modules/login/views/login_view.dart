@@ -9,7 +9,6 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:icons_plus/icons_plus.dart';
-import 'package:rive/rive.dart';
 import '../controllers/login_controller.dart';
 
 class LoginView extends GetView<LoginController> {
@@ -97,9 +96,9 @@ class LoginView extends GetView<LoginController> {
                                   borderRadius: BorderRadius.circular(30)),
                               elevation: 10,
                               child: TextField(
-                                onTap: controller.lookAround,
-                                onChanged: ((value) =>
-                                    controller.moveEyes(value)),
+                                // onTap: controller.lookAround,
+                                // onChanged: ((value) =>
+                                //     controller.moveEyes(value)),
                                 controller: controller.username,
                                 decoration: InputDecoration(
                                     border: OutlineInputBorder(
@@ -125,7 +124,7 @@ class LoginView extends GetView<LoginController> {
                               child: TextField(
                                 controller: controller.password,
                                 obscureText: controller.isPassHide.value,
-                                onTap: controller.handsUpOnEyes,
+                                // onTap: controller.handsUpOnEyes,
                                 decoration: InputDecoration(
                                     border: OutlineInputBorder(
                                         borderRadius:
@@ -166,8 +165,8 @@ class LoginView extends GetView<LoginController> {
                                       backgroundColor: AppColors.contentDefBtn,
                                       fixedSize: const Size(130, 40)),
                                   onPressed: () {
-                                    controller.isChecking?.change(false);
-                                    controller.isHandsUp?.change(false);
+                                    // controller.isChecking?.change(false);
+                                    // controller.isHandsUp?.change(false);
                                     if (controller.username.text != "" &&
                                         controller.password.text != "") {
                                       // throw Exception();

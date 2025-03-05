@@ -23,11 +23,9 @@ class LoginController extends GetxController
   var logUser = Data().obs;
   var isPassHide = true.obs;
 
-  var animationLink = 'assets/animation/animated_login.riv';
-  SMITrigger? failTrigger, successTrigger;
-  SMIBool? isHandsUp, isChecking;
-  SMINumber? lookNum;
-  StateMachineController? stateMachineController;
+  // var animationLink = 'assets/animation/animated_login.riv';
+ 
+  // StateMachineController? stateMachineController;
   var artboard = Artboard().obs;
   late AnimationController ctrAnimated;
 
@@ -44,32 +42,7 @@ class LoginController extends GetxController
         ctrAnimated.forward();
       }
     });
-    await RiveFile.initialize();
-    rootBundle.load(animationLink).then((value) {
-      final file = RiveFile.import(value);
-      final art = file.mainArtboard;
-      stateMachineController =
-          StateMachineController.fromArtboard(art, "Login Machine");
-
-      if (stateMachineController != null) {
-        art.addController(stateMachineController!);
-
-        for (var element in stateMachineController!.inputs) {
-          if (element.name == "isChecking") {
-            isChecking = element as SMIBool;
-          } else if (element.name == "isHandsUp") {
-            isHandsUp = element as SMIBool;
-          } else if (element.name == "trigSuccess") {
-            successTrigger = element as SMITrigger;
-          } else if (element.name == "trigFail") {
-            failTrigger = element as SMITrigger;
-          } else if (element.name == "numLook") {
-            lookNum = element as SMINumber;
-          }
-        }
-      }
-      artboard.value = art;
-    });
+    
     super.onInit();
     email = TextEditingController();
     username = TextEditingController();
@@ -84,20 +57,7 @@ class LoginController extends GetxController
     password.dispose();
   }
 
-  void lookAround() {
-    isChecking?.change(true);
-    isHandsUp?.change(false);
-    lookNum?.change(0);
-  }
-
-  void moveEyes(value) {
-    lookNum?.change(value.length.toDouble());
-  }
-
-  void handsUpOnEyes() {
-    isHandsUp?.change(true);
-    isChecking?.change(false);
-  }
+  
 
   login() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
@@ -108,9 +68,7 @@ class LoginController extends GetxController
 
     //checking data
     if (dataOffline.isNotEmpty) {
-      successTrigger?.fire();
-
-      FotoProfil foto =
+          FotoProfil foto =
           await ServiceApi().getFotoProfil({'id': dataOffline.first.id!});
 
       await pref.setString(
@@ -148,7 +106,7 @@ class LoginController extends GetxController
 
       // dataUser.value = response;
       if (response.success == true) {
-        successTrigger?.fire();
+        
 
         await pref.setString(
             'userDataLogin',
@@ -203,7 +161,6 @@ class LoginController extends GetxController
 
         showToast("Selamat datang ${response.data!.nama}");
       } else {
-        failTrigger?.fire();
         showToast("User tidak ditemukan\nHarap periksa username dan password");
       }
     }
