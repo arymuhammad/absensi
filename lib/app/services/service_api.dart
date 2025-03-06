@@ -1234,10 +1234,10 @@ class ServiceApi {
     }
   }
 
-  getReqUptAbs(String? accept, String? type) async {
+  getReqUptAbs(String? accept, String? type, String? level, String? idUser) async {
     try {
       final response = await http
-          .get(Uri.parse('${baseUrl}get_reqUptAbs?accept=$accept&type=$type'))
+          .get(Uri.parse('${baseUrl}get_reqUptAbs?accept=$accept&type=$type&level=$level&id_user=$idUser'))
           .timeout(const Duration(minutes: 1));
       switch (response.statusCode) {
         case 200:

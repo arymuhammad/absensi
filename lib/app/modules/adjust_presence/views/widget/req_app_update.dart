@@ -43,7 +43,7 @@ class ReqAppUpdate extends GetView {
                     onChanged: (val) {
                       adjCtrl.isLoading.value = true;
                       adjCtrl.selectedStatus.value = val;
-                      adjCtrl.getReqAppUpt(val, adjCtrl.selectedType.value);
+                      adjCtrl.getReqAppUpt(val, adjCtrl.selectedType.value, dataUser.level, dataUser.id);
                     },
                     label: 'Status',
                   ),
@@ -69,7 +69,7 @@ class ReqAppUpdate extends GetView {
                     onChanged: (val) {
                       adjCtrl.isLoading.value = true;
                       adjCtrl.selectedType.value = val;
-                      adjCtrl.getReqAppUpt(adjCtrl.selectedStatus.value, val);
+                      adjCtrl.getReqAppUpt(adjCtrl.selectedStatus.value, val, dataUser.level, dataUser.id);
                     },
                     label: 'Kategori',
                   ),
@@ -125,7 +125,7 @@ class ReqAppUpdate extends GetView {
                             // adjCtrl.isLoading.value = true;
                             adjCtrl.selectedType.value = "";
                             adjCtrl.selectedStatus.value = "";
-                            await adjCtrl.getReqAppUpt('', '');
+                            await adjCtrl.getReqAppUpt('', '', dataUser.level, dataUser.id);
                             return Future.delayed(const Duration(seconds: 1),
                                 () {
                               showToast("Page Refreshed");

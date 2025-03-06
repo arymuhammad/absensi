@@ -97,7 +97,7 @@ class AdjustPresenceController extends GetxController
     visit = TextEditingController();
     keteranganApp = TextEditingController();
     getCabang();
-    getReqAppUpt('', '');
+    getReqAppUpt('', '','','');
   }
 
   @override
@@ -106,8 +106,8 @@ class AdjustPresenceController extends GetxController
     tabController.dispose();
   }
 
-  getReqAppUpt(String? accept, String? type) async {
-    final response = await ServiceApi().getReqUptAbs(accept, type);
+  getReqAppUpt(String? accept, String? type, String? level, String? idUser) async {
+    final response = await ServiceApi().getReqUptAbs(accept, type, level, idUser);
     listReqUpt.value = response;
     isLoading.value = false;
     return listReqUpt;
