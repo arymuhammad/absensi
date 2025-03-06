@@ -26,7 +26,7 @@ import '../../../data/helper/custom_dialog.dart';
 import '../../../data/model/cabang_model.dart';
 import '../../../data/model/cek_user_model.dart';
 import '../../../data/model/foto_profil_model.dart';
-import 'package:google_ml_vision/google_ml_vision.dart';
+// import 'package:google_ml_vision/google_ml_vision.dart';
 
 class AddPegawaiController extends GetxController {
   late TextEditingController nip, name, username, pass, store, telp, level;
@@ -43,7 +43,7 @@ class AddPegawaiController extends GetxController {
   Uint8List webImage = Uint8List(0);
   String fileName = "";
   var isLoading = false.obs;
-  var faceDatas = DataWajah().obs;
+  // var faceDatas = DataWajah().obs;
   var cabang = <Cabang>[].obs;
   var levelUser = <Level>[].obs;
   var selectedCabang = "".obs;
@@ -647,45 +647,5 @@ class AddPegawaiController extends GetxController {
     }
   }
 
-  addFaceData(String idUser) async {
-    await uploadFaceData();
-    var faceData = "";
-    if (image != null) {
-      final googleVisionImage = GoogleVisionImage.fromFilePath(image!.path);
-
-      /// Buat objek FaceDetector
-      final faceDetector = GoogleVision.instance.faceDetector(
-          const FaceDetectorOptions(
-              enableClassification: true,
-              minFaceSize: 0.1,
-              mode: FaceDetectorMode.accurate,
-              enableContours: true,
-              enableLandmarks: true,
-              enableTracking: true));
-      final faces = await faceDetector.processImage(googleVisionImage);
-
-      /// Tampilkan pesan apakah wajahnya terdeteksi atau tidak
-      if (faces.isEmpty) {
-        failedDialog(Get.context!, 'ERROR', 'Wajah tidak terdeteksi');
-      } else {
-        // loadingDialog('Wajah terdeteksi','');
-        loadingDialog("Menyimpan data...", "");
-        faceData = base64Encode(File(image!.path).readAsBytesSync());
-        var data = {"data_wajah": faceData, "id_user": idUser};
-        var dataLocal = {"data_wajah": faceData};
-        await ServiceApi().faceData(data, 'post');
-        await SQLHelper.instance.updateFaceData(dataLocal, idUser);
-        Get.back();
-      }
-    }
-  }
-
-  getFaceData(String idUser) async {
-    isLoading.value = true;
-    var data = {"id_user": idUser};
-    var response = await ServiceApi().faceData(data, '');
-    faceDatas.value = response;
-    isLoading.value = false;
-    return faceDatas;
-  }
+  
 }

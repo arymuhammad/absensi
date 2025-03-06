@@ -6,14 +6,12 @@ import 'package:absensi/app/data/helper/db_helper.dart';
 import 'package:absensi/app/data/model/cek_visit_model.dart';
 import 'package:absensi/app/data/model/user_model.dart';
 import 'package:absensi/app/data/model/visit_model.dart';
-import 'package:absensi/app/modules/add_pegawai/controllers/add_pegawai_controller.dart';
 import 'package:absensi/app/modules/home/views/dialog_update_app.dart';
-import 'package:absensi/app/modules/profil/views/face_data_view.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:device_marketing_names/device_marketing_names.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
-import 'package:flutter_face_api/flutter_face_api.dart';
+// import 'package:flutter_face_api/flutter_face_api.dart';
 import 'package:flutter_native_timezone_updated_gradle/flutter_native_timezone.dart';
 // import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:http/http.dart' as http;
@@ -28,7 +26,6 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:xml/xml.dart' as xml;
-import '../../../data/model/data_wajah_model.dart';
 import '../../../data/model/login_model.dart';
 import '../views/dialog_absen.dart';
 import '../../../services/service_api.dart';
@@ -40,7 +37,7 @@ import 'package:pdf/pdf.dart';
 import 'package:printing/printing.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:device_info_null_safety/device_info_null_safety.dart';
-import 'package:flutter_face_api/flutter_face_api.dart' as regula;
+// import 'package:flutter_face_api/flutter_face_api.dart' as regula;
 
 class AbsenController extends GetxController {
   var isLoading = true.obs;
@@ -96,16 +93,16 @@ class AbsenController extends GetxController {
   final TextEditingController filterVisit = TextEditingController();
   final ImagePicker picker = ImagePicker();
   XFile? image;
-  MatchFacesImage? mfImage1;
-  MatchFacesImage? mfImage2;
-  var faceDatas = DataWajah().obs;
+  // MatchFacesImage? mfImage1;
+  // MatchFacesImage? mfImage2;
+  // var faceDatas = DataWajah().obs;
 
-  var status = "nil";
-  var similarityStatus = "".obs;
-  var livenessStatus = "nil";
-  var uiImage1 = Image.asset('assets/images/portrait.png');
-  var uiImage2 = Image.asset('assets/images/portrait.png');
-  var faceSdk = FaceSDK.instance;
+  // var status = "nil";
+  // var similarityStatus = "".obs;
+  // var livenessStatus = "nil";
+  // var uiImage1 = Image.asset('assets/images/portrait.png');
+  // var uiImage2 = Image.asset('assets/images/portrait.png');
+  // var faceSdk = FaceSDK.instance;
 
   // set status(String val) => _status = val;
   // set similarityStatus(String val) => _similarityStatus = val;
@@ -214,35 +211,35 @@ class AbsenController extends GetxController {
     _startDateStream(paramSingle, paramLimit, paramSingleVisit, paramLimitVisit,
         dataUserLogin);
 
-    await checkFaceData(dataUserLogin.id!);
-    if (faceDatas.value.dataWajah == "") {
-      infoDialog(
-        Get.context!,
-        'INFO',
-        'Untuk melakukan absen, harap tambahkan dulu data wajah',
-        'Tambah data',
-        () {
-          final ctrlPegawai = Get.put(AddPegawaiController());
-          ctrlPegawai.getFaceData(
-            dataUserLogin.id!,
-          );
-          return Get.to(
-              () => FaceDataView(
-                    idUser: dataUserLogin.id!,
-                  ),
-              transition: Transition.cupertino);
-        },
-      );
-    } else {
-      return;
-    }
+    // await checkFaceData(dataUserLogin.id!);
+    // if (faceDatas.value.dataWajah == "") {
+    //   infoDialog(
+    //     Get.context!,
+    //     'INFO',
+    //     'Untuk melakukan absen, harap tambahkan dulu data wajah',
+    //     'Tambah data',
+    //     () {
+    //       final ctrlPegawai = Get.put(AddPegawaiController());
+    //       ctrlPegawai.getFaceData(
+    //         dataUserLogin.id!,
+    //       );
+    //       return Get.to(
+    //           () => FaceDataView(
+    //                 idUser: dataUserLogin.id!,
+    //               ),
+    //           transition: Transition.cupertino);
+    //     },
+    //   );
+    // } else {
+    //   return;
+    // }
   }
 
-  checkFaceData(String id) async {
-    var data = {"id_user": id};
-    var getFaceFromDb = await ServiceApi().faceData(data, '');
-    faceDatas.value = getFaceFromDb;
-  }
+  // checkFaceData(String id) async {
+  //   var data = {"id_user": id};
+  //   var getFaceFromDb = await ServiceApi().faceData(data, '');
+  //   faceDatas.value = getFaceFromDb;
+  // }
 
   // Future<bool> initialize() async {
   //   status = "Initializing...";
@@ -1203,44 +1200,44 @@ class AbsenController extends GetxController {
     await ServiceApi().sendDataToXmor(data);
   }
 
-  matchFaces(String idUser) async {
-    Uint8List? imgs2;
-    var faceFromLocal = await SQLHelper.instance.getFaceData(idUser);
-    var data = {"id_user": idUser};
-    var getFaceFromDb = await ServiceApi().faceData(data, '');
-    faceDatas.value = getFaceFromDb;
-    if (faceFromLocal[0]['data_wajah'] != null) {
-      imgs2 = base64Decode(faceFromLocal[0]['data_wajah']);
-    } else if (faceFromLocal[0]['data_wajah'] == null &&
-        faceDatas.value.dataWajah != '') {
-      imgs2 = base64Decode(faceDatas.value.dataWajah!);
-      // var faceData = base64Encode(File(image!.path).readAsBytesSync());
-      var dataLocal = {"data_wajah": faceDatas.value.dataWajah!};
-      await SQLHelper.instance.updateFaceData(dataLocal, idUser);
-    } else {
-      Get.back(closeOverlays: true);
-      await failedDialog(Get.context!, 'ERROR',
-          'Anda bukan pemilik akun ini\natau\nData Wajah belum ditambahkan');
-    }
-    final imgs = await image!.readAsBytes();
+  // matchFaces(String idUser) async {
+  //   Uint8List? imgs2;
+  //   var faceFromLocal = await SQLHelper.instance.getFaceData(idUser);
+  //   var data = {"id_user": idUser};
+  //   var getFaceFromDb = await ServiceApi().faceData(data, '');
+  //   faceDatas.value = getFaceFromDb;
+  //   if (faceFromLocal[0]['data_wajah'] != null) {
+  //     imgs2 = base64Decode(faceFromLocal[0]['data_wajah']);
+  //   } else if (faceFromLocal[0]['data_wajah'] == null &&
+  //       faceDatas.value.dataWajah != '') {
+  //     imgs2 = base64Decode(faceDatas.value.dataWajah!);
+  //     // var faceData = base64Encode(File(image!.path).readAsBytesSync());
+  //     var dataLocal = {"data_wajah": faceDatas.value.dataWajah!};
+  //     await SQLHelper.instance.updateFaceData(dataLocal, idUser);
+  //   } else {
+  //     Get.back(closeOverlays: true);
+  //     await failedDialog(Get.context!, 'ERROR',
+  //         'Anda bukan pemilik akun ini\natau\nData Wajah belum ditambahkan');
+  //   }
+  //   final imgs = await image!.readAsBytes();
 
-    mfImage1 = regula.MatchFacesImage(imgs, regula.ImageType.LIVE);
-    mfImage2 = regula.MatchFacesImage(imgs2!, regula.ImageType.LIVE);
+  //   mfImage1 = regula.MatchFacesImage(imgs, regula.ImageType.LIVE);
+  //   mfImage2 = regula.MatchFacesImage(imgs2!, regula.ImageType.LIVE);
 
-    if (mfImage1 == null || mfImage2 == null) {
-      status = "Both images required!";
-      return;
-    }
-    status = "Processing...";
-    var request = MatchFacesRequest([mfImage1!, mfImage2!]);
-    var response = await faceSdk.matchFaces(request);
-    var split = await faceSdk.splitComparedFaces(response.results, 0.75);
-    var match = split.matchedFaces;
-    similarityStatus.value = "failed";
-    if (match.isNotEmpty) {
-      similarityStatus.value =
-          "${(match[0].similarity * 100).toStringAsFixed(2)}%";
-    }
-    status = "Ready";
-  }
+  //   if (mfImage1 == null || mfImage2 == null) {
+  //     status = "Both images required!";
+  //     return;
+  //   }
+  //   status = "Processing...";
+  //   var request = MatchFacesRequest([mfImage1!, mfImage2!]);
+  //   var response = await faceSdk.matchFaces(request);
+  //   var split = await faceSdk.splitComparedFaces(response.results, 0.75);
+  //   var match = split.matchedFaces;
+  //   similarityStatus.value = "failed";
+  //   if (match.isNotEmpty) {
+  //     similarityStatus.value =
+  //         "${(match[0].similarity * 100).toStringAsFixed(2)}%";
+  //   }
+  //   status = "Ready";
+  // }
 }

@@ -2,7 +2,6 @@ import 'package:absensi/app/data/helper/const.dart';
 import 'package:absensi/app/data/helper/custom_dialog.dart';
 import 'package:absensi/app/data/model/login_model.dart';
 import 'package:absensi/app/modules/add_pegawai/controllers/add_pegawai_controller.dart';
-import 'package:absensi/app/modules/profil/views/face_data_view.dart';
 import 'package:absensi/app/modules/settings/views/about_view.dart';
 import 'package:absensi/app/modules/settings/views/backup_view.dart';
 import 'package:absensi/app/modules/profil/views/update_profil.dart';
@@ -73,37 +72,37 @@ class SettingsView extends GetView<SettingsController> {
                                 transition: Transition.cupertino);
                           },
                         ),
-                        ListTile(
-                          title: Text(
-                            'Data Wajah',
-                            style: TextStyle(
-                                color: titleColor, fontWeight: FontWeight.bold),
-                          ),
-                          subtitle: Text(
-                            'Data Wajah Pengguna',
-                            style:
-                                TextStyle(color: subTitleColor, fontSize: 13),
-                          ),
-                          leading: Container(
-                            height: 40,
-                            width: 40,
-                            decoration: BoxDecoration(
-                                color: bgContainer,
-                                borderRadius: BorderRadius.circular(8)),
-                            child:
-                                Icon(FontAwesome.face_smile, color: mainColor),
-                          ),
-                          trailing:
-                              const Icon(Icons.keyboard_arrow_right_rounded),
-                          onTap: () {
-                            Get.to(() {
-                              ctrl.getFaceData(listDataUser!.id!);
-                              return FaceDataView(
-                                idUser: listDataUser!.id!,
-                              );
-                            }, transition: Transition.cupertino);
-                          },
-                        ),
+                        // ListTile(
+                        //   title: Text(
+                        //     'Data Wajah',
+                        //     style: TextStyle(
+                        //         color: titleColor, fontWeight: FontWeight.bold),
+                        //   ),
+                        //   subtitle: Text(
+                        //     'Data Wajah Pengguna',
+                        //     style:
+                        //         TextStyle(color: subTitleColor, fontSize: 13),
+                        //   ),
+                        //   leading: Container(
+                        //     height: 40,
+                        //     width: 40,
+                        //     decoration: BoxDecoration(
+                        //         color: bgContainer,
+                        //         borderRadius: BorderRadius.circular(8)),
+                        //     child:
+                        //         Icon(FontAwesome.face_smile, color: mainColor),
+                        //   ),
+                        //   trailing:
+                        //       const Icon(Icons.keyboard_arrow_right_rounded),
+                        //   onTap: () {
+                        //     Get.to(() {
+                        //       ctrl.getFaceData(listDataUser!.id!);
+                        //       return FaceDataView(
+                        //         idUser: listDataUser!.id!,
+                        //       );
+                        //     }, transition: Transition.cupertino);
+                        //   },
+                        // ),
                         ListTile(
                           onTap: () {
                             Get.to(() => VerifikasiUpdatePassword(),

@@ -40,7 +40,6 @@ class SQLHelper {
         lat TEXT,
         long TEXT,
         foto TEXT,
-        data_wajah BLOB,
         no_telp TEXT,
         level TEXT,
         level_user TEXT,
@@ -437,27 +436,27 @@ class SQLHelper {
     return res.map((e) => ServerApi.fromJson(e)).toList();
   }
 
-  Future<void> updateFaceData(Map<String, dynamic> data, String id) async {
-    try {
-      Database db = await instance.database;
-      await db
-          .update('tbl_user', data, where: 'id=?', whereArgs: [id])
-          .timeout(const Duration(minutes: 3))
-          .then((value) {
-            return showToast('Data wajah tersimpan di local storage');
-          });
-    } on TimeoutException catch (e) {
-      return showToast(e.toString());
-    } catch (e) {
-      return showToast(e.toString());
-    }
-  }
+  // Future<void> updateFaceData(Map<String, dynamic> data, String id) async {
+  //   try {
+  //     Database db = await instance.database;
+  //     await db
+  //         .update('tbl_user', data, where: 'id=?', whereArgs: [id])
+  //         .timeout(const Duration(minutes: 3))
+  //         .then((value) {
+  //           return showToast('Data wajah tersimpan di local storage');
+  //         });
+  //   } on TimeoutException catch (e) {
+  //     return showToast(e.toString());
+  //   } catch (e) {
+  //     return showToast(e.toString());
+  //   }
+  // }
 
-  Future<List> getFaceData(String id) async {
-    Database db = await database;
-    var res = await db.query('tbl_user', columns: ["data_wajah"], where: 'id=?', whereArgs: [id]);
-    return res.map((e) => e).toList();
-  }
+  // Future<List> getFaceData(String id) async {
+  //   Database db = await database;
+  //   var res = await db.query('tbl_user', columns: ["data_wajah"], where: 'id=?', whereArgs: [id]);
+  //   return res.map((e) => e).toList();
+  // }
 
   Future close() async => _database!.close();
 }

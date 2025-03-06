@@ -165,13 +165,13 @@ formAbsen(Data dataUser, double latitude, double longitude) async {
                     Get.back();
 
                     if (absC.image != null) {
-                      loadingDialog("Memproses data wajah", "");
-                      await absC.matchFaces(dataUser.id!);
-                      Get.back();
-                      if (absC.similarityStatus.value == "failed") {
-                        failedDialog(
-                            Get.context!, 'ERROR', 'Wajah tidak dikenali');
-                      } else {
+                      // loadingDialog("Memproses data wajah", "");
+                      // await absC.matchFaces(dataUser.id!);
+                      // Get.back();
+                      // if (absC.similarityStatus.value == "failed") {
+                      //   failedDialog(
+                      //       Get.context!, 'ERROR', 'Wajah tidak dikenali');
+                      // } else {
                         // CEK ABSEN MASUK HARI INI, JIKA HASIL = 0, ABSEN MASUK
 
                         var localDataAbs = await SQLHelper.instance
@@ -271,7 +271,7 @@ formAbsen(Data dataUser, double latitude, double longitude) async {
                               DialogType.info,
                               'INFO');
                         }
-                      }
+                      // }
                     } else {
                       absC.stsAbsenSelected.value = "";
                       absC.selectedShift.value = "";
@@ -356,13 +356,13 @@ formAbsen(Data dataUser, double latitude, double longitude) async {
                       Get.back();
 
                       if (absC.image != null) {
-                        loadingDialog("Memproses data wajah", "");
-                        await absC.matchFaces(dataUser.id!);
-                        Get.back();
-                        if (absC.similarityStatus.value == "failed") {
-                          failedDialog(
-                              Get.context!, 'ERROR', 'Wajah tidak dikenali');
-                        } else {
+                        // loadingDialog("Memproses data wajah", "");
+                        // await absC.matchFaces(dataUser.id!);
+                        // Get.back();
+                        // if (absC.similarityStatus.value == "failed") {
+                        //   failedDialog(
+                        //       Get.context!, 'ERROR', 'Wajah tidak dikenali');
+                        // } else {
                           var localDataAbs = await SQLHelper.instance
                               .getAbsenToday(dataUser.id!, absC.dateNow);
 
@@ -510,7 +510,7 @@ formAbsen(Data dataUser, double latitude, double longitude) async {
                           //       DialogType.info,
                           //       'INFO');
                           // }
-                        }
+                        // }
                       } else {
                         absC.stsAbsenSelected.value = "";
                         absC.selectedShift.value = "";
