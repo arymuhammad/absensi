@@ -66,46 +66,51 @@ dialogUpdateApp() {
                   i['desc'],
                   style: TextStyle(color: Colors.grey[500]),
                 ),
-                const SizedBox(
-                  height: 20,
-                ),
-                const Text('Download langsung via browser (install manual)\nHarap tekan salah satu link'),
-                const SizedBox(
-                  height: 10,
-                ),
-                TextButton(
-                  onPressed: () {
-                    launchUrl(Uri.parse(
-                        'http://103.156.15.61/update apk/absensiApp.apk'));
-                  },
-                  child: Row(
-                    children: [
-                      const Icon(Icons.file_download_outlined),
-                      const SizedBox(width: 5,),
-                      Text('Download',
-                          style: TextStyle(color: Colors.blue[500])),
-                    ],
-                  ),
-                ),
-                const SizedBox(
-                  height: 5,
-                ),
-                TextButton(
-                  onPressed: () {
-                    launchUrl(Uri.parse(
-                        'http://103.156.15.61/update apk/absensiApp.arm64v8a.apk'));
-                  },
-                  child: Row(
-                    children: [
-                      const Icon(Icons.file_download_outlined),
-                      const SizedBox(width: 5,),
-                      Text('Download\br(opsional, jika link diatas tidak support di hp anda)',
-                          style: TextStyle(color: Colors.blue[500])),
-                    ],
-                  ),
-                ),
               ],
-            )
+            ),
+          const SizedBox(
+            height: 20,
+          ),
+          const Text(
+              'Download langsung via browser (install manual)\nHarap tekan salah satu link'),
+          const SizedBox(
+            height: 10,
+          ),
+          TextButton(
+            onPressed: () {
+              launchUrl(
+                  Uri.parse('http://103.156.15.61/update apk/absensiApp.apk'));
+            },
+            child: Row(
+              children: [
+                const Icon(Icons.file_download_outlined),
+                const SizedBox(
+                  width: 5,
+                ),
+                Text('Download', style: TextStyle(color: Colors.blue[500])),
+              ],
+            ),
+          ),
+          const SizedBox(
+            height: 5,
+          ),
+          TextButton(
+            onPressed: () {
+              launchUrl(Uri.parse(
+                  'http://103.156.15.61/update apk/absensiApp.arm64v8a.apk'));
+            },
+            child: Row(
+              children: [
+                const Icon(Icons.file_download_outlined),
+                const SizedBox(
+                  width: 5,
+                ),
+                Text(
+                    'Download\br(opsional, jika link \ndiatas tidak support di hp anda)',
+                    style: TextStyle(color: Colors.blue[500])),
+              ],
+            ),
+          ),
         ],
       ),
       // textCancel: 'Batal',
