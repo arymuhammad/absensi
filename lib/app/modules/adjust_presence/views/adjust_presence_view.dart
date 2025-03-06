@@ -1,12 +1,13 @@
-
 import 'package:absensi/app/modules/adjust_presence/views/widget/adjust_data.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../data/model/login_model.dart';
 import '../controllers/adjust_presence_controller.dart';
 import 'widget/req_app_update.dart';
 
 class AdjustPresenceView extends GetView<AdjustPresenceController> {
-  AdjustPresenceView({super.key});
+  AdjustPresenceView({super.key, this.data});
+  final Data? data;
   final ctrl = Get.put(AdjustPresenceController());
 
   @override
@@ -60,26 +61,23 @@ class AdjustPresenceView extends GetView<AdjustPresenceController> {
                 ],
               ),
             ),
-             Expanded(
+            Expanded(
               child: TabBarView(
                 controller: ctrl.tabController,
                 children: [
-                  // first tab bar view widget 
+                  // first tab bar view widget
                   Padding(
-                    padding: const EdgeInsets.fromLTRB(8.0, 12, 8.0,8.0),
-                    child: Center(
-                      child: AdjustData()
-                    ),
+                    padding: const EdgeInsets.fromLTRB(8.0, 12, 8.0, 8.0),
+                    child: Center(child: AdjustData()),
                   ),
 
                   // second tab bar view widget
                   Center(
-                    child: ReqAppUpdate(),
+                    child: ReqAppUpdate(dataUser:data!),
                   ),
                 ],
               ),
             ),
-            
           ],
         ),
       ),

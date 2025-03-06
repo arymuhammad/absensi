@@ -17,6 +17,7 @@ class ReqApp {
   String? status;
   String? accept;
   String? keterangan;
+  String? alasan;
   String? namaShift;
 
   ReqApp({
@@ -38,6 +39,7 @@ class ReqApp {
     this.status,
     this.accept,
     this.keterangan,
+    this.alasan,
     this.namaShift
   });
 
@@ -60,6 +62,7 @@ class ReqApp {
     devInfo = json['device_info2']??'';
     accept = json['accept']??'';
     keterangan = json['keterangan']??'';
+    alasan = json['alasan']??'';
     namaShift = json['nama_shift']??'';
   }
 }

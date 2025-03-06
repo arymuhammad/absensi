@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:absensi/app/data/helper/custom_dialog.dart';
 import 'package:absensi/app/modules/detail_absen/controllers/detail_absen_controller.dart';
 import 'package:absensi/app/modules/shared/date_picker.dart';
+import 'package:absensi/app/modules/shared/text_field.dart';
 import 'package:absensi/app/modules/shared/time_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -16,7 +17,7 @@ class EditDataAbsen extends GetView<DetailAbsenController> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 450,
+      height: 500,
       decoration: const BoxDecoration(
         color: Colors.white,
       ),
@@ -55,45 +56,48 @@ class EditDataAbsen extends GetView<DetailAbsenController> {
               const SizedBox(
                 height: 5,
               ),
-              CsDropdownShiftKerja(
-                  page: 'edit_data_absen',
-                  value: detailC.selectedShift.value == ""
-                      ? null
-                      : detailC.selectedShift.value,
-                  onChanged: (val) {
-                    // if (val == "5") {
-                    //   if (FormatWaktu.formatJamMenit(jamMenit: detailC.timeNow)
-                    //       .isBefore(
-                    //           FormatWaktu.formatJamMenit(jamMenit: '15:00'))) {
-                    //     detailC.selectedShift.value = "";
-                    //     dialogMsg('INFO',
-                    //         'Tidak dapat memilih shift ini sebelum\npukul 15:00 waktu setempat.\n\nSilahkan pilih shift yang lain');
-                    //   } else {
-                    //     detailC.selectedShift.value = val!;
-                    //     detailC.jamMasuk.value = detailC.timeNow;
-                    //     detailC.jamPulang.value =
-                    //         DateTime.parse(detailC.dateNowServer)
-                    //             .add(const Duration(hours: 8))
-                    //             .toString();
-                    //     dialogMsg('INFO',
-                    //         'Pastikan Shift Kerja yang dipilih\nsudah sesuai');
-                    //   }
-                    // } else {
-
-                    for (int i = 0; i < detailC.shiftKerja.length; i++) {
-                      if (detailC.shiftKerja[i].id == val) {
-                        detailC.selectedShift.value = val!;
-                        detailC.jamMasuk.value =
-                            detailC.shiftKerja[i].jamMasuk!;
-                        detailC.jamPulang.value =
-                            detailC.shiftKerja[i].jamPulang!;
+              SizedBox(
+                height: 52,
+                child: CsDropdownShiftKerja(
+                    page: 'edit_data_absen',
+                    value: detailC.selectedShift.value == ""
+                        ? null
+                        : detailC.selectedShift.value,
+                    onChanged: (val) {
+                      // if (val == "5") {
+                      //   if (FormatWaktu.formatJamMenit(jamMenit: detailC.timeNow)
+                      //       .isBefore(
+                      //           FormatWaktu.formatJamMenit(jamMenit: '15:00'))) {
+                      //     detailC.selectedShift.value = "";
+                      //     dialogMsg('INFO',
+                      //         'Tidak dapat memilih shift ini sebelum\npukul 15:00 waktu setempat.\n\nSilahkan pilih shift yang lain');
+                      //   } else {
+                      //     detailC.selectedShift.value = val!;
+                      //     detailC.jamMasuk.value = detailC.timeNow;
+                      //     detailC.jamPulang.value =
+                      //         DateTime.parse(detailC.dateNowServer)
+                      //             .add(const Duration(hours: 8))
+                      //             .toString();
+                      //     dialogMsg('INFO',
+                      //         'Pastikan Shift Kerja yang dipilih\nsudah sesuai');
+                      //   }
+                      // } else {
+                
+                      for (int i = 0; i < detailC.shiftKerja.length; i++) {
+                        if (detailC.shiftKerja[i].id == val) {
+                          detailC.selectedShift.value = val!;
+                          detailC.jamMasuk.value =
+                              detailC.shiftKerja[i].jamMasuk!;
+                          detailC.jamPulang.value =
+                              detailC.shiftKerja[i].jamPulang!;
+                        }
                       }
+                      dialogMsg('INFO',
+                          'Pastikan Shift Kerja yang dipilih\nsudah sesuai');
                     }
-                    dialogMsg('INFO',
-                        'Pastikan Shift Kerja yang dipilih\nsudah sesuai');
-                  }
-                  // },
-                  ),
+                    // },
+                    ),
+              ),
               const SizedBox(
                 height: 5,
               ),
@@ -179,6 +183,14 @@ class EditDataAbsen extends GetView<DetailAbsenController> {
                     ],
                   ),
                 ],
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              SizedBox(height: 50,
+                child: CsTextField(
+                  controller: detailC.alasan,
+                  label: 'Alasan perubahan data'),
               ),
               const SizedBox(
                 height: 20,

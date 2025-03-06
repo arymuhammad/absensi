@@ -1,5 +1,5 @@
+import 'package:absensi/app/data/model/login_model.dart';
 import 'package:absensi/app/modules/adjust_presence/controllers/adjust_presence_controller.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icons_plus/icons_plus.dart';
@@ -12,8 +12,9 @@ import '../../../shared/elevated_button.dart';
 import '../../../shared/text_field.dart';
 
 class UptDataAbsen extends StatelessWidget {
-  UptDataAbsen({super.key, required this.data});
+  UptDataAbsen({super.key, required this.data, this.dataUser});
   final ReqApp data;
+  final Data? dataUser;
   final adjCtrl = Get.put(AdjustPresenceController());
 
   @override
@@ -96,10 +97,18 @@ class UptDataAbsen extends StatelessWidget {
           ],
         ),
         const SizedBox(
-          height: 5,
+          height: 10,
+        ),
+        Text(
+          'Alasan Perubahan Data',
+          style: titleTextStyle,
+        ),
+        Text(
+          data.alasan!,
+          style: subtitleTextStyle,
         ),
         Visibility(
-          visible: data.accept == "" ? true : false,
+          visible: data.accept == "" && dataUser!.level == "1" ? true : false,
           child: SizedBox(
               height: 45,
               child: CsTextField(
@@ -127,7 +136,7 @@ class UptDataAbsen extends StatelessWidget {
           thickness: 2,
         ),
         Visibility(
-          visible: data.accept == "" ? true : false,
+          visible: data.accept == "" && dataUser!.level == "1" ? true : false,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [

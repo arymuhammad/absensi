@@ -3,9 +3,7 @@ import 'package:absensi/app/data/helper/db_helper.dart';
 import 'package:absensi/app/data/helper/custom_dialog.dart';
 import 'package:absensi/app/data/model/login_offline_model.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:rive/rive.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:crypto/crypto.dart';
 import '../../../data/model/foto_profil_model.dart';
@@ -26,7 +24,6 @@ class LoginController extends GetxController
   // var animationLink = 'assets/animation/animated_login.riv';
  
   // StateMachineController? stateMachineController;
-  var artboard = Artboard().obs;
   late AnimationController ctrAnimated;
 
   @override

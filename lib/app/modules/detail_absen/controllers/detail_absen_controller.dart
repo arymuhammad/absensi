@@ -28,6 +28,7 @@ class DetailAbsenController extends GetxController {
       tglPulang,
       jamAbsenMasuk,
       jamAbsenPulang,
+      alasan,
       _startTime;
   Rx<Time> time =
       Time(hour: DateTime.now().hour, minute: DateTime.now().minute).obs;
@@ -45,6 +46,7 @@ class DetailAbsenController extends GetxController {
     jamAbsenMasuk = TextEditingController();
     jamAbsenPulang = TextEditingController();
     _startTime = TextEditingController();
+    alasan = TextEditingController();
   }
 
   Future<List<ShiftKerja>> getShift() async {
@@ -81,104 +83,128 @@ class DetailAbsenController extends GetxController {
 
   submitApproval(String id, String nama) async {
     if (jamAbsenMasuk.text != "" && jamAbsenPulang.text == "") {
-      if (image == null) {
-        failedDialog(Get.context!, "Kesalahan",
-            "Harap lampirkan bukti foto absen masuk");
+      if (alasan.text == "") {
+        failedDialog(
+            Get.context!, "Kesalahan", "Harap Isi kolom alasan perubahan data");
       } else {
-        var data = {
-          "status": "update_masuk",
-          "id_user": id,
-          "nama": nama,
-          "jam_absen_masuk": jamAbsenMasuk.text,
-          "tgl_masuk": tglMasuk.text,
-          "foto_masuk": image!.path
-        };
-        loadingDialog("Mengirim data...", "");
-        await ServiceApi().reqUpdateAbs(data);
-        jamAbsenMasuk.clear();
-        image == null;
-      }
-    } else if (jamAbsenPulang.text != "" && jamAbsenMasuk.text == "") {
-      if (tglPulang.text == "") {
-        failedDialog(Get.context!, "Kesalahan", "Harap pilih tanggal pulang");
-      } else {
-        if (image2 == null) {
+        if (image == null) {
           failedDialog(Get.context!, "Kesalahan",
-              "Harap lampirkan bukti foto absen pulang");
+              "Harap lampirkan bukti foto absen masuk");
         } else {
-          loadingDialog("Mengirim data...", "");
-          await getLoc();
           var data = {
-            "status": "update_pulang",
+            "status": "update_masuk",
             "id_user": id,
             "nama": nama,
+            "jam_absen_masuk": jamAbsenMasuk.text,
             "tgl_masuk": tglMasuk.text,
-            "tgl_pulang": tglPulang.text,
-            "jam_absen_pulang": jamAbsenPulang.text,
-            "foto_pulang": image2!.path,
-            "lat_out": lat.toString(),
-            "long_out": long.toString(),
-            "device_info2": devInfo.value,
+            "foto_masuk": image!.path,
+            "alasan": alasan.text
           };
+          loadingDialog("Mengirim data...", "");
           await ServiceApi().reqUpdateAbs(data);
-          tglPulang.clear();
-          jamAbsenPulang.clear();
-          image2 == null;
+          jamAbsenMasuk.clear();
+          image == null;
+        }
+      }
+    } else if (jamAbsenPulang.text != "" && jamAbsenMasuk.text == "") {
+      if (alasan.text == "") {
+        failedDialog(
+            Get.context!, "Kesalahan", "Harap Isi kolom alasan perubahan data");
+      } else {
+        if (tglPulang.text == "") {
+          failedDialog(Get.context!, "Kesalahan", "Harap pilih tanggal pulang");
+        } else {
+          if (image2 == null) {
+            failedDialog(Get.context!, "Kesalahan",
+                "Harap lampirkan bukti foto absen pulang");
+          } else {
+            loadingDialog("Mengirim data...", "");
+            await getLoc();
+            var data = {
+              "status": "update_pulang",
+              "id_user": id,
+              "nama": nama,
+              "tgl_masuk": tglMasuk.text,
+              "tgl_pulang": tglPulang.text,
+              "jam_absen_pulang": jamAbsenPulang.text,
+              "foto_pulang": image2!.path,
+              "lat_out": lat.toString(),
+              "long_out": long.toString(),
+              "device_info2": devInfo.value,
+              "alasan": alasan.text
+            };
+            await ServiceApi().reqUpdateAbs(data);
+            tglPulang.clear();
+            jamAbsenPulang.clear();
+            image2 == null;
+          }
         }
       }
     } else if (jamAbsenMasuk.text != "" &&
         jamAbsenPulang.text != "" &&
         selectedShift.isEmpty) {
-      if (tglPulang.text == "") {
-        failedDialog(Get.context!, "Kesalahan", "Harap pilih tanggal pulang");
+      if (alasan.text == "") {
+        failedDialog(
+            Get.context!, "Kesalahan", "Harap Isi kolom alasan perubahan data");
       } else {
-        if (image == null && image2 == null ||
-            image == null ||
-            image2 == null) {
-          failedDialog(Get.context!, "Kesalahan",
-              "Harap lampirkan bukti foto absen masuk & pulang");
+        if (tglPulang.text == "") {
+          failedDialog(Get.context!, "Kesalahan", "Harap pilih tanggal pulang");
         } else {
-          loadingDialog("Mengirim data...", "");
-          await getLoc();
-          var data = {
-            "status": "update_data_absen",
-            "id_user": id,
-            "nama": nama,
-            "tgl_masuk": tglMasuk.text,
-            "tgl_pulang": tglPulang.text,
-            "jam_absen_masuk": jamAbsenMasuk.text,
-            "jam_absen_pulang": jamAbsenPulang.text,
-            "foto_masuk": image!.path,
-            "foto_pulang": image2!.path,
-            "lat_out": lat.toString(),
-            "long_out": long.toString(),
-            "device_info2": devInfo.value,
-          };
-          await ServiceApi().reqUpdateAbs(data);
-          tglPulang.clear();
-          jamAbsenMasuk.clear();
-          jamAbsenMasuk.clear();
-          image == null;
-          image2 == null;
+          if (image == null && image2 == null ||
+              image == null ||
+              image2 == null) {
+            failedDialog(Get.context!, "Kesalahan",
+                "Harap lampirkan bukti foto absen masuk & pulang");
+          } else {
+            loadingDialog("Mengirim data...", "");
+            await getLoc();
+            var data = {
+              "status": "update_data_absen",
+              "id_user": id,
+              "nama": nama,
+              "tgl_masuk": tglMasuk.text,
+              "tgl_pulang": tglPulang.text,
+              "jam_absen_masuk": jamAbsenMasuk.text,
+              "jam_absen_pulang": jamAbsenPulang.text,
+              "foto_masuk": image!.path,
+              "foto_pulang": image2!.path,
+              "lat_out": lat.toString(),
+              "long_out": long.toString(),
+              "device_info2": devInfo.value,
+              "alasan": alasan.text
+            };
+            await ServiceApi().reqUpdateAbs(data);
+            tglPulang.clear();
+            jamAbsenMasuk.clear();
+            jamAbsenMasuk.clear();
+            image == null;
+            image2 == null;
+          }
         }
       }
     } else if (selectedShift.isNotEmpty &&
         jamAbsenMasuk.text == "" &&
         jamAbsenPulang.text == "") {
-      var data = {
-        "status": "update_shift",
-        "id_user": id,
-        "nama": nama,
-        "id_shift": selectedShift.value,
-        "jam_masuk": jamMasuk.value,
-        "jam_pulang": jamPulang.value,
-        "tgl_masuk": tglMasuk.text
-      };
-      loadingDialog("Mengirim data...", "");
-      await ServiceApi().reqUpdateAbs(data);
-      selectedShift.value = "";
-      jamMasuk.value = "";
-      jamPulang.value = "";
+      if (alasan.text == "") {
+        failedDialog(
+            Get.context!, "Kesalahan", "Harap Isi kolom alasan perubahan data");
+      } else {
+        var data = {
+          "status": "update_shift",
+          "id_user": id,
+          "nama": nama,
+          "id_shift": selectedShift.value,
+          "jam_masuk": jamMasuk.value,
+          "jam_pulang": jamPulang.value,
+          "tgl_masuk": tglMasuk.text,
+          "alasan": alasan.text
+        };
+        loadingDialog("Mengirim data...", "");
+        await ServiceApi().reqUpdateAbs(data);
+        selectedShift.value = "";
+        jamMasuk.value = "";
+        jamPulang.value = "";
+      }
     } else {
       failedDialog(
           Get.context!, "Kesalahan", "Harap isi bagian yang ingi diperbarui");
@@ -188,10 +214,10 @@ class DetailAbsenController extends GetxController {
   getLoc() async {
     try {
       final deviceNames = DeviceMarketingNames();
-     
+
       devInfo.value = await deviceNames.getSingleName();
-     
-    // ignore: empty_catches
+
+      // ignore: empty_catches
     } on PlatformException {}
 
     Position position = await determinePosition();

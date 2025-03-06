@@ -1,5 +1,5 @@
 name: absensi
-version: 2.3.36+30
+version: 2.3.37+31
 publish_to: none
 description: URBAN&CO SPOT
 environment: 
@@ -81,7 +81,6 @@ flutter_launcher_icons:
 flutter: 
   assets: 
     - assets/image/
-    - assets/animation/
     - assets/sound/
   fonts: 
     - family: Nunito

@@ -7,6 +7,7 @@ import 'package:absensi/app/modules/detail_absen/views/detail_visit_view.dart';
 import 'package:absensi/app/modules/shared/background_image_header.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 import 'package:get/get.dart';
 import 'package:icons_plus/icons_plus.dart';
@@ -22,19 +23,18 @@ class RiwayatVisitView extends GetView {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: const Text('RIWAYAT KUNJUNGAN'),
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage(
-                  'assets/image/new_bg_app.jpg'), // Gantilah dengan path gambar Anda
-              fit: BoxFit.cover,
-            ),
-          ),
-        ),
+        title: Text('RIWAYAT KUNJUNGAN',
+            style: titleTextStyle.copyWith(
+              fontSize: 20,
+            )),
+        backgroundColor: Colors.transparent.withOpacity(0.4),
+        elevation: 0.0,
+        // iconTheme: const IconThemeData(color: Colors.black,),
         centerTitle: true,
       ),
+      resizeToAvoidBottomInset: false,
       body: Stack(
         children: [
           const CsBgImg(),
@@ -43,7 +43,7 @@ class RiwayatVisitView extends GetView {
             children: [
               Padding(
                 padding: const EdgeInsets.only(
-                    left: 15.0, top: 10.0, right: 15.0, bottom: 10),
+                    left: 15.0, top: 100.0, right: 15.0, bottom: 10),
                 child: Card(
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10)),
@@ -66,12 +66,14 @@ class RiwayatVisitView extends GetView {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text('Periode',
-                            style: TextStyle(color: subTitleColor, fontSize: 18)),
+                            style:
+                                TextStyle(color: subTitleColor, fontSize: 18)),
                         Text(
                           visitC.searchDate.value != ""
                               ? visitC.searchDate.value
                               : visitC.thisMonth,
-                          style: const TextStyle(color: Colors.black, fontSize: 18),
+                          style: const TextStyle(
+                              color: Colors.black, fontSize: 18),
                         ),
                       ],
                     )),
@@ -88,8 +90,7 @@ class RiwayatVisitView extends GetView {
                   () {
                     return visitC.isLoading.value
                         ? ListView.builder(
-                            padding: const EdgeInsets.only(
-                                bottom: 20.0, left: 20.0, right: 20.0),
+                            padding: EdgeInsets.zero,
                             itemCount: 3,
                             itemBuilder: (context, index) {
                               return Container(
@@ -138,8 +139,8 @@ class RiwayatVisitView extends GetView {
                                     ),
                                     Shimmer.fromColors(
                                       baseColor: Colors.grey,
-                                      highlightColor:
-                                          const Color.fromARGB(255, 238, 238, 238),
+                                      highlightColor: const Color.fromARGB(
+                                          255, 238, 238, 238),
                                       child: Container(
                                         width: 70,
                                         height: 15,
@@ -154,8 +155,8 @@ class RiwayatVisitView extends GetView {
                                     ),
                                     Shimmer.fromColors(
                                       baseColor: Colors.grey,
-                                      highlightColor:
-                                          const Color.fromARGB(255, 238, 238, 238),
+                                      highlightColor: const Color.fromARGB(
+                                          255, 238, 238, 238),
                                       child: Container(
                                         width: 60,
                                         height: 15,
@@ -170,8 +171,8 @@ class RiwayatVisitView extends GetView {
                                     ),
                                     Shimmer.fromColors(
                                       baseColor: Colors.grey,
-                                      highlightColor:
-                                          const Color.fromARGB(255, 238, 238, 238),
+                                      highlightColor: const Color.fromARGB(
+                                          255, 238, 238, 238),
                                       child: Container(
                                         width: 70,
                                         height: 15,
@@ -189,25 +190,27 @@ class RiwayatVisitView extends GetView {
                         : visitC.searchVisit.isEmpty
                             ? RefreshIndicator(
                                 onRefresh: () {
-                                  return Future.delayed(const Duration(seconds: 1),
-                                      () async {
+                                  return Future.delayed(
+                                      const Duration(seconds: 1), () async {
                                     visitC.isLoading.value = true;
-                                    await visitC
-                                        .getAllVisited(Get.arguments["id_user"]);
+                                    await visitC.getAllVisited(
+                                        Get.arguments["id_user"]);
                                     visitC.searchDate.value = "";
                                     showToast("Halaman Disegarkan.");
                                   });
                                 },
                                 child: ListView(
-                                  physics: const AlwaysScrollableScrollPhysics(),
+                                  physics:
+                                      const AlwaysScrollableScrollPhysics(),
                                   children: [
                                     Padding(
-                                      padding:
-                                          EdgeInsets.only(top: Get.size.height / 3),
+                                      padding: EdgeInsets.only(
+                                          top: Get.size.height / 3),
                                       child: const Column(
                                         children: [
                                           Center(
-                                            child: Text('Belum ada data kunjungan'),
+                                            child: Text(
+                                                'Belum ada data kunjungan'),
                                           ),
                                         ],
                                       ),
@@ -217,11 +220,10 @@ class RiwayatVisitView extends GetView {
                               )
                             : RefreshIndicator(
                                 onRefresh: () {
-                                  return Future.delayed(const Duration(seconds: 1),
-                                      () async {
+                                  return Future.delayed(
+                                      const Duration(seconds: 1), () async {
                                     visitC.isLoading.value = true;
-                                    await visitC
-                                        .getAllVisited(userData!.id!);
+                                    await visitC.getAllVisited(userData!.id!);
                                     visitC.searchDate.value = "";
                                     showToast("Halaman Disegarkan.");
                                   });
@@ -230,8 +232,10 @@ class RiwayatVisitView extends GetView {
                                   padding: const EdgeInsets.only(
                                       left: 20.0, right: 20.0),
                                   child: ListView.builder(
+                                    padding: EdgeInsets.zero,
                                     shrinkWrap: true,
-                                    physics: const AlwaysScrollableScrollPhysics(),
+                                    physics:
+                                        const AlwaysScrollableScrollPhysics(),
                                     itemCount: visitC.searchVisit.length,
                                     itemBuilder: (c, i) {
                                       var diffHours = const Duration();
@@ -243,58 +247,68 @@ class RiwayatVisitView extends GetView {
                                       } else {
                                         diffHours = const Duration();
                                       }
-          
+
                                       return InkWell(
-                                        onTap: () => Get.to(() => DetailVisitView(),
+                                        onTap: () => Get.to(
+                                            () => DetailVisitView(),
                                             arguments: {
-                                              "foto_profil": userData!.foto != ""
-                                                  ? userData!.foto
-                                                  : userData!.nama,
-                                              "nama": visitC.searchVisit[i].nama!,
-                                              "id_user": visitC.searchVisit[i].id!,
-                                              "store":
-                                                  visitC.searchVisit[i].namaCabang!,
-                                              "tgl_visit":
-                                                  visitC.searchVisit[i].tglVisit!,
+                                              "foto_profil":
+                                                  userData!.foto != ""
+                                                      ? userData!.foto
+                                                      : userData!.nama,
+                                              "nama":
+                                                  visitC.searchVisit[i].nama!,
+                                              "id_user":
+                                                  visitC.searchVisit[i].id!,
+                                              "store": visitC
+                                                  .searchVisit[i].namaCabang!,
+                                              "tgl_visit": visitC
+                                                  .searchVisit[i].tglVisit!,
                                               "jam_in":
                                                   visitC.searchVisit[i].jamIn!,
                                               "foto_in":
                                                   visitC.searchVisit[i].fotoIn!,
-                                              "jam_out":
-                                                  visitC.searchVisit[i].jamOut != ""
-                                                      ? visitC
-                                                          .searchVisit[i].jamOut!
-                                                      : "",
-                                              "foto_out": visitC
-                                                          .searchVisit[i].fotoOut !=
+                                              "jam_out": visitC.searchVisit[i]
+                                                          .jamOut !=
                                                       ""
-                                                  ? visitC.searchVisit[i].fotoOut!
+                                                  ? visitC
+                                                      .searchVisit[i].jamOut!
+                                                  : "",
+                                              "foto_out": visitC.searchVisit[i]
+                                                          .fotoOut !=
+                                                      ""
+                                                  ? visitC
+                                                      .searchVisit[i].fotoOut!
                                                   : "",
                                               "lat_in":
                                                   visitC.searchVisit[i].latIn!,
                                               "long_in":
                                                   visitC.searchVisit[i].longIn!,
-                                              "lat_out":
-                                                  visitC.searchVisit[i].latOut != ""
-                                                      ? visitC
-                                                          .searchVisit[i].latOut!
-                                                      : "",
-                                              "long_out": visitC
-                                                          .searchVisit[i].longOut !=
-                                                      ""
-                                                  ? visitC.searchVisit[i].longOut!
-                                                  : "",
-                                              "device_info":
-                                                  visitC.searchVisit[i].deviceInfo!,
-                                              "device_info2": visitC.searchVisit[i]
-                                                          .deviceInfo2 !=
+                                              "lat_out": visitC.searchVisit[i]
+                                                          .latOut !=
                                                       ""
                                                   ? visitC
-                                                      .searchVisit[i].deviceInfo2
+                                                      .searchVisit[i].latOut!
+                                                  : "",
+                                              "long_out": visitC.searchVisit[i]
+                                                          .longOut !=
+                                                      ""
+                                                  ? visitC
+                                                      .searchVisit[i].longOut!
+                                                  : "",
+                                              "device_info": visitC
+                                                  .searchVisit[i].deviceInfo!,
+                                              "device_info2": visitC
+                                                          .searchVisit[i]
+                                                          .deviceInfo2 !=
+                                                      ""
+                                                  ? visitC.searchVisit[i]
+                                                      .deviceInfo2
                                                   : ""
                                             }),
-                                        child: Card(color: bgContainer,
-                                                  elevation: 8,
+                                        child: Card(
+                                          color: bgContainer,
+                                          elevation: 8,
                                           shape: RoundedRectangleBorder(
                                               borderRadius:
                                                   BorderRadius.circular(6)),
@@ -306,8 +320,10 @@ class RiwayatVisitView extends GetView {
                                                   children: [
                                                     Text(
                                                       DateFormat('MMM')
-                                                          .format(DateTime.parse(
-                                                              visitC.searchVisit[i]
+                                                          .format(DateTime
+                                                              .parse(visitC
+                                                                  .searchVisit[
+                                                                      i]
                                                                   .tglVisit!))
                                                           .toUpperCase(),
                                                       style: TextStyle(
@@ -334,10 +350,12 @@ class RiwayatVisitView extends GetView {
                                                       CrossAxisAlignment.start,
                                                   children: [
                                                     Text(
-                                                        DateFormat("EEEE", "id_ID")
-                                                            .format(DateTime.parse(
-                                                                visitC
-                                                                    .searchVisit[i]
+                                                        DateFormat(
+                                                                "EEEE", "id_ID")
+                                                            .format(DateTime
+                                                                .parse(visitC
+                                                                    .searchVisit[
+                                                                        i]
                                                                     .tglVisit!)),
                                                         style: TextStyle(
                                                             fontWeight:
@@ -358,10 +376,13 @@ class RiwayatVisitView extends GetView {
                                                                 .start,
                                                         children: <Widget>[
                                                           Text(
-                                                              visitC.searchVisit[i]
+                                                              visitC
+                                                                  .searchVisit[
+                                                                      i]
                                                                   .namaCabang!,
                                                               textAlign:
-                                                                  TextAlign.left)
+                                                                  TextAlign
+                                                                      .left)
                                                         ],
                                                       ),
                                                     ),
@@ -378,9 +399,11 @@ class RiwayatVisitView extends GetView {
                                                       children: [
                                                         const Icon(
                                                           Icons.timer_sharp,
-                                                          color: Colors.lightBlue,
+                                                          color:
+                                                              Colors.lightBlue,
                                                         ),
-                                                        const SizedBox(width: 5),
+                                                        const SizedBox(
+                                                            width: 5),
                                                         Text(
                                                             '${visitC.searchVisit[i].jamOut != "" ? diffHours.inHours : '-'} jam ${visitC.searchVisit[i].jamOut != "" ? diffHours.inMinutes % 60 : '-'} menit'),
                                                       ],
@@ -397,12 +420,15 @@ class RiwayatVisitView extends GetView {
                                                         children: [
                                                           const Text('Masuk'),
                                                           Text(
-                                                            visitC.searchVisit[i]
+                                                            visitC
+                                                                .searchVisit[i]
                                                                 .jamIn!,
                                                             style: TextStyle(
                                                                 fontWeight:
-                                                                    FontWeight.bold,
-                                                                color: titleColor),
+                                                                    FontWeight
+                                                                        .bold,
+                                                                color:
+                                                                    titleColor),
                                                           ),
                                                         ],
                                                       ),
@@ -413,17 +439,22 @@ class RiwayatVisitView extends GetView {
                                                         children: [
                                                           const Text('Keluar'),
                                                           Text(
-                                                            visitC.searchVisit[i]
+                                                            visitC
+                                                                        .searchVisit[
+                                                                            i]
                                                                         .jamOut! !=
                                                                     ""
                                                                 ? visitC
-                                                                    .searchVisit[i]
+                                                                    .searchVisit[
+                                                                        i]
                                                                     .jamOut!
                                                                 : "-",
                                                             style: TextStyle(
                                                                 fontWeight:
-                                                                    FontWeight.bold,
-                                                                color: titleColor),
+                                                                    FontWeight
+                                                                        .bold,
+                                                                color:
+                                                                    titleColor),
                                                           ),
                                                         ],
                                                       ),

@@ -58,21 +58,23 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title:  Text('DETAIL ABSEN', style: titleTextStyle.copyWith(fontSize: 20, color: Colors.black,)),
-        backgroundColor: Colors.transparent.withOpacity(0.2),
+        title: Text('DETAIL ABSEN',
+            style: titleTextStyle.copyWith(
+              fontSize: 20,
+              // color: Colors.black,
+            )),
+        backgroundColor: Colors.transparent.withOpacity(0.4),
         elevation: 0.0,
-        iconTheme: const IconThemeData(color: Colors.black,),
+       
         centerTitle: true,
-        
       ),
       resizeToAvoidBottomInset: false,
-     
       body: Stack(
         children: [
           const CsBgImg(),
           ListView(
-            padding:
-                const EdgeInsets.only(left:12, top: 100, right: 12, bottom: 10),
+            padding: const EdgeInsets.only(
+                left: 12, top: 100, right: 12, bottom: 10),
             children: [
               Card(
                 elevation: 10,
@@ -96,8 +98,8 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
                         child: Text(
                           DateFormat("EEEE, d MMMM yyyy", "id_ID").format(
                               DateTime.parse(detailData['tanggal_masuk'])),
-                          style:
-                              const TextStyle(fontSize: 18, color: Colors.white),
+                          style: const TextStyle(
+                              fontSize: 18, color: Colors.white),
                         ),
                       ),
                     ),
@@ -173,12 +175,12 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
                                               decoration: BoxDecoration(
                                                   borderRadius:
                                                       BorderRadius.circular(5),
-                                                  color:
-                                                      detailData['jam_masuk'] ==
-                                                              "Telat"
-                                                          ? Colors.redAccent[700]
-                                                          : Colors
-                                                              .greenAccent[700]),
+                                                  color: detailData[
+                                                              'jam_masuk'] ==
+                                                          "Telat"
+                                                      ? Colors.redAccent[700]
+                                                      : Colors
+                                                          .greenAccent[700]),
                                               constraints: BoxConstraints(
                                                 maxWidth: MediaQuery.of(context)
                                                         .size
@@ -293,8 +295,9 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
                         child: Center(
                           child: Text(
                             detailData['tanggal_pulang'] != ""
-                                ? DateFormat("EEEE, d MMMM yyyy", "id_ID").format(
-                                    DateTime.parse(detailData['tanggal_pulang']))
+                                ? DateFormat("EEEE, d MMMM yyyy", "id_ID")
+                                    .format(DateTime.parse(
+                                        detailData['tanggal_pulang']))
                                 : "",
                             style: const TextStyle(
                                 fontSize: 18, color: Colors.white),
@@ -339,8 +342,9 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
                                               const Text('Shift'),
                                               const SizedBox(width: 57),
                                               SizedBox(
-                                                width: Get.mediaQuery.size.width *
-                                                    0.35,
+                                                width:
+                                                    Get.mediaQuery.size.width *
+                                                        0.35,
                                                 child: Column(
                                                   crossAxisAlignment:
                                                       CrossAxisAlignment.start,
@@ -371,14 +375,16 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
                                               Container(
                                                 height: 25,
                                                 constraints: BoxConstraints(
-                                                  maxWidth: MediaQuery.of(context)
-                                                          .size
-                                                          .width *
-                                                      0.3,
+                                                  maxWidth:
+                                                      MediaQuery.of(context)
+                                                              .size
+                                                              .width *
+                                                          0.3,
                                                 ),
                                                 decoration: BoxDecoration(
                                                     borderRadius:
-                                                        BorderRadius.circular(5),
+                                                        BorderRadius.circular(
+                                                            5),
                                                     color: detailData[
                                                                     'jam_pulang'] ==
                                                                 "Belum Absen" ||
@@ -398,11 +404,11 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
                                             ],
                                           ),
                                           Visibility(
-                                            visible:
-                                                detailData['jam_absen_pulang'] !=
-                                                        ""
-                                                    ? true
-                                                    : false,
+                                            visible: detailData[
+                                                        'jam_absen_pulang'] !=
+                                                    ""
+                                                ? true
+                                                : false,
                                             child: Row(
                                               mainAxisAlignment:
                                                   MainAxisAlignment.end,

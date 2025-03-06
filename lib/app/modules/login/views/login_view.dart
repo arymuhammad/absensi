@@ -20,35 +20,19 @@ class LoginView extends GetView<LoginController> {
         body: Stack(
           children: [
             Container(
-              // height: Get.mediaQuery.size.height / 2,
               decoration: const BoxDecoration(
                   image: DecorationImage(
                       image: AssetImage('assets/image/bg.png'),
                       fit: BoxFit.fill)),
             ),
-            // Positioned(
-            //     left: 12,
-            //     top: 50,
-            //     right: 0,
-            //     bottom: 0,
-            //     child: Text(
-            //       'WELCOME\nBACK',
-            //       style: titleTextStyle.copyWith(
-            //         fontSize: 45,
-            //         color: Colors.black54,
-            //       ),
-            //     )),
+           
             Padding(
               padding: const EdgeInsets.all(15),
               child: Obx(
                 () => ListView(
                   scrollDirection: Axis.vertical,
                   children: [
-                    // const SizedBox(
-                    //   width: 450,
-                    //   height: 120,
-                    //   // child: Rive(artboard: controller.artboard.value),
-                    // ),
+                   
                     const SizedBox(height: 5),
                     Padding(
                       padding:
@@ -96,9 +80,7 @@ class LoginView extends GetView<LoginController> {
                                   borderRadius: BorderRadius.circular(30)),
                               elevation: 10,
                               child: TextField(
-                                // onTap: controller.lookAround,
-                                // onChanged: ((value) =>
-                                //     controller.moveEyes(value)),
+                               
                                 controller: controller.username,
                                 decoration: InputDecoration(
                                     border: OutlineInputBorder(
@@ -124,7 +106,7 @@ class LoginView extends GetView<LoginController> {
                               child: TextField(
                                 controller: controller.password,
                                 obscureText: controller.isPassHide.value,
-                                // onTap: controller.handsUpOnEyes,
+                              
                                 decoration: InputDecoration(
                                     border: OutlineInputBorder(
                                         borderRadius:
@@ -165,11 +147,10 @@ class LoginView extends GetView<LoginController> {
                                       backgroundColor: AppColors.contentDefBtn,
                                       fixedSize: const Size(130, 40)),
                                   onPressed: () {
-                                    // controller.isChecking?.change(false);
-                                    // controller.isHandsUp?.change(false);
+                                   
                                     if (controller.username.text != "" &&
                                         controller.password.text != "") {
-                                      // throw Exception();
+                                    
                                       controller.login();
                                     } else {
                                       showToast(
@@ -190,7 +171,7 @@ class LoginView extends GetView<LoginController> {
                             ],
                           ),
                           const SizedBox(
-                            height: 75,
+                            height: 95,
                           ),
                           Center(
                             child: RichText(
@@ -225,33 +206,7 @@ class LoginView extends GetView<LoginController> {
                                       "Menghapus data...", "Mohon menunggu");
                                   await SQLHelper.instance.truncateUser();
                                   Get.back();
-                                  // var databasesPath = await getDatabasesPath();
-                                  // // var dbPath = join(databasesPath, 'penjualan.db');
-
-                                  // var status = await Permission
-                                  //     .manageExternalStorage.status;
-                                  // if (!status.isGranted) {
-                                  //   await Permission.manageExternalStorage
-                                  //       .request();
-                                  // }
-
-                                  // var status1 = await Permission.storage.status;
-                                  // if (!status1.isGranted) {
-                                  //   await Permission.storage.request();
-                                  // }
-
-                                  // try {
-                                  //   File savedDb = File(
-                                  //       "/storage/emulated/0/URBANCO SPOT/absensi.db");
-
-                                  //   await savedDb
-                                  //       .copy('$databasesPath/absensi.db');
-                                  // } catch (e) {
-                                  //   showToast(
-                                  //       e.toString());
-                                  // }
-
-                                  // showToast('Successfully Restored Database');
+                                 
                                 },
                                 child: Row(
                                   children: [

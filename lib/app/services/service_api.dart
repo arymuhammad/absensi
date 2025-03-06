@@ -1158,6 +1158,7 @@ class ServiceApi {
       request.fields['status'] = data["status"];
       request.fields['id_user'] = data["id_user"];
       request.fields['nama'] = data["nama"];
+      request.fields['alasan'] = data["alasan"];
       if (data["status"] == "update_masuk") {
         request.fields['tgl_masuk'] = data["tgl_masuk"];
         request.fields['jam_absen_masuk'] = data["jam_absen_masuk"];
@@ -1258,6 +1259,8 @@ class ServiceApi {
     } on FetchDataException catch (e) {
       // print('error caught: ${e.message}');
       showToast("${e.message}");
+    } on TimeoutException catch (e) {
+      failedDialog(Get.context!, 'Kesalahan', e.toString());
     }
   }
 

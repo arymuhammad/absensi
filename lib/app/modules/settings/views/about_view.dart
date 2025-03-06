@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:absensi/app/modules/absen/controllers/absen_controller.dart';
-import 'package:absensi/app/data/helper/app_colors.dart';
 import 'package:absensi/app/modules/shared/background_image_header.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';

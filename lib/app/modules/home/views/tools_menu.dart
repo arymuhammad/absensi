@@ -1,4 +1,5 @@
 import 'package:absensi/app/modules/absen/controllers/absen_controller.dart';
+import 'package:absensi/app/modules/home/views/req_app_user_view.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icons_plus/icons_plus.dart';
@@ -6,7 +7,6 @@ import 'package:icons_plus/icons_plus.dart';
 import '../../../data/helper/const.dart';
 import '../../../data/model/login_model.dart';
 import '../../adjust_presence/views/adjust_presence_view.dart';
-import '../../cek_stok/views/cek_stok_view.dart';
 import '../../semua_absen/views/monitoring_absen_view.dart';
 
 class ToolsMenu extends StatelessWidget {
@@ -51,67 +51,24 @@ class ToolsMenu extends StatelessWidget {
                 scrollDirection: Axis.horizontal,
                 child: Row(
                   children: [
-                    userData!.cekStok == "0"
-                        ? const Text('Tidak ada menu yang tersedia')
-                        : Container(),
-                    Visibility(
-                      visible: userData!.cekStok == "1" ? true : false,
-                      child: Column(
-                        children: [
-                          IconButton(
-                              onPressed: () {
-                                Get.to(
-                                    () => CekStokView(
-                                        kodeCabang: userData!.kodeCabang),
-                                    transition: Transition.cupertino);
-                              },
-                              icon: Icon(
-                                // CupertinoIcons.doc_text_search,
-                                FontAwesome.box_open_solid,
-                                color: mainColor,
-                                size: 30,
-                              )),
-                          const Text(
-                            'Cek Stok\n',
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          )
-                        ],
-                      ),
+                    Column(
+                      children: [
+                        IconButton(
+                            onPressed: () {
+                              Get.to(() => ReqAppUserView(userData: userData!,));
+                            },
+                            icon: Icon(
+                              // CupertinoIcons.doc_text_search,
+                              Iconsax.sms_notification_outline,
+                              color: mainColor,
+                              size: 30,
+                            )),
+                        const Text(
+                          'Notification',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        )
+                      ],
                     ),
-                    // const SizedBox(
-                    //   width: 12,
-                    // ),
-                    // Visibility(
-                    //   visible: userData!.level == "1" ||
-                    //           userData!.level == "9" ||
-                    //           userData!.level == "10" ||
-                    //           userData!.level == "26" ||
-                    //           userData!.level == "50"
-                    //       ? true
-                    //       : false,
-                    //   child: Column(
-                    //     children: [
-                    //       IconButton(
-                    //           onPressed: () async {
-                    //             Get.to(() => ReportSalesView(),
-                    //                 transition: Transition.cupertino);
-                    //             loadingWithIcon();
-                    //             await reportC.fetchSalesReport();
-                    //             SmartDialog.dismiss();
-                    //           },
-                    //           icon: Icon(
-                    //             FontAwesome.circle_dollar_to_slot_solid,
-                    //             color: mainColor,
-                    //             size: 30,
-                    //           )),
-                    //       const Text(
-                    //         'Laporan\nSales',
-                    //         style: TextStyle(fontWeight: FontWeight.bold),
-                    //         textAlign: TextAlign.center,
-                    //       )
-                    //     ],
-                    //   ),
-                    // ),
                     const SizedBox(
                       width: 12,
                     ),
@@ -150,7 +107,7 @@ class ToolsMenu extends StatelessWidget {
                         children: [
                           IconButton(
                               onPressed: () async {
-                                Get.to(() => AdjustPresenceView(),
+                                Get.to(() => AdjustPresenceView(data:userData!),
                                     transition: Transition.cupertino);
                                 absC.searchAbsen.clear();
                                 absC.userMonitor.value = "";

@@ -1,3 +1,4 @@
+import 'package:absensi/app/data/model/login_model.dart';
 import 'package:absensi/app/data/model/req_app_model.dart';
 import 'package:absensi/app/modules/adjust_presence/controllers/adjust_presence_controller.dart';
 import 'package:flutter/material.dart';
@@ -7,13 +8,15 @@ import '../../../../data/helper/const.dart';
 import '../../../shared/elevated_button.dart';
 
 class UptShift extends StatelessWidget {
-  UptShift({super.key, required this.data});
+  UptShift({super.key, required this.data, this.dataUser});
   final ReqApp data;
+  final Data? dataUser;
   final adjCtrl = Get.put(AdjustPresenceController());
 
   @override
   Widget build(BuildContext context) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -43,22 +46,24 @@ class UptShift extends StatelessWidget {
                 )
               ],
             ),
-            // SizedBox(
-            //     height: 70,
-            //     width: 70,
-            //     child: WidgetZoom(
-            //       heroAnimationTag:
-            //           data.status == "update_masuk" ? 'fotoMasuk' : 'fotoPulang',
-            //       zoomWidget: Image.network(
-            //           '${ServiceApi().baseUrl}${data.status == "update_masuk" ? data.fotoMasuk : data.fotoPulang}'),
-            //     )),
           ],
+        ),
+        const SizedBox(
+          height: 10,
+        ),
+        Text(
+          'Alasan Perubahan Data',
+          style: titleTextStyle,
+        ),
+        Text(
+          data.alasan!,
+          style: subtitleTextStyle,
         ),
         const Divider(
           thickness: 2,
         ),
         Visibility(
-          visible: data.accept == "" ? true : false,
+          visible: data.accept == "" && dataUser!.level == "1" ? true : false,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
@@ -68,7 +73,7 @@ class UptShift extends StatelessWidget {
                 color: Colors.greenAccent[700]!,
                 onPressed: () {
                   var dataUptApp = {
-                    "uid":data.id,
+                    "uid": data.id,
                     "accept": "1",
                     "keterangan": adjCtrl.keteranganApp.text,
                     "id_user": data.idUser,
@@ -81,8 +86,8 @@ class UptShift extends StatelessWidget {
                     "id_user": data.idUser,
                     "tgl_masuk": data.tglMasuk,
                     "id_shift": data.idShift,
-                    "jam_masuk":data.jamMasuk,
-                    "jam_pulang":data.jamPulang
+                    "jam_masuk": data.jamMasuk,
+                    "jam_pulang": data.jamPulang
                   };
                   adjCtrl.appAbs(dataUptApp, dataUptAbs);
                 },
@@ -92,8 +97,8 @@ class UptShift extends StatelessWidget {
                 label: 'Reject',
                 color: Colors.redAccent[700]!,
                 onPressed: () {
-                   var dataUptApp = {
-                    "uid":data.id,
+                  var dataUptApp = {
+                    "uid": data.id,
                     "accept": "0",
                     "keterangan": adjCtrl.keteranganApp.text,
                     "id_user": data.idUser,

@@ -1,3 +1,4 @@
+import 'package:absensi/app/data/model/login_model.dart';
 import 'package:absensi/app/data/model/req_app_model.dart';
 import 'package:absensi/app/modules/adjust_presence/controllers/adjust_presence_controller.dart';
 import 'package:absensi/app/modules/shared/text_field.dart';
@@ -13,8 +14,9 @@ import '../../../../services/service_api.dart';
 import '../../../shared/elevated_button.dart';
 
 class UptMasukPulang extends StatelessWidget {
-  UptMasukPulang({super.key, required this.data});
+  UptMasukPulang({super.key, required this.data, this.dataUser});
   final ReqApp data;
+  final Data? dataUser;
   final adjCtrl = Get.put(AdjustPresenceController());
 
   @override
@@ -80,22 +82,38 @@ class UptMasukPulang extends StatelessWidget {
           ],
         ),
         const SizedBox(
-          height: 5,
+          height: 10,
+        ),
+        Text(
+          'Alasan Perubahan Data',
+          style: titleTextStyle,
+        ),
+        Text(
+          data.alasan!,
+          style: subtitleTextStyle,
+        ),
+        const SizedBox(
+          height: 10,
         ),
         Visibility(
-          visible: data.accept == "" ? true : false,
+          visible: data.accept == "" && dataUser!.level == "1" ? true : false,
           child: SizedBox(
               height: 45,
               child: CsTextField(
                   controller: adjCtrl.keteranganApp, label: 'Keterangan')),
         ),
-        const SizedBox(height: 5,),
+        const SizedBox(
+          height: 5,
+        ),
         Visibility(
             visible: data.accept == "0" ? true : false,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Keterangan', style: titleTextStyle.copyWith(fontSize: 18),),
+                Text(
+                  'Keterangan',
+                  style: titleTextStyle.copyWith(fontSize: 18),
+                ),
                 Text(
                   data.keterangan!,
                   style: subtitleTextStyle,
@@ -106,7 +124,7 @@ class UptMasukPulang extends StatelessWidget {
           thickness: 2,
         ),
         Visibility(
-          visible: data.accept == "" ? true : false,
+          visible: data.accept == "" && dataUser!.level == "1" ? true : false,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
@@ -116,7 +134,7 @@ class UptMasukPulang extends StatelessWidget {
                 color: Colors.greenAccent[700]!,
                 onPressed: () {
                   var dataUptApp = {
-                    "uid":data.id,
+                    "uid": data.id,
                     "accept": "1",
                     "keterangan": adjCtrl.keteranganApp.text,
                     "id_user": data.idUser,
@@ -145,9 +163,9 @@ class UptMasukPulang extends StatelessWidget {
                         ? data.fotoMasuk
                         : data.fotoPulang,
                     "tgl_pulang": data.tglPulang,
-                    "lat_out":data.latOut,
-                    "long_out":data.longOut,
-                    "device_info2":data.devInfo
+                    "lat_out": data.latOut,
+                    "long_out": data.longOut,
+                    "device_info2": data.devInfo
                   };
                   adjCtrl.appAbs(dataUptApp, dataUptAbs);
                 },
@@ -158,7 +176,7 @@ class UptMasukPulang extends StatelessWidget {
                 color: Colors.redAccent[700]!,
                 onPressed: () {
                   var dataUptApp = {
-                    "uid":data.id,
+                    "uid": data.id,
                     "accept": "0",
                     "keterangan": adjCtrl.keteranganApp.text,
                     "id_user": data.idUser,
