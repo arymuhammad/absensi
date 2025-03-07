@@ -1,4 +1,5 @@
 import 'package:absensi/app/modules/absen/controllers/absen_controller.dart';
+import 'package:absensi/app/modules/adjust_presence/controllers/adjust_presence_controller.dart';
 import 'package:absensi/app/modules/home/views/req_app_user_view.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -14,6 +15,7 @@ class ToolsMenu extends StatelessWidget {
   ToolsMenu({super.key, this.userData});
 
   final absC = Get.find<AbsenController>();
+  final adjCtrl = Get.put(AdjustPresenceController());
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +57,11 @@ class ToolsMenu extends StatelessWidget {
                       children: [
                         IconButton(
                             onPressed: () {
-                              Get.to(() => ReqAppUserView(userData: userData!,));
+                              adjCtrl.getReqAppUpt(
+                                  '', '', userData!.level, userData!.id);
+                              Get.to(() => ReqAppUserView(
+                                    userData: userData!,
+                                  ));
                             },
                             icon: Icon(
                               // CupertinoIcons.doc_text_search,
@@ -107,7 +113,8 @@ class ToolsMenu extends StatelessWidget {
                         children: [
                           IconButton(
                               onPressed: () async {
-                                Get.to(() => AdjustPresenceView(data:userData!),
+                                Get.to(
+                                    () => AdjustPresenceView(data: userData!),
                                     transition: Transition.cupertino);
                                 absC.searchAbsen.clear();
                                 absC.userMonitor.value = "";
