@@ -134,6 +134,7 @@ class AbsenController extends GetxController {
     // if (!await initialize()) return;
     // status = "Ready";
     timeNetwork(await FlutterNativeTimezone.getLocalTimezone());
+    Timer.periodic(const Duration(seconds: 1), (Timer t) async => timeNetwork(await FlutterNativeTimezone.getLocalTimezone()));
 
     SharedPreferences pref = await SharedPreferences.getInstance();
     var dataUserLogin =
@@ -210,56 +211,7 @@ class AbsenController extends GetxController {
 
     _startDateStream(paramSingle, paramLimit, paramSingleVisit, paramLimitVisit,
         dataUserLogin);
-
-    // await checkFaceData(dataUserLogin.id!);
-    // if (faceDatas.value.dataWajah == "") {
-    //   infoDialog(
-    //     Get.context!,
-    //     'INFO',
-    //     'Untuk melakukan absen, harap tambahkan dulu data wajah',
-    //     'Tambah data',
-    //     () {
-    //       final ctrlPegawai = Get.put(AddPegawaiController());
-    //       ctrlPegawai.getFaceData(
-    //         dataUserLogin.id!,
-    //       );
-    //       return Get.to(
-    //           () => FaceDataView(
-    //                 idUser: dataUserLogin.id!,
-    //               ),
-    //           transition: Transition.cupertino);
-    //     },
-    //   );
-    // } else {
-    //   return;
-    // }
   }
-
-  // checkFaceData(String id) async {
-  //   var data = {"id_user": id};
-  //   var getFaceFromDb = await ServiceApi().faceData(data, '');
-  //   faceDatas.value = getFaceFromDb;
-  // }
-
-  // Future<bool> initialize() async {
-  //   status = "Initializing...";
-  //   var license = await loadAssetIfExists("assets/regula.license");
-  //   InitConfig? config = null;
-  //   if (license != null) config = InitConfig(license);
-  //   var (success, error) = await faceSdk.initialize(config: config);
-  //   if (!success) {
-  //     status = error!.message;
-  //     print("${error.code}: ${error.message}");
-  //   }
-  //   return success;
-  // }
-  // Future<ByteData?> loadAssetIfExists(String path) async {
-  //   try {
-  //     return await rootBundle.load(path);
-  //   } catch (_) {
-  //     return null;
-  //   }
-  // }
 
   void startTimer(int sec) {
     Timer.periodic(const Duration(seconds: 1), (timer) {
@@ -526,7 +478,7 @@ class AbsenController extends GetxController {
       dialogMsgCncl('Peringatan',
           'Anda terdeteksi menggunakan\nlokasi palsu\nHarap matikan lokasi palsu');
     } else {
-      timeNetwork(await FlutterNativeTimezone.getLocalTimezone());
+      // timeNetwork(await FlutterNativeTimezone.getLocalTimezone());
       dialogAbsenView(dataUser!, position.latitude, position.longitude);
     }
   }
@@ -551,7 +503,7 @@ class AbsenController extends GetxController {
               double.parse(barcodeScanRes.value.split(' ')[1]));
           lokasi.value =
               '${placemarks[0].street!}, ${placemarks[0].subLocality!}\n${placemarks[0].subAdministrativeArea!}, ${placemarks[0].administrativeArea!}';
-          timeNetwork(await FlutterNativeTimezone.getLocalTimezone());
+          // timeNetwork(await FlutterNativeTimezone.getLocalTimezone());
           dialogAbsenView(
               dataUser!,
               double.parse(barcodeScanRes.value.split(' ')[0]),
@@ -1199,45 +1151,4 @@ class AbsenController extends GetxController {
     };
     await ServiceApi().sendDataToXmor(data);
   }
-
-  // matchFaces(String idUser) async {
-  //   Uint8List? imgs2;
-  //   var faceFromLocal = await SQLHelper.instance.getFaceData(idUser);
-  //   var data = {"id_user": idUser};
-  //   var getFaceFromDb = await ServiceApi().faceData(data, '');
-  //   faceDatas.value = getFaceFromDb;
-  //   if (faceFromLocal[0]['data_wajah'] != null) {
-  //     imgs2 = base64Decode(faceFromLocal[0]['data_wajah']);
-  //   } else if (faceFromLocal[0]['data_wajah'] == null &&
-  //       faceDatas.value.dataWajah != '') {
-  //     imgs2 = base64Decode(faceDatas.value.dataWajah!);
-  //     // var faceData = base64Encode(File(image!.path).readAsBytesSync());
-  //     var dataLocal = {"data_wajah": faceDatas.value.dataWajah!};
-  //     await SQLHelper.instance.updateFaceData(dataLocal, idUser);
-  //   } else {
-  //     Get.back(closeOverlays: true);
-  //     await failedDialog(Get.context!, 'ERROR',
-  //         'Anda bukan pemilik akun ini\natau\nData Wajah belum ditambahkan');
-  //   }
-  //   final imgs = await image!.readAsBytes();
-
-  //   mfImage1 = regula.MatchFacesImage(imgs, regula.ImageType.LIVE);
-  //   mfImage2 = regula.MatchFacesImage(imgs2!, regula.ImageType.LIVE);
-
-  //   if (mfImage1 == null || mfImage2 == null) {
-  //     status = "Both images required!";
-  //     return;
-  //   }
-  //   status = "Processing...";
-  //   var request = MatchFacesRequest([mfImage1!, mfImage2!]);
-  //   var response = await faceSdk.matchFaces(request);
-  //   var split = await faceSdk.splitComparedFaces(response.results, 0.75);
-  //   var match = split.matchedFaces;
-  //   similarityStatus.value = "failed";
-  //   if (match.isNotEmpty) {
-  //     similarityStatus.value =
-  //         "${(match[0].similarity * 100).toStringAsFixed(2)}%";
-  //   }
-  //   status = "Ready";
-  // }
 }

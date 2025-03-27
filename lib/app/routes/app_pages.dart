@@ -5,8 +5,6 @@ import '../modules/add_pegawai/bindings/add_pegawai_binding.dart';
 import '../modules/add_pegawai/views/add_pegawai_view.dart';
 import '../modules/adjust_presence/bindings/adjust_presence_binding.dart';
 import '../modules/adjust_presence/views/adjust_presence_view.dart';
-// import '../modules/alarm/bindings/alarm_binding.dart';
-// import '../modules/alarm/views/alarm_view.dart';
 import '../modules/cek_stok/bindings/cek_stok_binding.dart';
 import '../modules/cek_stok/views/cek_stok_view.dart';
 import '../modules/detail_absen/bindings/detail_absen_binding.dart';
@@ -21,6 +19,9 @@ import '../modules/semua_absen/bindings/semua_absen_binding.dart';
 import '../modules/semua_absen/views/semua_absen_view.dart';
 import '../modules/settings/bindings/settings_binding.dart';
 import '../modules/settings/views/settings_view.dart';
+
+// import '../modules/alarm/bindings/alarm_binding.dart';
+// import '../modules/alarm/views/alarm_view.dart';
 
 part 'app_routes.dart';
 
