@@ -106,7 +106,7 @@ dialogUpdateApp() {
                   width: 5,
                 ),
                 Text(
-                    'Download\br(opsional, jika link \ndiatas tidak support di hp anda)',
+                    'Download\n(opsional, jika link \ndiatas tidak support di hp anda)',
                     style: TextStyle(color: Colors.blue[500])),
               ],
             ),

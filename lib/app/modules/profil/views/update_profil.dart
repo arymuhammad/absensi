@@ -33,12 +33,12 @@ class UpdateProfil extends GetView {
         // iconTheme: const IconThemeData(color: Colors.black,),
         centerTitle: true,
       ),
-      resizeToAvoidBottomInset: false,
+      // resizeToAvoidBottomInset: false,
       body: Stack(
         children: [
           const CsBgImg(),
           ListView(
-            // scrollDirection: Axis.vertical,
+            scrollDirection: Axis.vertical,
             // keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
             padding: const EdgeInsets.fromLTRB(12, 100, 12, 12),
             children: [
