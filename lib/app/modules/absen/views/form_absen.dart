@@ -70,10 +70,10 @@ formAbsen(Data dataUser, double latitude, double longitude) async {
                         : absC.selectedShift.value,
                     onChanged: (val) {
                       if (val == "5") {
-                        if (FormatWaktu.formatJamMenit(jamMenit: absC.timeNow)
+                        if (FormatWaktu.formatJamMenit(jamMenit: absC.timeNow.isNotEmpty?absC.timeNow:absC.timeNowOpt)
                                 .isAfter(FormatWaktu.formatJamMenit(
                                     jamMenit: '08:59')) &&
-                            FormatWaktu.formatJamMenit(jamMenit: absC.timeNow)
+                            FormatWaktu.formatJamMenit(jamMenit: absC.timeNow.isNotEmpty?absC.timeNow:absC.timeNowOpt)
                                 .isBefore(FormatWaktu.formatJamMenit(
                                     jamMenit: '15:00'))) {
                           absC.selectedShift.value = "";
@@ -81,7 +81,7 @@ formAbsen(Data dataUser, double latitude, double longitude) async {
                               'Tidak dapat memilih shift ini sebelum\npukul 15:00 waktu setempat.\n\nSilahkan pilih shift yang lain');
                         } else {
                           absC.selectedShift.value = val!;
-                          absC.jamMasuk.value = absC.timeNow;
+                          absC.jamMasuk.value = absC.timeNow.isNotEmpty?absC.timeNow:absC.timeNowOpt;
                           absC.jamPulang.value = DateFormat("HH:mm").format(
                               DateTime.parse(absC.dateNowServer)
                                   .add(const Duration(hours: 8)));
@@ -182,7 +182,7 @@ formAbsen(Data dataUser, double latitude, double longitude) async {
                             "status": "add",
                             "id": dataUser.id,
                             "tanggal_masuk": DateFormat('yyyy-MM-dd')
-                                .format(DateTime.parse(absC.dateNowServer)),
+                                .format(DateTime.parse(absC.dateNowServer.isNotEmpty? absC.dateNowServer:absC.dateNow)),
                             "kode_cabang": absC.selectedCabang.isNotEmpty
                                 ? absC.selectedCabang.value
                                 : dataUser.kodeCabang,
@@ -190,7 +190,7 @@ formAbsen(Data dataUser, double latitude, double longitude) async {
                             "id_shift": absC.selectedShift.value,
                             "jam_masuk": absC.jamMasuk.value,
                             "jam_pulang": absC.jamPulang.value,
-                            "jam_absen_masuk": absC.timeNow.toString(),
+                            "jam_absen_masuk": absC.timeNow.isNotEmpty?absC.timeNow:absC.timeNowOpt,
                             "foto_masuk": File(absC.image!.path),
                             "lat_masuk": latitude.toString(),
                             "long_masuk": longitude.toString(),
@@ -201,7 +201,7 @@ formAbsen(Data dataUser, double latitude, double longitude) async {
                           SQLHelper.instance.insertDataAbsen(Absen(
                               idUser: dataUser.id,
                               tanggalMasuk: DateFormat('yyyy-MM-dd')
-                                  .format(DateTime.parse(absC.dateNowServer)),
+                                  .format(DateTime.parse(absC.dateNowServer.isNotEmpty? absC.dateNowServer:absC.dateNow)),
                               kodeCabang: absC.selectedCabang.isNotEmpty
                                   ? absC.selectedCabang.value
                                   : dataUser.kodeCabang,
@@ -209,7 +209,7 @@ formAbsen(Data dataUser, double latitude, double longitude) async {
                               idShift: absC.selectedShift.value,
                               jamMasuk: absC.jamMasuk.value,
                               jamPulang: absC.jamPulang.value,
-                              jamAbsenMasuk: absC.timeNow.toString(),
+                              jamAbsenMasuk: absC.timeNow.isNotEmpty?absC.timeNow:absC.timeNowOpt,
                               jamAbsenPulang: '',
                               fotoMasuk: absC.image!.path,
                               latMasuk: latitude.toString(),
@@ -240,7 +240,7 @@ formAbsen(Data dataUser, double latitude, double longitude) async {
                             "mode": "single",
                             "id_user": dataUser.id,
                             "tanggal_masuk": DateFormat('yyyy-MM-dd')
-                                .format(DateTime.parse(absC.dateNowServer))
+                                .format(DateTime.parse(absC.dateNowServer.isNotEmpty? absC.dateNowServer:absC.dateNow))
                           };
 
                           var paramLimitAbsen = {
@@ -372,11 +372,11 @@ formAbsen(Data dataUser, double latitude, double longitude) async {
                               "status": "update",
                               "id": dataUser.id,
                               "tanggal_masuk": DateFormat('yyyy-MM-dd')
-                                  .format(DateTime.parse(absC.dateNowServer)),
+                                  .format(DateTime.parse(absC.dateNowServer.isNotEmpty? absC.dateNowServer:absC.dateNow)),
                               "tanggal_pulang": DateFormat('yyyy-MM-dd')
-                                  .format(DateTime.parse(absC.dateNowServer)),
+                                  .format(DateTime.parse(absC.dateNowServer.isNotEmpty? absC.dateNowServer:absC.dateNow)),
                               "nama": dataUser.nama,
-                              "jam_absen_pulang": absC.timeNow.toString(),
+                              "jam_absen_pulang": absC.timeNow.isNotEmpty?absC.timeNow:absC.timeNowOpt,
                               "foto_pulang": File(absC.image!.path),
                               "lat_pulang": latitude.toString(),
                               "long_pulang": longitude.toString(),
@@ -402,7 +402,7 @@ formAbsen(Data dataUser, double latitude, double longitude) async {
                               "mode": "single",
                               "id_user": dataUser.id,
                               "tanggal_masuk": DateFormat('yyyy-MM-dd')
-                                  .format(DateTime.parse(absC.dateNowServer))
+                                  .format(DateTime.parse(absC.dateNowServer.isNotEmpty? absC.dateNowServer:absC.dateNow))
                             };
 
                             var paramLimitAbsen = {
@@ -429,11 +429,11 @@ formAbsen(Data dataUser, double latitude, double longitude) async {
                               "status": "update",
                               "id": dataUser.id,
                               "tanggal_masuk": DateFormat('yyyy-MM-dd')
-                                  .format(DateTime.parse(absC.dateNowServer)),
+                                  .format(DateTime.parse(absC.dateNowServer.isNotEmpty? absC.dateNowServer:absC.dateNow)),
                               "tanggal_pulang": DateFormat('yyyy-MM-dd')
-                                  .format(DateTime.parse(absC.dateNowServer)),
+                                  .format(DateTime.parse(absC.dateNowServer.isNotEmpty? absC.dateNowServer:absC.dateNow)),
                               "nama": dataUser.nama,
-                              "jam_absen_pulang": absC.timeNow.toString(),
+                              "jam_absen_pulang":absC.timeNow.isNotEmpty?absC.timeNow:absC.timeNowOpt,
                               "foto_pulang": File(absC.image!.path),
                               "lat_pulang": latitude.toString(),
                               "long_pulang": longitude.toString(),
@@ -445,9 +445,9 @@ formAbsen(Data dataUser, double latitude, double longitude) async {
                                 {
                                   "tanggal_pulang": DateFormat('yyyy-MM-dd')
                                       .format(
-                                          DateTime.parse(absC.dateNowServer)),
+                                          DateTime.parse(absC.dateNowServer.isNotEmpty? absC.dateNowServer:absC.dateNow)),
                                   "nama": dataUser.nama,
-                                  "jam_absen_pulang": absC.timeNow.toString(),
+                                  "jam_absen_pulang": absC.timeNow.isNotEmpty?absC.timeNow:absC.timeNowOpt,
                                   "foto_pulang": absC.image!.path,
                                   "lat_pulang": latitude.toString(),
                                   "long_pulang": longitude.toString(),
@@ -455,7 +455,7 @@ formAbsen(Data dataUser, double latitude, double longitude) async {
                                 },
                                 dataUser.id!,
                                 DateFormat('yyyy-MM-dd').format(
-                                    DateTime.parse(absC.dateNowServer)));
+                                    DateTime.parse(absC.dateNowServer.isNotEmpty? absC.dateNowServer:absC.dateNow)));
 
                             // update data absensi ke server
                             await ServiceApi().submitAbsen(data, false);
@@ -477,7 +477,7 @@ formAbsen(Data dataUser, double latitude, double longitude) async {
                               "mode": "single",
                               "id_user": dataUser.id,
                               "tanggal_masuk": DateFormat('yyyy-MM-dd')
-                                  .format(DateTime.parse(absC.dateNowServer))
+                                  .format(DateTime.parse(absC.dateNowServer.isNotEmpty? absC.dateNowServer:absC.dateNow))
                             };
 
                             var paramLimitAbsen = {

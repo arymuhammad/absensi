@@ -9,9 +9,7 @@ import 'package:absensi/app/modules/absen/views/visit.dart';
 import 'package:absensi/app/modules/shared/dropdown_cabang.dart';
 import 'package:absensi/app/services/service_api.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -118,9 +116,9 @@ dialogAbsenView(Data dataUser, latitude, longitude) async {
                         "id": dataUser.id,
                         "tanggal_masuk": previous,
                         "tanggal_pulang": DateFormat('yyyy-MM-dd')
-                            .format(DateTime.parse(absC.dateNowServer)),
+                            .format(DateTime.parse(absC.dateNowServer.isNotEmpty? absC.dateNowServer:absC.dateNow)),
                         "nama": dataUser.nama,
-                        "jam_absen_pulang": absC.timeNow.toString(),
+                        "jam_absen_pulang": absC.timeNow.isNotEmpty?absC.timeNow:absC.timeNowOpt,
                         "foto_pulang":  File(absC.image!.path),
                         "lat_pulang": latitude.toString(),
                         "long_pulang": longitude.toString(),
@@ -129,9 +127,9 @@ dialogAbsenView(Data dataUser, latitude, longitude) async {
 
                       SQLHelper.instance.updateDataAbsen({
                         "tanggal_pulang": DateFormat('yyyy-MM-dd')
-                            .format(DateTime.parse(absC.dateNowServer)),
+                            .format(DateTime.parse(absC.dateNowServer.isNotEmpty? absC.dateNowServer:absC.dateNow)),
                         "nama": dataUser.nama,
-                        "jam_absen_pulang": absC.timeNow.toString(),
+                        "jam_absen_pulang": absC.timeNow.isNotEmpty?absC.timeNow:absC.timeNowOpt,
                         "foto_pulang": absC.image!.path,
                         "lat_pulang": latitude.toString(),
                         "long_pulang": longitude.toString(),
@@ -157,7 +155,7 @@ dialogAbsenView(Data dataUser, latitude, longitude) async {
                         "mode": "single",
                         "id_user": dataUser.id,
                         "tanggal_masuk": DateFormat('yyyy-MM-dd')
-                            .format(DateTime.parse(absC.dateNowServer))
+                            .format(DateTime.parse(absC.dateNowServer.isNotEmpty? absC.dateNowServer:absC.dateNow))
                       };
 
                       var paramLimitAbsen = {

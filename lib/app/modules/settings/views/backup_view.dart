@@ -63,7 +63,7 @@ class BackupView extends GetView {
                                 height: 150,
                                 width: 150,
                                 child: Lottie.asset(
-                                    'assets/animation/restore.json'))),
+                                    'assets/animation/backup.json'))),
                     const SizedBox(
                       height: 20,
                     ),

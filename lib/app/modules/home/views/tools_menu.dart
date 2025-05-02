@@ -58,10 +58,17 @@ class ToolsMenu extends StatelessWidget {
                         IconButton(
                             onPressed: () {
                               adjCtrl.getReqAppUpt(
-                                  '', '', userData!.level, userData!.id);
-                              Get.to(() => ReqAppUserView(
-                                    userData: userData!,
-                                  ));
+                                  '',
+                                  '',
+                                  userData!.level,
+                                  userData!.id,
+                                  adjCtrl.initDate,
+                                  adjCtrl.lastDate);
+                              Get.to(
+                                  () => ReqAppUserView(
+                                        userData: userData!,
+                                      ),
+                                  transition: Transition.cupertino);
                             },
                             icon: Icon(
                               // CupertinoIcons.doc_text_search,
@@ -113,6 +120,13 @@ class ToolsMenu extends StatelessWidget {
                         children: [
                           IconButton(
                               onPressed: () async {
+                                adjCtrl.getReqAppUpt(
+                                    '',
+                                    '',
+                                    userData!.level,
+                                    userData!.id,
+                                    adjCtrl.initDate,
+                                    adjCtrl.lastDate);
                                 Get.to(
                                     () => AdjustPresenceView(data: userData!),
                                     transition: Transition.cupertino);

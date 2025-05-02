@@ -19,8 +19,8 @@ visit(Data dataUser, latitude, longitude) async {
   var paramVisitToday = {
     "mode": "single",
     "id_user": dataUser.id,
-    "tgl_visit":
-        DateFormat('yyyy-MM-dd').format(DateTime.parse(absC.dateNowServer))
+    "tgl_visit": DateFormat('yyyy-MM-dd').format(DateTime.parse(
+        absC.dateNowServer.isNotEmpty ? absC.dateNowServer : absC.dateNow))
   };
 
   absC.getVisitToday(paramVisitToday);
@@ -233,15 +233,17 @@ visit(Data dataUser, latitude, longitude) async {
                           "status": "add",
                           "id": dataUser.id,
                           "nama": dataUser.nama,
-                          "tgl_visit": DateFormat('yyyy-MM-dd')
-                              .format(DateTime.parse(absC.dateNowServer)),
+                          "tgl_visit": DateFormat('yyyy-MM-dd').format(
+                              DateTime.parse(absC.dateNowServer.isNotEmpty
+                                  ? absC.dateNowServer
+                                  : absC.dateNow)),
                           "visit_in":
                               absC.optVisitSelected.value == "Store Visit"
                                   ? absC.selectedCabangVisit.isNotEmpty
                                       ? absC.selectedCabangVisit.value
                                       : dataUser.kodeCabang
                                   : absC.rndLoc.text,
-                          "jam_in": absC.timeNow.toString(),
+                          "jam_in": absC.timeNow.isNotEmpty?absC.timeNow:absC.timeNowOpt,
                           "foto_in": File(absC.image!.path),
                           "foto_out": "",
                           "lat_in": latitude.toString(),
@@ -257,15 +259,17 @@ visit(Data dataUser, latitude, longitude) async {
                         SQLHelper.instance.insertDataVisit(Visit(
                             id: dataUser.id,
                             nama: dataUser.nama,
-                            tglVisit: DateFormat('yyyy-MM-dd')
-                                .format(DateTime.parse(absC.dateNowServer)),
+                            tglVisit: DateFormat('yyyy-MM-dd').format(
+                                DateTime.parse(absC.dateNowServer.isNotEmpty
+                                    ? absC.dateNowServer
+                                    : absC.dateNow)),
                             visitIn:
                                 absC.optVisitSelected.value == "Store Visit"
                                     ? absC.selectedCabangVisit.isNotEmpty
                                         ? absC.selectedCabangVisit.value
                                         : dataUser.kodeCabang
                                     : absC.rndLoc.text,
-                            jamIn: absC.timeNow.toString(),
+                            jamIn: absC.timeNow.isNotEmpty?absC.timeNow:absC.timeNowOpt,
                             visitOut: '',
                             jamOut: '',
                             fotoIn: absC.image!.path,
@@ -289,8 +293,10 @@ visit(Data dataUser, latitude, longitude) async {
                         var paramVisitToday = {
                           "mode": "single",
                           "id_user": dataUser.id,
-                          "tgl_visit": DateFormat('yyyy-MM-dd')
-                              .format(DateTime.parse(absC.dateNowServer))
+                          "tgl_visit": DateFormat('yyyy-MM-dd').format(
+                              DateTime.parse(absC.dateNowServer.isNotEmpty
+                                  ? absC.dateNowServer
+                                  : absC.dateNow))
                         };
 
                         var paramLimitVisit = {
@@ -364,8 +370,10 @@ visit(Data dataUser, latitude, longitude) async {
                               "status": "update",
                               "id": dataUser.id,
                               "nama": dataUser.nama,
-                              "tgl_visit": DateFormat('yyyy-MM-dd')
-                                  .format(DateTime.parse(absC.dateNowServer)),
+                              "tgl_visit": DateFormat('yyyy-MM-dd').format(
+                                  DateTime.parse(absC.dateNowServer.isNotEmpty
+                                      ? absC.dateNowServer
+                                      : absC.dateNow)),
                               "visit_out":
                                   absC.optVisitSelected.value == "Store Visit"
                                       ? absC.selectedCabangVisit.isNotEmpty
@@ -373,7 +381,7 @@ visit(Data dataUser, latitude, longitude) async {
                                           : dataUser.kodeCabang
                                       : absC.rndLoc.text,
                               "visit_in": absC.cekVisit.value.kodeStore,
-                              "jam_out": absC.timeNow.toString(),
+                              "jam_out": absC.timeNow.isNotEmpty?absC.timeNow:absC.timeNowOpt,
                               "foto_out": File(absC.image!.path),
                               "lat_out": latitude.toString(),
                               "long_out": longitude.toString(),
@@ -389,15 +397,17 @@ visit(Data dataUser, latitude, longitude) async {
                                           ? absC.selectedCabangVisit.value
                                           : dataUser.kodeCabang
                                       : absC.rndLoc.text,
-                                  "jam_out": absC.timeNow.toString(),
+                                  "jam_out":absC.timeNow.isNotEmpty?absC.timeNow:absC.timeNowOpt,
                                   "foto_out": absC.image!.path,
                                   "lat_out": latitude.toString(),
                                   "long_out": longitude.toString(),
                                   "device_info2": absC.devInfo.value
                                 },
                                 dataUser.id!,
-                                DateFormat('yyyy-MM-dd')
-                                    .format(DateTime.parse(absC.dateNowServer)),
+                                DateFormat('yyyy-MM-dd').format(DateTime.parse(
+                                    absC.dateNowServer.isNotEmpty
+                                        ? absC.dateNowServer
+                                        : absC.dateNow)),
                                 absC.optVisitSelected.value == "Store Visit"
                                     ? absC.selectedCabangVisit.isNotEmpty
                                         ? absC.selectedCabangVisit.value
@@ -412,8 +422,10 @@ visit(Data dataUser, latitude, longitude) async {
                             var paramVisitToday = {
                               "mode": "single",
                               "id_user": dataUser.id,
-                              "tgl_visit": DateFormat('yyyy-MM-dd')
-                                  .format(DateTime.parse(absC.dateNowServer))
+                              "tgl_visit": DateFormat('yyyy-MM-dd').format(
+                                  DateTime.parse(absC.dateNowServer.isNotEmpty
+                                      ? absC.dateNowServer
+                                      : absC.dateNow))
                             };
 
                             var paramLimitVisit = {
@@ -500,8 +512,10 @@ visit(Data dataUser, latitude, longitude) async {
                             "status": "update",
                             "id": dataUser.id,
                             "nama": dataUser.nama,
-                            "tgl_visit": DateFormat('yyyy-MM-dd')
-                                .format(DateTime.parse(absC.dateNowServer)),
+                            "tgl_visit": DateFormat('yyyy-MM-dd').format(
+                                DateTime.parse(absC.dateNowServer.isNotEmpty
+                                    ? absC.dateNowServer
+                                    : absC.dateNow)),
                             "visit_out":
                                 absC.optVisitSelected.value == "Store Visit"
                                     ? absC.selectedCabangVisit.isNotEmpty
@@ -509,7 +523,7 @@ visit(Data dataUser, latitude, longitude) async {
                                         : dataUser.kodeCabang
                                     : absC.rndLoc.text,
                             "visit_in": absC.cekVisit.value.kodeStore,
-                            "jam_out": absC.timeNow.toString(),
+                            "jam_out": absC.timeNow.isNotEmpty?absC.timeNow:absC.timeNowOpt,
                             "foto_out": File(absC.image!.path),
                             "lat_out": latitude.toString(),
                             "long_out": longitude.toString(),
@@ -525,15 +539,17 @@ visit(Data dataUser, latitude, longitude) async {
                                             ? absC.selectedCabangVisit.value
                                             : dataUser.kodeCabang
                                         : absC.rndLoc.text,
-                                "jam_out": absC.timeNow.toString(),
+                                "jam_out": absC.timeNow.isNotEmpty?absC.timeNow:absC.timeNowOpt,
                                 "foto_out": absC.image!.path,
                                 "lat_out": latitude.toString(),
                                 "long_out": longitude.toString(),
                                 "device_info2": absC.devInfo.value
                               },
                               dataUser.id!,
-                              DateFormat('yyyy-MM-dd')
-                                  .format(DateTime.parse(absC.dateNowServer)),
+                              DateFormat('yyyy-MM-dd').format(DateTime.parse(
+                                  absC.dateNowServer.isNotEmpty
+                                      ? absC.dateNowServer
+                                      : absC.dateNow)),
                               absC.optVisitSelected.value == "Store Visit"
                                   ? absC.selectedCabangVisit.isNotEmpty
                                       ? absC.selectedCabangVisit.value
@@ -548,8 +564,10 @@ visit(Data dataUser, latitude, longitude) async {
                           var paramVisitToday = {
                             "mode": "single",
                             "id_user": dataUser.id,
-                            "tgl_visit": DateFormat('yyyy-MM-dd')
-                                .format(DateTime.parse(absC.dateNowServer))
+                            "tgl_visit": DateFormat('yyyy-MM-dd').format(
+                                DateTime.parse(absC.dateNowServer.isNotEmpty
+                                    ? absC.dateNowServer
+                                    : absC.dateNow))
                           };
 
                           var paramLimitVisit = {

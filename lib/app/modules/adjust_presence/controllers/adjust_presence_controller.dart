@@ -1,13 +1,18 @@
+import 'dart:convert';
+
 import 'package:absensi/app/data/helper/custom_dialog.dart';
 import 'package:absensi/app/data/model/absen_model.dart';
 import 'package:absensi/app/data/model/req_app_model.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../data/helper/db_helper.dart';
 import '../../../data/model/cabang_model.dart';
 import '../../../data/model/dept_model.dart';
+import '../../../data/model/login_model.dart';
 import '../../../data/model/shift_kerja_model.dart';
 import '../../../data/model/user_model.dart';
 import '../../../data/model/users_model.dart';
@@ -33,6 +38,8 @@ class AdjustPresenceController extends GetxController
   var dateNowServer = "";
   var listTarget = ["", "absen", "visit"];
   var target = "".obs;
+  var idUser = "".obs;
+  var levelUser = "".obs;
 
   late final TextEditingController date1,
       datePulangupd,
@@ -49,7 +56,9 @@ class AdjustPresenceController extends GetxController
       userDept,
       visit,
       device,
-      keteranganApp;
+      keteranganApp,
+      dateInput1,
+      dateInput2;
 
   var resultData = Absen().obs;
   var shiftKerja = <ShiftKerja>[].obs;
@@ -68,6 +77,9 @@ class AdjustPresenceController extends GetxController
   var selectedStatus = "".obs;
   var statusReqApp = [
     {
+      "": "Unconfirmed",
+    },
+    {
       "0": "Reject",
     },
     {
@@ -75,12 +87,24 @@ class AdjustPresenceController extends GetxController
     }
   ];
 
+  var initDate = DateFormat('yyyy-MM-dd')
+      .format(DateTime.parse(
+          DateTime(DateTime.now().year, DateTime.now().month, 1).toString()))
+      .toString();
+  var lastDate = DateFormat('yyyy-MM-dd')
+      .format(DateTime.parse(
+          DateTime(DateTime.now().year, DateTime.now().month + 1, 0)
+              .toString()))
+      .toString();
+
   @override
-  void onInit() {
+  Future<void> onInit() async {
     super.onInit();
     tabController = TabController(length: 2, vsync: this);
 
     date1 = TextEditingController();
+    dateInput1 = TextEditingController();
+    dateInput2 = TextEditingController();
     datePulangupd = TextEditingController();
     jamMasukUpdate = TextEditingController();
     jamPulangUpdate = TextEditingController();
@@ -96,8 +120,14 @@ class AdjustPresenceController extends GetxController
     userDept = TextEditingController();
     visit = TextEditingController();
     keteranganApp = TextEditingController();
-    getCabang();
-    getReqAppUpt('', '','','');
+    // getCabang();
+    // getReqAppUpt('', '', '', '', initDate, lastDate);
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    var dataUserLogin =
+        Data.fromJson(jsonDecode(pref.getString('userDataLogin')!));
+    // var userID = Data.fromJson(jsonDecode(pref.getString('userDataLogin')!)).id!;
+    idUser.value = dataUserLogin.id!;
+    levelUser.value = dataUserLogin.level!;
   }
 
   @override
@@ -106,8 +136,10 @@ class AdjustPresenceController extends GetxController
     tabController.dispose();
   }
 
-  getReqAppUpt(String? accept, String? type, String? level, String? idUser) async {
-    final response = await ServiceApi().getReqUptAbs(accept, type, level, idUser);
+  getReqAppUpt(String? accept, String? type, String? level, String? idUser,
+      String? date1, String? date2) async {
+    final response = await ServiceApi()
+        .getReqUptAbs(accept, type, level, idUser, date1, date2);
     listReqUpt.value = response;
     isLoading.value = false;
     return listReqUpt;
@@ -263,8 +295,14 @@ class AdjustPresenceController extends GetxController
     if (dataUptApp['accept'] == "1") {
       await ServiceApi().updateReqApp(dataUptApp);
       await ServiceApi().updateReqAdjAbs(dataUptAbs!);
+      dialogMsg('INFO', 'Data berhasil diupdate');
+      await getReqAppUpt('', '', levelUser.value, idUser.value, dateInput1.text,
+          dateInput2.text);
     } else {
       await ServiceApi().updateReqApp(dataUptApp);
+      dialogMsg('INFO', 'Data berhasil diupdate');
+      await getReqAppUpt('', '', levelUser.value, idUser.value, dateInput1.text,
+          dateInput2.text);
     }
     keteranganApp.clear();
   }

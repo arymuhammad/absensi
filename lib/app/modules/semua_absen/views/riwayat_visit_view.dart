@@ -194,7 +194,7 @@ class RiwayatVisitView extends GetView {
                                       const Duration(seconds: 1), () async {
                                     visitC.isLoading.value = true;
                                     await visitC.getAllVisited(
-                                        Get.arguments["id_user"]);
+                                        userData!.id!);
                                     visitC.searchDate.value = "";
                                     showToast("Halaman Disegarkan.");
                                   });

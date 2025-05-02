@@ -9,6 +9,7 @@ import 'package:crypto/crypto.dart';
 import '../../../data/model/foto_profil_model.dart';
 import '../../../services/service_api.dart';
 import '../../../data/model/login_model.dart';
+import '../../absen/controllers/absen_controller.dart';
 
 class LoginController extends GetxController 
     with GetTickerProviderStateMixin{
@@ -175,7 +176,7 @@ class LoginController extends GetxController
 
     isAuth.value = false;
     selected.value = 0;
-    // Get.delete<AbsenController>(force: true);
+    Get.delete<AbsenController>(force: true);
     Get.back();
 
     showToast("Logout Berhasil");

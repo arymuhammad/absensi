@@ -337,7 +337,7 @@ class ServiceApi {
         // }
       }
 
-      await request.send().timeout(const Duration(minutes: 3)).then((value) {
+      await request.send().timeout(const Duration(minutes: 1)).then((value) {
         if (!isOnInit) {
           Get.back();
           succesDialog(
@@ -509,7 +509,7 @@ class ServiceApi {
         case 200:
           List<dynamic> result = json.decode(response.body)['data'];
           dataAbsen = result.map((e) => Absen.fromJson(e)).toList();
-          log('${baseUrl}get_absen', name: 'GET ABSEN');
+          // log('${baseUrl}get_absen', name: 'GET ABSEN');
         // log(paramAbsen.toString());
         // log(result.toString());
         case 400:
@@ -839,7 +839,7 @@ class ServiceApi {
             filename: data["foto_out"].path.split("/").last));
       }
 
-      await request.send().timeout(const Duration(minutes: 3)).then((value) {
+      await request.send().timeout(const Duration(minutes: 1)).then((value) {
         if (!isOnInit) {
           Get.back();
           succesDialog(
@@ -1234,11 +1234,15 @@ class ServiceApi {
     }
   }
 
-  getReqUptAbs(String? accept, String? type, String? level, String? idUser) async {
+  getReqUptAbs(String? accept, String? type, String? level, String? idUser,
+      String? date1, String? date2) async {
     try {
       final response = await http
-          .get(Uri.parse('${baseUrl}get_reqUptAbs?accept=$accept&type=$type&level=$level&id_user=$idUser'))
+          .get(Uri.parse(
+              '${baseUrl}get_reqUptAbs?accept=$accept&type=$type&level=$level&id_user=$idUser&date1=$date1&date2=$date2'))
           .timeout(const Duration(minutes: 1));
+      // print(
+      //     '${baseUrl}get_reqUptAbs?accept=$accept&type=$type&level=$level&id_user=$idUser&date1=$date1&date2=$date2');
       switch (response.statusCode) {
         case 200:
           List<dynamic> listData = json.decode(response.body)['data'];
@@ -1270,9 +1274,7 @@ class ServiceApi {
           .post(Uri.parse('${baseUrl}update_reqapp'), body: data)
           .timeout(const Duration(minutes: 1));
       if (response.statusCode == 200) {
-        // Get.back();
-        succesDialog(Get.context!, 'N', 'Data berhasil diupdate',
-            DialogType.success, 'SUKSES');
+    
       } else {
         failedDialog(
             Get.context!, 'ERROR', 'Terjadi kesalahan\n${response.body}');
@@ -1288,17 +1290,11 @@ class ServiceApi {
 
   updateReqAdjAbs(Map<String, dynamic> data) async {
     try {
-      final response = await http
+  
+      await http
           .post(Uri.parse('${baseUrl}update_presence_data'), body: data)
           .timeout(const Duration(minutes: 1));
-      if (response.statusCode == 200) {
-        Get.back();
-        succesDialog(Get.context!, 'N', 'Data berhasil diupdate',
-            DialogType.success, 'SUKSES');
-      } else {
-        failedDialog(
-            Get.context!, 'ERROR', 'Terjadi kesalahan\n${response.body}');
-      }
+  
     } on TimeoutException catch (_) {
       Get.back();
       failedDialog(Get.context!, 'ERROR',
@@ -1308,31 +1304,4 @@ class ServiceApi {
     }
   }
 
-  // Future<List<ServerApi>> getServer() async {
-  //   List<ServerApi> baseUrl = [];
-  //   try {
-  //     final response = await http
-  //         .get(Uri.parse('https://attendance.urbanco.id/api/get_server'));
-  //     switch (response.statusCode) {
-  //       case 200:
-  //         List<dynamic> result = json.decode(response.body)['data'];
-  //         baseUrl = result.map((e) => ServerApi.fromJson(e)).toList();
-
-  //       case 400:
-  //       case 401:
-  //       case 402:
-  //       case 404:
-  //         final result = json.decode(response.body);
-  //         throw FetchDataException(result["message"]);
-  //       default:
-  //         throw FetchDataException(
-  //           'Something went wrong.',
-  //         );
-  //     }
-  //   } on FetchDataException catch (e) {
-  //     // print('error caught: ${e.message}');
-  //     showToast("${e.message}");
-  //   }
-  //   return baseUrl;
-  // }
 }

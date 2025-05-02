@@ -9,6 +9,7 @@ import 'package:expansion_tile_group/expansion_tile_group.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icons_plus/icons_plus.dart';
+import 'package:marquee/marquee.dart';
 import '../../../../data/model/login_model.dart';
 import 'upt_shift.dart';
 
@@ -24,62 +25,74 @@ class ReqAppUpdate extends GetView {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Expanded(
-                  child: SizedBox(
-                height: 50,
-                child: Obx(
-                  () => CsDropDown(
-                    value: adjCtrl.selectedStatus.isNotEmpty
-                        ? adjCtrl.selectedStatus.value
-                        : null,
-                    items: adjCtrl.statusReqApp.map((e) {
-                      return DropdownMenuItem(
-                        value: e.entries.first.key,
-                        child: Text(e.entries.first.value),
-                      );
-                    }).toList(),
-                    onChanged: (val) {
-                      adjCtrl.isLoading.value = true;
-                      adjCtrl.selectedStatus.value = val;
-                      adjCtrl.getReqAppUpt(val, adjCtrl.selectedType.value, dataUser.level, dataUser.id);
-                    },
-                    label: 'Status',
-                  ),
-                ),
-              )),
-              const SizedBox(
-                width: 10,
-              ),
-              Expanded(
-                  child: SizedBox(
-                height: 50,
-                child: Obx(
-                  () => CsDropDown(
-                    value: adjCtrl.selectedType.isNotEmpty
-                        ? adjCtrl.selectedType.value
-                        : null,
-                    items: adjCtrl.typeReqApp.map((e) {
-                      return DropdownMenuItem(
-                        value: e.entries.first.key,
-                        child: Text(e.entries.first.value),
-                      );
-                    }).toList(),
-                    onChanged: (val) {
-                      adjCtrl.isLoading.value = true;
-                      adjCtrl.selectedType.value = val;
-                      adjCtrl.getReqAppUpt(adjCtrl.selectedStatus.value, val, dataUser.level, dataUser.id);
-                    },
-                    label: 'Kategori',
-                  ),
-                ),
-              )),
-            ],
-          ),
-          const SizedBox(
-            height: 15,
-          ),
+          // Row(
+          //   children: [
+          //     Expanded(
+          //         child: SizedBox(
+          //       height: 50,
+          //       child: Obx(
+          //         () => CsDropDown(
+          //           value: adjCtrl.selectedStatus.isNotEmpty
+          //               ? adjCtrl.selectedStatus.value
+          //               : null,
+          //           items: adjCtrl.statusReqApp.map((e) {
+          //             return DropdownMenuItem(
+          //               value: e.entries.first.key,
+          //               child: Text(e.entries.first.value),
+          //             );
+          //           }).toList(),
+          //           onChanged: (val) {
+          //             adjCtrl.isLoading.value = true;
+          //             adjCtrl.selectedStatus.value = val;
+          //             adjCtrl.getReqAppUpt(
+          //                 val,
+          //                 adjCtrl.selectedType.value,
+          //                 dataUser.level,
+          //                 dataUser.id,
+          //                 adjCtrl.initDate,
+          //                 adjCtrl.lastDate);
+          //           },
+          //           label: 'Status',
+          //         ),
+          //       ),
+          //     )),
+          //     const SizedBox(
+          //       width: 10,
+          //     ),
+          //     Expanded(
+          //         child: SizedBox(
+          //       height: 50,
+          //       child: Obx(
+          //         () => CsDropDown(
+          //           value: adjCtrl.selectedType.isNotEmpty
+          //               ? adjCtrl.selectedType.value
+          //               : null,
+          //           items: adjCtrl.typeReqApp.map((e) {
+          //             return DropdownMenuItem(
+          //               value: e.entries.first.key,
+          //               child: Text(e.entries.first.value),
+          //             );
+          //           }).toList(),
+          //           onChanged: (val) {
+          //             adjCtrl.isLoading.value = true;
+          //             adjCtrl.selectedType.value = val;
+          //             adjCtrl.getReqAppUpt(
+          //                 adjCtrl.selectedStatus.value,
+          //                 val,
+          //                 dataUser.level,
+          //                 dataUser.id,
+          //                 adjCtrl.initDate,
+          //                 adjCtrl.lastDate);
+          //           },
+          //           label: 'Kategori',
+          //         ),
+          //       ),
+          //     )),
+          //   ],
+          // ),
+          // const SizedBox(
+          //   height: 15,
+          // ),
           Obx(() => Row(
                 children: [
                   Text(
@@ -110,24 +123,79 @@ class ReqAppUpdate extends GetView {
           const Divider(
             thickness: 2,
           ),
+          SizedBox(
+            height: 30,
+            child: Marquee(
+              text:
+                  'Selalu periksa pengajuan edit data absen pada bagian status Accept / Reject',
+              style: const TextStyle(fontWeight: FontWeight.bold),
+              scrollAxis: Axis.horizontal,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              blankSpace: 20.0,
+              velocity: 50.0,
+              pauseAfterRound: const Duration(seconds: 1),
+              startPadding: 10.0,
+              accelerationDuration: const Duration(seconds: 1),
+              accelerationCurve: Curves.linear,
+              decelerationDuration: const Duration(milliseconds: 500),
+              decelerationCurve: Curves.easeOut,
+            ),
+          ),
           Expanded(
             child: Obx(
               () => adjCtrl.isLoading.value
-                  ? const Center(
-                      child: CircularProgressIndicator(),
+                  ? const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text('Memuat data...'),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        CircularProgressIndicator(),
+                      ],
                     )
                   : adjCtrl.listReqUpt.isEmpty
-                      ? const Center(
-                          child: Text('Tidak ada data'),
+                      ? RefreshIndicator(
+                          onRefresh: () async {
+                            // adjCtrl.isLoading.value = true;
+                            adjCtrl.selectedType.value = "";
+                            adjCtrl.selectedStatus.value = "";
+                            await adjCtrl.getReqAppUpt(
+                                '',
+                                '',
+                                dataUser.level,
+                                dataUser.id,
+                                adjCtrl.dateInput1.text != ""
+                                    ? adjCtrl.dateInput1.text
+                                    : adjCtrl.initDate,
+                                adjCtrl.dateInput2.text != ""
+                                    ? adjCtrl.dateInput2.text
+                                    : adjCtrl.lastDate);
+                            return Future.delayed(Duration.zero, () {
+                              showToast("Page Refreshed");
+                            });
+                          },
+                          child: ListView(children: const [
+                            Center(child: Text('Tidak ada data'))
+                          ]),
                         )
                       : RefreshIndicator(
                           onRefresh: () async {
                             // adjCtrl.isLoading.value = true;
                             adjCtrl.selectedType.value = "";
                             adjCtrl.selectedStatus.value = "";
-                            await adjCtrl.getReqAppUpt('', '', dataUser.level, dataUser.id);
-                            return Future.delayed(const Duration(seconds: 1),
-                                () {
+                            await adjCtrl.getReqAppUpt(
+                                '',
+                                '',
+                                dataUser.level,
+                                dataUser.id,
+                                adjCtrl.dateInput1.text != ""
+                                    ? adjCtrl.dateInput1.text
+                                    : adjCtrl.initDate,
+                                adjCtrl.dateInput2.text != ""
+                                    ? adjCtrl.dateInput2.text
+                                    : adjCtrl.lastDate);
+                            return Future.delayed(Duration.zero, () {
                               showToast("Page Refreshed");
                             });
                           },
@@ -152,10 +220,16 @@ class ReqAppUpdate extends GetView {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.end,
                                       children: [
-                                        Text('Tanggal Masuk', style: titleTextStyle,),
-                                        Text(FormatWaktu.formatIndo(
-                                            tanggal:
-                                                DateTime.parse(i.tglMasuk)), style: subtitleTextStyle,),
+                                        Text(
+                                          'Tanggal Masuk',
+                                          style: titleTextStyle,
+                                        ),
+                                        Text(
+                                          FormatWaktu.formatIndo(
+                                              tanggal:
+                                                  DateTime.parse(i.tglMasuk)),
+                                          style: subtitleTextStyle,
+                                        ),
                                       ],
                                     ),
                                     border: Border.all(),

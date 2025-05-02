@@ -77,6 +77,7 @@ class AbsenController extends GetxController {
   var jamMasuk = "".obs;
   var jamPulang = "".obs;
   var timeNow = "";
+  var timeNowOpt = DateFormat('HH:mm').format(DateTime.now()).toString();
   var dateNowServer = "";
   var tglStream = DateTime.now().obs;
   var dateAbsen = "";
@@ -134,7 +135,10 @@ class AbsenController extends GetxController {
     // if (!await initialize()) return;
     // status = "Ready";
     timeNetwork(await FlutterNativeTimezone.getLocalTimezone());
-    Timer.periodic(const Duration(seconds: 1), (Timer t) async => timeNetwork(await FlutterNativeTimezone.getLocalTimezone()));
+    Timer.periodic(
+        const Duration(seconds: 1),
+        (Timer t) async =>
+            timeNowOpt);
 
     SharedPreferences pref = await SharedPreferences.getInstance();
     var dataUserLogin =
@@ -441,7 +445,8 @@ class AbsenController extends GetxController {
       final response = await http
           .get(Uri.parse(
               'https://timeapi.io/api/Time/current/zone?timeZone=$timeZone'))
-          .then((data) => jsonDecode(data.body));
+          .then((data) => jsonDecode(data.body))
+          .timeout(const Duration(minutes: 1));
       timeNow = response['time'];
       // DateTime.parse(response['dateTime']).timeZoneName;
       // timeNow = DateFormat('HH:mm').format(DateTime.now()).toString();
@@ -478,7 +483,8 @@ class AbsenController extends GetxController {
       dialogMsgCncl('Peringatan',
           'Anda terdeteksi menggunakan\nlokasi palsu\nHarap matikan lokasi palsu');
     } else {
-      // timeNetwork(await FlutterNativeTimezone.getLocalTimezone());
+      timeNetwork(await FlutterNativeTimezone.getLocalTimezone());
+    
       dialogAbsenView(dataUser!, position.latitude, position.longitude);
     }
   }

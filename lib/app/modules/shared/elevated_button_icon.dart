@@ -5,6 +5,7 @@ class CsElevatedButtonIcon extends StatelessWidget {
   final Widget icon;
   final Size? size;
   final String? label;
+  final Color? backgroundColor;
   final double fontSize;
   const CsElevatedButtonIcon(
       {super.key,
@@ -12,6 +13,7 @@ class CsElevatedButtonIcon extends StatelessWidget {
       required this.icon,
       this.size,
       this.label,
+      this.backgroundColor,
       required this.fontSize});
 
   @override
@@ -19,7 +21,7 @@ class CsElevatedButtonIcon extends StatelessWidget {
     return ElevatedButton.icon(
       icon: icon,
       style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.blue,
+          backgroundColor: backgroundColor,
           foregroundColor: Colors.white,
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
