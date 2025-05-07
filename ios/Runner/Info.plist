@@ -47,5 +47,11 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>This app required access to your photo library to pick profile your account image</string>
+	<key>NSCameraUsageDescription</key>
+	<string>This app required camera access to take pictures when taking attendance</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>This app needs access to location when user taking attendance</string>
 </dict>
 </plist>
