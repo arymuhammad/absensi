@@ -35,6 +35,11 @@ class Data {
   String? areaCover;
   String? visit;
   String? cekStok;
+  String? idRegion;
+  String? leaveBalance;
+  String? createdAt;
+  String? parentId;
+  String? namaParent;
 
   Data({
     this.id,
@@ -52,6 +57,11 @@ class Data {
     this.areaCover,
     this.visit,
     this.cekStok,
+    this.idRegion,
+    this.leaveBalance,
+    this.createdAt,
+    this.parentId,
+    this.namaParent,
   });
 
   Data.fromJson(Map<String, dynamic> json) {
@@ -70,6 +80,11 @@ class Data {
     areaCover = json['area_coverage'];
     visit = json['visit'];
     cekStok = json['cek_stok'];
+    idRegion = json['id_region']??'';
+    leaveBalance = json['leave_balance'];
+    createdAt = json['created_at']??'';
+    parentId = json['parent_id']??'';
+    namaParent = json['nama_parent']??'';
   }
 
   Map<String, dynamic> toJson() {
@@ -89,6 +104,11 @@ class Data {
     data['area_coverage'] = areaCover;
     data['visit'] = visit;
     data['cek_stok'] = cekStok;
+    data['id_region'] = idRegion;
+    data['leave_balance'] = leaveBalance;
+    data['created_at'] = createdAt;
+    data['parent_id'] = parentId;
+    data['nama_parent'] = namaParent;
     return data;
   }
 }

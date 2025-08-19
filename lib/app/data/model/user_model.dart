@@ -6,6 +6,7 @@ class User {
   String? noTelp;
   String? kodeCabang;
   String? level;
+  String? namaLevel;
   String? foto;
 
   User({this.id, this.username, this.password, this.nama, this.noTelp, this.kodeCabang, this.level, this.foto});
@@ -18,6 +19,7 @@ class User {
     noTelp = json['no_telp'].toString();
     kodeCabang = json['kode_cabang'];
     level = json['level'].toString();
+    namaLevel = json['nama_level'].toString();
     foto = json['foto'];
   }
 
@@ -30,6 +32,7 @@ class User {
     data['no_telp'] = noTelp;
     data['kode_cabang'] = kodeCabang;
     data['level'] = level;
+    data['nama_level'] = namaLevel;
     data['foto'] = foto;
     return data;
   }

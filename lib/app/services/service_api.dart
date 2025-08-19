@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:developer';
 // import 'dart:developer';
 import 'dart:io';
 import 'package:absensi/app/data/model/cabang_model.dart';
@@ -8,16 +7,18 @@ import 'package:absensi/app/data/model/cek_absen_model.dart';
 import 'package:absensi/app/data/model/cek_stok_model.dart';
 import 'package:absensi/app/data/model/cek_user_model.dart';
 import 'package:absensi/app/data/model/cek_visit_model.dart';
-import 'package:absensi/app/data/model/data_wajah_model.dart';
+import 'package:absensi/app/data/model/leave_model.dart';
 import 'package:absensi/app/data/model/level_model.dart';
 import 'package:absensi/app/data/model/report_sales_model.dart';
 import 'package:absensi/app/data/model/req_app_model.dart';
 import 'package:absensi/app/data/model/shift_kerja_model.dart';
 import 'package:absensi/app/data/model/user_model.dart';
 import 'package:absensi/app/data/model/visit_model.dart';
+import 'package:absensi/app/modules/semua_absen/views/widget/form_filter.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
@@ -34,7 +35,7 @@ import 'app_exceptions.dart';
 class ServiceApi {
   // var baseUrlPath = "https://attendance.urbanco.id/api/"; // poduction
   // var baseUrlPath = "https://88.222.214.157/"; // dev
-  var baseUrl = "http://103.156.15.61/api-absensi/"; // dev
+  var baseUrl = dotenv.env['API_URL']; // dev
   // var baseUrlPath = BASEURL.PATH; // dev
 
   var isLoading = false.obs;
@@ -44,18 +45,18 @@ class ServiceApi {
     try {
       loadingWithIcon();
 
-      final response =
-          await http.post(Uri.parse('${baseUrl}auth'), body: data).timeout(
-        const Duration(seconds: 30),
-        onTimeout: () {
-          SmartDialog.dismiss();
-          Get.back();
-          return dialogMsg("Time Out", "Koneksi server timeout");
-        },
-      );
+      final response = await http
+          .post(Uri.parse('${baseUrl}auth'), body: data)
+          .timeout(
+            const Duration(seconds: 30),
+            onTimeout: () {
+              SmartDialog.dismiss();
+              Get.back();
+              return dialogMsg("Time Out", "Koneksi server timeout");
+            },
+          );
 
       SmartDialog.dismiss();
-
       switch (response.statusCode) {
         case 200:
           final data = json.decode(response.body);
@@ -67,9 +68,7 @@ class ServiceApi {
           final result = json.decode(response.body);
           throw FetchDataException(result["message"]);
         default:
-          throw FetchDataException(
-            'Something went wrong.',
-          );
+          throw FetchDataException('Something went wrong.');
       }
     } on FetchDataException catch (_) {
       showToast("Username atau Password salah");
@@ -95,6 +94,22 @@ class ServiceApi {
     return result;
   }
 
+  Future<Data> fetchCurrentUser(data) async {
+    var user = Data();
+    try {
+      final response = await http
+          .post(Uri.parse('${baseUrl}auth'), body: data)
+          .timeout(const Duration(seconds: 20));
+
+      // if (response.statusCode == 200) {
+      user = Data.fromJson(jsonDecode(response.body)['data']);
+      // }
+    } on TimeoutException catch (e) {
+      showToast('$e');
+    }
+    return user;
+  }
+
   getBrandCabang() async {
     try {
       final response = await http.get(Uri.parse('${baseUrl}brand_cabang'));
@@ -114,8 +129,10 @@ class ServiceApi {
 
   getCabang(Map<String, dynamic>? data) async {
     try {
-      final response =
-          await http.post(Uri.parse('${baseUrl}cabang'), body: data);
+      final response = await http.post(
+        Uri.parse('${baseUrl}cabang'),
+        body: data,
+      );
 
       switch (response.statusCode) {
         case 200:
@@ -167,8 +184,10 @@ class ServiceApi {
 
   addUpdatePegawai(Map<String, dynamic> data, String mode) async {
     try {
-      var request =
-          http.MultipartRequest('POST', Uri.parse('${baseUrl}add_user'));
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse('${baseUrl}add_user'),
+      );
 
       // request.headers.addAll(headers);
       request.fields['status'] = data["status"];
@@ -184,15 +203,23 @@ class ServiceApi {
         request.fields['level'] = data["level"];
         if (data["foto"] != null) {
           if (kIsWeb) {
-            request.files.add(http.MultipartFile(
-                "foto", data["foto"].readStream, data["foto"].size,
-                filename: data["foto"].name));
+            request.files.add(
+              http.MultipartFile(
+                "foto",
+                data["foto"].readStream,
+                data["foto"].size,
+                filename: data["foto"].name,
+              ),
+            );
           } else {
-            request.files.add(http.MultipartFile(
+            request.files.add(
+              http.MultipartFile(
                 'foto',
                 data["foto"].readAsBytes().asStream(),
                 data["foto"].lengthSync(),
-                filename: data["foto"].path.split("/").last));
+                filename: data["foto"].path.split("/").last,
+              ),
+            );
           }
         } else {}
       } else {
@@ -205,9 +232,14 @@ class ServiceApi {
           if (kIsWeb) {
             // print(data["foto"]);
             // print(data["foto"]["img"]);
-            request.files.add(http.MultipartFile(
-                "foto", data["foto"].readStream, data["foto"].size,
-                filename: data["foto"].name));
+            request.files.add(
+              http.MultipartFile(
+                "foto",
+                data["foto"].readStream,
+                data["foto"].size,
+                filename: data["foto"].name,
+              ),
+            );
             // String imageFilePath = "name";
             // PickedFile imageFile = PickedFile(data["foto"]["path"]);
             // var stream =
@@ -218,16 +250,19 @@ class ServiceApi {
             // request.files.add(http.MultipartFile.fromBytes('foto', data["foto"],
             //     filename: "Profile.jpg"));
           } else {
-            request.files.add(http.MultipartFile(
+            request.files.add(
+              http.MultipartFile(
                 'foto',
                 data["foto"].readAsBytes().asStream(),
                 data["foto"].lengthSync(),
-                filename: data["foto"].path.split("/").last));
+                filename: data["foto"].path.split("/").last,
+              ),
+            );
           }
         } else {}
       }
 
-      var res = await request.send();
+      var res = await request.send().timeout(const Duration(seconds: 20));
       var responseBytes = await res.stream.toBytes();
       var responseString = utf8.decode(responseBytes);
 
@@ -241,23 +276,31 @@ class ServiceApi {
 
       if (res.statusCode == 200 && mode == "add") {
         Get.back();
-        succesDialog(Get.context!, "N", "Data berhasil disimpan",
-            DialogType.success, 'SUKSES');
+        succesDialog(
+          Get.context!,
+          "N",
+          "Data berhasil disimpan",
+          DialogType.success,
+          'SUKSES',
+        );
       } else {
-        if (mode == "update") {
-          Get.back();
-          succesDialog(
-              Get.context!,
-              "N",
-              "Data berhasil disimpan\nSilahkan login ulang",
-              DialogType.success,
-              'SUKSES');
-          Future.delayed(const Duration(seconds: 1), () {
-            auth.logout();
-            Get.back(closeOverlays: true);
-          });
-        }
+        // if (mode == "update") {
+        Get.back();
+        succesDialog(
+          Get.context!,
+          "N",
+          "Data berhasil diperbarui",
+          DialogType.success,
+          'SUKSES',
+        );
+        // Future.delayed(const Duration(seconds: 1), () {
+        //   Get.back(closeOverlays: true);
+        //   auth.logout();
+        // });
+        // }
       }
+    } on TimeoutException catch (e) {
+      showToast('$e');
     } catch (e) {
       debugPrint('$e');
     }
@@ -317,11 +360,14 @@ class ServiceApi {
         //       data["foto_masuk"].readStream, data["foto_masuk"].size,
         //       filename: data["foto_masuk"].name));
         // } else {
-        request.files.add(http.MultipartFile(
+        request.files.add(
+          http.MultipartFile(
             "foto_masuk",
             data["foto_masuk"].readAsBytes().asStream(),
             data["foto_masuk"].lengthSync(),
-            filename: data["foto_masuk"].path.split("/").last));
+            filename: data["foto_masuk"].path.split("/").last,
+          ),
+        );
         // }
       } else {
         // if (kIsWeb) {
@@ -329,11 +375,14 @@ class ServiceApi {
         //       data["foto_pulang"].readStream, data["foto_pulang"].size,
         //       filename: data["foto_pulang"].name));
         // } else {
-        request.files.add(http.MultipartFile(
+        request.files.add(
+          http.MultipartFile(
             'foto_pulang',
             data["foto_pulang"].readAsBytes().asStream(),
             data["foto_pulang"].lengthSync(),
-            filename: data["foto_pulang"].path.split("/").last));
+            filename: data["foto_pulang"].path.split("/").last,
+          ),
+        );
         // }
       }
 
@@ -341,11 +390,12 @@ class ServiceApi {
         if (!isOnInit) {
           Get.back();
           succesDialog(
-              Get.context,
-              "Y",
-              "Harap tidak menutup aplikasi selama proses syncron data absensi",
-              DialogType.warning,
-              'PERINGATAN');
+            Get.context,
+            "Y",
+            "Harap tidak menutup aplikasi selama proses syncron data absensi",
+            DialogType.warning,
+            'PERINGATAN',
+          );
         } else {
           showToast('data sukses dikirim');
         }
@@ -362,13 +412,19 @@ class ServiceApi {
     } on SocketException {
       if (!isOnInit) {
         Get.back();
-        failedDialog(Get.context, 'ERROR',
-            'Tidak ada koneksi internet\nHarap mencoba kembali');
+        failedDialog(
+          Get.context,
+          'ERROR',
+          'Tidak ada koneksi internet\nHarap mencoba kembali',
+        );
       }
     } on TimeoutException {
       Get.back();
       failedDialog(
-          Get.context, 'ERROR', 'Waktu habis. Silahkan mencoba kembali');
+        Get.context,
+        'ERROR',
+        'Waktu habis. Silahkan mencoba kembali',
+      );
     } catch (e) {
       if (!isOnInit) {
         Get.back();
@@ -382,8 +438,10 @@ class ServiceApi {
 
   reSubmitAbsen(data) async {
     try {
-      var request =
-          http.MultipartRequest('POST', Uri.parse('${baseUrl}reabsen'));
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse('${baseUrl}reabsen'),
+      );
 
       request.fields['tanggal_masuk'] = data["tanggal_masuk"];
       request.fields['tanggal_pulang'] = data["tanggal_pulang"];
@@ -395,16 +453,22 @@ class ServiceApi {
       request.fields['jam_pulang'] = data["jam_pulang"];
       request.fields['jam_absen_masuk'] = data["jam_absen_masuk"];
       request.fields['jam_absen_pulang'] = data["jam_absen_pulang"];
-      request.files.add(http.MultipartFile(
+      request.files.add(
+        http.MultipartFile(
           'foto_masuk',
           data["foto_masuk"].readAsBytes().asStream(),
           data["foto_masuk"].lengthSync(),
-          filename: data["foto_masuk"].path.split("/").last));
-      request.files.add(http.MultipartFile(
+          filename: data["foto_masuk"].path.split("/").last,
+        ),
+      );
+      request.files.add(
+        http.MultipartFile(
           'foto_pulang',
           data["foto_pulang"].readAsBytes().asStream(),
           data["foto_pulang"].lengthSync(),
-          filename: data["foto_pulang"].path.split("/").last));
+          filename: data["foto_pulang"].path.split("/").last,
+        ),
+      );
 
       request.fields['lat_masuk'] = data["lat_masuk"];
       request.fields['long_masuk'] = data["long_masuk"];
@@ -433,8 +497,10 @@ class ServiceApi {
 
   cekDataAbsen(Map<String, dynamic> data) async {
     try {
-      final response =
-          await http.post(Uri.parse('${baseUrl}cek_absen'), body: data);
+      final response = await http.post(
+        Uri.parse('${baseUrl}cek_absen'),
+        body: data,
+      );
       // log('${baseUrl}cek_absen');
       // log(data.toString());
       switch (response.statusCode) {
@@ -449,9 +515,7 @@ class ServiceApi {
           final result = json.decode(response.body);
           throw FetchDataException(result["message"]);
         default:
-          throw FetchDataException(
-            'Something went wrong.',
-          );
+          throw FetchDataException('Something went wrong.');
       }
     } on FetchDataException catch (e) {
       // print('error caught: ${e.message}');
@@ -481,9 +545,7 @@ class ServiceApi {
           final result = json.decode(response.body);
           throw FetchDataException(result["message"]);
         default:
-          throw FetchDataException(
-            'Something went wrong.',
-          );
+          throw FetchDataException('Something went wrong.');
       }
     } on FetchDataException catch (e) {
       // print('error caught: ${e.message}');
@@ -498,42 +560,42 @@ class ServiceApi {
   Future<List<Absen>> getAbsen(paramAbsen) async {
     List<Absen> dataAbsen = [];
     try {
-      // var bs = await SQLHelper.instance.getServer();
-      // if (bs.isNotEmpty) {
-      //   baseUrl = bs.first.url!;
-
-      // }
-      final response =
-          await http.post(Uri.parse('${baseUrl}get_absen'), body: paramAbsen);
+      final response = await http
+          .post(Uri.parse('${baseUrl}get_absen'), body: paramAbsen)
+          .timeout(const Duration(seconds: 10));
       switch (response.statusCode) {
         case 200:
           List<dynamic> result = json.decode(response.body)['data'];
           dataAbsen = result.map((e) => Absen.fromJson(e)).toList();
-          // log('${baseUrl}get_absen', name: 'GET ABSEN');
-        // log(paramAbsen.toString());
-        // log(result.toString());
+
         case 400:
         case 401:
         case 402:
         case 404:
           final result = json.decode(response.body);
+          absenC.isLoading.value = false;
           throw FetchDataException(result["message"]);
         default:
-          throw FetchDataException(
-            'Something went wrong.',
-          );
+          absenC.isLoading.value = false;
+          throw FetchDataException('Something went wrong.');
       }
     } on FetchDataException catch (e) {
       // print('error caught: ${e.message}');
+      absenC.isLoading.value = false;
       showToast("${e.message}");
+    } on TimeoutException catch (e) {
+      absenC.isLoading.value = false;
+      showToast("$e");
     }
     return dataAbsen;
   }
 
   getFotoProfil(idUser) async {
     try {
-      final response =
-          await http.post(Uri.parse('${baseUrl}get_foto_profil'), body: idUser);
+      final response = await http.post(
+        Uri.parse('${baseUrl}get_foto_profil'),
+        body: idUser,
+      );
       switch (response.statusCode) {
         case 200:
           final result = json.decode(response.body)['data'];
@@ -547,9 +609,7 @@ class ServiceApi {
           final result = json.decode(response.body);
           throw FetchDataException(result["message"]);
         default:
-          throw FetchDataException(
-            'Something went wrong.',
-          );
+          throw FetchDataException('Something went wrong.');
       }
     } on FetchDataException catch (e) {
       // print('error caught: ${e.message}');
@@ -574,9 +634,7 @@ class ServiceApi {
           final result = json.decode(response.body);
           throw FetchDataException(result["message"]);
         default:
-          throw FetchDataException(
-            'Something went wrong.',
-          );
+          throw FetchDataException('Something went wrong.');
       }
     } on FetchDataException catch (e) {
       // print('error caught: ${e.message}');
@@ -586,8 +644,10 @@ class ServiceApi {
 
   cekUser(Map<String, String> data) async {
     try {
-      final response =
-          await http.post(Uri.parse('${baseUrl}cek_user'), body: data);
+      final response = await http.post(
+        Uri.parse('${baseUrl}cek_user'),
+        body: data,
+      );
       switch (response.statusCode) {
         case 200:
           List<dynamic> result = json.decode(response.body)['data'];
@@ -601,9 +661,7 @@ class ServiceApi {
           final result = json.decode(response.body);
           throw FetchDataException(result["message"]);
         default:
-          throw FetchDataException(
-            'Something went wrong.',
-          );
+          throw FetchDataException('Something went wrong.');
       }
     } on FetchDataException catch (e) {
       // print('error caught: ${e.message}');
@@ -613,8 +671,10 @@ class ServiceApi {
 
   updatePasswordUser(Map<String, String> data) async {
     try {
-      final response =
-          await http.post(Uri.parse('${baseUrl}update_password'), body: data);
+      final response = await http.post(
+        Uri.parse('${baseUrl}update_password'),
+        body: data,
+      );
       switch (response.statusCode) {
         case 200:
           List<dynamic> result = json.decode(response.body)['data'];
@@ -628,9 +688,7 @@ class ServiceApi {
           final result = json.decode(response.body);
           throw FetchDataException(result["message"]);
         default:
-          throw FetchDataException(
-            'Something went wrong.',
-          );
+          throw FetchDataException('Something went wrong.');
       }
     } on FetchDataException catch (e) {
       // print('error caught: ${e.message}');
@@ -655,9 +713,7 @@ class ServiceApi {
           final result = json.decode(response.body);
           throw FetchDataException(result["message"]);
         default:
-          throw FetchDataException(
-            'Something went wrong.',
-          );
+          throw FetchDataException('Something went wrong.');
       }
     } on FetchDataException catch (e) {
       // print('error caught: ${e.message}');
@@ -687,9 +743,7 @@ class ServiceApi {
           final result = json.decode(response.body);
           throw FetchDataException(result["message"]);
         default:
-          throw FetchDataException(
-            'Something went wrong.',
-          );
+          throw FetchDataException('Something went wrong.');
       }
     } on FetchDataException catch (e) {
       // print('error caught: ${e.message}');
@@ -704,8 +758,10 @@ class ServiceApi {
 
   getDataStok(data) async {
     try {
-      final response =
-          await http.post(Uri.parse('${baseUrl}cek_stok'), body: data);
+      final response = await http.post(
+        Uri.parse('${baseUrl}cek_stok'),
+        body: data,
+      );
       switch (response.statusCode) {
         case 200:
           List<dynamic> result = json.decode(response.body)['data'];
@@ -771,8 +827,10 @@ class ServiceApi {
 
   cekDataVisit(Map<String, String> data) async {
     try {
-      final response =
-          await http.post(Uri.parse('${baseUrl}cek_visit'), body: data);
+      final response = await http.post(
+        Uri.parse('${baseUrl}cek_visit'),
+        body: data,
+      );
       // log('${baseUrl}cek_visit', name: 'LINK');
       // log(data.toString());
       switch (response.statusCode) {
@@ -788,9 +846,7 @@ class ServiceApi {
           final result = json.decode(response.body);
           throw FetchDataException(result["message"]);
         default:
-          throw FetchDataException(
-            'Something went wrong.',
-          );
+          throw FetchDataException('Something went wrong.');
       }
     } on FetchDataException catch (e) {
       // print('error caught: ${e.message}');
@@ -826,28 +882,35 @@ class ServiceApi {
       }
 
       if (data["status"] == "add") {
-        request.files.add(http.MultipartFile(
+        request.files.add(
+          http.MultipartFile(
             'foto_in',
             data["foto_in"].readAsBytes().asStream(),
             data["foto_in"].lengthSync(),
-            filename: data["foto_in"].path.split("/").last));
+            filename: data["foto_in"].path.split("/").last,
+          ),
+        );
       } else {
-        request.files.add(http.MultipartFile(
+        request.files.add(
+          http.MultipartFile(
             'foto_out',
             data["foto_out"].readAsBytes().asStream(),
             data["foto_out"].lengthSync(),
-            filename: data["foto_out"].path.split("/").last));
+            filename: data["foto_out"].path.split("/").last,
+          ),
+        );
       }
 
       await request.send().timeout(const Duration(minutes: 1)).then((value) {
         if (!isOnInit) {
           Get.back();
           succesDialog(
-              Get.context,
-              "Y",
-              "Harap tidak menutup aplikasi selama proses syncron data absensi",
-              DialogType.warning,
-              'PERINGATAN');
+            Get.context,
+            "Y",
+            "Harap tidak menutup aplikasi selama proses syncron data absensi",
+            DialogType.warning,
+            'PERINGATAN',
+          );
         } else {
           showToast('data sukses dikirim');
         }
@@ -865,13 +928,19 @@ class ServiceApi {
     } on SocketException {
       if (!isOnInit) {
         Get.back();
-        failedDialog(Get.context, 'ERROR',
-            'Tidak ada koneksi internet\nHarap mencoba kembali');
+        failedDialog(
+          Get.context,
+          'ERROR',
+          'Tidak ada koneksi internet\nHarap mencoba kembali',
+        );
       }
     } on TimeoutException {
       Get.back();
       failedDialog(
-          Get.context, 'ERROR', 'Waktu habis. Silahkan mencoba kembali');
+        Get.context,
+        'ERROR',
+        'Waktu habis. Silahkan mencoba kembali',
+      );
     } catch (e) {
       if (!isOnInit) {
         Get.back();
@@ -885,8 +954,10 @@ class ServiceApi {
 
   reSubmitVisit(Map<String, dynamic> data) async {
     try {
-      var request =
-          http.MultipartRequest('POST', Uri.parse('${baseUrl}revisit'));
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse('${baseUrl}revisit'),
+      );
       // request.headers.addAll(headers);
       request.fields['id'] = data["id"];
       request.fields['nama'] = data["nama"];
@@ -895,18 +966,24 @@ class ServiceApi {
       request.fields['jam_in'] = data["jam_in"];
       request.fields['visit_out'] = data["visit_out"];
       request.fields['jam_out'] = data["jam_out"];
-      request.files.add(http.MultipartFile(
+      request.files.add(
+        http.MultipartFile(
           'foto_in',
           data["foto_in"].readAsBytes().asStream(),
           data["foto_in"].lengthSync(),
-          filename: data["foto_in"].path.split("/").last));
+          filename: data["foto_in"].path.split("/").last,
+        ),
+      );
       request.fields['lat_in'] = data["lat_in"];
       request.fields['long_in'] = data["long_in"];
-      request.files.add(http.MultipartFile(
+      request.files.add(
+        http.MultipartFile(
           'foto_out',
           data["foto_out"].readAsBytes().asStream(),
           data["foto_out"].lengthSync(),
-          filename: data["foto_out"].path.split("/").last));
+          filename: data["foto_out"].path.split("/").last,
+        ),
+      );
       request.fields['lat_out'] = data["lat_out"];
       request.fields['long_out'] = data["long_out"];
       request.fields['device_info'] = data["device_info"];
@@ -958,9 +1035,7 @@ class ServiceApi {
           final result = json.decode(response.body);
           throw FetchDataException(result["message"]);
         default:
-          throw FetchDataException(
-            'Something went wrong.',
-          );
+          throw FetchDataException('Something went wrong.');
       }
     } on FetchDataException catch (e) {
       // print('error caught: ${e.message}');
@@ -972,11 +1047,14 @@ class ServiceApi {
   }
 
   Future<List<Visit>> getLimitVisit(
-      Map<String, dynamic> paramLimitVisit) async {
+    Map<String, dynamic> paramLimitVisit,
+  ) async {
     List<Visit> dataVisit = [];
     try {
-      final response = await http.post(Uri.parse('${baseUrl}get_visit'),
-          body: paramLimitVisit);
+      final response = await http.post(
+        Uri.parse('${baseUrl}get_visit'),
+        body: paramLimitVisit,
+      );
       switch (response.statusCode) {
         case 200:
           List<dynamic> result = json.decode(response.body)['data'];
@@ -990,9 +1068,7 @@ class ServiceApi {
           final result = json.decode(response.body);
           throw FetchDataException(result["message"]);
         default:
-          throw FetchDataException(
-            'Something went wrong.',
-          );
+          throw FetchDataException('Something went wrong.');
       }
     } on FetchDataException catch (e) {
       // print('error caught: ${e.message}');
@@ -1001,11 +1077,14 @@ class ServiceApi {
     return dataVisit;
   }
 
-  getUserCabang(idStore) async {
-    var param = {"idCabang": idStore};
+  getUserCabang(String idStore, String parentId) async {
+    var param = {"idCabang": idStore, "parentId": parentId};
+  
     try {
-      final response =
-          await http.post(Uri.parse('${baseUrl}get_user_cabang'), body: param);
+      final response = await http.post(
+        Uri.parse('${baseUrl}get_user_cabang'),
+        body: param,
+      );
       switch (response.statusCode) {
         case 200:
           List<dynamic> result = json.decode(response.body)['data'];
@@ -1019,9 +1098,7 @@ class ServiceApi {
           final result = json.decode(response.body);
           throw FetchDataException(result["message"]);
         default:
-          throw FetchDataException(
-            'Something went wrong.',
-          );
+          throw FetchDataException('Something went wrong.');
       }
     } on FetchDataException catch (e) {
       // print('error caught: ${e.message}');
@@ -1058,9 +1135,7 @@ class ServiceApi {
           final result = json.decode(response.body);
           throw FetchDataException(result["message"]);
         default:
-          throw FetchDataException(
-            'Something went wrong.',
-          );
+          throw FetchDataException('Something went wrong.');
       }
     } on FetchDataException catch (e) {
       // print('error caught: ${e.message}');
@@ -1071,8 +1146,10 @@ class ServiceApi {
   getUserVisit(idDept) async {
     var data = {"idDept": idDept};
     try {
-      final response =
-          await http.post(Uri.parse('${baseUrl}get_user_visit'), body: data);
+      final response = await http.post(
+        Uri.parse('${baseUrl}get_user_visit'),
+        body: data,
+      );
 
       switch (response.statusCode) {
         case 200:
@@ -1086,9 +1163,7 @@ class ServiceApi {
           final result = json.decode(response.body);
           throw FetchDataException(result["message"]);
         default:
-          throw FetchDataException(
-            'Something went wrong.',
-          );
+          throw FetchDataException('Something went wrong.');
       }
     } on FetchDataException catch (e) {
       // print('error caught: ${e.message}');
@@ -1099,13 +1174,15 @@ class ServiceApi {
   sendDataToXmor(data) async {
     String url = "https://xmor.urbanco.id/api";
     // final response =
-    await http.post(Uri.parse('$url/attendance/create'),
-        headers: {
-          "Accept": "application/json",
-          "Authorization":
-              "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJuaWsiOiIyMDI0MDcwMDAxIiwicGFzc3dvcmQiOiJhc2Q5OTkiLCJpZCI6MjY1LCJ1c2VyX2lkIjoyfQ.s7rw000BPNeJjrH7z-5pkxw4LZ8eixiXE9Cp913ItBE"
-        },
-        body: data);
+    await http.post(
+      Uri.parse('$url/attendance/create'),
+      headers: {
+        "Accept": "application/json",
+        "Authorization":
+            "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJuaWsiOiIyMDI0MDcwMDAxIiwicGFzc3dvcmQiOiJhc2Q5OTkiLCJpZCI6MjY1LCJ1c2VyX2lkIjoyfQ.s7rw000BPNeJjrH7z-5pkxw4LZ8eixiXE9Cp913ItBE",
+      },
+      body: data,
+    );
     // if (response.statusCode == 200) {
     //   log('$url/attendance/create', name: 'LINK');
     //   // print(data);
@@ -1117,43 +1194,46 @@ class ServiceApi {
     // }
   }
 
-  faceData(Map<String, String>? data, mode) async {
-    switch (mode) {
-      case 'post':
-        try {
-          await http
-              .post(Uri.parse('${baseUrl}post_face_data'), body: data!)
-              .timeout(const Duration(seconds: 30));
-        } on FetchDataException catch (e) {
-          // print('error caught: ${e.message}');
-          showToast("${e.message}");
-        } on TimeoutException catch (_) {
-          showToast("waktu koneksi ke server habis");
-        }
-        break;
-      default:
-        try {
-          var response = await http.get(
-              Uri.parse('${baseUrl}get_face_data?id_user=${data!['id_user']}'));
-          dynamic result = json.decode(response.body)['data'];
-          DataWajah face = DataWajah.fromJson(result);
-          return face;
-        } on FormatException catch (e) {
-          showToast(e.toString());
-        } catch (e) {
-          showToast(e.toString());
-        }
-        break;
-    }
-  }
+  // faceData(Map<String, String>? data, mode) async {
+  //   switch (mode) {
+  //     case 'post':
+  //       try {
+  //         await http
+  //             .post(Uri.parse('${baseUrl}post_face_data'), body: data!)
+  //             .timeout(const Duration(seconds: 30));
+  //       } on FetchDataException catch (e) {
+  //         // print('error caught: ${e.message}');
+  //         showToast("${e.message}");
+  //       } on TimeoutException catch (_) {
+  //         showToast("waktu koneksi ke server habis");
+  //       }
+  //       break;
+  //     default:
+  //       try {
+  //         var response = await http.get(
+  //           Uri.parse('${baseUrl}get_face_data?id_user=${data!['id_user']}'),
+  //         );
+  //         dynamic result = json.decode(response.body)['data'];
+  //         DataWajah face = DataWajah.fromJson(result);
+  //         return face;
+  //       } on FormatException catch (e) {
+  //         showToast(e.toString());
+  //       } catch (e) {
+  //         showToast(e.toString());
+  //       }
+  //       break;
+  //   }
+  // }
 
   reqUpdateAbs(Map<String, dynamic> data) async {
     try {
       Map<String, String> headers = {
         'Content-Type': 'application/json; charset=UTF-8',
       };
-      var request =
-          http.MultipartRequest('POST', Uri.parse('${baseUrl}req_update_data'));
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse('${baseUrl}req_update_data'),
+      );
       request.headers.addAll(headers);
       request.fields['status'] = data["status"];
       request.fields['id_user'] = data["id_user"];
@@ -1185,61 +1265,89 @@ class ServiceApi {
       }
 
       if (data["status"] == "update_masuk") {
-        request.files.add(http.MultipartFile(
+        request.files.add(
+          http.MultipartFile(
             "foto_masuk",
             File(data["foto_masuk"]).readAsBytes().asStream(),
             File(data["foto_masuk"]).lengthSync(),
-            filename: File(data["foto_masuk"]).path.split("/").last));
+            filename: File(data["foto_masuk"]).path.split("/").last,
+          ),
+        );
       } else if (data["status"] == "update_pulang") {
-        request.files.add(http.MultipartFile(
+        request.files.add(
+          http.MultipartFile(
             "foto_pulang",
             File(data["foto_pulang"]).readAsBytes().asStream(),
             File(data["foto_pulang"]).lengthSync(),
-            filename: File(data["foto_pulang"]).path.split("/").last));
+            filename: File(data["foto_pulang"]).path.split("/").last,
+          ),
+        );
       } else if (data["status"] == "update_data_absen") {
-        request.files.add(http.MultipartFile(
+        request.files.add(
+          http.MultipartFile(
             "foto_masuk",
             File(data["foto_masuk"]).readAsBytes().asStream(),
             File(data["foto_masuk"]).lengthSync(),
-            filename: File(data["foto_masuk"]).path.split("/").last));
+            filename: File(data["foto_masuk"]).path.split("/").last,
+          ),
+        );
 
-        request.files.add(http.MultipartFile(
+        request.files.add(
+          http.MultipartFile(
             "foto_pulang",
             File(data["foto_pulang"]).readAsBytes().asStream(),
             File(data["foto_pulang"]).lengthSync(),
-            filename: File(data["foto_pulang"]).path.split("/").last));
+            filename: File(data["foto_pulang"]).path.split("/").last,
+          ),
+        );
       } else {}
 
       await request.send().timeout(const Duration(minutes: 1)).then((val) {
         if (val.statusCode == 200) {
           Get.back();
           succesDialog(
-              Get.context!,
-              'N',
-              'Data berhasil dikirim\nMenunggu persetujuan IT untuk perubahan data',
-              DialogType.success,
-              'SUKSES');
+            Get.context!,
+            'N',
+            'Data berhasil dikirim\nMenunggu persetujuan IT untuk perubahan data',
+            DialogType.success,
+            'SUKSES',
+          );
         } else {
           Get.back();
-          failedDialog(Get.context!, 'ERROR',
-              '${val.request!.url}\n${val.statusCode} ${val.reasonPhrase}');
+          failedDialog(
+            Get.context!,
+            'ERROR',
+            '${val.request!.url}\n${val.statusCode} ${val.reasonPhrase}',
+          );
         }
       });
     } on TimeoutException catch (_) {
       Get.back();
-      failedDialog(Get.context!, 'ERROR',
-          'Waktu koneksi ke server telah habis\nSilahkan coba lagi nanti');
+      failedDialog(
+        Get.context!,
+        'ERROR',
+        'Waktu koneksi ke server telah habis\nSilahkan coba lagi nanti',
+      );
     } on Exception catch (e) {
       showToast(e.toString());
     }
   }
 
-  getReqUptAbs(String? accept, String? type, String? level, String? idUser,
-      String? date1, String? date2) async {
+  getReqUptAbs(
+    String? accept,
+    String? type,
+    String? level,
+    String? idUser,
+    String? date1,
+    String? date2,
+  ) async {
     try {
       final response = await http
-          .get(Uri.parse(
-              '${baseUrl}get_reqUptAbs?accept=$accept&type=$type&level=$level&id_user=$idUser&date1=$date1&date2=$date2'))
+          .get(
+            Uri.parse(
+              '${baseUrl}get_reqUptAbs?accept=$accept&type=$type&level=$level&id_user=$idUser&date1=$date1&date2=$date2',
+            ),
+          )
           .timeout(const Duration(minutes: 1));
       // print(
       //     '${baseUrl}get_reqUptAbs?accept=$accept&type=$type&level=$level&id_user=$idUser&date1=$date1&date2=$date2');
@@ -1256,9 +1364,7 @@ class ServiceApi {
           final result = json.decode(response.body);
           throw FetchDataException(result["data"]);
         default:
-          throw FetchDataException(
-            'Something went wrong.',
-          );
+          throw FetchDataException('Something went wrong.');
       }
     } on FetchDataException catch (e) {
       // print('error caught: ${e.message}');
@@ -1274,15 +1380,20 @@ class ServiceApi {
           .post(Uri.parse('${baseUrl}update_reqapp'), body: data)
           .timeout(const Duration(minutes: 1));
       if (response.statusCode == 200) {
-    
       } else {
         failedDialog(
-            Get.context!, 'ERROR', 'Terjadi kesalahan\n${response.body}');
+          Get.context!,
+          'ERROR',
+          'Terjadi kesalahan\n${response.body}',
+        );
       }
     } on TimeoutException catch (_) {
       // Get.back();
-      failedDialog(Get.context!, 'ERROR',
-          'Waktu koneksi ke server telah habis\nSilahkan coba lagi nanti');
+      failedDialog(
+        Get.context!,
+        'ERROR',
+        'Waktu koneksi ke server telah habis\nSilahkan coba lagi nanti',
+      );
     } on Exception catch (e) {
       showToast(e.toString());
     }
@@ -1290,18 +1401,53 @@ class ServiceApi {
 
   updateReqAdjAbs(Map<String, dynamic> data) async {
     try {
-  
       await http
           .post(Uri.parse('${baseUrl}update_presence_data'), body: data)
           .timeout(const Duration(minutes: 1));
-  
     } on TimeoutException catch (_) {
       Get.back();
-      failedDialog(Get.context!, 'ERROR',
-          'Waktu koneksi ke server telah habis\nSilahkan coba lagi nanti');
+      failedDialog(
+        Get.context!,
+        'ERROR',
+        'Waktu koneksi ke server telah habis\nSilahkan coba lagi nanti',
+      );
     } on Exception catch (e) {
       showToast(e.toString());
     }
   }
 
+  leave(Map<String, dynamic> param) async {
+    try {
+      final response = await http
+          .post(Uri.parse('${baseUrl}leave'), body: param)
+          .timeout(const Duration(minutes: 1));
+
+      if (response.statusCode == 200) {
+        final responseBody = jsonDecode(response.body);
+        final type = param['type'];
+
+        if (type == "" || type == "get_pending_req_leave") {
+          List<dynamic> result = responseBody['data'];
+          List<LeaveModel> data =
+              result.map((e) => LeaveModel.fromJson(e)).toList();
+          return data;
+        }
+
+        if (type == "update") {
+          showToast("Pengajuan berhasil disetujui");
+        } else if (type == "add_leave") {
+          showToast("Pengajuan berhasil dibuat");
+        } else {
+          showToast("Pengajuan berhasil dicancel");
+        }
+      } else {
+        // Bisa juga handle error atau status selain 200 di sini jika perlu
+        showToast("Terjadi kesalahan: Status code ${response.statusCode}");
+      }
+    } catch (e) {
+      // Tangani error jaringan, timeout, atau parsing json
+
+      showToast("Gagal terhubung ke server: $e");
+    }
+  }
 }

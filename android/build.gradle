@@ -9,6 +9,36 @@ rootProject.buildDir = '../build'
 subprojects {
     project.buildDir = "${rootProject.buildDir}/${project.name}"
 }
+
+subprojects {
+    afterEvaluate { project ->
+        if (project.plugins.hasPlugin("com.android.library") || project.plugins.hasPlugin("com.android.application")) {
+            if (project.name == "flutter_native_timezone_updated_gradle") {
+                project.android.compileOptions {
+                    sourceCompatibility = JavaVersion.VERSION_17
+                    targetCompatibility = JavaVersion.VERSION_17
+                }
+                project.android.kotlinOptions {
+                    jvmTarget = "17"
+                }
+                // Set namespace jika perlu (AGP 8.x+)
+                if (!project.android.hasProperty("namespace") || project.android.namespace == null) {
+                    project.android.namespace = project.group ?: "com.default.namespace"
+                }
+            }
+        }
+    }
+}
+
+configurations.all {
+    resolutionStrategy.eachDependency { details ->
+        if (details.requested.group == 'org.jetbrains.kotlin') {
+            details.useVersion '2.0.20'
+        }
+    }
+}
+
+
 subprojects {
     project.evaluationDependsOn(':app')
 }

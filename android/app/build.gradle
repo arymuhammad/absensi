@@ -2,7 +2,7 @@ plugins {
     id "com.android.application"
     // START: FlutterFire Configuration
     id 'com.google.gms.google-services'
-    id 'com.google.firebase.crashlytics'
+    // id 'com.google.firebase.crashlytics'
     // END: FlutterFire Configuration
     id "kotlin-android"
     id "dev.flutter.flutter-gradle-plugin"
@@ -16,10 +16,6 @@ if (localPropertiesFile.exists()) {
     }
 }
 
-// def flutterRoot = localProperties.getProperty('flutter.sdk')
-// if (flutterRoot == null) {
-//     throw new GradleException("Flutter SDK not found. Define location with flutter.sdk in the local.properties file.")
-// }
 
 def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
 if (flutterVersionCode == null) {
@@ -31,20 +27,24 @@ if (flutterVersionName == null) {
     flutterVersionName = '1.0'
 }
 
+
 android {
-    compileSdkVersion 34
-    // namespace "com.absensi.urbanco"
+    namespace "com.absensi.urbanco"
+    compileSdkVersion 35
     // compileSdkVersion flutter.compileSdkVersion
     ndkVersion "25.1.8937393"
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+
     }
 
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = '17'
+        freeCompilerArgs += ['-Xjsr305=strict']
     }
+
 
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
@@ -55,22 +55,13 @@ android {
         applicationId "com.absensi.urbanco"
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
-        minSdkVersion 21
-        targetSdkVersion flutter.targetSdkVersion
+        minSdkVersion 23
+        targetSdkVersion 33
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         multiDexEnabled true
     }
 
-    // Signing configuration for release build
-    // signingConfigs {
-    //     release {
-    //         keyAlias keystoreProperties['keyAlias']
-    //         keyPassword keystoreProperties['keyPassword']
-    //         storeFile keystoreProperties['storeFile'] ? file(keystoreProperties['storeFile']) : null
-    //         storePassword keystoreProperties['storePassword']
-    //     }
-    // }
 
     buildTypes {
         release {
@@ -82,12 +73,21 @@ android {
     }
 }
 
+tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+    kotlinOptions {
+        jvmTarget = '17'
+        freeCompilerArgs += ['-Xjsr305=strict']
+    }
+}
+
+
 flutter {
     source '../..'
 }
 
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.24"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:2.0.20"
     implementation 'com.android.support:multidex:1.0.3'
+    // implementation "com.google.android.gms:play-services-ads:24.5.0"
     
 }

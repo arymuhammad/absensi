@@ -29,10 +29,7 @@ class UptDataAbsen extends StatelessWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'STATUS',
-                  style: subtitleTextStyle,
-                ),
+                Text('STATUS', style: subtitleTextStyle),
                 Text(
                   data.status!.replaceAll('_', ' ').toUpperCase(),
                   style: titleTextStyle,
@@ -41,30 +38,25 @@ class UptDataAbsen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Icon(Iconsax.clock_outline),
-                    const SizedBox(
-                      width: 5,
-                    ),
-                    Text(
-                      '${data.jamAbsenMasuk!} (IN)',
-                      style: titleTextStyle,
-                    ),
+                    const SizedBox(width: 5),
+                    Text('${data.jamAbsenMasuk!} (IN)', style: titleTextStyle),
                   ],
-                )
+                ),
               ],
             ),
             SizedBox(
-                height: 70,
-                width: 70,
-                child: WidgetZoom(
-                  heroAnimationTag: 'fotoMasuk',
-                  zoomWidget:
-                      Image.network('${ServiceApi().baseUrl}${data.fotoMasuk}'),
-                )),
+              height: 70,
+              width: 70,
+              child: WidgetZoom(
+                heroAnimationTag: 'fotoMasuk',
+                zoomWidget: Image.network(
+                  '${ServiceApi().baseUrl}${data.fotoMasuk}',
+                ),
+              ),
+            ),
           ],
         ),
-        const SizedBox(
-          height: 10,
-        ),
+        const SizedBox(height: 10),
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -75,66 +67,52 @@ class UptDataAbsen extends StatelessWidget {
                 Row(
                   children: [
                     const Icon(Iconsax.clock_outline),
-                    const SizedBox(
-                      width: 5,
-                    ),
+                    const SizedBox(width: 5),
                     Text(
                       '${data.jamAbsenPulang!} (OUT)',
                       style: titleTextStyle,
                     ),
                   ],
-                )
+                ),
               ],
             ),
             SizedBox(
-                height: 70,
-                width: 70,
-                child: WidgetZoom(
-                  heroAnimationTag: 'fotoPulang',
-                  zoomWidget: Image.network(
-                      '${ServiceApi().baseUrl}${data.fotoPulang}'),
-                )),
+              height: 70,
+              width: 70,
+              child: WidgetZoom(
+                heroAnimationTag: 'fotoPulang',
+                zoomWidget: Image.network(
+                  '${ServiceApi().baseUrl}${data.fotoPulang}',
+                ),
+              ),
+            ),
           ],
         ),
-        const SizedBox(
-          height: 10,
-        ),
-        Text(
-          'Alasan Perubahan Data',
-          style: titleTextStyle,
-        ),
-        Text(
-          data.alasan!,
-          style: subtitleTextStyle,
-        ),
+        const SizedBox(height: 10),
+        Text('Alasan Perubahan Data', style: titleTextStyle),
+        Text(data.alasan!, style: subtitleTextStyle),
         Visibility(
           visible: data.accept == "" && dataUser!.level == "1" ? true : false,
           child: SizedBox(
-              height: 45,
-              child: CsTextField(
-                  controller: adjCtrl.keteranganApp, label: 'Keterangan')),
+            height: 45,
+            child: CsTextField(
+              controller: adjCtrl.keteranganApp,
+              label: 'Keterangan',
+            ),
+          ),
         ),
-        const SizedBox(
-          height: 5,
-        ),
+        const SizedBox(height: 5),
         Visibility(
-            visible: data.accept == "0" ? true : false,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Keterangan',
-                  style: titleTextStyle.copyWith(fontSize: 18),
-                ),
-                Text(
-                  data.keterangan!,
-                  style: subtitleTextStyle,
-                ),
-              ],
-            )),
-        const Divider(
-          thickness: 2,
+          visible: data.accept == "0" ? true : false,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Keterangan', style: titleTextStyle.copyWith(fontSize: 18)),
+              Text(data.keterangan!, style: subtitleTextStyle),
+            ],
+          ),
         ),
+        const Divider(thickness: 2),
         Visibility(
           visible: data.accept == "" && dataUser!.level == "1" ? true : false,
           child: Row(
@@ -151,7 +129,7 @@ class UptDataAbsen extends StatelessWidget {
                     "keterangan": adjCtrl.keteranganApp.text,
                     "id_user": data.idUser,
                     "tgl_masuk": data.tglMasuk,
-                    "status": data.status
+                    "status": data.status,
                   };
 
                   //////////
@@ -166,7 +144,7 @@ class UptDataAbsen extends StatelessWidget {
                     "foto_pulang": data.fotoPulang,
                     "lat_out": data.latOut,
                     "long_out": data.longOut,
-                    "device_info2": data.devInfo
+                    "device_info2": data.devInfo,
                   };
                   adjCtrl.appAbs(dataUptApp, dataUptAbs);
                 },
@@ -182,7 +160,7 @@ class UptDataAbsen extends StatelessWidget {
                     "keterangan": adjCtrl.keteranganApp.text,
                     "id_user": data.idUser,
                     "tgl_masuk": data.tglMasuk,
-                    "status": data.status
+                    "status": data.status,
                   };
                   adjCtrl.appAbs(dataUptApp, {});
                 },

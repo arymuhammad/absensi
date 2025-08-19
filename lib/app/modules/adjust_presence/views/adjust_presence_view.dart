@@ -68,7 +68,7 @@ class AdjustPresenceView extends GetView<AdjustPresenceController> {
                   // first tab bar view widget
                   Padding(
                     padding: const EdgeInsets.fromLTRB(8.0, 12, 8.0, 8.0),
-                    child: Center(child: AdjustData()),
+                    child: Center(child: AdjustData(userData: data!,)),
                   ),
 
                   // second tab bar view widget

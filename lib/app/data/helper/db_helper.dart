@@ -45,7 +45,12 @@ class SQLHelper {
         level_user TEXT,
         area_coverage TEXT,
         visit TEXT,
-        cek_stok TEXT
+        cek_stok TEXT,
+        id_region TEXT,
+        leave_balance TEXT,
+        created_at TEXT,
+        parent_id TEXT,
+        nama_parent TEXT
       )
       """);
     await db.execute("""CREATE TABLE IF NOT EXISTS tbl_cabang(

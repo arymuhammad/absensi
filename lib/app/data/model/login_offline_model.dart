@@ -14,6 +14,11 @@ class LoginOffline {
   String? areaCover;
   String? visit;
   String? cekStok;
+  String? idRegion;
+  String? leaveBalance;
+  String? createdAt;
+  String? parentId;
+  String? namaParent;
 
   LoginOffline({
     this.id,
@@ -31,6 +36,11 @@ class LoginOffline {
     this.areaCover,
     this.visit,
     this.cekStok,
+    this.idRegion,
+    this.leaveBalance,
+    this.createdAt,
+    this.parentId,
+    this.namaParent,
   });
 
    LoginOffline.fromJson(Map<String, dynamic> json) {
@@ -49,6 +59,11 @@ class LoginOffline {
     areaCover = json['area_coverage'].toString();
     visit = json['visit'].toString();
     cekStok = json['cek_stok'].toString();
+    idRegion = json['id_region'].toString();
+    leaveBalance = json['leave_balance'].toString();
+    createdAt = json['created_at'].toString();
+    parentId = json['parent_id'].toString();
+    namaParent = json['nama_parent'].toString();
   }
 
   Map<String, dynamic> toJson() {
@@ -68,6 +83,11 @@ class LoginOffline {
     data['area_coverage'] = areaCover;
     data['visit'] = visit;
     data['cek_stok'] = cekStok;
+    data['id_region'] = idRegion;
+    data['leave_balance'] = leaveBalance;
+    data['created_at'] = createdAt;
+    data['parent_id'] = parentId;
+    data['nama_parent'] = namaParent;
     return data;
   }
 }

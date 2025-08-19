@@ -1,80 +1,132 @@
+import 'package:absensi/app/data/helper/app_colors.dart';
 import 'package:absensi/app/data/helper/const.dart';
 import 'package:absensi/app/data/model/login_model.dart';
 import 'package:absensi/app/modules/home/views/summary_absen.dart';
 import 'package:absensi/app/modules/home/views/summary_absen_area.dart';
+import 'package:absensi/app/modules/leave/controllers/leave_controller.dart';
 import 'package:absensi/app/modules/profil/views/profil_view.dart';
-import 'package:absensi/app/modules/shared/background_image_header.dart';
 import 'package:absensi/app/modules/shared/rounded_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../absen/controllers/absen_controller.dart';
+import '../../adjust_presence/controllers/adjust_presence_controller.dart';
 import '../controllers/home_controller.dart';
+import 'req_app_user_view.dart';
 
 class HomeView extends GetView<HomeController> {
-  const HomeView({super.key, this.listDataUser});
+  HomeView({super.key, this.listDataUser});
   final Data? listDataUser;
-
+  final absenC = Get.put(AbsenController());
+  final adjCtrl = Get.put(AdjustPresenceController());
+  final leaveC = Get.put(LeaveController());
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: Stack(
         children: [
-         const CsBgImg(),
+          // const CsBgImg(),
+          Container(
+            height: 250,
+            decoration: const BoxDecoration(color: AppColors.itemsBackground),
+          ),
           Padding(
             padding: const EdgeInsets.only(left: 15.0, top: 60.0, right: 15.0),
             child: Column(
               children: [
                 Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    Row(
                       children: [
-                        Text(
-                          listDataUser!.nama!.substring(
-                                  0,
-                                  listDataUser!.nama!.length > 18
-                                      ? 18
-                                      : listDataUser!.nama!.length) +
-                              (listDataUser!.nama!.length > 18 ? '...' : '')
-                                  .toString()
-                                  .capitalize!,
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
-                          softWrap: true,
-                          style: titleTextStyle.copyWith(fontSize: 22),
+                        InkWell(
+                          onTap: () {
+                            Get.to(
+                              () => ProfilView(listDataUser: listDataUser!),
+                            );
+                          },
+                          child: RoundedImage(
+                            height: 50,
+                            width: 50,
+                            foto: listDataUser!.foto!,
+                            name: listDataUser!.nama!,
+                            headerProfile: true,
+                          ),
                         ),
-                        Text(
-                          listDataUser!.levelUser!,
-                          style: subtitleTextStyle.copyWith(fontSize: 15)
-                        ),
-                        Text(
-                          listDataUser!.namaCabang!,  overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
-                          softWrap: true,
-                          style: subtitleTextStyle.copyWith(fontSize: 12)
+                        const SizedBox(width: 5),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              listDataUser!.nama!.substring(
+                                    0,
+                                    listDataUser!.nama!.length > 18
+                                        ? 18
+                                        : listDataUser!.nama!.length,
+                                  ) +
+                                  (listDataUser!.nama!.length > 18 ? '...' : '')
+                                      .toString()
+                                      .capitalize!,
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              softWrap: true,
+                              style: titleTextStyle.copyWith(
+                                fontSize: 18,
+                                color: AppColors.contentColorWhite,
+                                // fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            Text(
+                              listDataUser!.levelUser!.capitalize!,
+                              style: subtitleTextStyle.copyWith(
+                                color: AppColors.mainTextColor2,
+                                fontWeight: FontWeight.normal,
+                                fontSize: 15,
+                              ),
+                            ),
+                            // Text(
+                            //   listDataUser!.namaCabang!,
+                            //   overflow: TextOverflow.ellipsis,
+                            //   maxLines: 1,
+                            //   softWrap: true,
+                            //   style: subtitleTextStyle.copyWith(fontSize: 14),
+                            // ),
+                          ],
                         ),
                       ],
                     ),
-                    InkWell(
-                      onTap: () {
-                        Get.to(() => ProfilView(listDataUser: listDataUser!));
-                      },
-                      child: Card(
-                        elevation: 4,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(100),
-                            side: const BorderSide(
-                                width: 3, color: Colors.white)),
-                        child: RoundedImage(
-                          height: 80,
-                          width: 80,
-                          foto: listDataUser!.foto!,
-                          name: listDataUser!.nama!,
-                          headerProfile: true,
-                        ),
-                      ),
-                    ),
+                    // IconButton(
+                    //   tooltip: "Messages",
+                    //   // padding: EdgeInsets.zero,
+                    //   //  constraints: BoxConstraints(),
+                    //   onPressed: () {
+                    //     adjCtrl.getReqAppUpt(
+                    //       '',
+                    //       '',
+                    //       listDataUser!.level,
+                    //       listDataUser!.id,
+                    //       adjCtrl.initDate,
+                    //       adjCtrl.lastDate,
+                    //     );
+                    //     Get.to(
+                    //       () => ReqAppUserView(userData: listDataUser!),
+                    //       transition: Transition.cupertino,
+                    //     );
+                    //   },
+                    //   icon: const Badge(
+                    //     isLabelVisible: true,
+                    //     label: Text("99"),
+                    //     // offset: Offset(8, 8),
+                    //     //  backgroundColor: Theme.of(context).colorScheme.secondary,
+                    //     child: Icon(
+                    //       Icons.circle_notifications_rounded,
+                    //       color: AppColors.contentColorWhite,
+                    //       size: 32,
+                    //     ),
+                    //   ),
+                    // ),
+
                     // const SizedBox(width: 10),
                     // IconButton(
                     //     onPressed: () {
@@ -88,12 +140,76 @@ class HomeView extends GetView<HomeController> {
                   ],
                 ),
                 const SizedBox(height: 20),
+                // Row(
+                //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                //   children: [
+                   
+                //     Obx(
+                //       () => IconButton(
+                //         onPressed:
+                //             absenC.timerStat.value == true ||
+                //                     absenC.dataAbsen.isEmpty
+                //                 ? null
+                //                 : () async {
+                //                   if (absenC.dataAbsen.isEmpty) {
+                //                     absenC.startTimer(0);
+                //                     showToast("Tidak ada data absen hari ini");
+                //                   } else {
+                //                     loadingDialog("Sending data", "");
+                //                     absenC.startTimer(20);
+                //                     absenC.resend();
+
+                //                     await Future.delayed(
+                //                       const Duration(seconds: 2),
+                //                       () {
+                //                         Get.back();
+                //                       },
+                //                     );
+                //                   }
+                //                 },
+                //         icon: Icon(
+                //           Icons.change_circle_sharp,
+                //           size: 30.0,
+                //           color:
+                //               absenC.timerStat.value == true
+                //                   ? AppColors.mainTextColor3
+                //                   : AppColors.contentColorWhite,
+                //         ),
+                //         tooltip: 'Resend Data',
+                //       ),
+                //     ),
+                //   ],
+                // ),
+                // Visibility(
+                //   visible: listDataUser!.visit == "1" ? true : false,
+                //   child: Row(
+                //     children: [
+                //       const Icon(
+                //         FontAwesome.map_location_dot_solid,
+                //         size: 17,
+                //         color: AppColors.contentColorWhite,
+                //       ),
+                //       const SizedBox(width: 5),
+                //       Obx(
+                //         () => Text(
+                //           absenC.dataVisit.isNotEmpty &&
+                //                   absenC.dataVisit[0].namaCabang! != ""
+                //               ? absenC.dataVisit[0].namaCabang!
+                //               : '-',
+                //           style: const TextStyle(fontWeight: FontWeight.bold),
+                //           softWrap: true,
+                //         ),
+                //       ),
+                //     ],
+                //   ),
+                // ),
                 listDataUser!.visit == "1"
                     ? SummaryAbsenArea(userData: listDataUser!)
                     : SummaryAbsen(userData: listDataUser!),
               ],
             ),
           ),
+          
         ],
       ),
     );

@@ -14,8 +14,9 @@ class CsDropDown extends StatelessWidget {
       value: value,
       decoration: InputDecoration(
           labelText: label,
-          border: OutlineInputBorder(),
-          contentPadding: EdgeInsets.all(8)),
+          border: const OutlineInputBorder(),
+          contentPadding: const EdgeInsets.all(8),
+          ),
     );
   }
 }

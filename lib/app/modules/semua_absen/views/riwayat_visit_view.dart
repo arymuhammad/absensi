@@ -4,7 +4,6 @@ import 'package:absensi/app/data/helper/const.dart';
 import 'package:absensi/app/data/helper/custom_dialog.dart';
 import 'package:absensi/app/data/model/login_model.dart';
 import 'package:absensi/app/modules/detail_absen/views/detail_visit_view.dart';
-import 'package:absensi/app/modules/shared/background_image_header.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -13,6 +12,8 @@ import 'package:get/get.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:intl/intl.dart';
 import 'package:shimmer/shimmer.dart';
+
+import '../../../data/helper/format_waktu.dart';
 
 class RiwayatVisitView extends GetView {
   RiwayatVisitView({super.key, this.userData});
@@ -25,11 +26,14 @@ class RiwayatVisitView extends GetView {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: Text('RIWAYAT KUNJUNGAN',
-            style: titleTextStyle.copyWith(
-              fontSize: 20,
-            )),
-        backgroundColor: Colors.transparent.withOpacity(0.4),
+        title: Text(
+          'Visit History',
+          style: titleTextStyle.copyWith(
+            fontSize: 18,
+            color: AppColors.contentColorWhite,
+          ),
+        ),
+        backgroundColor: AppColors.itemsBackground,
         elevation: 0.0,
         // iconTheme: const IconThemeData(color: Colors.black,),
         centerTitle: true,
@@ -37,455 +41,535 @@ class RiwayatVisitView extends GetView {
       resizeToAvoidBottomInset: false,
       body: Stack(
         children: [
-          const CsBgImg(),
+          // const CsBgImg(),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Padding(
                 padding: const EdgeInsets.only(
-                    left: 15.0, top: 100.0, right: 15.0, bottom: 10),
+                  left: 15.0,
+                  top: 100.0,
+                  right: 15.0,
+                  bottom: 10,
+                ),
                 child: Card(
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10)),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
                   elevation: 8,
                   child: TextField(
                     controller: visitC.filterVisit,
                     onChanged: (data) => visitC.filterDataVisit(data),
                     decoration: InputDecoration(
-                        prefixIcon: const Icon(Icons.search),
-                        hintText: 'Store',
-                        labelText: 'Cari Data Visit Store',
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10))),
+                      prefixIcon: const Icon(Icons.search),
+                      hintText: 'Store',
+                      labelText: 'Cari Data Visit Store',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
                   ),
                 ),
               ),
               Padding(
                 padding: const EdgeInsets.only(left: 20.0, right: 20.0),
-                child: Obx(() => Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text('Periode',
-                            style:
-                                TextStyle(color: subTitleColor, fontSize: 18)),
-                        Text(
-                          visitC.searchDate.value != ""
-                              ? visitC.searchDate.value
-                              : visitC.thisMonth,
-                          style: const TextStyle(
-                              color: Colors.black, fontSize: 18),
+                child: Obx(
+                  () => Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Periode',
+                        style: TextStyle(color: subTitleColor, fontSize: 18),
+                      ),
+                      Text(
+                        visitC.searchDate.value != ""
+                            ? visitC.searchDate.value
+                            : visitC.thisMonth,
+                        style: const TextStyle(
+                          color: Colors.black,
+                          fontSize: 18,
                         ),
-                      ],
-                    )),
+                      ),
+                    ],
+                  ),
+                ),
               ),
               const Padding(
                 padding: EdgeInsets.only(left: 20.0, right: 20.0),
-                child: Divider(
-                  color: Colors.white,
-                  thickness: 2,
-                ),
+                child: Divider(color: Colors.white, thickness: 2),
               ),
               Expanded(
-                child: Obx(
-                  () {
-                    return visitC.isLoading.value
-                        ? ListView.builder(
-                            padding: EdgeInsets.zero,
-                            itemCount: 3,
-                            itemBuilder: (context, index) {
-                              return Container(
-                                margin: const EdgeInsets.only(bottom: 20),
-                                padding: const EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                    color: Colors.grey[200],
-                                    borderRadius: BorderRadius.circular(20)),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
+                child: Obx(() {
+                  return visitC.isLoading.value
+                      ? ListView.builder(
+                        padding: EdgeInsets.zero,
+                        itemCount: 3,
+                        itemBuilder: (context, index) {
+                          return Container(
+                            margin: const EdgeInsets.only(bottom: 20),
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: Colors.grey[200],
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Shimmer.fromColors(
-                                          baseColor: Colors.grey,
-                                          highlightColor: const Color.fromARGB(
-                                              255, 238, 238, 238),
-                                          child: Container(
-                                            width: 60,
-                                            height: 15,
-                                            decoration: BoxDecoration(
-                                                color: Colors.white,
-                                                borderRadius:
-                                                    BorderRadius.circular(10)),
-                                          ),
-                                        ),
-                                        Shimmer.fromColors(
-                                          baseColor: Colors.grey,
-                                          highlightColor: const Color.fromARGB(
-                                              255, 238, 238, 238),
-                                          child: Container(
-                                            width: 130,
-                                            height: 15,
-                                            decoration: BoxDecoration(
-                                                color: Colors.white,
-                                                borderRadius:
-                                                    BorderRadius.circular(10)),
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                    const SizedBox(
-                                      height: 8,
-                                    ),
                                     Shimmer.fromColors(
                                       baseColor: Colors.grey,
                                       highlightColor: const Color.fromARGB(
-                                          255, 238, 238, 238),
-                                      child: Container(
-                                        width: 70,
-                                        height: 15,
-                                        decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            borderRadius:
-                                                BorderRadius.circular(10)),
+                                        255,
+                                        238,
+                                        238,
+                                        238,
                                       ),
-                                    ),
-                                    const SizedBox(
-                                      height: 8,
-                                    ),
-                                    Shimmer.fromColors(
-                                      baseColor: Colors.grey,
-                                      highlightColor: const Color.fromARGB(
-                                          255, 238, 238, 238),
                                       child: Container(
                                         width: 60,
                                         height: 15,
                                         decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            borderRadius:
-                                                BorderRadius.circular(10)),
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.circular(
+                                            10,
+                                          ),
+                                        ),
                                       ),
-                                    ),
-                                    const SizedBox(
-                                      height: 8,
                                     ),
                                     Shimmer.fromColors(
                                       baseColor: Colors.grey,
                                       highlightColor: const Color.fromARGB(
-                                          255, 238, 238, 238),
+                                        255,
+                                        238,
+                                        238,
+                                        238,
+                                      ),
                                       child: Container(
-                                        width: 70,
+                                        width: 130,
                                         height: 15,
                                         decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            borderRadius:
-                                                BorderRadius.circular(10)),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            },
-                          )
-                        : visitC.searchVisit.isEmpty
-                            ? RefreshIndicator(
-                                onRefresh: () {
-                                  return Future.delayed(
-                                      const Duration(seconds: 1), () async {
-                                    visitC.isLoading.value = true;
-                                    await visitC.getAllVisited(
-                                        userData!.id!);
-                                    visitC.searchDate.value = "";
-                                    showToast("Halaman Disegarkan.");
-                                  });
-                                },
-                                child: ListView(
-                                  physics:
-                                      const AlwaysScrollableScrollPhysics(),
-                                  children: [
-                                    Padding(
-                                      padding: EdgeInsets.only(
-                                          top: Get.size.height / 3),
-                                      child: const Column(
-                                        children: [
-                                          Center(
-                                            child: Text(
-                                                'Belum ada data kunjungan'),
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.circular(
+                                            10,
                                           ),
-                                        ],
+                                        ),
                                       ),
                                     ),
                                   ],
                                 ),
-                              )
-                            : RefreshIndicator(
-                                onRefresh: () {
-                                  return Future.delayed(
-                                      const Duration(seconds: 1), () async {
-                                    visitC.isLoading.value = true;
-                                    await visitC.getAllVisited(userData!.id!);
-                                    visitC.searchDate.value = "";
-                                    showToast("Halaman Disegarkan.");
-                                  });
-                                },
-                                child: Padding(
-                                  padding: const EdgeInsets.only(
-                                      left: 20.0, right: 20.0),
-                                  child: ListView.builder(
-                                    padding: EdgeInsets.zero,
-                                    shrinkWrap: true,
-                                    physics:
-                                        const AlwaysScrollableScrollPhysics(),
-                                    itemCount: visitC.searchVisit.length,
-                                    itemBuilder: (c, i) {
-                                      var diffHours = const Duration();
-                                      if (visitC.searchVisit[i].jamOut != "") {
-                                        diffHours = DateTime.parse(
-                                                '${visitC.searchVisit[i].tglVisit!} ${visitC.searchVisit[i].jamOut!}')
-                                            .difference(DateTime.parse(
-                                                '${visitC.searchVisit[i].tglVisit!} ${visitC.searchVisit[i].jamIn!}'));
-                                      } else {
-                                        diffHours = const Duration();
-                                      }
+                                const SizedBox(height: 8),
+                                Shimmer.fromColors(
+                                  baseColor: Colors.grey,
+                                  highlightColor: const Color.fromARGB(
+                                    255,
+                                    238,
+                                    238,
+                                    238,
+                                  ),
+                                  child: Container(
+                                    width: 70,
+                                    height: 15,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Shimmer.fromColors(
+                                  baseColor: Colors.grey,
+                                  highlightColor: const Color.fromARGB(
+                                    255,
+                                    238,
+                                    238,
+                                    238,
+                                  ),
+                                  child: Container(
+                                    width: 60,
+                                    height: 15,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Shimmer.fromColors(
+                                  baseColor: Colors.grey,
+                                  highlightColor: const Color.fromARGB(
+                                    255,
+                                    238,
+                                    238,
+                                    238,
+                                  ),
+                                  child: Container(
+                                    width: 70,
+                                    height: 15,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      )
+                      : visitC.searchVisit.isEmpty
+                      ? RefreshIndicator(
+                        onRefresh: () {
+                          return Future.delayed(
+                            const Duration(seconds: 1),
+                            () async {
+                              visitC.isLoading.value = true;
+                              await visitC.getAllVisited(userData!.id!);
+                              visitC.searchDate.value = "";
+                              showToast("Halaman Disegarkan.");
+                            },
+                          );
+                        },
+                        child: ListView(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.only(
+                                top: Get.size.height / 3,
+                              ),
+                              child: const Column(
+                                children: [
+                                  Center(
+                                    child: Text('Belum ada data kunjungan'),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                      : RefreshIndicator(
+                        onRefresh: () {
+                          return Future.delayed(
+                            const Duration(seconds: 1),
+                            () async {
+                              visitC.isLoading.value = true;
+                              await visitC.getAllVisited(userData!.id!);
+                              visitC.searchDate.value = "";
+                              showToast("Halaman Disegarkan.");
+                            },
+                          );
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.only(
+                            left: 20.0,
+                            right: 20.0,
+                          ),
+                          child: ListView.separated(
+                            padding: EdgeInsets.zero,
+                            shrinkWrap: true,
+                            physics: const AlwaysScrollableScrollPhysics(),
+                            itemCount: visitC.searchVisit.length,
+                            separatorBuilder:
+                                (context, index) => const SizedBox(height: 5),
+                            itemBuilder: (c, i) {
+                              var visit = visitC.searchVisit[i];
+                              var diffHours = const Duration();
+                              if (visit.jamOut != "") {
+                                diffHours = DateTime.parse(
+                                  '${visit.tglVisit!} ${visit.jamOut!}',
+                                ).difference(
+                                  DateTime.parse(
+                                    '${visit.tglVisit!} ${visit.jamIn!}',
+                                  ),
+                                );
+                              } else {
+                                diffHours = const Duration();
+                              }
 
-                                      return InkWell(
-                                        onTap: () => Get.to(
-                                            () => DetailVisitView(),
-                                            arguments: {
-                                              "foto_profil":
-                                                  userData!.foto != ""
-                                                      ? userData!.foto
-                                                      : userData!.nama,
-                                              "nama":
-                                                  visitC.searchVisit[i].nama!,
-                                              "id_user":
-                                                  visitC.searchVisit[i].id!,
-                                              "store": visitC
-                                                  .searchVisit[i].namaCabang!,
-                                              "tgl_visit": visitC
-                                                  .searchVisit[i].tglVisit!,
-                                              "jam_in":
-                                                  visitC.searchVisit[i].jamIn!,
-                                              "foto_in":
-                                                  visitC.searchVisit[i].fotoIn!,
-                                              "jam_out": visitC.searchVisit[i]
-                                                          .jamOut !=
-                                                      ""
-                                                  ? visitC
-                                                      .searchVisit[i].jamOut!
-                                                  : "",
-                                              "foto_out": visitC.searchVisit[i]
-                                                          .fotoOut !=
-                                                      ""
-                                                  ? visitC
-                                                      .searchVisit[i].fotoOut!
-                                                  : "",
-                                              "lat_in":
-                                                  visitC.searchVisit[i].latIn!,
-                                              "long_in":
-                                                  visitC.searchVisit[i].longIn!,
-                                              "lat_out": visitC.searchVisit[i]
-                                                          .latOut !=
-                                                      ""
-                                                  ? visitC
-                                                      .searchVisit[i].latOut!
-                                                  : "",
-                                              "long_out": visitC.searchVisit[i]
-                                                          .longOut !=
-                                                      ""
-                                                  ? visitC
-                                                      .searchVisit[i].longOut!
-                                                  : "",
-                                              "device_info": visitC
-                                                  .searchVisit[i].deviceInfo!,
-                                              "device_info2": visitC
-                                                          .searchVisit[i]
-                                                          .deviceInfo2 !=
-                                                      ""
-                                                  ? visitC.searchVisit[i]
-                                                      .deviceInfo2
-                                                  : ""
-                                            }),
-                                        child: Card(
-                                          color: bgContainer,
-                                          elevation: 8,
-                                          shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(6)),
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: Row(
-                                              children: [
-                                                Column(
-                                                  children: [
-                                                    Text(
-                                                      DateFormat('MMM')
-                                                          .format(DateTime
-                                                              .parse(visitC
-                                                                  .searchVisit[
-                                                                      i]
-                                                                  .tglVisit!))
-                                                          .toUpperCase(),
-                                                      style: TextStyle(
-                                                          color: subTitleColor),
+                              return InkWell(
+                                onTap: () {
+                                  var detailData = {
+                                    "foto_profil":
+                                        userData!.foto != ""
+                                            ? userData!.foto
+                                            : userData!.nama,
+                                    "nama": visit.nama!,
+                                    "id_user": visit.id!,
+                                    "store": visit.namaCabang!,
+                                    "tgl_visit": visit.tglVisit!,
+                                    "jam_in": visit.jamIn!,
+                                    "foto_in": visit.fotoIn!,
+                                    "jam_out":
+                                        visit.jamOut != "" ? visit.jamOut! : "",
+                                    "foto_out":
+                                        visit.fotoOut != ""
+                                            ? visit.fotoOut!
+                                            : "",
+                                    "lat_in": visit.latIn!,
+                                    "long_in": visit.longIn!,
+                                    "lat_out":
+                                        visit.latOut != "" ? visit.latOut! : "",
+                                    "long_out":
+                                        visit.longOut != ""
+                                            ? visit.longOut!
+                                            : "",
+                                    "device_info": visit.deviceInfo!,
+                                    "device_info2":
+                                        visit.deviceInfo2 != ""
+                                            ? visitC.searchVisit[i].deviceInfo2
+                                            : "",
+                                  };
+                                  Get.to(() => DetailVisitView(detailData));
+                                },
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(5),
+                                    color: Colors.white,
+                                  ),
+                                  height:
+                                      i == 0 && visitC.statsCon.value != ""
+                                          ? 147
+                                          : 85,
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            Container(
+                                              width: 55,
+                                              padding: const EdgeInsets.all(8),
+                                              decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(5),
+                                                color:
+                                                    AppColors.itemsBackground,
+                                              ),
+                                              child: Column(
+                                                children: [
+                                                  // Tanggal
+                                                  Text(
+                                                    FormatWaktu.formatTanggal(
+                                                      tanggal: visit.tglVisit!,
                                                     ),
-                                                    Text(
-                                                      DateFormat('dd').format(
-                                                          DateTime.parse(visitC
-                                                              .searchVisit[i]
-                                                              .tglVisit!)),
-                                                      style: TextStyle(
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          fontSize: 16,
-                                                          color: titleColor),
+                                                    style: titleTextStyle.copyWith(
+                                                      fontSize: 30,
+                                                      color:
+                                                          AppColors
+                                                              .contentColorWhite,
                                                     ),
-                                                  ],
-                                                ),
-                                                const SizedBox(
-                                                  width: 20,
-                                                ),
-                                                Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    Text(
-                                                        DateFormat(
-                                                                "EEEE", "id_ID")
-                                                            .format(DateTime
-                                                                .parse(visitC
-                                                                    .searchVisit[
-                                                                        i]
-                                                                    .tglVisit!)),
-                                                        style: TextStyle(
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                            fontSize: 18,
-                                                            color: titleColor)),
-                                                    const SizedBox(
-                                                      width: 10,
+                                                  ),
+                                                  // Hari
+                                                  Text(
+                                                    FormatWaktu.formatHariEn(
+                                                      tanggal: visit.tglVisit!,
                                                     ),
-                                                    SizedBox(
-                                                      // padding: const EdgeInsets.all(10.0),
-                                                      width: Get.mediaQuery.size
-                                                              .width *
-                                                          0.4,
-                                                      child: Column(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
-                                                        children: <Widget>[
-                                                          Text(
-                                                              visitC
-                                                                  .searchVisit[
-                                                                      i]
-                                                                  .namaCabang!,
-                                                              textAlign:
-                                                                  TextAlign
-                                                                      .left)
-                                                        ],
-                                                      ),
-                                                    ),
-                                                    // Text(
-                                                    //   visitC
-                                                    //       .searchVisit[i].namaCabang!,
-                                                    //   softWrap: false,
-                                                    //   overflow: TextOverflow.ellipsis,
-                                                    //   maxLines: 3,
-                                                    //   style:
-                                                    //       TextStyle(color: subTitleColor, fontSize: 14),
-                                                    // ),
-                                                    Row(
-                                                      children: [
-                                                        const Icon(
-                                                          Icons.timer_sharp,
-                                                          color:
-                                                              Colors.lightBlue,
+                                                    style: subtitleTextStyle
+                                                        .copyWith(
+                                                          color: Colors.white,
                                                         ),
-                                                        const SizedBox(
-                                                            width: 5),
-                                                        Text(
-                                                            '${visitC.searchVisit[i].jamOut != "" ? diffHours.inHours : '-'} jam ${visitC.searchVisit[i].jamOut != "" ? diffHours.inMinutes % 60 : '-'} menit'),
-                                                      ],
-                                                    )
-                                                  ],
-                                                ),
-                                                const Spacer(),
-                                                Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(8.0),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            const SizedBox(width: 12),
+                                            Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                IntrinsicHeight(
                                                   child: Row(
                                                     children: [
                                                       Column(
                                                         children: [
-                                                          const Text('Masuk'),
                                                           Text(
-                                                            visitC
-                                                                .searchVisit[i]
-                                                                .jamIn!,
+                                                            visit.jamIn!,
+                                                            style: const TextStyle(
+                                                              // color:
+                                                              //     stsMasuk == "Late"
+                                                              //         ? red
+                                                              //         : green,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              fontSize: 18,
+                                                            ),
+                                                          ),
+                                                          const Text(
+                                                            'Check In',
                                                             style: TextStyle(
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                                color:
-                                                                    titleColor),
+                                                              fontSize: 14,
+                                                              color:
+                                                                  Colors.grey,
+                                                            ),
                                                           ),
                                                         ],
                                                       ),
-                                                      const SizedBox(
-                                                        width: 15,
+                                                      const SizedBox(width: 5),
+                                                      const VerticalDivider(
+                                                        color:
+                                                            Colors
+                                                                .grey, // Warna garis
+                                                        // thickness:
+                                                        //     1, // Ketebalan garis
+                                                        width:
+                                                            25, // Lebar box pembungkus
+                                                        // indent: 20, // Jarak dari atas
+                                                        endIndent: 5,
                                                       ),
                                                       Column(
                                                         children: [
-                                                          const Text('Keluar'),
+                                                          Text(
+                                                            visit.jamOut!,
+                                                            style: const TextStyle(
+                                                              // color:
+                                                              //     stsPulang ==
+                                                              //                 "Early" ||
+                                                              //             stsPulang ==
+                                                              //                 "Absent"
+                                                              //         ? red
+                                                              //         : green,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              fontSize: 18,
+                                                            ),
+                                                          ),
+                                                          const Text(
+                                                            'Check Out',
+                                                            style: TextStyle(
+                                                              color:
+                                                                  Colors.grey,
+                                                              fontSize: 14,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      const SizedBox(width: 5),
+                                                      const VerticalDivider(
+                                                        color:
+                                                            Colors
+                                                                .grey, // Warna garis
+                                                        // thickness:
+                                                        //     1, // Ketebalan garis
+                                                        width:
+                                                            25, // Lebar box pembungkus
+                                                        // indent: 20, // Jarak dari atas
+                                                        endIndent: 5,
+                                                      ),
+                                                      Column(
+                                                        children: [
                                                           Text(
                                                             visitC
-                                                                        .searchVisit[
-                                                                            i]
-                                                                        .jamOut! !=
-                                                                    ""
-                                                                ? visitC
-                                                                    .searchVisit[
-                                                                        i]
-                                                                    .jamOut!
-                                                                : "-",
+                                                                        .searchVisit
+                                                                        .isNotEmpty &&
+                                                                    visit.jamIn! !=
+                                                                        ""
+                                                                ? '${visit.jamOut != "" ? diffHours.inHours % 24 : '-'}j ${visit.jamOut != "" ? diffHours.inMinutes % 60 : '-'}m'
+                                                                : '-:-',
+                                                            style: const TextStyle(
+                                                              // color:
+                                                              //     stsPulang ==
+                                                              //                 "Pulang Cepat" ||
+                                                              //             stsPulang ==
+                                                              //                 "Belum Absen"
+                                                              //         ? red
+                                                              //         : green,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              fontSize: 18,
+                                                            ),
+                                                          ),
+                                                          const Text(
+                                                            'Total Hours',
                                                             style: TextStyle(
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                                color:
-                                                                    titleColor),
+                                                              color:
+                                                                  Colors.grey,
+                                                              fontSize: 14,
+                                                            ),
                                                           ),
                                                         ],
                                                       ),
                                                     ],
                                                   ),
                                                 ),
+                                                const SizedBox(height: 5),
+                                                Row(
+                                                  children: [
+                                                    const Icon(
+                                                      HeroIcons.map_pin,
+                                                      size: 16,
+                                                    ),
+                                                    const SizedBox(width: 5),
+                                                    Text(
+                                                      visit
+                                                          .namaCabang!
+                                                          .capitalize!,
+                                                    ),
+                                                  ],
+                                                ),
                                               ],
                                             ),
-                                          ),
+                                          ],
                                         ),
-                                      );
-                                    },
+                                        const SizedBox(height: 2),
+                                        i == 0 && visitC.statsCon.value != ""
+                                            ? Container(
+                                              width: Get.mediaQuery.size.width,
+                                              decoration: BoxDecoration(
+                                                color: const Color.fromARGB(
+                                                  118,
+                                                  255,
+                                                  139,
+                                                  128,
+                                                ),
+                                                borderRadius:
+                                                    BorderRadius.circular(5),
+                                              ),
+                                              child: Padding(
+                                                padding: const EdgeInsets.only(
+                                                  left: 8.0,
+                                                ),
+                                                child: Text(
+                                                  visitC.statsCon.value,
+                                                  style: TextStyle(
+                                                    color:
+                                                        Colors.redAccent[700],
+                                                  ),
+                                                ),
+                                              ),
+                                            )
+                                            : Container(),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               );
-                  },
-                ),
+                            },
+                          ),
+                        ),
+                      );
+                }),
               ),
             ],
           ),
         ],
       ),
       floatingActionButton: FloatingActionButton(
-          backgroundColor: AppColors.contentDefBtn,
-          onPressed: () {
-            formFilter(userData!.id);
-          },
-          child: const Icon(
-            Iconsax.calendar_tick_outline,
-            color: AppColors.mainTextColor1,
-          )),
+        backgroundColor: AppColors.contentDefBtn,
+        onPressed: () {
+          formFilter(userData!.id);
+        },
+        child: const Icon(
+          Iconsax.calendar_tick_outline,
+          color: AppColors.mainTextColor1,
+        ),
+      ),
     );
   }
 
@@ -508,42 +592,44 @@ class RiwayatVisitView extends GetView {
                       controller: visitC.date1,
                       style: const TextStyle(fontSize: 14),
                       decoration: const InputDecoration(
-                          contentPadding: EdgeInsets.all(0.5),
-                          prefixIcon: Icon(Iconsax.calendar_edit_outline),
-                          hintText: 'Tanggal Awal',
-                          border: OutlineInputBorder()),
+                        contentPadding: EdgeInsets.all(0.5),
+                        prefixIcon: Icon(Iconsax.calendar_edit_outline),
+                        hintText: 'Tanggal Awal',
+                        border: OutlineInputBorder(),
+                      ),
                       format: DateFormat("yyyy-MM-dd"),
                       onShowPicker: (context, currentValue) {
                         return showDatePicker(
-                            context: context,
-                            firstDate: DateTime(1900),
-                            initialDate: currentValue ?? DateTime.now(),
-                            lastDate: DateTime(2100));
+                          context: context,
+                          firstDate: DateTime(1900),
+                          initialDate: currentValue ?? DateTime.now(),
+                          lastDate: DateTime(2100),
+                        );
                       },
                     ),
                   ),
-                  const SizedBox(
-                    width: 8,
-                  ),
+                  const SizedBox(width: 8),
                   Expanded(
                     child: DateTimeField(
                       controller: visitC.date2,
                       style: const TextStyle(fontSize: 14),
                       decoration: const InputDecoration(
-                          contentPadding: EdgeInsets.all(0.5),
-                          prefixIcon: Icon(Iconsax.calendar_edit_outline),
-                          hintText: 'Tanggal Akhir',
-                          border: OutlineInputBorder()),
+                        contentPadding: EdgeInsets.all(0.5),
+                        prefixIcon: Icon(Iconsax.calendar_edit_outline),
+                        hintText: 'Tanggal Akhir',
+                        border: OutlineInputBorder(),
+                      ),
                       format: DateFormat("yyyy-MM-dd"),
                       onShowPicker: (context, currentValue) {
                         return showDatePicker(
-                            context: context,
-                            firstDate: DateTime(1900),
-                            initialDate: currentValue ?? DateTime.now(),
-                            lastDate: DateTime(2100));
+                          context: context,
+                          firstDate: DateTime(1900),
+                          initialDate: currentValue ?? DateTime.now(),
+                          lastDate: DateTime(2100),
+                        );
                       },
                     ),
-                  )
+                  ),
                 ],
               ),
               const SizedBox(height: 10),
@@ -557,17 +643,21 @@ class RiwayatVisitView extends GetView {
                     //  Restart.restartApp();
                   },
                   style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.contentDefBtn,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(50)),
-                      minimumSize: Size(Get.size.width / 2, 50)),
+                    backgroundColor: AppColors.contentDefBtn,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(50),
+                    ),
+                    minimumSize: Size(Get.size.width / 2, 50),
+                  ),
                   child: const Text(
                     'SIMPAN',
                     style: TextStyle(
-                        fontSize: 15, color: AppColors.mainTextColor1),
+                      fontSize: 15,
+                      color: AppColors.mainTextColor1,
+                    ),
                   ),
                 ),
-              )
+              ),
             ],
           ),
         ),

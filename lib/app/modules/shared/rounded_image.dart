@@ -31,7 +31,7 @@ class RoundedImage extends StatelessWidget {
             ? foto != ""
                 ? CachedNetworkImage(
                     imageUrl: "${ServiceApi().baseUrl}$foto",
-                    fit: BoxFit.fill,
+                    fit: BoxFit.cover,
                     progressIndicatorBuilder: (context, url, progress) =>
                         CircularProgressIndicator(
                       value: progress.progress,
@@ -47,7 +47,7 @@ class RoundedImage extends StatelessWidget {
             : foto != "" && foto.contains('absensi/')
                 ? CachedNetworkImage(
                     imageUrl: "${ServiceApi().baseUrl}$foto",
-                    fit: BoxFit.cover,
+                    fit: BoxFit.fill,
                     progressIndicatorBuilder: (context, url, progress) =>
                         CircularProgressIndicator(
                       value: progress.progress,

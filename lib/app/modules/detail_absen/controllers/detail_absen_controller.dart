@@ -10,6 +10,7 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 
+import '../../../data/add_controller.dart';
 import '../../../data/helper/custom_dialog.dart';
 import '../../../data/helper/db_helper.dart';
 import '../../../data/model/shift_kerja_model.dart';
@@ -60,8 +61,10 @@ class DetailAbsenController extends GetxController {
   }
 
   void pickImg() async {
-    image =
-        await picker.pickImage(source: ImageSource.gallery, imageQuality: 8);
+    image = await picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 8,
+    );
 
     if (image != null) {
       update();
@@ -71,8 +74,10 @@ class DetailAbsenController extends GetxController {
   }
 
   void pickImg2() async {
-    image2 =
-        await picker.pickImage(source: ImageSource.gallery, imageQuality: 8);
+    image2 = await picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 8,
+    );
 
     if (image2 != null) {
       update();
@@ -85,11 +90,17 @@ class DetailAbsenController extends GetxController {
     if (jamAbsenMasuk.text != "" && jamAbsenPulang.text == "") {
       if (alasan.text == "") {
         failedDialog(
-            Get.context!, "Kesalahan", "Harap Isi kolom alasan perubahan data");
+          Get.context!,
+          "Kesalahan",
+          "Harap Isi kolom alasan perubahan data",
+        );
       } else {
         if (image == null) {
-          failedDialog(Get.context!, "Kesalahan",
-              "Harap lampirkan bukti foto absen masuk");
+          failedDialog(
+            Get.context!,
+            "Kesalahan",
+            "Harap lampirkan bukti foto absen masuk",
+          );
         } else {
           var data = {
             "status": "update_masuk",
@@ -98,10 +109,18 @@ class DetailAbsenController extends GetxController {
             "jam_absen_masuk": jamAbsenMasuk.text,
             "tgl_masuk": tglMasuk.text,
             "foto_masuk": image!.path,
-            "alasan": alasan.text
+            "alasan": alasan.text,
           };
           loadingDialog("Mengirim data...", "");
           await ServiceApi().reqUpdateAbs(data);
+          // after 2 sec
+          if (!Get.isRegistered<AdController>()) {
+            Get.put(AdController());
+            Get.find<AdController>().loadInterstitialAd();
+          }
+          Future.delayed(const Duration(seconds: 2), () {
+            Get.find<AdController>().showInterstitialAd(() {});
+          });
           jamAbsenMasuk.clear();
           image == null;
         }
@@ -109,14 +128,20 @@ class DetailAbsenController extends GetxController {
     } else if (jamAbsenPulang.text != "" && jamAbsenMasuk.text == "") {
       if (alasan.text == "") {
         failedDialog(
-            Get.context!, "Kesalahan", "Harap Isi kolom alasan perubahan data");
+          Get.context!,
+          "Kesalahan",
+          "Harap Isi kolom alasan perubahan data",
+        );
       } else {
         if (tglPulang.text == "") {
           failedDialog(Get.context!, "Kesalahan", "Harap pilih tanggal pulang");
         } else {
           if (image2 == null) {
-            failedDialog(Get.context!, "Kesalahan",
-                "Harap lampirkan bukti foto absen pulang");
+            failedDialog(
+              Get.context!,
+              "Kesalahan",
+              "Harap lampirkan bukti foto absen pulang",
+            );
           } else {
             loadingDialog("Mengirim data...", "");
             await getLoc();
@@ -131,9 +156,17 @@ class DetailAbsenController extends GetxController {
               "lat_out": lat.toString(),
               "long_out": long.toString(),
               "device_info2": devInfo.value,
-              "alasan": alasan.text
+              "alasan": alasan.text,
             };
             await ServiceApi().reqUpdateAbs(data);
+            // after 2 sec
+            if (!Get.isRegistered<AdController>()) {
+              Get.put(AdController());
+              Get.find<AdController>().loadInterstitialAd();
+            }
+            Future.delayed(const Duration(seconds: 2), () {
+              Get.find<AdController>().showInterstitialAd(() {});
+            });
             tglPulang.clear();
             jamAbsenPulang.clear();
             image2 == null;
@@ -145,7 +178,10 @@ class DetailAbsenController extends GetxController {
         selectedShift.isEmpty) {
       if (alasan.text == "") {
         failedDialog(
-            Get.context!, "Kesalahan", "Harap Isi kolom alasan perubahan data");
+          Get.context!,
+          "Kesalahan",
+          "Harap Isi kolom alasan perubahan data",
+        );
       } else {
         if (tglPulang.text == "") {
           failedDialog(Get.context!, "Kesalahan", "Harap pilih tanggal pulang");
@@ -153,8 +189,11 @@ class DetailAbsenController extends GetxController {
           if (image == null && image2 == null ||
               image == null ||
               image2 == null) {
-            failedDialog(Get.context!, "Kesalahan",
-                "Harap lampirkan bukti foto absen masuk & pulang");
+            failedDialog(
+              Get.context!,
+              "Kesalahan",
+              "Harap lampirkan bukti foto absen masuk & pulang",
+            );
           } else {
             loadingDialog("Mengirim data...", "");
             await getLoc();
@@ -171,9 +210,17 @@ class DetailAbsenController extends GetxController {
               "lat_out": lat.toString(),
               "long_out": long.toString(),
               "device_info2": devInfo.value,
-              "alasan": alasan.text
+              "alasan": alasan.text,
             };
             await ServiceApi().reqUpdateAbs(data);
+            // after 2 sec
+            if (!Get.isRegistered<AdController>()) {
+              Get.put(AdController());
+              Get.find<AdController>().loadInterstitialAd();
+            }
+            Future.delayed(const Duration(seconds: 2), () {
+              Get.find<AdController>().showInterstitialAd(() {});
+            });
             tglPulang.clear();
             jamAbsenMasuk.clear();
             jamAbsenMasuk.clear();
@@ -187,7 +234,10 @@ class DetailAbsenController extends GetxController {
         jamAbsenPulang.text == "") {
       if (alasan.text == "") {
         failedDialog(
-            Get.context!, "Kesalahan", "Harap Isi kolom alasan perubahan data");
+          Get.context!,
+          "Kesalahan",
+          "Harap Isi kolom alasan perubahan data",
+        );
       } else {
         var data = {
           "status": "update_shift",
@@ -197,17 +247,28 @@ class DetailAbsenController extends GetxController {
           "jam_masuk": jamMasuk.value,
           "jam_pulang": jamPulang.value,
           "tgl_masuk": tglMasuk.text,
-          "alasan": alasan.text
+          "alasan": alasan.text,
         };
         loadingDialog("Mengirim data...", "");
         await ServiceApi().reqUpdateAbs(data);
+        // after 2 sec
+        if (!Get.isRegistered<AdController>()) {
+          Get.put(AdController());
+          Get.find<AdController>().loadInterstitialAd();
+        }
+        Future.delayed(const Duration(seconds: 2), () {
+          Get.find<AdController>().showInterstitialAd(() {});
+        });
         selectedShift.value = "";
         jamMasuk.value = "";
         jamPulang.value = "";
       }
     } else {
       failedDialog(
-          Get.context!, "Kesalahan", "Harap isi bagian yang ingi diperbarui");
+        Get.context!,
+        "Kesalahan",
+        "Harap isi bagian yang ingi diperbarui",
+      );
     }
   }
 
@@ -225,8 +286,10 @@ class DetailAbsenController extends GetxController {
     long = position.longitude;
 
     if (position.isMocked == true) {
-      dialogMsgCncl('Peringatan',
-          'Anda terdeteksi menggunakan\nlokasi palsu\nHarap matikan lokasi palsu');
+      dialogMsgCncl(
+        'Peringatan',
+        'Anda terdeteksi menggunakan\nlokasi palsu\nHarap matikan lokasi palsu',
+      );
     }
   }
 
@@ -267,13 +330,16 @@ class DetailAbsenController extends GetxController {
       if (permission == LocationPermission.deniedForever) {
         // Permissions are denied forever, handle appropriately.
         showToast(
-            "Izin Lokasi ditolak.\nHarap berikan akses pada perizinan lokasi");
+          "Izin Lokasi ditolak.\nHarap berikan akses pada perizinan lokasi",
+        );
         // Get.back();
         return Future.error(
-            'Location permissions are permanently denied, we cannot request permissions.');
+          'Location permissions are permanently denied, we cannot request permissions.',
+        );
       }
       var loc = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
+        timeLimit: const Duration(seconds: 10),
       );
       loc.isMocked;
       // Get.back();

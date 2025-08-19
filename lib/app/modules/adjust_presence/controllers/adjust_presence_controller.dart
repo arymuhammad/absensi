@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:absensi/app/data/helper/custom_dialog.dart';
@@ -5,14 +6,17 @@ import 'package:absensi/app/data/model/absen_model.dart';
 import 'package:absensi/app/data/model/req_app_model.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../data/helper/db_helper.dart';
+import '../../../data/helper/manual_sse_client.dart';
 import '../../../data/model/cabang_model.dart';
 import '../../../data/model/dept_model.dart';
 import '../../../data/model/login_model.dart';
+import '../../../data/model/notif_model.dart';
 import '../../../data/model/shift_kerja_model.dart';
 import '../../../data/model/user_model.dart';
 import '../../../data/model/users_model.dart';
@@ -66,36 +70,39 @@ class AdjustPresenceController extends GetxController
   var listReqUpt = <ReqApp>[].obs;
   var selectedType = "".obs;
   var typeReqApp = [
-    {
-      "update_masuk": "Update Masuk",
-    },
+    {"update_masuk": "Update Masuk"},
     {"update_pulang": "Update Pulang"},
     {"update_data_absen": "Update Data Absen"},
-    {"update_shift": "Update Shift"}
+    {"update_shift": "Update Shift"},
   ];
 
   var selectedStatus = "".obs;
   var statusReqApp = [
-    {
-      "": "Unconfirmed",
-    },
-    {
-      "0": "Reject",
-    },
-    {
-      "1": "Accept",
-    }
+    {"": "Unconfirmed"},
+    {"0": "Reject"},
+    {"1": "Accept"},
   ];
 
-  var initDate = DateFormat('yyyy-MM-dd')
-      .format(DateTime.parse(
-          DateTime(DateTime.now().year, DateTime.now().month, 1).toString()))
-      .toString();
-  var lastDate = DateFormat('yyyy-MM-dd')
-      .format(DateTime.parse(
-          DateTime(DateTime.now().year, DateTime.now().month + 1, 0)
-              .toString()))
-      .toString();
+  var initDate =
+      DateFormat('yyyy-MM-dd')
+          .format(
+            DateTime.parse(
+              DateTime(DateTime.now().year, DateTime.now().month, 1).toString(),
+            ),
+          )
+          .toString();
+  var lastDate =
+      DateFormat('yyyy-MM-dd')
+          .format(
+            DateTime.parse(
+              DateTime(
+                DateTime.now().year,
+                DateTime.now().month + 1,
+                0,
+              ).toString(),
+            ),
+          )
+          .toString();
 
   @override
   Future<void> onInit() async {
@@ -123,8 +130,9 @@ class AdjustPresenceController extends GetxController
     // getCabang();
     // getReqAppUpt('', '', '', '', initDate, lastDate);
     SharedPreferences pref = await SharedPreferences.getInstance();
-    var dataUserLogin =
-        Data.fromJson(jsonDecode(pref.getString('userDataLogin')!));
+    var dataUserLogin = Data.fromJson(
+      jsonDecode(pref.getString('userDataLogin')!),
+    );
     // var userID = Data.fromJson(jsonDecode(pref.getString('userDataLogin')!)).id!;
     idUser.value = dataUserLogin.id!;
     levelUser.value = dataUserLogin.level!;
@@ -136,10 +144,22 @@ class AdjustPresenceController extends GetxController
     tabController.dispose();
   }
 
-  getReqAppUpt(String? accept, String? type, String? level, String? idUser,
-      String? date1, String? date2) async {
-    final response = await ServiceApi()
-        .getReqUptAbs(accept, type, level, idUser, date1, date2);
+  getReqAppUpt(
+    String? accept,
+    String? type,
+    String? level,
+    String? idUser,
+    String? date1,
+    String? date2,
+  ) async {
+    final response = await ServiceApi().getReqUptAbs(
+      accept,
+      type,
+      level,
+      idUser,
+      date1,
+      date2,
+    );
     listReqUpt.value = response;
     isLoading.value = false;
     return listReqUpt;
@@ -153,19 +173,24 @@ class AdjustPresenceController extends GetxController
       final response = await ServiceApi().getCabang({});
       cabang.value = response;
       cabang
-          .map((e) async => await SQLHelper.instance.insertCabang(Cabang(
-              kodeCabang: e.kodeCabang,
-              brandCabang: e.brandCabang,
-              namaCabang: e.namaCabang,
-              lat: e.lat,
-              long: e.long)))
+          .map(
+            (e) async => await SQLHelper.instance.insertCabang(
+              Cabang(
+                kodeCabang: e.kodeCabang,
+                brandCabang: e.brandCabang,
+                namaCabang: e.namaCabang,
+                lat: e.lat,
+                long: e.long,
+              ),
+            ),
+          )
           .toList();
       return cabang;
     }
   }
 
-  Future<List<User>> getUserCabang(String idStore) async {
-    final response = await ServiceApi().getUserCabang(idStore);
+  Future<List<User>> getUserCabang(String idStore, String parentId) async {
+    final response = await ServiceApi().getUserCabang(idStore, parentId);
     return userCabang.value = response;
   }
 
@@ -177,11 +202,16 @@ class AdjustPresenceController extends GetxController
       final response = await ServiceApi().getShift();
       shiftKerja.value = response;
       shiftKerja
-          .map((e) async => await SQLHelper.instance.insertShift(ShiftKerja(
-              id: e.id,
-              namaShift: e.namaShift,
-              jamMasuk: e.jamMasuk,
-              jamPulang: e.jamPulang)))
+          .map(
+            (e) async => await SQLHelper.instance.insertShift(
+              ShiftKerja(
+                id: e.id,
+                namaShift: e.namaShift,
+                jamMasuk: e.jamMasuk,
+                jamPulang: e.jamPulang,
+              ),
+            ),
+          )
           .toList();
 
       return shiftKerja;
@@ -237,8 +267,13 @@ class AdjustPresenceController extends GetxController
     };
     await ServiceApi().updateAbsen(data);
     selectedShift.value = "";
-    succesDialog(Get.context!, 'N', 'Data berhasil diupdate',
-        DialogType.success, 'SUKSES');
+    succesDialog(
+      Get.context!,
+      'N',
+      'Data berhasil diupdate',
+      DialogType.success,
+      'SUKSES',
+    );
   }
 
   Future<List<Dept>> getDeptVisit() async {
@@ -257,7 +292,7 @@ class AdjustPresenceController extends GetxController
       "id_dept": idDept,
       "id_user": idUser,
       "tanggal1": date1,
-      "tanggal2": date2
+      "tanggal2": date2,
     };
 
     loadingDialog("Sedang memuat data...", "");
@@ -280,30 +315,110 @@ class AdjustPresenceController extends GetxController
       "foto_out": foto.text,
       "lat_out": lat.text,
       "long_out": long.text,
-      "device_info2": device.text
+      "device_info2": device.text,
     };
     if (data.isNotEmpty) {
       await ServiceApi().updateAbsen(data);
-      succesDialog(Get.context!, 'N', 'Data berhasil diupdate',
-          DialogType.success, 'SUKSES');
+      succesDialog(
+        Get.context!,
+        'N',
+        'Data berhasil diupdate',
+        DialogType.success,
+        'SUKSES',
+      );
     }
   }
 
   appAbs(
-      Map<String, dynamic> dataUptApp, Map<String, dynamic>? dataUptAbs) async {
+    Map<String, dynamic> dataUptApp,
+    Map<String, dynamic>? dataUptAbs,
+  ) async {
     // print(dataUptApp['accept']);
     if (dataUptApp['accept'] == "1") {
       await ServiceApi().updateReqApp(dataUptApp);
       await ServiceApi().updateReqAdjAbs(dataUptAbs!);
       dialogMsg('INFO', 'Data berhasil diupdate');
-      await getReqAppUpt('', '', levelUser.value, idUser.value, dateInput1.text,
-          dateInput2.text);
+      await getReqAppUpt(
+        '',
+        '',
+        levelUser.value,
+        idUser.value,
+        dateInput1.text,
+        dateInput2.text,
+      );
     } else {
       await ServiceApi().updateReqApp(dataUptApp);
       dialogMsg('INFO', 'Data berhasil diupdate');
-      await getReqAppUpt('', '', levelUser.value, idUser.value, dateInput1.text,
-          dateInput2.text);
+      await getReqAppUpt(
+        '',
+        '',
+        levelUser.value,
+        idUser.value,
+        dateInput1.text,
+        dateInput2.text,
+      );
     }
     keteranganApp.clear();
+  }
+
+  Stream<NotifModel> getAdjusmentData({
+    required String idUser,
+    // required String level,
+  }) {
+    StreamController<NotifModel> controller = StreamController();
+
+    void connect() {
+      final url = Uri.parse(
+        '${dotenv.env['STREAM_NOTIF_URL']}?type=adjusment&id_user=$idUser&date1=$initDate&date2=$lastDate',
+      );
+      // print( '${dotenv.env['STREAM_NOTIF_URL']}?type=adjusment&id_user=$idUser&date1=$initDate&date2=$lastDate');
+      final sseClient = ManualSseClient(url);
+
+      sseClient.connect().listen(
+        (dataStr) {
+          //  print('Received raw data: $dataStr');
+          try {
+            final jsonData = jsonDecode(dataStr);
+            // print(jsonData);
+            if (jsonData is Map<String, dynamic> &&
+                jsonData['success'] == true &&
+                jsonData['data'] != null) {
+              final model = NotifModel.fromJson(jsonData['data']);
+              // print('---------');
+              // print(model);
+              if (!controller.isClosed) controller.add(model);
+            } else {
+              if (!controller.isClosed) {
+                controller.addError('Tidak berhasil mendapatkan data');
+              }
+            }
+          } catch (e) {
+            if (!controller.isClosed) {
+              controller.addError('Parse JSON gagal: $e');
+            }
+          }
+        },
+        onError: (error) async {
+          if (!controller.isClosed) controller.addError(error);
+          // Reconnect after delay
+          await Future.delayed(const Duration(seconds: 5));
+          if (!controller.isClosed) connect();
+        },
+        onDone: () async {
+          // Reconnect after delay
+          await Future.delayed(const Duration(seconds: 5));
+          if (!controller.isClosed) connect();
+        },
+        cancelOnError: true,
+      );
+    }
+
+    connect();
+
+    controller.onCancel = () {
+      controller.close();
+    };
+
+    return controller.stream;
   }
 }

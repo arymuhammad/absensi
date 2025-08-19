@@ -19,10 +19,7 @@ class LoginView extends GetView<LoginController> {
         body: Stack(
           children: [
             Container(
-              decoration: const BoxDecoration(
-                  image: DecorationImage(
-                      image: AssetImage('assets/image/bg.png'),
-                      fit: BoxFit.fill)),
+             color: AppColors.itemsBackground,
             ),
            
             Padding(
@@ -56,7 +53,7 @@ class LoginView extends GetView<LoginController> {
                               'WELCOME BACK',
                               style: titleTextStyle.copyWith(
                                 fontSize: 22,
-                                color: Colors.black54,
+                                color: AppColors.contentColorWhite,
                               ),
                             ),
                           ),
@@ -65,7 +62,7 @@ class LoginView extends GetView<LoginController> {
                               'Login to your account',
                               style: subtitleTextStyle.copyWith(
                                 fontSize: 16,
-                                color: Colors.black54,
+                                color: AppColors.contentColorWhite,
                               ),
                             ),
                           ),
@@ -177,7 +174,7 @@ class LoginView extends GetView<LoginController> {
                                 text: TextSpan(
                                     text: 'Belum punya akun? ',
                                     style: const TextStyle(
-                                        color: Colors.black,
+                                        color: AppColors.contentColorWhite,
                                         fontFamily: 'Nunito',
                                         fontWeight: FontWeight.bold),
                                     children: [

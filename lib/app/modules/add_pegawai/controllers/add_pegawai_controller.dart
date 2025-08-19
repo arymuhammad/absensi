@@ -25,6 +25,7 @@ import '../../../data/helper/custom_dialog.dart';
 import '../../../data/model/cabang_model.dart';
 import '../../../data/model/cek_user_model.dart';
 import '../../../data/model/foto_profil_model.dart';
+import '../../login/controllers/login_controller.dart';
 // import 'package:google_ml_vision/google_ml_vision.dart';
 
 class AddPegawaiController extends GetxController {
@@ -111,17 +112,22 @@ class AddPegawaiController extends GetxController {
 
   checkForUpdate(context, status) async {
     if (status != "onInit") {
-      loadingDialog("Memeriksa pembaruan...", "");
+      loadingDialog("Checking for updates...", "");
     }
 
     try {
-      final readDoc = await http
-          .get(Uri.parse('http://103.156.15.61/update apk/updateLog.xml'));
+      final readDoc = await http.get(
+        Uri.parse('http://103.156.15.61/update apk/updateLog.xml'),
+      );
 
       final response = await http
-          .head(Uri.parse(supportedAbi == 'arm64-v8a'
-              ? 'http://103.156.15.61/update apk/absensiApp.arm64v8a.apk'
-              : 'http://103.156.15.61/update apk/absensiApp.apk'))
+          .head(
+            Uri.parse(
+              supportedAbi == 'arm64-v8a'
+                  ? 'http://103.156.15.61/update apk/absensiApp.arm64v8a.apk'
+                  : 'http://103.156.15.61/update apk/absensiApp.apk',
+            ),
+          )
           .timeout(const Duration(seconds: 20));
       Get.back();
       if (response.statusCode == 200) {
@@ -138,137 +144,144 @@ class AddPegawaiController extends GetxController {
           final icon = listUpdates.findElements('icon').first.innerText;
           final color = listUpdates.findElements('color').first.innerText;
 
-          updateList
-              .add({'name': name, 'desc': desc, 'icon': icon, 'color': color});
+          updateList.add({
+            'name': name,
+            'desc': desc,
+            'icon': icon,
+            'color': color,
+          });
         }
         //end loop item on readDoc
         if (latestVer == currVer) {
           // Get.back();
-          succesDialog(context, "N", "Tidak ada pembaruan sistem",
-              DialogType.info, 'INFO');
+          succesDialog(
+            context,
+            "N",
+            "No system updates",
+            DialogType.info,
+            'INFO',
+          );
           // dialogMsgScsUpd("", "Tidak ada pembaruan sistem");
         } else {
           Get.defaultDialog(
-              radius: 2,
-              onWillPop: () async {
-                return false;
-              },
-              title: 'Pembaruan Tersedia',
-              content: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Apa yang baru',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                  ),
-                  const SizedBox(
-                    height: 5,
-                  ),
-                  for (var i in updateList)
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Icon(
-                              IconData(int.parse(i['icon']),
-                                  fontFamily: 'MaterialIcons'),
-                              color: Color(int.parse(i['color'])),
-                            ),
-                            const SizedBox(
-                              width: 5,
-                            ),
-                            Text('${i['name']}',
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold, fontSize: 18)),
-                          ],
-                        ),
-                        Text(
-                          i['desc'],
-                          style: TextStyle(color: Colors.grey[500]),
-                        ),
-                        const SizedBox(
-                          height: 5,
-                        ),
-                      ],
-                    )
-                ],
-              ),
-              textConfirm: 'Unduh Pembaruan',
-              confirmTextColor: Colors.white,
-              onConfirm: () {
-                Get.back(closeOverlays: true);
-                try {
-                  Get.defaultDialog(
-                      title: 'Pembaruan perangkat lunak',
-                      radius: 2,
-                      barrierDismissible: false,
-                      onWillPop: () async {
-                        return false;
-                      },
-                      content: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
+            radius: 2,
+            onWillPop: () async {
+              return false;
+            },
+            title: 'Update Available',
+            content: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  "What's new",
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                ),
+                const SizedBox(height: 5),
+                for (var i in updateList)
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
                         children: [
-                          const Divider(),
-                          const Text('Mengunduh pembaruan...'),
-                          Obx(
-                            () => Text('${(downloadProgress.value).toInt()}%'),
+                          Icon(
+                            IconData(
+                              int.parse(i['icon']),
+                              fontFamily: 'MaterialIcons',
+                            ),
+                            color: Color(int.parse(i['color'])),
                           ),
-                          const SizedBox(
-                            height: 5,
-                          ),
-                          Obx(
-                            () => LinearPercentIndicator(
-                                lineHeight: 10.0,
-                                percent: downloadProgress.value / 100,
-                                backgroundColor: Colors.grey[220],
-                                progressColor: Colors.blue,
-                                barRadius: const Radius.circular(5)),
-                          ),
-                          const SizedBox(
-                            height: 5,
+                          const SizedBox(width: 5),
+                          Text(
+                            '${i['name']}',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
+                            ),
                           ),
                         ],
-                      ));
-                  //LINK CONTAINS APK OF FLUTTER HELLO WORLD FROM FLUTTER SDK EXAMPLES
-                  OtaUpdate()
-                      .execute(
-                    supportedAbi == 'arm64-v8a'
-                        ? 'http://103.156.15.61/update apk/absensiApp.arm64v8a.apk'
-                        : 'http://103.156.15.61/update apk/absensiApp.apk',
-                    // OPTIONAL
-                    // destinationFilename: '/',
-                    //OPTIONAL, ANDROID ONLY - ABILITY TO VALIDATE CHECKSUM OF FILE:
-                    // sha256checksum:
-                    //     "d6da28451a1e15cf7a75f2c3f151befad3b80ad0bb232ab15c20897e54f21478",
-                  )
-                      .listen(
-                    (OtaEvent event) {
-                      downloadProgress.value = double.parse(event.value!);
-                    },
-                    // onError: errorHandle(Error()),
-                    // onDone: logC.logout,
-                  );
-                } on http.ClientException catch (e) {
-                  showToast('Failed to make OTA update. Details: $e');
-                }
-              });
+                      ),
+                      Text(
+                        i['desc'],
+                        style: TextStyle(color: Colors.grey[500]),
+                      ),
+                      const SizedBox(height: 5),
+                    ],
+                  ),
+              ],
+            ),
+            textConfirm: 'Download Update',
+            confirmTextColor: Colors.white,
+            onConfirm: () {
+              Get.back(closeOverlays: true);
+              try {
+                Get.defaultDialog(
+                  title: 'Software update',
+                  radius: 2,
+                  barrierDismissible: false,
+                  onWillPop: () async {
+                    return false;
+                  },
+                  content: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Divider(),
+                      const Text('Downloading updates...'),
+                      Obx(() => Text('${(downloadProgress.value).toInt()}%')),
+                      const SizedBox(height: 5),
+                      Obx(
+                        () => LinearPercentIndicator(
+                          lineHeight: 10.0,
+                          percent: downloadProgress.value / 100,
+                          backgroundColor: Colors.grey[220],
+                          progressColor: Colors.blue,
+                          barRadius: const Radius.circular(5),
+                        ),
+                      ),
+                      const SizedBox(height: 5),
+                    ],
+                  ),
+                );
+                //LINK CONTAINS APK OF FLUTTER HELLO WORLD FROM FLUTTER SDK EXAMPLES
+                OtaUpdate()
+                    .execute(
+                      supportedAbi == 'arm64-v8a'
+                          ? 'http://103.156.15.61/update apk/absensiApp.arm64v8a.apk'
+                          : 'http://103.156.15.61/update apk/absensiApp.apk',
+                      // OPTIONAL
+                      // destinationFilename: '/',
+                      //OPTIONAL, ANDROID ONLY - ABILITY TO VALIDATE CHECKSUM OF FILE:
+                      // sha256checksum:
+                      //     "d6da28451a1e15cf7a75f2c3f151befad3b80ad0bb232ab15c20897e54f21478",
+                    )
+                    .listen(
+                      (OtaEvent event) {
+                        downloadProgress.value = double.parse(event.value!);
+                      },
+                      // onError: errorHandle(Error()),
+                      // onDone: logC.logout,
+                    );
+              } on http.ClientException catch (e) {
+                showToast('Failed to make OTA update. Details: $e');
+              }
+            },
+          );
         }
       } else {
         Get.defaultDialog(
-            title: 'Pesan',
-            middleText:
-                'Tidak ada pembaruan aplikasi. \nSistem anda sudah yang terbaru',
-            onCancel: () => Get.back(),
-            textCancel: 'Tutup');
+          title: 'Info',
+          middleText:
+              'There are no app updates. \nYour system is already up to date',
+          onCancel: () => Get.back(),
+          textCancel: 'Close',
+        );
       }
     } on SocketException catch (e) {
       Get.back(closeOverlays: true);
       Get.defaultDialog(
         title: e.toString(),
-        middleText: 'Periksa koneksi internet anda',
+        middleText: 'Check your internet connection',
         textConfirm: 'Refresh',
         confirmTextColor: Colors.white,
         onConfirm: () {
@@ -293,17 +306,19 @@ class AddPegawaiController extends GetxController {
   void uploadImageProfile() async {
     if (kIsWeb) {
       fileResult = await FilePicker.platform.pickFiles(
-          compressionQuality: 50,
-          allowedExtensions: ['jpg', 'jpeg', 'png'],
-          withReadStream: true,
-          // // this will return PlatformFile object with read stream
-          allowCompression: true);
+        compressionQuality: 50,
+        allowedExtensions: ['jpg', 'jpeg', 'png'],
+        withReadStream: true,
+        // // this will return PlatformFile object with read stream
+        allowCompression: true,
+      );
     } else {
       image = await picker.pickImage(
-          source: ImageSource.gallery,
-          imageQuality: 50,
-          maxHeight: 600,
-          maxWidth: 600);
+        source: ImageSource.gallery,
+        imageQuality: 50,
+        maxHeight: 600,
+        maxWidth: 600,
+      );
       if (image != null) {
         update();
       }
@@ -325,7 +340,7 @@ class AddPegawaiController extends GetxController {
       lstPhone.add(e.notelp!);
     }).toList();
     if (mode == "add") {
-      loadingDialog("Mengirim data...", "Harap menunggu");
+      loadingDialog("Updating data", "Please wait");
       if (selectedCabang.isNotEmpty &&
           username.text != "" &&
           pass.text != "" &&
@@ -347,21 +362,32 @@ class AddPegawaiController extends GetxController {
             "kode_cabang": selectedCabang.value,
             "level": selectedLevel.value,
             "foto":
-                kIsWeb ? fileResult!.files.single : File(image!.path.toString())
+                kIsWeb
+                    ? fileResult!.files.single
+                    : File(image!.path.toString()),
           };
 
           if (lstUser.contains(username.text) && lstPhone.contains(telp.text)) {
             Get.back();
-            failedDialog(Get.context!, "Kesalahan",
-                "Username dan No Telp sudah terdaftar\nSilahkan ubah Username dan No Telp ");
+            warningDialog(
+              Get.context!,
+              "Warning",
+              "Username and Phone Number are already registered\nPlease change Username and Phone Number",
+            );
           } else if (lstUser.contains(username.text)) {
             Get.back();
-            failedDialog(Get.context!, "Kesalahan",
-                "Username sudah terdaftar\nSilahkan gunakan username lain");
+            warningDialog(
+              Get.context!,
+              "Warning",
+              "Username is already registered\nPlease change it to another username",
+            );
           } else if (lstPhone.contains(telp.text)) {
             Get.back();
-            failedDialog(Get.context!, "Kesalahan",
-                "No Telp ini sudah terdaftar\nSilahkan masukkan No Telp lain");
+            warningDialog(
+              Get.context!,
+              "Warning",
+              "This phone number is already registered\nPlease enter another phone number",
+            );
           } else {
             // succesDialog(context, "N", "Data berhasil disimpan", DialogType.success, 'SUKSES');
             await ServiceApi().addUpdatePegawai(data, mode);
@@ -390,16 +416,25 @@ class AddPegawaiController extends GetxController {
           };
           if (lstUser.contains(username.text) && lstPhone.contains(telp.text)) {
             Get.back();
-            failedDialog(Get.context!, "Kesalahan",
-                "Username dan No Telp sudah terdaftar\nSilahkan ubah Username dan No Telp ");
+            warningDialog(
+              Get.context!,
+              "Warning",
+              "Username and Phone Number are already registered\nPlease change Username and Phone Number",
+            );
           } else if (lstUser.contains(username.text)) {
             Get.back();
-            failedDialog(Get.context!, "Kesalahan",
-                "Username sudah terdaftar\nSilahkan ubah dengan Username lain");
+            warningDialog(
+              Get.context!,
+              "Warning",
+              "Username is already registered\nPlease change it to another username",
+            );
           } else if (lstPhone.contains(telp.text)) {
             Get.back();
-            failedDialog(Get.context!, "Kesalahan",
-                "No Telp ini sudah terdaftar\nSilahkan masukkan No Telp lain");
+            warningDialog(
+              Get.context!,
+              "Warning",
+              "This phone number is already registered\nPlease enter another phone number",
+            );
           } else {
             await ServiceApi().addUpdatePegawai(data, mode);
             selectedCabang.value = "";
@@ -417,11 +452,14 @@ class AddPegawaiController extends GetxController {
         }
       } else {
         Get.back();
-        failedDialog(
-            Get.context!, "Kesalahan", "Harap mengisi data pada semua kolom");
+        warningDialog(
+          Get.context!,
+          "Warning",
+          "Please fill in the data in all columns",
+        );
       }
     } else {
-      loadingDialog("Memperbarui data", "Harap menunggu");
+      loadingDialog("Updating data", "Please wait");
 
       if (image != null && image!.name.split(".").last == "jpg" ||
           image != null && image!.name.split(".").last == "jpeg" ||
@@ -433,46 +471,73 @@ class AddPegawaiController extends GetxController {
           "username": dataUser.username,
           "nama": name.text != "" ? name.text : dataUser.nama,
           "no_telp": telp.text != "" ? telp.text : dataUser.noTelp,
-          "kode_cabang": selectedCabang.value != ""
-              ? selectedCabang.value
-              : dataUser.kodeCabang,
+          "kode_cabang":
+              selectedCabang.value != ""
+                  ? selectedCabang.value
+                  : dataUser.kodeCabang,
           "level":
               selectedLevel.value != "" ? selectedLevel.value : dataUser.level,
           "foto":
-              kIsWeb ? fileResult!.files.single : File(image!.path.toString())
+              kIsWeb ? fileResult!.files.single : File(image!.path.toString()),
         };
 
         if (lstPhone.contains(telp.text)) {
           Get.back();
-          failedDialog(Get.context!, "Kesalahan",
-              "No Telp ini sudah terdaftar\nSilahkan masukkan No Telp lain");
+          warningDialog(
+            Get.context!,
+            "Warning",
+            "This phone number is already registered\nPlease enter another phone number",
+          );
         } else {
-          
+          await ServiceApi().addUpdatePegawai(data, mode);
+          // langsung update sharedpref tanpa harus re login
+          var newUsr = await ServiceApi().fetchCurrentUser({
+            "username": dataUser.username!,
+            "password": dataUser.password!,
+          });
+          if (Get.isRegistered<LoginController>()) {
+            final logC = Get.find<LoginController>();
+
+            // update sharedpreff
+            final prefs = await SharedPreferences.getInstance();
+            await prefs.setString('userDataLogin', jsonEncode(newUsr.toJson()));
+            logC.logUser.value = newUsr;
+
+            logC.refresh();
+          }
           //start update local db for tbl_user
-          SQLHelper.instance.updateDataUser({
-            "nama": name.text != "" ? name.text : dataUser.nama,
-            "no_telp": telp.text != "" ? telp.text : dataUser.noTelp,
-            "kode_cabang": selectedCabang.value != ""
-                ? selectedCabang.value
-                : dataUser.kodeCabang,
-            "nama_cabang":
-                cabangName.value != "" ? cabangName.value : dataUser.namaCabang,
-            "lat": lat.value != "" ? lat.value : dataUser.lat,
-            "long": long.value != "" ? long.value : dataUser.long,
-            "area_coverage":
-                cvrArea.value != "" ? cvrArea.value : dataUser.areaCover,
-            "level": selectedLevel.value != ""
-                ? selectedLevel.value
-                : dataUser.level,
-            "level_user":
-                levelName.value != "" ? levelName.value : dataUser.levelUser,
-            "foto": image!.path,
-            "visit": vst.value != "" ? vst.value : dataUser.visit,
-            "cek_stok": cekStok.value != "" ? cekStok.value : dataUser.cekStok
-          }, dataUser.id!, dataUser.username!);
+          SQLHelper.instance.updateDataUser(
+            {
+              "nama": name.text != "" ? name.text : dataUser.nama,
+              "no_telp": telp.text != "" ? telp.text : dataUser.noTelp,
+              "kode_cabang":
+                  selectedCabang.value != ""
+                      ? selectedCabang.value
+                      : dataUser.kodeCabang,
+              "nama_cabang":
+                  cabangName.value != ""
+                      ? cabangName.value
+                      : dataUser.namaCabang,
+              "lat": newUsr.lat!,
+              "long": newUsr.long!,
+              "area_coverage": newUsr.areaCover!,
+              "level":
+                  selectedLevel.value != ""
+                      ? selectedLevel.value
+                      : dataUser.level,
+              "level_user":
+                  levelName.value != "" ? levelName.value : dataUser.levelUser,
+              "foto": image!.path,
+              "visit": newUsr.visit!,
+              "parent_id": newUsr.parentId!,
+              "cek_stok":
+                  cekStok.value != "" ? cekStok.value : dataUser.cekStok,
+            },
+            dataUser.id!,
+            dataUser.username!,
+          );
           //end of update
 
-          await ServiceApi().addUpdatePegawai(data, mode);
           // Get.back();
           // dialogMsgScsUpd(
           //     "Sukses", "Data berhasil disimpan\nSilahkan login ulang");
@@ -499,6 +564,7 @@ class AddPegawaiController extends GetxController {
           selectedLevel.value = "";
           brandCabang.value = "";
           lstPhone.clear();
+          isLoading.value = false;
         }
         // Get.back();
       } else {
@@ -507,49 +573,73 @@ class AddPegawaiController extends GetxController {
           "id": dataUser.id,
           "nama": name.text != "" ? name.text : dataUser.nama,
           "no_telp": telp.text != "" ? telp.text : dataUser.noTelp,
-          "kode_cabang": selectedCabang.value != ""
-              ? selectedCabang.value
-              : dataUser.kodeCabang,
+          "kode_cabang":
+              selectedCabang.value != ""
+                  ? selectedCabang.value
+                  : dataUser.kodeCabang,
           "level":
-              selectedLevel.value != "" ? selectedLevel.value : dataUser.level
+              selectedLevel.value != "" ? selectedLevel.value : dataUser.level,
         };
         if (lstPhone.contains(telp.text)) {
           Get.back();
-          failedDialog(Get.context!, "Kesalahan",
-              "No Telp ini sudah terdaftar\nSilahkan masukkan No Telp lain");
+          warningDialog(
+            Get.context!,
+            "Warning",
+            "This phone number is already registered\nPlease enter another phone number",
+          );
         } else {
           // loadingDialog("updating data", "");
-          //start update local db for tbl_user
-          SQLHelper.instance.updateDataUser({
-            "nama": name.text != "" ? name.text : dataUser.nama,
-            "no_telp": telp.text != "" ? telp.text : dataUser.noTelp,
-            "kode_cabang": selectedCabang.value != ""
-                ? selectedCabang.value
-                : dataUser.kodeCabang,
-            "nama_cabang":
-                cabangName.value != "" ? cabangName.value : dataUser.namaCabang,
-            "lat": lat.value != "" ? lat.value : dataUser.lat,
-            "long": long.value != "" ? long.value : dataUser.long,
-            "area_coverage":
-                cvrArea.value != "" ? cvrArea.value : dataUser.areaCover,
-            "level": selectedLevel.value != ""
-                ? selectedLevel.value
-                : dataUser.level,
-            "level_user":
-                levelName.value != "" ? levelName.value : dataUser.levelUser,
-            "visit": vst.value != "" ? vst.value : dataUser.visit,
-            "cek_stok": cekStok.value != "" ? cekStok.value : dataUser.cekStok
-          }, dataUser.id!, dataUser.username!);
-          //end of update
 
           await ServiceApi().addUpdatePegawai(data, mode);
 
-          // Get.back();
-          // dialogMsgScsUpd(
-          //     "Sukses", "Data berhasil disimpan\nSilahkan login ulang");
+          // langsung update sharedpref tanpa harus re login
+          var newUsr = await ServiceApi().fetchCurrentUser({
+            "username": dataUser.username!,
+            "password": dataUser.password!,
+          });
+          if (Get.isRegistered<LoginController>()) {
+            final logC = Get.find<LoginController>();
+
+            // update sharedpreff
+            final prefs = await SharedPreferences.getInstance();
+            await prefs.setString('userDataLogin', jsonEncode(newUsr.toJson()));
+            logC.logUser.value = newUsr;
+
+            logC.refresh();
+          }
+          //start update local db for tbl_user
+          SQLHelper.instance.updateDataUser(
+            {
+              "nama": name.text != "" ? name.text : dataUser.nama,
+              "no_telp": telp.text != "" ? telp.text : dataUser.noTelp,
+              "kode_cabang":
+                  selectedCabang.value != ""
+                      ? selectedCabang.value
+                      : dataUser.kodeCabang,
+              "nama_cabang":
+                  cabangName.value != ""
+                      ? cabangName.value
+                      : dataUser.namaCabang,
+              "lat": newUsr.lat!,
+              "long": newUsr.long!,
+              "area_coverage": newUsr.areaCover!,
+              "level":
+                  selectedLevel.value != ""
+                      ? selectedLevel.value
+                      : dataUser.level,
+              "level_user":
+                  levelName.value != "" ? levelName.value : dataUser.levelUser,
+              "visit": newUsr.visit!,
+              "parent_id": newUsr.parentId!,
+              "cek_stok":
+                  cekStok.value != "" ? cekStok.value : dataUser.cekStok,
+            },
+            dataUser.id!,
+            dataUser.username!,
+          );
+          //end of update
 
           newPhone.value = telp.text;
-
           selectedCabang.value = "";
           cvrArea.value = "";
           lat.value = "";
@@ -566,6 +656,7 @@ class AddPegawaiController extends GetxController {
           selectedLevel.value = "";
           brandCabang.value = "";
           lstPhone.clear();
+          isLoading.value = false;
         }
       }
     }
@@ -574,47 +665,55 @@ class AddPegawaiController extends GetxController {
   void cekUser(context) async {
     var data = {"no_telp": telp.text};
     if (telp.text != "") {
-      loadingDialog("Sedang mencari data user", "");
+      loadingDialog("Looking for user data", "");
       final response = await ServiceApi().cekUser(data);
       cekDataUser.value = response;
       Get.back();
       if (cekDataUser.isNotEmpty) {
         telp.clear();
 
-        Get.to(() => UpdatePassword(), arguments: {
-          "id_user": cekDataUser[0].id,
-          "username": cekDataUser[0].username,
-          "nama": cekDataUser[0].nama,
-          "no_telp": cekDataUser[0].notelp,
-          "foto": cekDataUser[0].foto,
-        });
+        Get.to(
+          () => UpdatePassword(),
+          arguments: {
+            "id_user": cekDataUser[0].id,
+            "username": cekDataUser[0].username,
+            "nama": cekDataUser[0].nama,
+            "no_telp": cekDataUser[0].notelp,
+            "foto": cekDataUser[0].foto,
+          },
+        );
       } else {
-        failedDialog(context, "Peringatan",
-            "Tidak ditemukan user dengan No Telp ${telp.text}. Pastikan No Telp yang diinput sudah sesuai");
+        warningDialog(
+          context,
+          "Warning",
+          "No user found with phone number ${telp.text}. Make sure the phone number entered is correct",
+        );
       }
     } else {
-      showToast("Anda harus mengisi kolom No Telp");
+      showToast("You must fill in the Phone Column");
     }
   }
 
   updatePassword(context, String id, String username) async {
     var data = {"id": id, "username": username, "password": pass.text};
     if (pass.text != "") {
-      loadingDialog("Memperbarui data user...", "");
+      loadingDialog("Updating user data...", "");
 
       SQLHelper.instance.updateDataUser(
-          {"password": md5.convert(utf8.encode(pass.text)).toString()},
-          id,
-          username);
+        {"password": md5.convert(utf8.encode(pass.text)).toString()},
+        id,
+        username,
+      );
 
       final response = await ServiceApi().updatePasswordUser(data);
       Future.delayed(Duration.zero, () {
         succesDialog(
-            context,
-            "N",
-            "Password berhasil diperbarui\nSilahkan melakukan login ulang",
-            DialogType.success,
-            'SUKSES');
+          context,
+          "N",
+          "Password updated successfully\nPlease re-login",
+          DialogType.success,
+          'SUCCESS',
+        );
       });
       cekDataUser.value = response;
 
@@ -623,19 +722,22 @@ class AddPegawaiController extends GetxController {
       if (cekDataUser.isNotEmpty) {
       } else {
         dialogMsg(
-            "Terjadi Kesalahan", "Tidak dapat memperbarui password. Coba lagi");
+          "An error occurred",
+          "Unable to update password. Please try again.",
+        );
       }
     } else {
-      showToast("Anda belum mengisi kolom Password");
+      showToast("You have not filled in the Password field");
     }
   }
 
   Future<void> uploadFaceData() async {
     image = await picker.pickImage(
-        source: ImageSource.camera,
-        imageQuality: 70,
-        maxHeight: 600,
-        maxWidth: 600);
+      source: ImageSource.camera,
+      imageQuality: 70,
+      maxHeight: 600,
+      maxWidth: 600,
+    );
 
     if (image != null) {
       // var img = base64.encode(File(image!.path).readAsBytesSync());
@@ -645,6 +747,4 @@ class AddPegawaiController extends GetxController {
       return;
     }
   }
-
-  
 }

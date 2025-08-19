@@ -6,10 +6,8 @@ import '../controllers/login_controller.dart';
 class LoginBinding extends Bindings {
   @override
   void dependencies() {
-    Get.lazyPut<LoginController>(
-      () => LoginController(),
-    );
+    Get.lazyPut<LoginController>(() => LoginController(), fenix: true);
     // Get.put(()=>AlarmController());
-    Get.put(()=>AbsenController());
+    Get.put(() => AbsenController());
   }
 }

@@ -20,8 +20,8 @@ class CsDropdownShiftKerja extends StatelessWidget {
           var dataShift = snapshot.data!;
           return DropdownButtonFormField(
             decoration: const InputDecoration(
-              contentPadding: EdgeInsets.all(8),
-                border: OutlineInputBorder(), hintText: 'Pilih Shift Absen'),
+              // contentPadding: EdgeInsets.all(8),
+                border: OutlineInputBorder(), hintText: 'Select Shift Absence'),
             value: value,
             onChanged:
                 // (data) {

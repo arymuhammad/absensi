@@ -17,6 +17,7 @@ abstract class Routes {
   static const ALARM = _Paths.ALARM;
   static const ADJUST_PRESENCE = _Paths.ADJUST_PRESENCE;
   static const REQUEST_APPROVAL = _Paths.REQUEST_APPROVAL;
+  static const LEAVE = _Paths.LEAVE;
 }
 
 abstract class _Paths {
@@ -35,4 +36,5 @@ abstract class _Paths {
   static const ALARM = '/alarm';
   static const ADJUST_PRESENCE = '/adjust-presence';
   static const REQUEST_APPROVAL = '/request-approval';
+  static const LEAVE = '/leave';
 }

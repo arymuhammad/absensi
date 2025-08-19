@@ -1,430 +1,375 @@
 import 'package:absensi/app/data/helper/const.dart';
-import 'package:absensi/app/modules/shared/background_image_header.dart';
 import 'package:absensi/app/modules/shared/rounded_image.dart';
 import 'package:absensi/app/services/service_api.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 
 import 'package:get/get.dart';
+import 'package:icons_plus/icons_plus.dart';
 import 'package:intl/intl.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+import '../../../data/helper/app_colors.dart';
+import '../../../data/helper/format_waktu.dart';
 
 class DetailVisitView extends GetView {
-  DetailVisitView({super.key});
-
-  final markersMasuk = <Marker>[
-    Marker(
-      width: 80,
-      height: 80,
-      point: LatLng(double.parse(Get.arguments["lat_in"]),
-          double.parse(Get.arguments["long_in"])),
-      child: Card(
-          elevation: 10,
-          child: Image.network(
-            "${ServiceApi().baseUrl}${Get.arguments['foto_in']}",
-            errorBuilder: (context, error, stackTrace) =>
-                Image.asset('assets/image/selfie.png'),
-            fit: BoxFit.cover,
-          )
-          // Image.network(
-          //   "${ServiceApi().baseUrl}${Get.arguments['foto_in']}",
-          //   errorBuilder: (context, error, stackTrace) =>Image.asset('assets/image/selfie.png'),
-          //   fit: BoxFit.cover,
-          // ),
-          ),
-    ),
-  ];
-
-  final markersPulang = <Marker>[
-    Marker(
-      width: 80,
-      height: 80,
-      point: LatLng(
-          double.parse(Get.arguments["lat_out"] != ""
-              ? Get.arguments["lat_out"]
-              : "0.0"),
-          double.parse(Get.arguments["long_out"] != ""
-              ? Get.arguments["long_out"]
-              : "0.0")),
-      child: Card(
-          elevation: 10,
-          child: Image.network(
-            "${ServiceApi().baseUrl}${Get.arguments['foto_out']}",
-            errorBuilder: (context, error, stackTrace) =>
-                Image.asset('assets/image/selfie.png'),
-            fit: BoxFit.cover,
-          )
-          //       Image.network(
-          //         "${ServiceApi().baseUrl}${Get.arguments['foto_out']}",
-          //         fit: BoxFit.cover,
-          // errorBuilder: (context, error, stackTrace) =>Image.asset('assets/image/selfie.png'),
-          //       ),
-          ),
-    ),
-  ];
+  DetailVisitView(this.detailData, {super.key});
+  final Map<String, dynamic> detailData;
 
   @override
   Widget build(BuildContext context) {
+    final markersMasuk = <Marker>[
+      Marker(
+        width: 80,
+        height: 80,
+        point: LatLng(
+          double.parse(detailData["lat_in"]),
+          double.parse(detailData["long_in"]),
+        ),
+        child: const Icon(HeroIcons.map_pin, color: AppColors.contentColorBlue),
+      ),
+    ];
+
+    final markersPulang = <Marker>[
+      Marker(
+        width: 80,
+        height: 80,
+        point: LatLng(
+          double.parse(
+            detailData["lat_out"] != "" ? detailData["lat_out"] : "0.0",
+          ),
+          double.parse(
+            detailData["long_out"] != "" ? detailData["long_out"] : "0.0",
+          ),
+        ),
+        child: const Icon(HeroIcons.map_pin, color: AppColors.contentColorBlue),
+      ),
+    ];
     return Scaffold(
       extendBodyBehindAppBar: true,
-        appBar: AppBar(
-          title: Text('DETAIL VISIT',
-              style: titleTextStyle.copyWith(
-                fontSize: 20,
-              )),
-          backgroundColor: Colors.transparent.withOpacity(0.4),
-          elevation: 0.0,
-          // iconTheme: const IconThemeData(color: Colors.black,),
-          centerTitle: true,
+      appBar: AppBar(
+        title: Text(
+          'Detail Visit',
+          style: titleTextStyle.copyWith(
+            fontSize: 18,
+            color: AppColors.contentColorWhite,
+          ),
         ),
-        resizeToAvoidBottomInset: false,
-      
+        backgroundColor: AppColors.itemsBackground,
+        // elevation: 0.0,
+        // iconTheme: const IconThemeData(color: Colors.black,),
+        centerTitle: true,
+      ),
+      resizeToAvoidBottomInset: false,
+
       body: Stack(
         children: [
-          const CsBgImg(),
           ListView(
-            padding: const EdgeInsets.fromLTRB(12, 100, 12, 12),
+            padding: const EdgeInsets.fromLTRB(12, 100, 12, 10),
             children: [
-              Card(
-                elevation: 10,
-                shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(15),
-                        topRight: Radius.circular(15),
-                        bottomLeft: Radius.circular(10),
-                        bottomRight: Radius.circular(10))),
-                child: Column(
-                  children: [
-                    Container(
-                      height: 40,
-                      decoration: BoxDecoration(
-                        borderRadius: const BorderRadius.only(
-                            topLeft: Radius.circular(15),
-                            topRight: Radius.circular(15)),
-                        color: mainColor,
-                      ),
-                      child: Center(
-                        child: Text(
-                          DateFormat("EEEE, d MMMM yyyy", "id_ID")
-                              .format(DateTime.parse(Get.arguments['tgl_visit'])),
-                          style: const TextStyle(fontSize: 18, color: Colors.white),
-                        ),
-                      ),
+              buildCard(
+                context: context,
+                data: detailData,
+                marker: markersMasuk,
+                isIn: true,
+              ),
+              const SizedBox(height: 10),
+              Visibility(
+                visible: detailData['jam_out'] == "" ? true : false,
+                child: const Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Text(
+                      'Tidak ada data keluar ',
+                      style: TextStyle(fontSize: 18),
                     ),
-                    Container(
-                        padding: const EdgeInsets.all(15),
+                  ),
+                ),
+              ),
+              Visibility(
+                visible: detailData['jam_out'] != "" ? true : false,
+                child: buildCard(
+                  context: context,
+                  data: detailData,
+                  markerOut: markersPulang,
+                  isIn: false,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  buildCard({
+    required BuildContext context,
+    required data,
+    List<Marker>? marker,
+    List<Marker>? markerOut,
+    required bool isIn,
+  }) {
+    return Card(
+      elevation: 10,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      child: Column(
+        children: [
+          Container(
+            height: 40,
+            decoration: BoxDecoration(
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(10),
+                topRight: Radius.circular(10),
+              ),
+              color: mainColor,
+            ),
+            child: Center(
+              child: Text(
+                FormatWaktu.formatIndo(
+                  tanggal: DateTime.parse(data!['tgl_visit']),
+                ),
+                style: const TextStyle(
+                  fontSize: 15,
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: SizedBox(
+              height: 265,
+              child: Stack(
+                children: [
+                  FlutterMap(
+                    options: MapOptions(
+                      onTap: (tapPosition, point) {
+                        // print(point.latitude);
+                        // print(point.longitude);
+                        launchUrl(
+                          Uri.parse(
+                            "https://www.google.com/maps/place/6%C2%B033'35.6%22S+106%C2%B051'16.7%22E/@${point.latitude},${point.longitude},191m/data=!3m2!1e3!4b1!4m4!3m3!8m2!3d-6.5598889!4d106.8546389!5m1!1e2?entry=ttu&g_ep=EgoyMDI1MDcyOS4wIKXMDSoASAFQAw%3D%3D",
+                          ),
+                        );
+                      },
+                      initialCenter:
+                          isIn
+                              ? LatLng(
+                                double.parse(data["lat_in"]),
+                                double.parse(data["long_in"]),
+                              )
+                              : LatLng(
+                                double.parse(
+                                  data["lat_out"] != ""
+                                      ? data["lat_out"]
+                                      : '0.0',
+                                ),
+                                double.parse(
+                                  data["long_out"] != ""
+                                      ? data["long_out"]
+                                      : '0.0',
+                                ),
+                              ),
+                      initialZoom: 17,
+                    ),
+                    nonRotatedChildren: [
+                      RichAttributionWidget(
+                        attributions: [
+                          TextSourceAttribution(
+                            'OpenStreetMap contributors',
+                            onTap: () {},
+                          ),
+                        ],
+                      ),
+                    ],
+                    children: [
+                      TileLayer(
+                        urlTemplate:
+                            'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                        userAgentPackageName:
+                            'dev.fleaflet.flutter_map.example',
+                      ),
+                      MarkerLayer(markers: isIn ? marker! : markerOut!),
+                    ],
+                  ),
+
+                  Positioned.fill(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(2, 155, 2, 5),
+                      child: Container(
+                        // height: 50,
+                        padding: const EdgeInsets.fromLTRB(5, 0, 5, 0),
                         decoration: const BoxDecoration(
-                            borderRadius: BorderRadius.only(
-                                bottomLeft: Radius.circular(10),
-                                bottomRight: Radius.circular(10)),
-                            color: Colors.white),
-                        child: Column(
+                          color: AppColors.contentColorWhite,
+                        ),
+                        child: Row(
                           children: [
-                            Row(
+                            SizedBox(
+                              height: 75,
+                              width: 75,
+                              child: Image.network(
+                                "${ServiceApi().baseUrl}${isIn ? data['foto_in'] : data['foto_out']}",
+                                errorBuilder:
+                                    (context, error, stackTrace) =>
+                                        Image.asset('assets/image/selfie.png'),
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                            const SizedBox(width: 5),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                RoundedImage(
-                                    height: 75,
-                                    width: 75,
-                                    foto: Get.arguments['foto_profil'],
-                                    name: Get.arguments['foto_profil'],
-                                    headerProfile: true),
-                                const SizedBox(width: 10),
                                 Row(
                                   children: [
-                                    Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Row(
-                                          children: [
-                                            const Text('Nama'),
-                                            const SizedBox(
-                                              width: 5,
-                                            ),
-                                            const SizedBox(width: 44),
-                                            Text(
-                                              ': ${Get.arguments["nama"].toString().capitalize}',
-                                            ),
-                                          ],
-                                        ),
-                                        Row(
-                                          children: [
-                                            const Text('Masuk'),
-                                            const SizedBox(width: 45),
-                                            Text(
-                                              ': ${Get.arguments['jam_in']}',
-                                            ),
-                                          ],
-                                        ),
-                                        Row(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            const Text('Store'),
-                                            const SizedBox(width: 45),
-                                            SizedBox(
-                                              // padding: const EdgeInsets.all(10.0),
-                                              width:
-                                                  Get.mediaQuery.size.width * 0.42,
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Text(
-                                                    '  : ${Get.arguments['store']}',
-                                                    textAlign: TextAlign.left,
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.end,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            const Text('Device Info'),
-                                            const SizedBox(
-                                              width: 16,
-                                            ),
-                                            Container(
-                                              constraints: BoxConstraints(
-                                                maxWidth: MediaQuery.of(context)
-                                                        .size
-                                                        .width *
-                                                    0.3,
-                                              ),
-                                              child: Text(
-                                                ": ${Get.arguments['device_info']}",
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
+                                    const Text('Name'),
+                                    const SizedBox(width: 5),
+                                    const SizedBox(width: 44),
+                                    Text(
+                                      ': ${data["nama"].toString().substring(0, data["nama"].toString().length > 20 ? 20 : data["nama"].toString().length) + (data["nama"].toString().length > 18 ? '...' : '').toString().capitalize!}',
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ],
+                                ),
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text('Store'),
+                                    const SizedBox(width: 53),
+                                    SizedBox(
+                                      width: Get.mediaQuery.size.width * 0.35,
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [Text(': ${data['store']}')],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Row(
+                                  children: [
+                                    Text(isIn ? 'Check In' : 'Check Out'),
+                                    SizedBox(width: isIn ? 33 : 21),
+                                    Text(
+                                      ': ${isIn ? data['jam_in'] : data['jam_out']}',
+                                    ),
+                                  ],
+                                ),
+
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text('Device Info'),
+                                    const SizedBox(width: 17),
+                                    Container(
+                                      constraints: BoxConstraints(
+                                        maxWidth:
+                                            MediaQuery.of(context).size.width *
+                                            0.3,
+                                      ),
+                                      child: Text(
+                                        ": ${isIn ? data['device_info'] : data['device_info2']}",
+                                      ),
                                     ),
                                   ],
                                 ),
                               ],
                             ),
                           ],
-                        )),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: SizedBox(
-                        height: 200,
-                        child: FlutterMap(
-                          options: MapOptions(
-                            initialCenter: LatLng(
-                                double.parse(Get.arguments["lat_in"]),
-                                double.parse(Get.arguments["long_in"])),
-                            initialZoom: 15,
-                          ),
-                          nonRotatedChildren: [
-                            RichAttributionWidget(
-                              attributions: [
-                                TextSourceAttribution(
-                                  'OpenStreetMap contributors',
-                                  onTap: () {},
-                                )
-                              ],
-                            ),
-                          ],
-                          children: [
-                            TileLayer(
-                              urlTemplate:
-                                  'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                              userAgentPackageName:
-                                  'dev.fleaflet.flutter_map.example',
-                            ),
-                            MarkerLayer(markers: markersMasuk),
-                          ],
                         ),
                       ),
                     ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 20),
-              Visibility(
-                  visible: Get.arguments['jam_out'] == "" ? true : false,
-                  child: const Center(
-                      child: Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: Text('Tidak ada data keluar ',
-                        style: TextStyle(fontSize: 18)),
-                  ))),
-              Visibility(
-                visible: Get.arguments['jam_out'] != "" ? true : false,
-                child: Card(
-                  elevation: 10,
-                  shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(15),
-                          topRight: Radius.circular(15),
-                          bottomLeft: Radius.circular(10),
-                          bottomRight: Radius.circular(10))),
-                  child: Column(
-                    children: [
-                      Container(
-                        height: 40,
-                        decoration: BoxDecoration(
-                          borderRadius: const BorderRadius.only(
-                              topLeft: Radius.circular(15),
-                              topRight: Radius.circular(15)),
-                          color: mainColor,
-                        ),
-                        child: Center(
-                          child: Text(
-                            Get.arguments['tgl_visit'] != ""
-                                ? DateFormat("EEEE, d MMMM yyyy", "id_ID").format(
-                                    DateTime.parse(Get.arguments['tgl_visit']))
-                                : "",
-                            style:
-                                const TextStyle(fontSize: 18, color: Colors.white),
-                          ),
-                        ),
-                      ),
-                      Container(
-                          padding: const EdgeInsets.all(15),
-                          decoration: const BoxDecoration(
-                              borderRadius: BorderRadius.only(
-                                  bottomLeft: Radius.circular(10),
-                                  bottomRight: Radius.circular(10)),
-                              color: Colors.white),
-                          child: Column(
-                            children: [
-                              Row(
-                                children: [
-                                  RoundedImage(
-                                      height: 75,
-                                      width: 75,
-                                      foto: Get.arguments['foto_profil'],
-                                      name: Get.arguments['foto_profil'],
-                                      headerProfile: true),
-                                  const SizedBox(width: 10),
-                                  Row(
-                                    children: [
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Row(
-                                            children: [
-                                              const Text('Nama'),
-                                              const SizedBox(
-                                                width: 5,
-                                              ),
-                                              const SizedBox(width: 44),
-                                              Text(
-                                                ': ${Get.arguments["nama"].toString().capitalize}',
-                                              ),
-                                            ],
-                                          ),
-                                          Row(
-                                            children: [
-                                              const Text('Keluar'),
-                                              const SizedBox(width: 42),
-                                              Text(
-                                                ' : ${Get.arguments['jam_out'] != "" ? Get.arguments['jam_out'] : "-"}',
-                                              ),
-                                            ],
-                                          ),
-                                          Row(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              const Text('Store'),
-                                              const SizedBox(width: 45),
-                                              SizedBox(
-                                                // padding: const EdgeInsets.all(10.0),
-                                                width: Get.mediaQuery.size.width *
-                                                    0.42,
-                                                child: Text(
-                                                  '  : ${Get.arguments['store']}',
-                                                  textAlign: TextAlign.left,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                          Visibility(
-                                            visible: Get.arguments['jam_out'] != ""
-                                                ? true
-                                                : false,
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.end,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                const Text('Device Info'),
-                                                const SizedBox(
-                                                  width: 16,
-                                                ),
-                                                Container(
-                                                  constraints: BoxConstraints(
-                                                    maxWidth: MediaQuery.of(context)
-                                                            .size
-                                                            .width *
-                                                        0.3,
-                                                  ),
-                                                  child: Text(
-                                                    ": ${Get.arguments['device_info2']}",
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          )
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(
-                                    width: 50,
-                                  ),
-                                ],
-                              ),
-                            ],
-                          )),
-                      Visibility(
-                        visible: Get.arguments['jam_out'] != "" ? true : false,
-                        child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: SizedBox(
-                                height: 200,
-                                child: FlutterMap(
-                                  options: MapOptions(
-                                    initialCenter: LatLng(
-                                        double.parse(Get.arguments["lat_in"]),
-                                        double.parse(Get.arguments["long_in"])),
-                                    initialZoom: 15,
-                                  ),
-                                  nonRotatedChildren: [
-                                    RichAttributionWidget(
-                                      attributions: [
-                                        TextSourceAttribution(
-                                          'OpenStreetMap contributors',
-                                          onTap: () {},
-                                        )
-                                      ],
-                                    ),
-                                  ],
-                                  children: [
-                                    TileLayer(
-                                      urlTemplate:
-                                          'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                                      userAgentPackageName:
-                                          'dev.fleaflet.flutter_map.example',
-                                    ),
-                                    MarkerLayer(markers: markersPulang),
-                                  ],
-                                ))),
-                      )
-                    ],
                   ),
-                ),
-              )
-            ],
+                  // Row(
+                  //   children: [
+                  //     RoundedImage(
+                  //       height: 75,
+                  //       width: 75,
+                  //       foto: data['foto_profil'],
+                  //       name: data['foto_profil'],
+                  //       headerProfile: true,
+                  //     ),
+                  //     const SizedBox(width: 10),
+                  //     Row(
+                  //       children: [
+                  //         Column(
+                  //           crossAxisAlignment: CrossAxisAlignment.start,
+                  //           children: [
+                  //             Row(
+                  //               children: [
+                  //                 const Text('Nama'),
+                  //                 const SizedBox(width: 5),
+                  //                 const SizedBox(width: 44),
+                  //                 Text(
+                  //                   ': ${data["nama"].toString().capitalize}',
+                  //                 ),
+                  //               ],
+                  //             ),
+                  //             Row(
+                  //               children: [
+                  //                 const Text('Masuk'),
+                  //                 const SizedBox(width: 45),
+                  //                 Text(': ${data['jam_in']}'),
+                  //               ],
+                  //             ),
+                  //             Row(
+                  //               crossAxisAlignment: CrossAxisAlignment.start,
+                  //               children: [
+                  //                 const Text('Store'),
+                  //                 const SizedBox(width: 45),
+                  //                 SizedBox(
+                  //                   // padding: const EdgeInsets.all(10.0),
+                  //                   width: Get.mediaQuery.size.width * 0.42,
+                  //                   child: Column(
+                  //                     crossAxisAlignment:
+                  //                         CrossAxisAlignment.start,
+                  //                     children: [
+                  //                       Text(
+                  //                         '  : ${data['store']}',
+                  //                         textAlign: TextAlign.left,
+                  //                       ),
+                  //                     ],
+                  //                   ),
+                  //                 ),
+                  //               ],
+                  //             ),
+                  //             Row(
+                  //               mainAxisAlignment: MainAxisAlignment.end,
+                  //               crossAxisAlignment: CrossAxisAlignment.start,
+                  //               children: [
+                  //                 const Text('Device Info'),
+                  //                 const SizedBox(width: 16),
+                  //                 Container(
+                  //                   constraints: BoxConstraints(
+                  //                     maxWidth:
+                  //                         MediaQuery.of(context).size.width *
+                  //                         0.3,
+                  //                   ),
+                  //                   child: Text(": ${data['device_info']}"),
+                  //                 ),
+                  //               ],
+                  //             ),
+                  //           ],
+                  //         ),
+                  //       ],
+                  //     ),
+                  //   ],
+                  // ),
+                ],
+              ),
+            ),
           ),
+          // Padding(
+          //   padding: const EdgeInsets.all(8.0),
+          //   child: SizedBox(
+          //     height: 200,
+          //     child: ,
+          //   ),
+          // ),
         ],
       ),
     );

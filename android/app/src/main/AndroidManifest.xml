@@ -1,5 +1,5 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.absensi.urbanco">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- package="com.absensi.urbanco"> -->
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
@@ -78,6 +78,12 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+        <meta-data
+        android:name="com.google.android.gms.ads.APPLICATION_ID"
+        android:value="ca-app-pub-9798493008106015~5659520125"/>
 
+        <meta-data
+        android:name="com.startapp.sdk.APPLICATION_ID"
+        android:value="207916836" />
     </application>
 </manifest>

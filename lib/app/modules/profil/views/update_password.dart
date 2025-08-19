@@ -1,5 +1,4 @@
 import 'package:absensi/app/data/helper/app_colors.dart';
-import 'package:absensi/app/modules/shared/background_image_header.dart';
 import 'package:absensi/app/services/service_api.dart';
 import 'package:absensi/app/modules/add_pegawai/controllers/add_pegawai_controller.dart';
 import 'package:flutter/material.dart';
@@ -18,25 +17,26 @@ class UpdatePassword extends GetView {
       appBar: AppBar(
         title: Text('UPDATE PASSWORD',
             style: titleTextStyle.copyWith(
-              fontSize: 20,
+              fontSize: 18,
             )),
         backgroundColor: Colors.transparent.withOpacity(0.4),
-        elevation: 0.0,
+        // elevation: 0.0,
         // iconTheme: const IconThemeData(color: Colors.black,),
-        centerTitle: true,
+        // centerTitle: true,
       ),
       resizeToAvoidBottomInset: false,
       body: Stack(
         children: [
-          const CsBgImg(),
+          // const CsBgImg(),
+          Container(height: 250, decoration: const BoxDecoration(color: AppColors.itemsBackground)),
           Padding(
             padding: const EdgeInsets.all(20.0),
             child: ListView(
               children: [
                 const SizedBox(height: 20),
                 Text(
-                  'Ditemukan user yang cocok dengan No Telp ${Get.arguments["no_telp"]}',
-                  style: const TextStyle(fontSize: 18),
+                  'Found a user that matches the phone number ${Get.arguments["no_telp"]}',
+                  style: const TextStyle(fontSize: 18, color: AppColors.contentColorWhite),
                 ),
                 const SizedBox(height: 20),
                 Row(
@@ -67,7 +67,7 @@ class UpdatePassword extends GetView {
                   obscureText: true,
                   controller: pegawaiC.pass,
                   decoration: InputDecoration(
-                      labelText: 'Ketik password baru',
+                      labelText: 'Type new password',
                       filled: true,
                       fillColor: Colors.white,
                       prefixIcon: const Icon(Icons.lock_outline),
@@ -84,12 +84,12 @@ class UpdatePassword extends GetView {
                       //  Restart.restartApp();
                     },
                     style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.contentDefBtn,
+                        backgroundColor: AppColors.itemsBackground,
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(50)),
                         minimumSize: Size(Get.size.width / 2, 50)),
                     child: const Text(
-                      'SIMPAN',
+                      'UPDATE',
                       style:
                           TextStyle(fontSize: 18, color: AppColors.mainTextColor1),
                     ),

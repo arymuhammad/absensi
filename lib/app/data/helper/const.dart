@@ -8,9 +8,10 @@ var timeColor = Colors.blueAccent[700];
 var defaultColor = Colors.black;
 var bgContainer = Colors.blue[50];
 var red = Colors.redAccent[700];
-var green = Colors.greenAccent[700]!;
+var green = Colors.greenAccent[700];
+var yellow = Colors.yellowAccent[700];
 
-var titleTextStyle = const TextStyle(fontSize: 16, fontWeight: FontWeight.bold);
+var titleTextStyle = const TextStyle(fontSize: 15, fontWeight: FontWeight.bold);
 var subtitleTextStyle = TextStyle(
   fontSize: 14,
   fontWeight: FontWeight.bold,

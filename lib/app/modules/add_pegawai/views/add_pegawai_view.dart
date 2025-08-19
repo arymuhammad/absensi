@@ -95,7 +95,7 @@ class AddPegawaiView extends GetView<AddPegawaiController> {
                                   dataCabang!.map((data) {
                                     allStore.add(data.namaCabang!);
                                   }).toList();
-                                  return TypeAheadFormField<String>(
+                                  return TypeAheadFormField<String>(autoFlipDirection: true,
                                     textFieldConfiguration:
                                         TextFieldConfiguration(
                                       controller: controller.store,
