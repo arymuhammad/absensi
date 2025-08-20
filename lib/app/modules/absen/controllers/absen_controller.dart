@@ -255,17 +255,17 @@ class AbsenController extends GetxController {
       dataUserLogin,
     );
     // after 2 sec
-    if (!Get.isRegistered<AdController>()) {
-      Get.put(AdController());
-    }
-    final adC = Get.find<AdController>();
+    // if (!Get.isRegistered<AdController>()) {
+    //   Get.put(AdController());
+    // }
+    // final adC = Get.find<AdController>();
 
-    await adC.loadInterstitialAd();
-    Future.delayed(const Duration(seconds: 2), () {
-      adC.showInterstitialAd(() {
-        // print('Iklan interstitial ditutup');
-      });
-    });
+    // await adC.loadInterstitialAd();
+    // Future.delayed(const Duration(seconds: 2), () {
+    //   adC.showInterstitialAd(() {
+    //     // print('Iklan interstitial ditutup');
+    //   });
+    // });
   }
 
   @override

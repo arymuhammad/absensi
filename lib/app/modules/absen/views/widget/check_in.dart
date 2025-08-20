@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:absensi/app/data/add_controller.dart';
 import 'package:absensi/app/modules/absen/controllers/absen_controller.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter_native_timezone_updated_gradle/flutter_native_timezone.dart';
@@ -13,6 +14,7 @@ import '../../../../data/model/login_model.dart';
 import '../../../../services/service_api.dart';
 
 final absC = Get.find<AbsenController>();
+final adC = Get.put(AdController());
 checkIn(Data dataUser, double latitude, double longitude) async {
   await absC.cekDataAbsen(
     "masuk",
@@ -105,6 +107,9 @@ checkIn(Data dataUser, double latitude, double longitude) async {
         // offline first
         // submit data absensi ke server
         await ServiceApi().submitAbsen(data, false);
+
+        adC.loadInterstitialAd();
+        adC.showInterstitialAd(() {});
 
         absC.sendDataToXmor(
           dataUser.id!,

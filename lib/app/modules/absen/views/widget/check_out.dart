@@ -5,11 +5,13 @@ import 'package:absensi/app/modules/absen/controllers/absen_controller.dart';
 import 'package:flutter_native_timezone_updated_gradle/flutter_native_timezone.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import '../../../../data/add_controller.dart';
 import '../../../../data/helper/custom_dialog.dart';
 import '../../../../data/helper/db_helper.dart';
 import '../../../../services/service_api.dart';
 
 final absC = Get.find<AbsenController>();
+final adC = Get.put(AdController());
 checkOut(Data dataUser, double latitude, double longitude) async {
   //absen pulang
 
@@ -113,6 +115,8 @@ checkOut(Data dataUser, double latitude, double longitude) async {
         };
 
         await ServiceApi().submitAbsen(data, false);
+        adC.loadInterstitialAd();
+        adC.showInterstitialAd(() {});
         // send data to xmor
         absC.sendDataToXmor(
           dataUser.id!,

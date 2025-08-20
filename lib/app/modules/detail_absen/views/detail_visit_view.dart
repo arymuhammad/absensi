@@ -14,7 +14,7 @@ import '../../../data/helper/app_colors.dart';
 import '../../../data/helper/format_waktu.dart';
 
 class DetailVisitView extends GetView {
-  DetailVisitView(this.detailData, {super.key});
+  const DetailVisitView(this.detailData, {super.key});
   final Map<String, dynamic> detailData;
 
   @override
