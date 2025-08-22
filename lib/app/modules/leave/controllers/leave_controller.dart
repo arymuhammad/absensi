@@ -80,12 +80,14 @@ class LeaveController extends GetxController {
         StartAppBannerType.BANNER,
       );
       // simpan bannerAd ke state/store supaya bisa dipakai di widget
-    } on PlatformException catch (e) {
-      print('Failed to load banner ad: ${e.message}');
+    } on PlatformException catch (_) {
+      // print('Failed to load banner ad: ${e.message}');
       showToast('Gagal memuat iklan banner');
+      loadBannerAd();
     } catch (e) {
       // print('Unexpected error: $e');
       showToast('Gagal memuat iklan banner');
+      loadBannerAd();
     }
     // var ads = await startAppSdk
     //     .loadBannerAd(
@@ -104,11 +106,6 @@ class LeaveController extends GetxController {
     //     });
     // bannerAdStartApp.value = ads;
   }
-
-  // @override
-  // void onReady() {
-  //   super.onReady();
-  // }
 
   @override
   void onClose() {

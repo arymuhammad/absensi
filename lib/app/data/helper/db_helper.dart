@@ -37,6 +37,7 @@ class SQLHelper {
         password TEXT,
         kode_cabang TEXT,
         nama_cabang TEXT,
+        nik TEXT,
         lat TEXT,
         long TEXT,
         foto TEXT,
@@ -131,10 +132,13 @@ class SQLHelper {
   }
 
   Future<List<LoginOffline>> loginUserOffline(
-      String username, String password) async {
+    String username,
+    String password,
+  ) async {
     Database db = await instance.database;
     var res = await db.rawQuery(
-        "select * from tbl_user where username='$username' and password='$password'");
+      "select * from tbl_user where username='$username' and password='$password'",
+    );
     return res.map((e) => LoginOffline.fromJson(e)).toList();
   }
 
@@ -147,11 +151,11 @@ class SQLHelper {
           .insert('absen', todo.toJson())
           .timeout(const Duration(minutes: 3))
           .then((value) {
-        // Get.back();
-        return showToast('Data saved on local storage');
-        // return succesDialog(Get.context, "Y",
-        //     "Harap tidak menutup aplikasi selama proses syncron data absensi");
-      });
+            // Get.back();
+            return showToast('Data saved on local storage');
+            // return succesDialog(Get.context, "Y",
+            //     "Harap tidak menutup aplikasi selama proses syncron data absensi");
+          });
     } on TimeoutException catch (e) {
       return showToast(e.toString());
     } catch (e) {
@@ -161,14 +165,20 @@ class SQLHelper {
   }
 
   Future<void> updateDataAbsen(
-      Map<String, dynamic> todo, String idUser, String tglMasuk) async {
+    Map<String, dynamic> todo,
+    String idUser,
+    String tglMasuk,
+  ) async {
     try {
       Database db = await instance.database;
       // loadingDialog("Sedang mengirim data...", "");
       await db
-          .update('absen', todo,
-              where: 'id_user = ? and tanggal_masuk = ?',
-              whereArgs: [idUser, tglMasuk])
+          .update(
+            'absen',
+            todo,
+            where: 'id_user = ? and tanggal_masuk = ?',
+            whereArgs: [idUser, tglMasuk],
+          )
           .timeout(const Duration(minutes: 3))
           .then((value) {
             return showToast('Data is successfully updated on local storage');
@@ -187,35 +197,55 @@ class SQLHelper {
 
   Future<void> deleteDataAbsenMasuk(String idUser, String tglMasuk) async {
     Database db = await instance.database;
-    await db.delete('absen',
-        where: 'id_user = ? and tanggal_masuk = ?',
-        whereArgs: [idUser, tglMasuk]);
+    await db.delete(
+      'absen',
+      where: 'id_user = ? and tanggal_masuk = ?',
+      whereArgs: [idUser, tglMasuk],
+    );
     // return res;
   }
 
   Future<void> deleteDataAbsenPulang(
-      Map<String, dynamic> todo, String idUser, String tglMasuk) async {
+    Map<String, dynamic> todo,
+    String idUser,
+    String tglMasuk,
+  ) async {
     Database db = await instance.database;
-    await db.update('absen', todo,
-        where: 'id_user = ? and tanggal_masuk = ?',
-        whereArgs: [idUser, tglMasuk]);
+    await db.update(
+      'absen',
+      todo,
+      where: 'id_user = ? and tanggal_masuk = ?',
+      whereArgs: [idUser, tglMasuk],
+    );
     // return res;
   }
 
   Future<void> deleteDataVisitMasuk(
-      String idUser, String tglMasuk, String visitIn) async {
+    String idUser,
+    String tglMasuk,
+    String visitIn,
+  ) async {
     Database db = await instance.database;
-    await db.delete('tbl_visit_area',
-        where: 'id_user = ? and tgl_visit = ? and visit_in = ?',
-        whereArgs: [idUser, tglMasuk, visitIn]);
+    await db.delete(
+      'tbl_visit_area',
+      where: 'id_user = ? and tgl_visit = ? and visit_in = ?',
+      whereArgs: [idUser, tglMasuk, visitIn],
+    );
     // return res;
   }
 
   Future<void> deleteDataVisitPulang(
-      Map<String, dynamic> todo, String idUser, String tglMasuk) async {
+    Map<String, dynamic> todo,
+    String idUser,
+    String tglMasuk,
+  ) async {
     Database db = await instance.database;
-    await db.update('tbl_visit_area', todo,
-        where: 'id_user = ? and tgl_visit = ?', whereArgs: [idUser, tglMasuk]);
+    await db.update(
+      'tbl_visit_area',
+      todo,
+      where: 'id_user = ? and tgl_visit = ?',
+      whereArgs: [idUser, tglMasuk],
+    );
     // return res;
   }
 
@@ -227,9 +257,7 @@ class SQLHelper {
 
   Future<List<ShiftKerja>> getShift() async {
     Database db = await instance.database;
-    var res = await db.query(
-      'shift_kerja',
-    );
+    var res = await db.query('shift_kerja');
     return res.map((e) => ShiftKerja.fromJson(e)).toList();
   }
 
@@ -287,33 +315,40 @@ class SQLHelper {
 
   Future<List<Cabang>> getCabang() async {
     Database db = await instance.database;
-    var res = await db.query(
-      'tbl_cabang',
-    );
+    var res = await db.query('tbl_cabang');
     return res.map((e) => Cabang.fromJson(e)).toList();
   }
 
   Future<List<Absen>> getAbsenToday(String idUser, String today) async {
     Database db = await instance.database;
-    var res = await db.query('absen',
-        where: 'id_user=? and tanggal_masuk = ?', whereArgs: [idUser, today]);
+    var res = await db.query(
+      'absen',
+      where: 'id_user=? and tanggal_masuk = ?',
+      whereArgs: [idUser, today],
+    );
     return res.map((e) => Absen.fromJson(e)).toList();
   }
 
   Future<List<Absen>> getAllAbsenToday(String today) async {
     Database db = await instance.database;
-    var res = await db.query('absen',
-        where: 'tanggal_masuk = ?',
-        whereArgs: [today],
-        orderBy: 'tanggal_masuk DESC');
+    var res = await db.query(
+      'absen',
+      where: 'tanggal_masuk = ?',
+      whereArgs: [today],
+      orderBy: 'tanggal_masuk DESC',
+    );
     return res.map((e) => Absen.fromJson(e)).toList();
   }
 
   Future<List<Absen>> getLimitDataAbsen(
-      String idUser, String date1, String date2) async {
+    String idUser,
+    String date1,
+    String date2,
+  ) async {
     Database db = await instance.database;
     var res = await db.rawQuery(
-        " SELECT A.*, B.nama_shift FROM absen A INNER JOIN shift_kerja B ON B.id = A.id_shift WHERE id_user =  '$idUser'  AND tanggal_masuk BETWEEN '$date1' AND '$date2' ORDER BY tanggal_masuk DESC LIMIT 7 ");
+      " SELECT A.*, B.nama_shift FROM absen A INNER JOIN shift_kerja B ON B.id = A.id_shift WHERE id_user =  '$idUser'  AND tanggal_masuk BETWEEN '$date1' AND '$date2' ORDER BY tanggal_masuk DESC LIMIT 7 ",
+    );
     return res.map((json) => Absen.fromJson(json)).toList();
   }
 
@@ -324,11 +359,11 @@ class SQLHelper {
           .insert('tbl_visit_area', todo.toJson())
           .timeout(const Duration(minutes: 3))
           .then((value) {
-        // Get.back();
-        return showToast('Data saved on local storage');
-        // return succesDialog(Get.context, "Y",
-        //     "Harap tidak menutup aplikasi selama proses syncron data absensi");
-      });
+            // Get.back();
+            return showToast('Data saved on local storage');
+            // return succesDialog(Get.context, "Y",
+            //     "Harap tidak menutup aplikasi selama proses syncron data absensi");
+          });
     } on TimeoutException catch (e) {
       return showToast(e.toString());
     } catch (e) {
@@ -338,14 +373,21 @@ class SQLHelper {
     // return res;
   }
 
-  Future<void> updateDataVisit(Map<String, dynamic> todo, String idUser,
-      String tglVisit, String visitIn) async {
+  Future<void> updateDataVisit(
+    Map<String, dynamic> todo,
+    String idUser,
+    String tglVisit,
+    String visitIn,
+  ) async {
     try {
       Database db = await instance.database;
       await db
-          .update('tbl_visit_area', todo,
-              where: 'id_user=? and tgl_visit=? and visit_in=?',
-              whereArgs: [idUser, tglVisit, visitIn])
+          .update(
+            'tbl_visit_area',
+            todo,
+            where: 'id_user=? and tgl_visit=? and visit_in=?',
+            whereArgs: [idUser, tglVisit, visitIn],
+          )
           .timeout(const Duration(minutes: 3))
           .then((value) {
             // Get.back();
@@ -363,7 +405,11 @@ class SQLHelper {
   }
 
   Future<List<Visit>> getVisitToday(
-      String idUser, String date, String cabang, int limit) async {
+    String idUser,
+    String date,
+    String cabang,
+    int limit,
+  ) async {
     var lmt = "";
     var cbg = "";
     if (limit > 0) {
@@ -378,15 +424,20 @@ class SQLHelper {
     }
     Database db = await instance.database;
     var res = await db.rawQuery(
-        " SELECT A.*, B.nama_cabang FROM tbl_visit_area A LEFT JOIN tbl_cabang B ON B.kode_cabang = A.visit_in WHERE id_user =  '$idUser'  AND tgl_visit ='$date' $cbg ORDER BY tgl_visit DESC, jam_in DESC $lmt");
+      " SELECT A.*, B.nama_cabang FROM tbl_visit_area A LEFT JOIN tbl_cabang B ON B.kode_cabang = A.visit_in WHERE id_user =  '$idUser'  AND tgl_visit ='$date' $cbg ORDER BY tgl_visit DESC, jam_in DESC $lmt",
+    );
     return res.map((e) => Visit.fromJson(e)).toList();
   }
 
   Future<List<Visit>> getLimitDataVisit(
-      String idUser, String date1, String date2) async {
+    String idUser,
+    String date1,
+    String date2,
+  ) async {
     Database db = await instance.database;
     var res = await db.rawQuery(
-        " SELECT A.*, B.nama_cabang FROM tbl_visit_area A LEFT JOIN tbl_cabang B ON B.kode_cabang = A.visit_in WHERE id_user =  '$idUser'  AND tgl_visit BETWEEN '$date1' AND '$date2' ORDER BY tgl_visit DESC, jam_in DESC LIMIT 7 ");
+      " SELECT A.*, B.nama_cabang FROM tbl_visit_area A LEFT JOIN tbl_cabang B ON B.kode_cabang = A.visit_in WHERE id_user =  '$idUser'  AND tgl_visit BETWEEN '$date1' AND '$date2' ORDER BY tgl_visit DESC, jam_in DESC LIMIT 7 ",
+    );
     return res.map((json) => Visit.fromJson(json)).toList();
   }
 
@@ -397,10 +448,17 @@ class SQLHelper {
   }
 
   Future<void> updateDataUser(
-      Map<String, dynamic> todo, String idUser, String username) async {
+    Map<String, dynamic> todo,
+    String idUser,
+    String username,
+  ) async {
     Database db = await instance.database;
-    await db.update('tbl_user', todo,
-        where: 'id=? and username=?', whereArgs: [idUser, username]);
+    await db.update(
+      'tbl_user',
+      todo,
+      where: 'id=? and username=?',
+      whereArgs: [idUser, username],
+    );
     // return res;
   }
 
@@ -418,8 +476,10 @@ class SQLHelper {
 
   Future<List<Visit>> getAllDataVisit() async {
     Database db = await instance.database;
-    var res = await db.query('tbl_visit_area',
-        orderBy: "tgl_visit DESC, jam_in DESC");
+    var res = await db.query(
+      'tbl_visit_area',
+      orderBy: "tgl_visit DESC, jam_in DESC",
+    );
     return res.map((json) => Visit.fromJson(json)).toList();
   }
 

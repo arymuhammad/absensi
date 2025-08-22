@@ -26,10 +26,10 @@ class SummaryToday extends StatelessWidget {
     return Stack(
       children: [
         Container(
-          padding: const EdgeInsets.only(left: 8, top: 4, right: 8),
+          padding: const EdgeInsets.only(left:10, top: 5, right: 10),
           height: 180,
           decoration: BoxDecoration(
-            color: Colors.grey,
+            color: AppColors.itemsBackground,
             borderRadius: BorderRadius.circular(10),
           ),
           child: Row(
@@ -224,15 +224,13 @@ class SummaryToday extends StatelessWidget {
                           ),
                           child: Row(
                             children: [
-                              Transform.rotate(
-                                angle: -120,
-                                child: const Icon(
-                                  Icons.campaign_rounded,
-                                  size: 18.0,
-                                  color: AppColors.contentColorWhite,
-                                ),
+                              const SizedBox(width: 5,),
+                              const Icon(
+                                Icons.campaign_rounded,
+                                size: 18.0,
+                                color: AppColors.contentColorWhite,
                               ),
-                              const SizedBox(width: 8),
+                              const SizedBox(width: 5),
                               SizedBox(
                                 height: 50,
                                 width: Get.mediaQuery.size.width / 1.5,
@@ -240,7 +238,7 @@ class SummaryToday extends StatelessWidget {
                                   text:
                                       'Periksa selalu notifikasi untuk informasi pengajuan perubahan data absensi ',
                                   style: const TextStyle(
-                                    fontSize: 15,
+                                    fontSize: 14,
                                     color: AppColors.contentColorWhite,
                                   ),
                                   scrollAxis: Axis.horizontal,

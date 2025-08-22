@@ -15,7 +15,7 @@ class UpdatePassword extends GetView {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: Text('UPDATE PASSWORD',
+        title: Text('Update Password',
             style: titleTextStyle.copyWith(
               fontSize: 18,
             )),

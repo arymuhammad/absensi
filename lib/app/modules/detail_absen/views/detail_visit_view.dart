@@ -110,6 +110,12 @@ class DetailVisitView extends GetView {
     List<Marker>? markerOut,
     required bool isIn,
   }) {
+    String getGoogleMapsUrl(double lat, double lng) {
+      // Format koordinat ke format decimal raw untuk URL query
+      return 'https://www.google.com/maps/search/?api=1&query=$lat,$lng';
+    }
+
+    // format lt lng
     return Card(
       elevation: 10,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -148,11 +154,12 @@ class DetailVisitView extends GetView {
                       onTap: (tapPosition, point) {
                         // print(point.latitude);
                         // print(point.longitude);
-                        launchUrl(
-                          Uri.parse(
-                            "https://www.google.com/maps/place/6%C2%B033'35.6%22S+106%C2%B051'16.7%22E/@${point.latitude},${point.longitude},191m/data=!3m2!1e3!4b1!4m4!3m3!8m2!3d-6.5598889!4d106.8546389!5m1!1e2?entry=ttu&g_ep=EgoyMDI1MDcyOS4wIKXMDSoASAFQAw%3D%3D",
-                          ),
+                         var gmaps = getGoogleMapsUrl(
+                          point.latitude,
+                          point.longitude,
                         );
+                        // print(gmaps);
+                        launchUrl(Uri.parse(gmaps));
                       },
                       initialCenter:
                           isIn

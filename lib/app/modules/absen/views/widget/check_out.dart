@@ -1,11 +1,11 @@
 import 'dart:io';
 
+import 'package:absensi/app/data/add_controller.dart';
 import 'package:absensi/app/data/model/login_model.dart';
 import 'package:absensi/app/modules/absen/controllers/absen_controller.dart';
 import 'package:flutter_native_timezone_updated_gradle/flutter_native_timezone.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import '../../../../data/add_controller.dart';
 import '../../../../data/helper/custom_dialog.dart';
 import '../../../../data/helper/db_helper.dart';
 import '../../../../services/service_api.dart';
@@ -73,7 +73,7 @@ checkOut(Data dataUser, double latitude, double longitude) async {
     // if (absC.cekAbsen.value.total == "1") {
     // face detectionhr
     //  await Get.to(() => const FaceDetection());
-    absC.timeNetwork(await FlutterNativeTimezone.getLocalTimezone());
+    
     await absC.uploadFotoAbsen();
     Get.back();
 
@@ -92,6 +92,7 @@ checkOut(Data dataUser, double latitude, double longitude) async {
 
       if (localDataAbs.isEmpty) {
         loadingDialog("Mengirim data...", "");
+        absC.timeNetwork(await FlutterNativeTimezone.getLocalTimezone());
         var data = {
           "status": "update",
           "id": dataUser.id,
@@ -163,6 +164,7 @@ checkOut(Data dataUser, double latitude, double longitude) async {
         // && localDataAbs[0].tanggalPulang == null
 
         loadingDialog("Mengirim data...", "");
+        absC.timeNetwork(await FlutterNativeTimezone.getLocalTimezone());
         var data = {
           "status": "update",
           "id": dataUser.id,
@@ -213,7 +215,8 @@ checkOut(Data dataUser, double latitude, double longitude) async {
 
         // update data absensi ke server
         await ServiceApi().submitAbsen(data, false);
-
+        adC.loadInterstitialAd();
+        adC.showInterstitialAd(() {});
         absC.sendDataToXmor(
           dataUser.id!,
           "clock_out",

@@ -235,36 +235,36 @@ class SummaryAbsenArea extends GetView {
                                         userData!.foto != ""
                                             ? userData!.foto
                                             : userData!.nama,
-                                    "nama": absenC.searchVisit[i].nama!,
-                                    "id_user": absenC.searchVisit[i].id!,
-                                    "store": absenC.searchVisit[i].namaCabang!,
+                                    "nama": absenC.dataLimitVisit[i].nama!,
+                                    "id_user": absenC.dataLimitVisit[i].id!,
+                                    "store": absenC.dataLimitVisit[i].namaCabang!,
                                     "tgl_visit":
-                                        absenC.searchVisit[i].tglVisit!,
-                                    "jam_in": absenC.searchVisit[i].jamIn!,
-                                    "foto_in": absenC.searchVisit[i].fotoIn!,
+                                        absenC.dataLimitVisit[i].tglVisit!,
+                                    "jam_in": absenC.dataLimitVisit[i].jamIn!,
+                                    "foto_in": absenC.dataLimitVisit[i].fotoIn!,
                                     "jam_out":
-                                        absenC.searchVisit[i].jamOut != ""
-                                            ? absenC.searchVisit[i].jamOut!
+                                        absenC.dataLimitVisit[i].jamOut != ""
+                                            ? absenC.dataLimitVisit[i].jamOut!
                                             : "",
                                     "foto_out":
-                                        absenC.searchVisit[i].fotoOut != ""
-                                            ? absenC.searchVisit[i].fotoOut!
+                                        absenC.dataLimitVisit[i].fotoOut != ""
+                                            ? absenC.dataLimitVisit[i].fotoOut!
                                             : "",
-                                    "lat_in": absenC.searchVisit[i].latIn!,
-                                    "long_in": absenC.searchVisit[i].longIn!,
+                                    "lat_in": absenC.dataLimitVisit[i].latIn!,
+                                    "long_in": absenC.dataLimitVisit[i].longIn!,
                                     "lat_out":
-                                        absenC.searchVisit[i].latOut != ""
-                                            ? absenC.searchVisit[i].latOut!
+                                        absenC.dataLimitVisit[i].latOut != ""
+                                            ? absenC.dataLimitVisit[i].latOut!
                                             : "",
                                     "long_out":
-                                        absenC.searchVisit[i].longOut != ""
-                                            ? absenC.searchVisit[i].longOut!
+                                        absenC.dataLimitVisit[i].longOut != ""
+                                            ? absenC.dataLimitVisit[i].longOut!
                                             : "",
                                     "device_info":
-                                        absenC.searchVisit[i].deviceInfo!,
+                                        absenC.dataLimitVisit[i].deviceInfo!,
                                     "device_info2":
-                                        absenC.searchVisit[i].deviceInfo2 != ""
-                                            ? absenC.searchVisit[i].deviceInfo2
+                                        absenC.dataLimitVisit[i].deviceInfo2 != ""
+                                            ? absenC.dataLimitVisit[i].deviceInfo2
                                             : "",
                                   };
 

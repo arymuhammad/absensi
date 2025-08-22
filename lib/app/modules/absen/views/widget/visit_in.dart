@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:absensi/app/data/add_controller.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter_native_timezone_updated_gradle/flutter_native_timezone.dart';
 import 'package:get/get.dart';
@@ -11,6 +12,7 @@ import '../../../../services/service_api.dart';
 import '../../controllers/absen_controller.dart';
 
 final absC = Get.find<AbsenController>();
+final adC = Get.put(AdController());
 visitIn({
   required Data dataUser,
   required double latitude,
@@ -41,11 +43,11 @@ visitIn({
 
     if (tempDataVisit.isEmpty) {
       // simpan dulu ke sqlite
-      absC.timeNetwork(await FlutterNativeTimezone.getLocalTimezone());
       await absC.uploadFotoAbsen();
       Get.back();
       if (absC.image != null) {
         loadingDialog("Sedang mengirim data...", "");
+        absC.timeNetwork(await FlutterNativeTimezone.getLocalTimezone());
         var data = {
           "status": "add",
           "id": dataUser.id,
@@ -111,6 +113,8 @@ visitIn({
         // submit data visit ke server
 
         await ServiceApi().submitVisit(data, false);
+        adC.loadInterstitialAd();
+        adC.showInterstitialAd(() {});
         var paramVisitToday = {
           "mode": "single",
           "id_user": dataUser.id,
@@ -143,11 +147,11 @@ visitIn({
       }
     } else {
       // langsung kirim ke server
-      absC.timeNetwork(await FlutterNativeTimezone.getLocalTimezone());
       await absC.uploadFotoAbsen();
       Get.back();
       if (absC.image != null) {
         loadingDialog("Sedang mengirim data...", "");
+        absC.timeNetwork(await FlutterNativeTimezone.getLocalTimezone());
         var data = {
           "status": "add",
           "id": dataUser.id,
@@ -176,6 +180,8 @@ visitIn({
         };
         // submit data visit ke server
         await ServiceApi().submitVisit(data, false);
+        adC.loadInterstitialAd();
+        adC.showInterstitialAd(() {});
         var paramVisitToday = {
           "mode": "single",
           "id_user": dataUser.id,

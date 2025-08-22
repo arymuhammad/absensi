@@ -28,9 +28,8 @@ checkIn(Data dataUser, double latitude, double longitude) async {
 
   if (absC.cekAbsen.value.total == "0") {
     // await Get.to(() => const FaceDetection());
-    absC.timeNetwork(await FlutterNativeTimezone.getLocalTimezone());
     await absC.uploadFotoAbsen();
-    // Get.back();
+    Get.back();
 
     if (absC.image != null) {
       // loadingDialog("Memproses data wajah", "");
@@ -48,6 +47,7 @@ checkIn(Data dataUser, double latitude, double longitude) async {
       );
       if (localDataAbs.isEmpty) {
         loadingDialog("Sedang mengirim data...", "");
+        absC.timeNetwork(await FlutterNativeTimezone.getLocalTimezone());
         var data = {
           "status": "add",
           "id": dataUser.id,

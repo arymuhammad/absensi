@@ -323,8 +323,8 @@ class AbsenView extends GetView<AbsenController> {
                                   latitude: absenC.latFromGps.value,
                                   longitude: absenC.longFromGps.value,
                                 );
-                            await Future.delayed(const Duration(seconds: 3));
-                            Get.back();
+                            // await Future.delayed(const Duration(seconds: 3));
+                            // Get.back();
                           }
                         } else {
                           if (absenC.stsAbsenSelected.isEmpty) {
@@ -346,8 +346,8 @@ class AbsenView extends GetView<AbsenController> {
                                   absenC.latFromGps.value,
                                   absenC.longFromGps.value,
                                 );
-                            await Future.delayed(const Duration(seconds: 3));
-                            Get.back();
+                            // await Future.delayed(const Duration(seconds: 3));
+                            // Get.back();
                           }
                         }
 

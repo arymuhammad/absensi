@@ -79,8 +79,8 @@ class AdjustPresenceController extends GetxController
   var selectedStatus = "".obs;
   var statusReqApp = [
     {"": "Unconfirmed"},
-    {"0": "Reject"},
-    {"1": "Accept"},
+    {"0": "Canceled"},
+    {"1": "Approved"},
   ];
 
   var initDate =
@@ -329,6 +329,11 @@ class AdjustPresenceController extends GetxController
     }
   }
 
+  updateStatIsReadNotif({required String id, required String idUser}) async {
+    var data = {"id": id, "id_user": idUser, "is_read": "1"};
+    await ServiceApi().updateIsreadNotif(data);
+  }
+
   appAbs(
     Map<String, dynamic> dataUptApp,
     Map<String, dynamic>? dataUptAbs,
@@ -343,8 +348,8 @@ class AdjustPresenceController extends GetxController
         '',
         levelUser.value,
         idUser.value,
-        dateInput1.text,
-        dateInput2.text,
+        initDate,
+        lastDate,
       );
     } else {
       await ServiceApi().updateReqApp(dataUptApp);
@@ -354,8 +359,8 @@ class AdjustPresenceController extends GetxController
         '',
         levelUser.value,
         idUser.value,
-        dateInput1.text,
-        dateInput2.text,
+        initDate,
+        lastDate,
       );
     }
     keteranganApp.clear();
@@ -363,15 +368,17 @@ class AdjustPresenceController extends GetxController
 
   Stream<NotifModel> getAdjusmentData({
     required String idUser,
-    // required String level,
+    required String level,
   }) {
     StreamController<NotifModel> controller = StreamController();
 
     void connect() {
       final url = Uri.parse(
-        '${dotenv.env['STREAM_NOTIF_URL']}?type=adjusment&id_user=$idUser&date1=$initDate&date2=$lastDate',
+        '${dotenv.env['STREAM_NOTIF_URL']}?type=adjusment&id_user=$idUser&level=$level&date1=$initDate&date2=$lastDate',
       );
-      // print( '${dotenv.env['STREAM_NOTIF_URL']}?type=adjusment&id_user=$idUser&date1=$initDate&date2=$lastDate');
+      // print(
+      //   '${dotenv.env['STREAM_NOTIF_URL']}?type=adjusment&id_user=$idUser&level=$level&date1=$initDate&date2=$lastDate',
+      // );
       final sseClient = ManualSseClient(url);
 
       sseClient.connect().listen(

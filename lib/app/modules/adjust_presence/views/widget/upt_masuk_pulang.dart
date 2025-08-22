@@ -36,7 +36,7 @@ class UptMasukPulang extends StatelessWidget {
                 ),
                 Text(
                   data.status!.replaceAll('_', ' ').toUpperCase(),
-                  style: titleTextStyle,
+                  style: titleTextStyle.copyWith(fontSize: 14),
                 ),
                 Row(
                   children: [
@@ -120,9 +120,9 @@ class UptMasukPulang extends StatelessWidget {
                 ),
               ],
             )),
-        const Divider(
-          thickness: 2,
-        ),
+        // const Divider(
+        //   thickness: 2,
+        // ),
         Visibility(
           visible: data.accept == "" && dataUser!.level == "1" ? true : false,
           child: Row(

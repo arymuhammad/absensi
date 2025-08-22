@@ -16,9 +16,7 @@ Widget buildVisit({required Data? data}) {
           label: Text('Select one'),
         ),
         value:
-            absC.stsAbsenSelected.isEmpty
-                ? null
-                : absC.stsAbsenSelected.value,
+            absC.stsAbsenSelected.isEmpty ? null : absC.stsAbsenSelected.value,
         items:
             absC.stsAbsen
                 .map((e) => DropdownMenuItem<String>(value: e, child: Text(e)))
@@ -46,6 +44,7 @@ Widget buildVisit({required Data? data}) {
               absC.rndLoc.clear();
               if (val != null) {
                 absC.optVisitSelected.value = val;
+                absC.getLoc(data);
               }
             },
           ),

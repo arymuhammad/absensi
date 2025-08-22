@@ -214,6 +214,7 @@ class MainMenu extends StatelessWidget {
                             InkWell(
                               onTap: () {
                                 Get.to(() {
+                                
                                   adjCtrl.getReqAppUpt(
                                     '',
                                     '',
@@ -236,7 +237,7 @@ class MainMenu extends StatelessWidget {
                                 child: StreamBuilder<NotifModel>(
                                   stream: adjCtrl.getAdjusmentData(
                                     idUser: userData!.id!,
-                                    // level: userData!.level!,
+                                    level: userData!.level!,
                                   ),
                                   builder: (context, snapshot) {
                                     return Stack(

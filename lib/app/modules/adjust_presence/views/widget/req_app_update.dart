@@ -23,17 +23,21 @@ class ReqAppUpdate extends GetView {
       padding: const EdgeInsets.fromLTRB(8.0, 15.0, 8.0, 8.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: [Row(
-              children: [
-                const Icon(Iconsax.task_outline, color: AppColors.contentColorBlue),
-                const SizedBox(width: 5),
-                Text(
-                  'Data Adjusment List',
-                  style: titleTextStyle.copyWith(fontSize: 16),
-                ),
-              ],
-            ),
-          
+        children: [
+          Row(
+            children: [
+              const Icon(
+                Iconsax.task_outline,
+                color: AppColors.contentColorBlue,
+              ),
+              const SizedBox(width: 5),
+              Text(
+                'Data Adjusment List',
+                style: titleTextStyle.copyWith(fontSize: 16),
+              ),
+            ],
+          ),
+
           const Divider(thickness: 2),
           // SizedBox(
           //   height: 30,
@@ -68,7 +72,7 @@ class ReqAppUpdate extends GetView {
                       : adjCtrl.listReqUpt.isEmpty
                       ? RefreshIndicator(
                         onRefresh: () async {
-                          // adjCtrl.isLoading.value = true;
+                          adjCtrl.isLoading.value = true;
                           adjCtrl.selectedType.value = "";
                           // adjCtrl.selectedStatus.value = "";
                           await adjCtrl.getReqAppUpt(
@@ -123,38 +127,122 @@ class ReqAppUpdate extends GetView {
                               children: [
                                 for (var i in adjCtrl.listReqUpt)
                                   ExpansionTileItem(
-                                    title: Text(i.nama, style: titleTextStyle),
-                                    subtitle: Text(
-                                      i.idUser,
-                                      style: subtitleTextStyle,
+                                    tilePadding: const EdgeInsets.fromLTRB(
+                                      2,
+                                      2,
+                                      2,
+                                      2,
                                     ),
-                                    trailing: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.end,
-                                      children: [
-                                        Text(
-                                          'Tanggal Masuk',
-                                          style: titleTextStyle,
-                                        ),
-                                        Text(
-                                          FormatWaktu.formatIndo(
-                                            tanggal: DateTime.parse(i.tglMasuk),
-                                          ),
-                                          style: subtitleTextStyle,
-                                        ),
-                                      ],
+                                    childrenPadding: const EdgeInsets.fromLTRB(
+                                      2,
+                                      2,
+                                      2,
+                                      2,
                                     ),
-                                    border: Border.all(),
                                     isHasBottomBorder: true,
                                     isHasTopBorder: true,
                                     isHasLeftBorder: true,
                                     isHasRightBorder: true,
-                                    backgroundColor: Colors.white,
+                                    collapsedBackgroundColor:
+                                        i.isRead == "" && i.accept != ""
+                                            ? Colors.blue[200]
+                                            : Colors.white,
+                                    onExpansionChanged: (value) {
+                                      // print(value);
+                                      if (i.accept != "" && i.isRead == "") {
+                                        adjCtrl.updateStatIsReadNotif(
+                                          id: i.id,
+                                          idUser: i.idUser,
+                                        );
+                                        Future.delayed(
+                                          const Duration(seconds: 3),
+                                          () async {
+                                            await adjCtrl.getReqAppUpt(
+                                              '',
+                                              '',
+                                              dataUser.level,
+                                              dataUser.id,
+                                              adjCtrl.dateInput1.text != ""
+                                                  ? adjCtrl.dateInput1.text
+                                                  : adjCtrl.initDate,
+                                              adjCtrl.dateInput2.text != ""
+                                                  ? adjCtrl.dateInput2.text
+                                                  : adjCtrl.lastDate,
+                                            );
+                                          },
+                                        );
+                                      } else {
+                                        null;
+                                      }
+                                    },
                                     borderRadius: const BorderRadius.all(
-                                      Radius.circular(10),
+                                      Radius.circular(5),
                                     ),
+
+                                    title: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 5,
+                                            vertical: 1,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color:
+                                                i.accept == ""
+                                                    ? Colors.amber
+                                                    : i.accept == "1"
+                                                    ? Colors.green
+                                                    : Colors.grey,
+                                            borderRadius:
+                                                const BorderRadius.only(
+                                                  topRight: Radius.circular(20),
+                                                  bottomRight: Radius.circular(
+                                                    20,
+                                                  ),
+                                                ),
+                                          ),
+                                          child: Text(
+                                            i.accept == ""
+                                                ? 'Pending'
+                                                : i.accept == "1"
+                                                ? 'Approved'
+                                                : 'Canceled',
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 14,
+                                            ),
+                                          ),
+                                        ),
+                                        // const SizedBox(height: 5),
+                                        Text(i.nama, style: titleTextStyle),
+                                        Text(
+                                          i.idUser,
+                                          style: subtitleTextStyle,
+                                        ),
+                                        Row(
+                                          children: [
+                                            const Icon(
+                                              Iconsax.calendar_1_outline,
+                                              color: AppColors.itemsBackground,
+                                              size: 15,
+                                            ),
+                                            const SizedBox(width: 2),
+                                            Text(
+                                              FormatWaktu.formatIndo(
+                                                tanggal: DateTime.parse(
+                                                  i.tglMasuk,
+                                                ),
+                                              ),
+                                              style: subtitleTextStyle,
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+
+                                    // border: Border.all(),
                                     children: [
                                       i.status == "update_masuk" ||
                                               i.status == "update_pulang"

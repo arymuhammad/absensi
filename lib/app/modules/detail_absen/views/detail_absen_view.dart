@@ -45,6 +45,7 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
         child: const Icon(HeroIcons.map_pin, color: AppColors.contentColorBlue),
       ),
     ];
+
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
@@ -119,6 +120,28 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
     List<Marker>? markerPulang,
     required bool isIn,
   }) {
+    // String formatLatLng(double lat, double lng) {
+    //   // Tentukan Utara/Selatan
+    //   String latDirection = lat >= 0 ? 'N' : 'S';
+    //   String lngDirection = lng >= 0 ? 'E' : 'W';
+
+    //   // Ambil nilai absolut agar derajat positif
+    //   double absLat = lat.abs();
+    //   double absLng = lng.abs();
+
+    //   // Format ke derajat dengan 6 desimal (atau sesuai kebutuhan)
+    //   String formattedLat = '${absLat.toStringAsFixed(6)}°$latDirection';
+    //   String formattedLng = '${absLng.toStringAsFixed(6)}°$lngDirection';
+
+    //   return '$formattedLat, $formattedLng';
+    // }
+
+    String getGoogleMapsUrl(double lat, double lng) {
+      // Format koordinat ke format decimal raw untuk URL query
+      return 'https://www.google.com/maps/search/?api=1&query=$lat,$lng';
+    }
+    // format lt lng
+
     return Card(
       elevation: 10,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -163,11 +186,13 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
                       onTap: (tapPosition, point) {
                         // print(point.latitude);
                         // print(point.longitude);
-                        launchUrl(
-                          Uri.parse(
-                            "https://www.google.com/maps/place/6%C2%B033'35.6%22S+106%C2%B051'16.7%22E/@${point.latitude},${point.longitude},191m/data=!3m2!1e3!4b1!4m4!3m3!8m2!3d-6.5598889!4d106.8546389!5m1!1e2?entry=ttu&g_ep=EgoyMDI1MDcyOS4wIKXMDSoASAFQAw%3D%3D",
-                          ),
+                        var gmaps = getGoogleMapsUrl(
+                          point.latitude,
+                          point.longitude,
                         );
+                        // print(gmaps);
+                        launchUrl(Uri.parse(gmaps));
+                       
                       },
                       initialCenter:
                           isIn

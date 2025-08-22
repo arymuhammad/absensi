@@ -26,6 +26,7 @@ class Data {
   String? password;
   String? kodeCabang;
   String? namaCabang;
+  String? nik;
   String? lat;
   String? long;
   String? foto;
@@ -48,6 +49,7 @@ class Data {
     this.password,
     this.kodeCabang,
     this.namaCabang,
+    this.nik,
     this.lat,
     this.long,
     this.foto,
@@ -71,6 +73,7 @@ class Data {
     password = json['password'];
     kodeCabang = json['kode_cabang'];
     namaCabang = json['nama_cabang'];
+    nik = json['nik']??'';
     lat = json['lat'];
     long = json['long'];
     foto = json['foto'];
@@ -95,6 +98,7 @@ class Data {
     data['password'] = password;
     data['kode_cabang'] = kodeCabang;
     data['nama_cabang'] = namaCabang;
+    data['nik'] = nik;
     data['foto'] = foto;
     data['lat'] = lat;
     data['long'] = long;

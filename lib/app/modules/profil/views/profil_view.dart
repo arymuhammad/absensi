@@ -1,7 +1,9 @@
 import 'package:absensi/app/data/helper/app_colors.dart';
 import 'package:absensi/app/data/helper/const.dart';
+import 'package:absensi/app/data/helper/format_waktu.dart';
 import 'package:absensi/app/data/model/login_model.dart';
 import 'package:absensi/app/modules/login/controllers/login_controller.dart';
+import 'package:absensi/app/modules/shared/elevated_button.dart';
 import 'package:absensi/app/services/service_api.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -14,7 +16,7 @@ import '../controllers/profil_controller.dart';
 class ProfilView extends GetView<ProfilController> {
   ProfilView({super.key, this.listDataUser});
   final auth = Get.find<LoginController>();
-  final user = Get.put(AddPegawaiController());
+  final ctr = Get.find<AddPegawaiController>();
   final Data? listDataUser;
 
   @override
@@ -142,6 +144,40 @@ class ProfilView extends GetView<ProfilController> {
                             children: [
                               ListTile(
                                 title: Text(
+                                  'Employee ID',
+                                  style: subtitleTextStyle,
+                                ),
+                                trailing:
+                                    listDataUser!.nik!.isEmpty
+                                        ? CsElevatedButton(
+                                          color: AppColors.itemsBackground,
+                                          fontsize: 12,
+                                          label: 'Generate ID',
+                                          onPressed:
+                                              listDataUser!.createdAt! == ""
+                                                  ? null
+                                                  : () {
+                                                    ctr.generateEmpId(
+                                                      listDataUser!,
+                                                    );
+                                                  },
+                                        )
+                                        : Text(
+                                          listDataUser!.nik!,
+                                          style: titleTextStyle,
+                                        ),
+                                contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                ),
+                                dense: true,
+                              ),
+                              const Divider(
+                                indent: 15,
+                                endIndent: 15,
+                                height: 0,
+                              ),
+                              ListTile(
+                                title: Text(
                                   'Phone No.',
                                   style: subtitleTextStyle,
                                 ),
@@ -185,7 +221,11 @@ class ProfilView extends GetView<ProfilController> {
                                 ),
                                 trailing: Text(
                                   listDataUser!.createdAt != ""
-                                      ? listDataUser!.createdAt!.capitalize!
+                                      ? FormatWaktu.formatShortEng(
+                                        tanggal: DateTime.parse(
+                                          listDataUser!.createdAt!,
+                                        ),
+                                      )
                                       : '-',
                                   style: titleTextStyle,
                                 ),
@@ -289,177 +329,6 @@ class ProfilView extends GetView<ProfilController> {
                     ],
                   ),
                 ),
-
-                // Card(
-                //   color: Colors.transparent,
-                //   elevation: 4,
-                //   shape: RoundedRectangleBorder(
-                //     borderRadius: BorderRadius.circular(10),
-                //   ),
-                //   child: Container(
-                //     height: 220,
-                //     decoration: BoxDecoration(
-                //       borderRadius: BorderRadius.circular(10),
-                //       image: const DecorationImage(
-                //         image: AssetImage('assets/image/bg_card.jpg'),
-                //       ),
-                //     ),
-                //     child: Padding(
-                //       padding: const EdgeInsets.fromLTRB(19, 19, 19, 0),
-                //       child: Column(
-                //         crossAxisAlignment: CrossAxisAlignment.start,
-                //         children: [
-                //           Text(
-                //             'URBAN&CO',
-                //             style: titleTextStyle.copyWith(
-                //               color: AppColors.contentColorYellow,
-                //             ),
-                //           ),
-                //           const SizedBox(height: 10),
-                //           Row(
-                //             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                //             children: [
-                //               Column(
-                //                 crossAxisAlignment: CrossAxisAlignment.start,
-                //                 children: [
-                //                   Text(
-                //                     listDataUser!.nama!,
-                //                     style: titleTextStyle.copyWith(
-                //                       color: AppColors.contentColorYellow,
-                //                       fontSize: 18,
-                //                     ),
-                //                   ),
-                //                   Text(
-                //                     listDataUser!.levelUser!,
-                //                     style: const TextStyle(
-                //                       color: Colors.white,
-                //                       fontSize: 12,
-                //                     ),
-                //                   ),
-                //                   const SizedBox(height: 20),
-                //                   Row(
-                //                     children: [
-                //                       const Icon(
-                //                         FontAwesome.id_badge,
-                //                         color: AppColors.contentColorBlue,
-                //                         size: 12,
-                //                       ),
-                //                       const SizedBox(width: 5),
-                //                       Text(
-                //                         listDataUser!.id!,
-                //                         style: const TextStyle(
-                //                           color: Colors.white,
-                //                           fontSize: 12,
-                //                         ),
-                //                       ),
-                //                     ],
-                //                   ),
-                //                   const SizedBox(height: 5),
-                //                   Row(
-                //                     children: [
-                //                       const Icon(
-                //                         HeroIcons.phone,
-                //                         color: AppColors.contentColorBlue,
-                //                         size: 12,
-                //                       ),
-                //                       const SizedBox(width: 5),
-                //                       Text(
-                //                         listDataUser!.noTelp!,
-                //                         style: const TextStyle(
-                //                           color: Colors.white,
-                //                           fontSize: 12,
-                //                         ),
-                //                       ),
-                //                     ],
-                //                   ),
-                //                   const SizedBox(height: 5),
-                //                   Row(
-                //                     children: [
-                //                       const Icon(
-                //                         HeroIcons.user,
-                //                         color: AppColors.contentColorBlue,
-                //                         size: 12,
-                //                       ),
-                //                       const SizedBox(width: 5),
-                //                       Text(
-                //                         '@${listDataUser!.username!}',
-                //                         style: const TextStyle(
-                //                           color: Colors.white,
-                //                           fontSize: 12,
-                //                         ),
-                //                       ),
-                //                     ],
-                //                   ),
-                //                   const SizedBox(height: 5),
-                //                   Row(
-                //                     children: [
-                //                       const Icon(
-                //                         HeroIcons.map_pin,
-                //                         color: AppColors.contentColorBlue,
-                //                         size: 12,
-                //                       ),
-                //                       const SizedBox(width: 5),
-                //                       Text(
-                //                         listDataUser!.namaCabang!,
-                //                         style: const TextStyle(
-                //                           color: Colors.white,
-                //                           fontSize: 12,
-                //                         ),
-                //                       ),
-                //                     ],
-                //                   ),
-                //                 ],
-                //               ),
-                //               ClipOval(
-                //                 child: SizedBox(
-                //                   height: 70,
-                //                   width: 70,
-                //                   child: WidgetZoom(
-                //                     heroAnimationTag: 'customTag',
-                //                     zoomWidget: Image.network(
-                //                       '${ServiceApi().baseUrl}${listDataUser!.foto!}',
-                //                       fit: BoxFit.cover,
-                //                       errorBuilder:
-                //                           (
-                //                             context,
-                //                             error,
-                //                             stackTrace,
-                //                           ) => Image.network(
-                //                             "https://ui-avatars.com/api/?name=${listDataUser!.nama}",
-                //                             fit: BoxFit.cover,
-                //                           ),
-                //                       loadingBuilder: (
-                //                         context,
-                //                         child,
-                //                         loadingProgress,
-                //                       ) {
-                //                         if (loadingProgress == null)
-                //                           return child;
-                //                         return Center(
-                //                           child: CircularProgressIndicator(
-                //                             value:
-                //                                 loadingProgress
-                //                                             .expectedTotalBytes !=
-                //                                         null
-                //                                     ? loadingProgress
-                //                                             .cumulativeBytesLoaded /
-                //                                         loadingProgress
-                //                                             .expectedTotalBytes!
-                //                                     : null,
-                //                           ),
-                //                         );
-                //                       },
-                //                     ),
-                //                   ),
-                //                 ),
-                //               ),
-                //             ],
-                //           ),
-                //         ],
-                //       ),
-                //     ),
-                //   ),
-                // ),
               ],
             ),
           ),
@@ -490,16 +359,6 @@ class ProfilView extends GetView<ProfilController> {
                     ),
                   ],
                 ),
-                // IconButton(
-                //   onPressed: () {
-                //     promptDialog(context, 'Anda yakin ingin keluar?');
-                //   },
-                //   icon: const Icon(
-                //     Iconsax.logout_1_outline,
-                //     color: Colors.black,
-                //     size: 30,
-                //   ),
-                // ),
               ],
             ),
           ),

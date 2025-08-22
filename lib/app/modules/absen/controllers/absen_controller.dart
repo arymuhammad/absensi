@@ -255,12 +255,12 @@ class AbsenController extends GetxController {
       dataUserLogin,
     );
     // after 2 sec
-    // if (!Get.isRegistered<AdController>()) {
-    //   Get.put(AdController());
-    // }
-    // final adC = Get.find<AdController>();
+    if (!Get.isRegistered<AdController>()) {
+      Get.put(AdController());
+    }
+    final adC = Get.find<AdController>();
 
-    // await adC.loadInterstitialAd();
+    await adC.loadInterstitialAd();
     // Future.delayed(const Duration(seconds: 2), () {
     //   adC.showInterstitialAd(() {
     //     // print('Iklan interstitial ditutup');
@@ -606,23 +606,31 @@ class AbsenController extends GetxController {
     // timeNetwork(await FlutterNativeTimezone.getLocalTimezone());
     latFromGps.value = position.latitude;
     longFromGps.value = position.longitude;
-    await calcDistanceBetween(
-      LatLng(
-        double.parse(lat.isNotEmpty ? lat.value : dataUser!.lat!),
-        double.parse(long.isNotEmpty ? long.value : dataUser!.long!),
-      ),
-      LatLng(position.latitude, position.longitude),
-    );
 
-    if (distanceStore.value > num.parse(dataUser!.areaCover!)) {
-      isLoading.value = false;
-      isEnabled.value = false;
-      locNote.value =
-          "Your position is far from the permitted area (${(distanceStore.value / 1000).toStringAsFixed(2)} Km)";
-    } else {
-      isLoading.value = false;
+    //cek user visit atau bukan
+    if (optVisitSelected.isNotEmpty &&
+        optVisitSelected.value == "Research and Development") {
       isEnabled.value = true;
-      locNote.value = "You are in the radius area";
+      locNote.value = "";
+    } else {
+      await calcDistanceBetween(
+        LatLng(
+          double.parse(lat.isNotEmpty ? lat.value : dataUser!.lat!),
+          double.parse(long.isNotEmpty ? long.value : dataUser!.long!),
+        ),
+        LatLng(position.latitude, position.longitude),
+      );
+
+      if (distanceStore.value > num.parse(dataUser!.areaCover!)) {
+        isLoading.value = false;
+        isEnabled.value = false;
+        locNote.value =
+            "Your position is far from the permitted area (${(distanceStore.value / 1000).toStringAsFixed(2)} Km)";
+      } else {
+        isLoading.value = false;
+        isEnabled.value = true;
+        locNote.value = "You are in the radius area";
+      }
     }
 
     barcodeScanRes.value = "";
@@ -789,7 +797,7 @@ class AbsenController extends GetxController {
         try {
           userPosition = await Geolocator.getCurrentPosition(
             desiredAccuracy: LocationAccuracy.high,
-            timeLimit: const Duration(seconds: 15),
+            timeLimit: const Duration(seconds: 10),
           );
           Get.back();
         } catch (e) {
@@ -811,7 +819,7 @@ class AbsenController extends GetxController {
         );
 
         // Step 4: Validasi
-        if (distanceMeter <= num.parse(dataUser!.areaCover!)) {
+        if (distanceMeter <= 100) {
           isLoading.value = false;
           isEnabled.value = true;
           locNote.value = "You are in the radius area";

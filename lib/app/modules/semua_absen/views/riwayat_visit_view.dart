@@ -561,7 +561,7 @@ class RiwayatVisitView extends GetView {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: AppColors.contentDefBtn,
+        backgroundColor: AppColors.itemsBackground,
         onPressed: () {
           formFilter(userData!.id);
         },

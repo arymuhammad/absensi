@@ -99,12 +99,13 @@ class ServiceApi {
     try {
       final response = await http
           .post(Uri.parse('${baseUrl}auth'), body: data)
-          .timeout(const Duration(seconds: 20));
+          .timeout(const Duration(seconds: 10));
 
       // if (response.statusCode == 200) {
       user = Data.fromJson(jsonDecode(response.body)['data']);
       // }
     } on TimeoutException catch (e) {
+      Get.back();
       showToast('$e');
     }
     return user;
@@ -228,6 +229,7 @@ class ServiceApi {
         request.fields['no_telp'] = data["no_telp"];
         request.fields['kode_cabang'] = data["kode_cabang"];
         request.fields['level'] = data["level"];
+        request.fields['created_at'] = data["created_at"];
         if (data["foto"] != null) {
           if (kIsWeb) {
             // print(data["foto"]);
@@ -274,34 +276,38 @@ class ServiceApi {
       final dataDecode = jsonDecode(responseString);
       // debugPrint(dataDecode.toString());
 
-      if (res.statusCode == 200 && mode == "add") {
-        Get.back();
-        succesDialog(
-          Get.context!,
-          "N",
-          "Data berhasil disimpan",
-          DialogType.success,
-          'SUKSES',
-        );
-      } else {
-        // if (mode == "update") {
-        Get.back();
-        succesDialog(
-          Get.context!,
-          "N",
-          "Data berhasil diperbarui",
-          DialogType.success,
-          'SUKSES',
-        );
-        // Future.delayed(const Duration(seconds: 1), () {
-        //   Get.back(closeOverlays: true);
-        //   auth.logout();
-        // });
-        // }
+      if (res.statusCode == 200) {
+        if (mode == "add") {
+          Get.back();
+          succesDialog(
+            Get.context!,
+            "N",
+            "Data berhasil disimpan",
+            DialogType.success,
+            'SUKSES',
+          );
+        } else {
+          // if (mode == "update") {
+          Get.back();
+          succesDialog(
+            Get.context!,
+            "N",
+            "Data berhasil diperbarui",
+            DialogType.success,
+            'SUKSES',
+          );
+          // Future.delayed(const Duration(seconds: 1), () {
+          //   Get.back(closeOverlays: true);
+          //   auth.logout();
+          // });
+          // }
+        }
       }
     } on TimeoutException catch (e) {
+      Get.back();
       showToast('$e');
     } catch (e) {
+      Get.back();
       debugPrint('$e');
     }
   }
@@ -1079,7 +1085,7 @@ class ServiceApi {
 
   getUserCabang(String idStore, String parentId) async {
     var param = {"idCabang": idStore, "parentId": parentId};
-  
+
     try {
       final response = await http.post(
         Uri.parse('${baseUrl}get_user_cabang'),
@@ -1374,6 +1380,24 @@ class ServiceApi {
     }
   }
 
+  updateIsreadNotif(Map<String, dynamic> data) async {
+    try {
+      final response = await http
+          .post(Uri.parse('${baseUrl}update_isread_notif'), body: data)
+          .timeout(const Duration(minutes: 1));
+      if (response.statusCode == 200) {
+      } else {
+        showToast('Terjadi kesalahan\n${response.body}');
+      }
+    } on TimeoutException catch (_) {
+      // Get.back();
+      showToast('Timeout to updating status is read');
+    } on Exception catch (_) {
+      showToast('Failed to update status is read');
+      // showToast(e.toString());
+    }
+  }
+
   updateReqApp(Map<String, dynamic> data) async {
     try {
       final response = await http
@@ -1448,6 +1472,22 @@ class ServiceApi {
       // Tangani error jaringan, timeout, atau parsing json
 
       showToast("Gagal terhubung ke server: $e");
+    }
+  }
+
+  genEmpId(Map<String, String?> data) async {
+    try {
+      final response = await http
+          .post(Uri.parse('${baseUrl}gen_emp_id'), body: data)
+          .timeout(const Duration(seconds: 10));
+      if (response.statusCode == 200) {
+        showToast("generate employee ID has been successful");
+      } else {
+        final result = jsonDecode(response.body)['message'];
+        showToast(result);
+      }
+    } on Exception catch (_) {
+      showToast('Terjadi kesalahan');
     }
   }
 }

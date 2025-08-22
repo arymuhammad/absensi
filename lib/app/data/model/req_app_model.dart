@@ -19,6 +19,7 @@ class ReqApp {
   String? keterangan;
   String? alasan;
   String? namaShift;
+  String? isRead;
 
   ReqApp({
     required this.id,
@@ -40,7 +41,8 @@ class ReqApp {
     this.accept,
     this.keterangan,
     this.alasan,
-    this.namaShift
+    this.namaShift,
+    this.isRead
   });
 
   ReqApp.fromJson(Map<String, dynamic> json) {
@@ -64,5 +66,6 @@ class ReqApp {
     keterangan = json['keterangan']??'';
     alasan = json['alasan']??'';
     namaShift = json['nama_shift']??'';
+    isRead = json['is_read']??'';
   }
 }

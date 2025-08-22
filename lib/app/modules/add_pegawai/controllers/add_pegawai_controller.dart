@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
+import 'package:absensi/app/data/helper/format_waktu.dart';
 import 'package:absensi/app/data/model/login_model.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:crypto/crypto.dart';
@@ -14,6 +15,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 import 'package:ota_update/ota_update.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:xml/xml.dart' as xml;
@@ -29,7 +31,14 @@ import '../../login/controllers/login_controller.dart';
 // import 'package:google_ml_vision/google_ml_vision.dart';
 
 class AddPegawaiController extends GetxController {
-  late TextEditingController nip, name, username, pass, store, telp, level;
+  late TextEditingController nip,
+      name,
+      username,
+      pass,
+      store,
+      telp,
+      level,
+      joinDate;
   final FocusNode focusNodecabang = FocusNode();
   final FocusNode focusNodelevel = FocusNode();
   final GlobalKey autocompleteKeyBrand = GlobalKey();
@@ -77,6 +86,7 @@ class AddPegawaiController extends GetxController {
     store = TextEditingController();
     telp = TextEditingController();
     level = TextEditingController();
+    joinDate = TextEditingController();
     getBrandCabang();
     getLevel();
 
@@ -103,6 +113,7 @@ class AddPegawaiController extends GetxController {
     store.dispose();
     telp.dispose();
     level.dispose();
+    joinDate.dispose();
   }
 
   getBrandCabang() async {
@@ -479,6 +490,7 @@ class AddPegawaiController extends GetxController {
               selectedLevel.value != "" ? selectedLevel.value : dataUser.level,
           "foto":
               kIsWeb ? fileResult!.files.single : File(image!.path.toString()),
+          "created_at": joinDate.text.isNotEmpty ? joinDate.text : null,
         };
 
         if (lstPhone.contains(telp.text)) {
@@ -532,6 +544,8 @@ class AddPegawaiController extends GetxController {
               "parent_id": newUsr.parentId!,
               "cek_stok":
                   cekStok.value != "" ? cekStok.value : dataUser.cekStok,
+              "created_at":
+                  joinDate.text.isNotEmpty ? joinDate.text : dataUser.createdAt,
             },
             dataUser.id!,
             dataUser.username!,
@@ -561,6 +575,7 @@ class AddPegawaiController extends GetxController {
           pass.clear();
           name.clear();
           telp.clear();
+          joinDate.clear();
           selectedLevel.value = "";
           brandCabang.value = "";
           lstPhone.clear();
@@ -568,18 +583,6 @@ class AddPegawaiController extends GetxController {
         }
         // Get.back();
       } else {
-        var data = {
-          "status": mode,
-          "id": dataUser.id,
-          "nama": name.text != "" ? name.text : dataUser.nama,
-          "no_telp": telp.text != "" ? telp.text : dataUser.noTelp,
-          "kode_cabang":
-              selectedCabang.value != ""
-                  ? selectedCabang.value
-                  : dataUser.kodeCabang,
-          "level":
-              selectedLevel.value != "" ? selectedLevel.value : dataUser.level,
-        };
         if (lstPhone.contains(telp.text)) {
           Get.back();
           warningDialog(
@@ -588,6 +591,21 @@ class AddPegawaiController extends GetxController {
             "This phone number is already registered\nPlease enter another phone number",
           );
         } else {
+          var data = {
+            "status": mode,
+            "id": dataUser.id,
+            "nama": name.text != "" ? name.text : dataUser.nama,
+            "no_telp": telp.text != "" ? telp.text : dataUser.noTelp,
+            "kode_cabang":
+                selectedCabang.value != ""
+                    ? selectedCabang.value
+                    : dataUser.kodeCabang,
+            "level":
+                selectedLevel.value != ""
+                    ? selectedLevel.value
+                    : dataUser.level,
+            "created_at": joinDate.text.isNotEmpty ? joinDate.text : null,
+          };
           // loadingDialog("updating data", "");
 
           await ServiceApi().addUpdatePegawai(data, mode);
@@ -633,6 +651,8 @@ class AddPegawaiController extends GetxController {
               "parent_id": newUsr.parentId!,
               "cek_stok":
                   cekStok.value != "" ? cekStok.value : dataUser.cekStok,
+              "created_at":
+                  joinDate.text.isNotEmpty ? joinDate.text : newUsr.createdAt,
             },
             dataUser.id!,
             dataUser.username!,
@@ -653,6 +673,7 @@ class AddPegawaiController extends GetxController {
           pass.clear();
           name.clear();
           telp.clear();
+          joinDate.clear();
           selectedLevel.value = "";
           brandCabang.value = "";
           lstPhone.clear();
@@ -719,13 +740,14 @@ class AddPegawaiController extends GetxController {
 
       pass.clear();
       Get.back();
-      if (cekDataUser.isNotEmpty) {
-      } else {
-        dialogMsg(
-          "An error occurred",
-          "Unable to update password. Please try again.",
-        );
-      }
+      Get.back();
+      // if (cekDataUser.isNotEmpty) {
+      // } else {
+      //   dialogMsg(
+      //     "An error occurred",
+      //     "Unable to update password. Please try again.",
+      //   );
+      // }
     } else {
       showToast("You have not filled in the Password field");
     }
@@ -746,5 +768,63 @@ class AddPegawaiController extends GetxController {
     } else {
       return;
     }
+  }
+
+  Future<void> generateEmpId(Data? userData) async {
+    var data = {
+      "id": userData!.id,
+      "kode_cabang": userData.kodeCabang,
+      "thn": DateFormat('yy').format(DateTime.parse(userData.createdAt!)),
+      "bln": DateFormat('MM').format(DateTime.parse(userData.createdAt!)),
+      "tgl": DateFormat('dd').format(DateTime.parse(userData.createdAt!)),
+    };
+    // print(data);
+    await ServiceApi().genEmpId(data);
+    // isLoading.value = false;
+    var newUsr = await ServiceApi().fetchCurrentUser({
+      "username": userData.username!,
+      "password": userData.password!,
+    });
+    if (Get.isRegistered<LoginController>()) {
+      final logC = Get.find<LoginController>();
+
+      // update sharedpreff
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('userDataLogin', jsonEncode(newUsr.toJson()));
+      logC.logUser.value = newUsr;
+
+      logC.refresh();
+    }
+    //start update local db for tbl_user
+    SQLHelper.instance.updateDataUser(
+      {
+        // "nama": name.text != "" ? name.text : userData.nama,
+        // "no_telp": telp.text != "" ? telp.text : userData.noTelp,
+        // "kode_cabang":
+        //     selectedCabang.value != ""
+        //         ? selectedCabang.value
+        //         : userData.kodeCabang,
+        // "nama_cabang":
+        //     cabangName.value != ""
+        //         ? cabangName.value
+        //         : userData.namaCabang,
+        // "lat": newUsr.lat!,
+        // "long": newUsr.long!,
+        // "area_coverage": newUsr.areaCover!,
+        // "level":
+        //     selectedLevel.value != ""
+        //         ? selectedLevel.value
+        //         : userData.level,
+        // "level_user":
+        //     levelName.value != "" ? levelName.value : userData.levelUser,
+        // "visit": newUsr.visit!,
+        // "parent_id": newUsr.parentId!,
+        // "cek_stok":
+        //     cekStok.value != "" ? cekStok.value : userData.cekStok,
+        "nik": newUsr.createdAt,
+      },
+      userData.id!,
+      userData.username!,
+    );
   }
 }

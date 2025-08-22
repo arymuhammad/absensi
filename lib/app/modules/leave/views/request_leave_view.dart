@@ -78,6 +78,7 @@ class RequestLeaveView extends GetView<LeaveController> {
                                 i,
                               ) {
                                 final leave = leaveC.listLeaveReq[i];
+
                                 // Fungsi untuk menghitung totalSteps
                                 var validLevels = ["19", "26", "50", "59"];
                                 int getTotalSteps() {
@@ -89,8 +90,21 @@ class RequestLeaveView extends GetView<LeaveController> {
                                 }
 
                                 int totalSteps = getTotalSteps();
-                                // Tentukan step aktif (0-based)
-                                // String stepLabel = "";
+                                // Data base nodeTitles full (4 steps)
+                                // List<String> nodeTitlesFull = const [
+                                //         'Apply',
+                                //         'Store Manager',
+                                //         'Area Manager',
+                                //         'HRD',
+                                //       ];
+
+                                //       // Node titles untuk 3 steps (kurangi 1 step, misalnya tanpa step terakhir "HR")
+                                //       List<String> nodeTitles3Steps = const [
+                                //         'Apply',
+                                //         // 'Store Manager',
+                                //         'Area Manager',
+                                //         'HRD',
+                                //       ];
 
                                 // Fungsi untuk mendapatkan step label dan currentStep
                                 Map<String, dynamic> getStepInfo(
@@ -171,7 +185,28 @@ class RequestLeaveView extends GetView<LeaveController> {
                                     if (totalSteps == 3) {
                                       if (leave.acc3 == null) {
                                         // Step 1 - berdasarkan acc2 dan userData
-                                        if (leave.parentId == "4") {
+                                        if (leave.parentId == "3") {
+                                          if (leave.levelId == "19" ||
+                                              leave.levelId == "59") {
+                                            stepLabel =
+                                                leave.acc2 == "0" ||
+                                                        leave.acc2 == null
+                                                    ? "Area Manager"
+                                                    : "HRD";
+                                            currentStep =
+                                                leave.acc2 == null ? 0 : 1;
+                                          } else if (leave.levelId == "26" ||
+                                              leave.levelId == "50") {
+                                            // print(leave.levelId);
+                                            stepLabel =
+                                                leave.acc2 == "0" ||
+                                                        leave.acc2 == null
+                                                    ? "Operational Manager"
+                                                    : "HRD";
+                                            currentStep =
+                                                leave.acc2 == null ? 0 : 1;
+                                          }
+                                        } else if (leave.parentId == "4") {
                                           if (leave.levelId == "43") {
                                             stepLabel =
                                                 leave.acc2 == "0" ||
@@ -333,10 +368,24 @@ class RequestLeaveView extends GetView<LeaveController> {
                                   ), // key unik per item penting!
                                   controlAffinity:
                                       ListTileControlAffinity.trailing,
+                                  tilePadding: const EdgeInsets.fromLTRB(
+                                    8,
+                                    2,
+                                    8,
+                                    2,
+                                  ),
+                                  childrenPadding: const EdgeInsets.fromLTRB(
+                                    8,
+                                    2,
+                                    8,
+                                    2,
+                                  ),
                                   isHasBottomBorder: true,
                                   isHasTopBorder: true,
                                   isHasLeftBorder: true,
                                   isHasRightBorder: true,
+                                  borderRadius: BorderRadius.circular(5),
+                                  backgroundColor: Colors.white,
                                   title: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
@@ -431,17 +480,26 @@ class RequestLeaveView extends GetView<LeaveController> {
                                       TextSpan(
                                         children: [
                                           const TextSpan(
-                                            text: 'Dengan ini,\nSaya ',
+                                            text:
+                                                'Saya yang bertanda tangan dibawah ini:\n',
                                           ),
+                                          const TextSpan(text: 'Nama    : '),
                                           TextSpan(
-                                            text: leave.nama,
+                                            text: '${leave.nama}\n',
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          const TextSpan(text: 'Jabatan : '),
+                                          TextSpan(
+                                            text: '${leave.namaLevel}\n\n',
                                             style: const TextStyle(
                                               fontWeight: FontWeight.bold,
                                             ),
                                           ),
                                           const TextSpan(
                                             text:
-                                                ', hendak mengajukan permohonan cuti\n',
+                                                'Hendak mengajukan permohonan cuti ',
                                           ),
                                           TextSpan(
                                             text: leave.jenisCuti,
@@ -450,7 +508,7 @@ class RequestLeaveView extends GetView<LeaveController> {
                                             ),
                                           ),
                                           const TextSpan(
-                                            text: ' untuk jangka waktu ',
+                                            text: '\nuntuk jangka waktu ',
                                           ),
                                           TextSpan(
                                             text:
@@ -534,33 +592,48 @@ class RequestLeaveView extends GetView<LeaveController> {
                                           label: 'Cancel',
                                           color: AppColors.contentColorRed,
                                           fontsize: 15,
-                                          onPressed: () {
-                                            promptDialog(
-                                              context: context,
-                                              title: 'KONFIRMASI',
-                                              desc: 'Tolak pengajuan ini?',
-                                              btnOkOnPress: () async {
-                                                var param = {
-                                                  "type": "reject",
-                                                  "uid": leave.uid!,
-                                                  "level": userData!.level,
-                                                  "acc_name": userData!.nama,
-                                                  "sign": "0",
-                                                };
-                                                await ServiceApi().leave(param);
-                                                var reload = {
-                                                  "type":
-                                                      "get_pending_req_leave",
-                                                  "kode_cabang":
-                                                      userData!.kodeCabang!,
-                                                  "id_user": userData!.id!,
-                                                  "level": userData!.level!,
-                                                };
-                                                leaveC.isLoading.value = true;
-                                                leaveC.getLeaveReq(reload);
-                                              },
-                                            );
-                                          },
+                                          onPressed:
+                                              leaveStats == "Approved by" ||
+                                                      leaveStats ==
+                                                          "Canceled by"
+                                                  ? null
+                                                  : () {
+                                                    promptDialog(
+                                                      context: context,
+                                                      title: 'KONFIRMASI',
+                                                      desc:
+                                                          'Tolak pengajuan ini?',
+                                                      btnOkOnPress: () async {
+                                                        var param = {
+                                                          "type": "reject",
+                                                          "uid": leave.uid!,
+                                                          "level":
+                                                              userData!.level,
+                                                          "acc_name":
+                                                              userData!.nama,
+                                                          "sign": "0",
+                                                        };
+                                                        await ServiceApi()
+                                                            .leave(param);
+                                                        var reload = {
+                                                          "type":
+                                                              "get_pending_req_leave",
+                                                          "kode_cabang":
+                                                              userData!
+                                                                  .kodeCabang!,
+                                                          "id_user":
+                                                              userData!.id!,
+                                                          "level":
+                                                              userData!.level!,
+                                                        };
+                                                        leaveC.isLoading.value =
+                                                            true;
+                                                        leaveC.getLeaveReq(
+                                                          reload,
+                                                        );
+                                                      },
+                                                    );
+                                                  },
                                           size: const Size(double.infinity, 30),
                                         ),
                                         CsElevatedButton(
@@ -568,13 +641,18 @@ class RequestLeaveView extends GetView<LeaveController> {
                                           color:
                                               AppColors.contentColorGreenAccent,
                                           fontsize: 15,
-                                          onPressed: () {
-                                            signDialog(
-                                              context,
-                                              userData!,
-                                              leave.uid!,
-                                            );
-                                          },
+                                          onPressed:
+                                              leaveStats == "Approved by" ||
+                                                      leaveStats ==
+                                                          "Canceled by"
+                                                  ? null
+                                                  : () {
+                                                    signDialog(
+                                                      context,
+                                                      userData!,
+                                                      leave.uid!,
+                                                    );
+                                                  },
                                           size: const Size(double.infinity, 30),
                                         ),
                                       ],

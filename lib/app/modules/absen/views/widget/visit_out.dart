@@ -1,15 +1,17 @@
 import 'dart:io';
 
 import 'package:absensi/app/data/model/login_model.dart';
+import 'package:flutter_native_timezone_updated_gradle/flutter_native_timezone.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../data/add_controller.dart';
 import '../../../../data/helper/custom_dialog.dart';
 import '../../../../data/helper/db_helper.dart';
 import '../../../../services/service_api.dart';
 import '../../controllers/absen_controller.dart';
 
-final absC = Get.find<AbsenController>();
+final absC = Get.find<AbsenController>();final adC = Get.put(AdController());
 visitOut({
   required Data dataUser,
   required double latitude,
@@ -31,13 +33,14 @@ visitOut({
     failedDialog(
       Get.context,
       "Peringatan",
-      "Data Check In tidak ditemukan\nHarap Check In terlebih dahulu",
+      "Data Check In tidak ditemukan\n\nPastikan nama/lokasi Checkout\nsama dengan nama/lokasi Check In",
     );
   } else {
     await absC.uploadFotoAbsen();
     Get.back();
     if (absC.image != null) {
       loadingDialog("Sedang mengirim data...", "");
+      absC.timeNetwork(await FlutterNativeTimezone.getLocalTimezone());
       var data = {
         "status": "update",
         "id": dataUser.id,
@@ -91,6 +94,9 @@ visitOut({
       // update data visit ke server
       // offline first
       await ServiceApi().submitVisit(data, false);
+
+      adC.loadInterstitialAd();
+        adC.showInterstitialAd(() {});
       // Get.back();
       // succesDialog(Get.context, "Y",
       //     "Harap tidak menutup aplikasi selama proses syncron data absensi");
@@ -118,6 +124,7 @@ visitOut({
       absC.lat.value = "";
       absC.long.value = "";
       absC.optVisitSelected.value = "";
+      absC.stsAbsenSelected.value = "";
       absC.rndLoc.clear();
     } else {
       Get.back();

@@ -118,7 +118,26 @@ class LeaveView extends GetView<LeaveController> {
                                       i,
                                     ) {
                                       final leave = leaveC.listLeaveReq[i];
+                                      // Fungsi untuk menghitung totalSteps
+                                      var validLevels = [
+                                        "19",
+                                        "26",
+                                        "50",
+                                        "59",
+                                      ];
+                                      int getTotalSteps() {
+                                        //                                         print('parentId: "${leave.parentId}"');
+                                        // print('levelId: "${leave.levelId}", isInValidLevels: ${validLevels.contains(leave.levelId)}');
+                                        if (leave.parentId == "3" &&
+                                            !validLevels.contains(
+                                              leave.levelId,
+                                            )) {
+                                          return 4;
+                                        }
+                                        return 3;
+                                      }
 
+                                      int totalSteps = getTotalSteps();
                                       // Data base nodeTitles full (4 steps)
                                       List<String> nodeTitlesFull = const [
                                         'Apply',
@@ -128,11 +147,12 @@ class LeaveView extends GetView<LeaveController> {
                                       ];
 
                                       // Node titles untuk 3 steps (kurangi 1 step, misalnya tanpa step terakhir "HR")
-                                      // List<String> nodeTitles3Steps = const [
-                                      //   'Apply',
-                                      //   'Store Manager',
-                                      //   'Area Manager',
-                                      // ];
+                                      List<String> nodeTitles3Steps = const [
+                                        'Apply',
+                                        // 'Store Manager',
+                                        'Area Manager',
+                                        'HRD',
+                                      ];
 
                                       // Fungsi untuk dapatkan nodeTitles berdasarkan kondisi user dan totalSteps
                                       List<String> getNodeTitles() {
@@ -141,11 +161,7 @@ class LeaveView extends GetView<LeaveController> {
                                               leave.levelId == "50" ||
                                               leave.levelId == "59") {
                                             // Level 19 di parent 3; 3 steps tapi sM seperti contoh kamu
-                                            return const [
-                                              'Apply',
-                                              'Area Manager',
-                                              'HRD',
-                                            ];
+                                            return nodeTitles3Steps;
                                           } else if (leave.levelId == "26") {
                                             return const [
                                               'Apply',
@@ -158,7 +174,7 @@ class LeaveView extends GetView<LeaveController> {
                                             //   // Tambahkan jika ingin memperhatikan levelId 50 dan 59
                                             //   return nodeTitlesFull; // misal 4 steps
                                           } else {
-                                            // parentId 3 tapi levelId bukan yg disebut di atas, pakai 3 steps
+                                            // parentId 3 tapi levelId bukan yg disebut di atas, pakai 4 steps
                                             return nodeTitlesFull;
                                           }
                                         } else if (leave.parentId == "4") {
@@ -205,26 +221,6 @@ class LeaveView extends GetView<LeaveController> {
                                           return nodeTitlesFull;
                                         }
                                       }
-
-                                      // Fungsi untuk menghitung totalSteps
-                                      var validLevels = [
-                                        "19",
-                                        "26",
-                                        "50",
-                                        "59",
-                                      ];
-
-                                      int getTotalSteps() {
-                                        if (leave.parentId == "3" &&
-                                            !validLevels.contains(
-                                              leave.levelId,
-                                            )) {
-                                          return 4;
-                                        }
-                                        return 3;
-                                      }
-
-                                      int totalSteps = getTotalSteps();
 
                                       // Fungsi untuk mendapatkan step label dan currentStep
                                       Map<String, dynamic> getStepInfo(
@@ -305,7 +301,35 @@ class LeaveView extends GetView<LeaveController> {
                                           if (totalSteps == 3) {
                                             if (leave.acc3 == null) {
                                               // Step 1 - berdasarkan acc2 dan userData
-                                              if (leave.parentId == "4") {
+
+                                              if (leave.parentId == "3") {
+                                                if (leave.levelId == "19" ||
+                                                    leave.levelId == "59") {
+                                                  stepLabel =
+                                                      leave.acc2 == "0" ||
+                                                              leave.acc2 == null
+                                                          ? "Area Manager"
+                                                          : "HRD";
+                                                  currentStep =
+                                                      leave.acc2 == null
+                                                          ? 0
+                                                          : 1;
+                                                } else if (leave.levelId ==
+                                                        "26" ||
+                                                    leave.levelId == "50") {
+                                                  // print(leave.levelId);
+                                                  stepLabel =
+                                                      leave.acc2 == "0" ||
+                                                              leave.acc2 == null
+                                                          ? "Operational Manager"
+                                                          : "HRD";
+                                                  currentStep =
+                                                      leave.acc2 == null
+                                                          ? 0
+                                                          : 1;
+                                                }
+                                              } else if (leave.parentId ==
+                                                  "4") {
                                                 if (leave.levelId == "43") {
                                                   stepLabel =
                                                       leave.acc2 == "0" ||
@@ -317,7 +341,7 @@ class LeaveView extends GetView<LeaveController> {
                                                           ? 0
                                                           : 1;
                                                 } else {
-                                                  print(leave.levelId);
+                                                  // print(leave.levelId);
                                                   stepLabel =
                                                       leave.acc2 == "0" ||
                                                               leave.acc2 == null
@@ -642,10 +666,25 @@ class LeaveView extends GetView<LeaveController> {
                                         ), // key unik per item penting!
                                         controlAffinity:
                                             ListTileControlAffinity.trailing,
+                                        tilePadding: const EdgeInsets.fromLTRB(
+                                          8,
+                                          2,
+                                          8,
+                                          2,
+                                        ),
+                                        childrenPadding:
+                                            const EdgeInsets.fromLTRB(
+                                              8,
+                                              2,
+                                              8,
+                                              2,
+                                            ),
                                         isHasBottomBorder: true,
                                         isHasTopBorder: true,
                                         isHasLeftBorder: true,
                                         isHasRightBorder: true,
+                                        borderRadius: BorderRadius.circular(5),
+                                        backgroundColor: Colors.white,
                                         title: Column(
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
@@ -738,17 +777,31 @@ class LeaveView extends GetView<LeaveController> {
                                             TextSpan(
                                               children: [
                                                 const TextSpan(
-                                                  text: 'Dengan ini,\nSaya ',
+                                                  text:
+                                                      'Saya yang bertanda tangan dibawah ini:\n',
+                                                ),
+                                                const TextSpan(
+                                                  text: 'Nama    : ',
                                                 ),
                                                 TextSpan(
-                                                  text: leave.nama,
+                                                  text: '${leave.nama}\n',
+                                                  style: const TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                                const TextSpan(
+                                                  text: 'Jabatan : ',
+                                                ),
+                                                TextSpan(
+                                                  text:
+                                                      '${leave.namaLevel}\n\n',
                                                   style: const TextStyle(
                                                     fontWeight: FontWeight.bold,
                                                   ),
                                                 ),
                                                 const TextSpan(
                                                   text:
-                                                      ', hendak mengajukan permohonan cuti yaitu, ',
+                                                      'Hendak mengajukan permohonan cuti ',
                                                 ),
                                                 TextSpan(
                                                   text: leave.jenisCuti,
@@ -757,7 +810,7 @@ class LeaveView extends GetView<LeaveController> {
                                                   ),
                                                 ),
                                                 const TextSpan(
-                                                  text: ' untuk jangka waktu ',
+                                                  text: '\nuntuk jangka waktu ',
                                                 ),
                                                 TextSpan(
                                                   text:

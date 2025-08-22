@@ -33,10 +33,11 @@ Widget buildAbsen({required Data? data}) {
         ),
       ),
       const SizedBox(height: 5),
-      Obx(
-        () => Visibility(
-          visible: absC.stsAbsenSelected.value != "Check Out",
-          child: CsDropdownCabang(
+      // Obx(
+      //   () => Visibility(
+      //     visible: absC.stsAbsenSelected.value != "Check Out",
+      //     child: 
+          CsDropdownCabang(
             hintText: data!.namaCabang,
             dataUser: data,
             value:
@@ -44,8 +45,8 @@ Widget buildAbsen({required Data? data}) {
                     ? null
                     : absC.selectedCabang.value,
           ),
-        ),
-      ),
+      //   ),
+      // ),
       const SizedBox(height: 5),
       Obx(
         () => Visibility(

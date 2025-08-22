@@ -6,8 +6,11 @@ import 'package:absensi/app/modules/home/views/summary_absen_area.dart';
 import 'package:absensi/app/modules/leave/controllers/leave_controller.dart';
 import 'package:absensi/app/modules/profil/views/profil_view.dart';
 import 'package:absensi/app/modules/shared/rounded_image.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:icons_plus/icons_plus.dart';
+import '../../../data/helper/custom_dialog.dart';
 import '../../absen/controllers/absen_controller.dart';
 import '../../adjust_presence/controllers/adjust_presence_controller.dart';
 import '../controllers/home_controller.dart';
@@ -27,11 +30,11 @@ class HomeView extends GetView<HomeController> {
         children: [
           // const CsBgImg(),
           Container(
-            height: 250,
+            height: 110,
             decoration: const BoxDecoration(color: AppColors.itemsBackground),
           ),
           Padding(
-            padding: const EdgeInsets.only(left: 15.0, top: 60.0, right: 15.0),
+            padding: const EdgeInsets.only(left: 15.0, top: 35.0, right: 15.0),
             child: Column(
               children: [
                 Row(
@@ -47,14 +50,14 @@ class HomeView extends GetView<HomeController> {
                             );
                           },
                           child: RoundedImage(
-                            height: 50,
-                            width: 50,
+                            height: 60,
+                            width: 60,
                             foto: listDataUser!.foto!,
                             name: listDataUser!.nama!,
                             headerProfile: true,
                           ),
                         ),
-                        const SizedBox(width: 5),
+                        const SizedBox(width: 10),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -80,22 +83,22 @@ class HomeView extends GetView<HomeController> {
                             Text(
                               listDataUser!.levelUser!.capitalize!,
                               style: subtitleTextStyle.copyWith(
-                                color: AppColors.mainTextColor2,
-                                fontWeight: FontWeight.normal,
-                                fontSize: 15,
+                                // color: Colors.grey,
+                                fontSize: 14,
                               ),
                             ),
-                            // Text(
-                            //   listDataUser!.namaCabang!,
-                            //   overflow: TextOverflow.ellipsis,
-                            //   maxLines: 1,
-                            //   softWrap: true,
-                            //   style: subtitleTextStyle.copyWith(fontSize: 14),
-                            // ),
+                            Text(
+                              listDataUser!.namaCabang!.capitalize!,
+                              // overflow: TextOverflow.ellipsis,
+                              // maxLines: 1,
+                              softWrap: true,
+                              style: subtitleTextStyle.copyWith(fontSize: 14),
+                            ),
                           ],
                         ),
                       ],
                     ),
+
                     // IconButton(
                     //   tooltip: "Messages",
                     //   // padding: EdgeInsets.zero,
@@ -126,24 +129,34 @@ class HomeView extends GetView<HomeController> {
                     //     ),
                     //   ),
                     // ),
-
                     // const SizedBox(width: 10),
-                    // IconButton(
+                    // Container(
+                    //   height: 40,
+                    //   width: 40,
+                    //   // padding: const EdgeInsets.all(5),
+                    //   decoration: BoxDecoration(
+                    //     borderRadius: BorderRadius.circular(10),
+                    //     color: Colors.white,
+                    //   ),
+                    //   child: IconButton(
                     //     onPressed: () {
-                    //       promptDialog(context, 'Anda yakin ingin keluar?');
+                    //       promptDialog(
+                    //         context: context,
+                    //         title: 'LOG OUT',
+                    //         desc: 'Are you sure you want to log out?',
+                    //         btnOkOnPress: () => auth.logout(),
+                    //       );
                     //     },
-                    //     icon: const Icon(
-                    //       Icons.logout_rounded,
-                    //       color: Colors.white,
-                    //       size: 35,
-                    //     ))
+                    //     icon: Icon(Icons.logout_rounded, color: red, size: 30),
+                    //   ),
+                    // ),
                   ],
                 ),
                 const SizedBox(height: 20),
                 // Row(
                 //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 //   children: [
-                   
+
                 //     Obx(
                 //       () => IconButton(
                 //         onPressed:
@@ -209,7 +222,6 @@ class HomeView extends GetView<HomeController> {
               ],
             ),
           ),
-          
         ],
       ),
     );

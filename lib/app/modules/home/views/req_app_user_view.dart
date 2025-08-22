@@ -55,6 +55,7 @@ class ReqAppUserView extends GetView {
       floatingActionButton: Builder(
         builder:
             (context) => FloatingActionButton(
+              backgroundColor: AppColors.itemsBackground,
               onPressed: () {
                 dialogSearchData(context);
               },
@@ -226,37 +227,55 @@ class ReqAppUserView extends GetView {
                       },
                     ),
                     CsElevatedButtonIcon(
+                      backgroundColor: AppColors.itemsBackground,
                       icon: const Icon(Icons.save_as_rounded),
                       fontSize: 14,
                       label: 'Cari',
                       onPressed: () {
-                        var tglA = DateFormat(
-                          'yyyy-MM-dd',
-                        ).format(DateTime.parse(adjCtrl.dateInput1.text));
-                        var tglB = DateFormat(
-                          'yyyy-MM-dd',
-                        ).format(DateTime.parse(adjCtrl.dateInput2.text));
-
-                        if (DateTime.parse(
-                          tglA,
-                        ).isAfter(DateTime.parse(tglB))) {
-                          failedDialog(
-                            context,
-                            'ERROR',
-                            'Rentang tanggal yang Anda masukkan salah',
+                        if (adjCtrl.dateInput1.text.isEmpty ||
+                            adjCtrl.dateInput2.text.isEmpty) {
+                          showToast(
+                            'Harap pilih tanggal data adjusment terlebih dahulu',
                           );
                         } else {
-                          adjCtrl.isLoading.value = true;
-                          // adjCtrl.selectedType.value = val;
-                          adjCtrl.getReqAppUpt(
-                            adjCtrl.selectedStatus.value,
-                            adjCtrl.selectedType.value,
-                            userData!.level,
-                            userData!.id,
-                            adjCtrl.dateInput1.text,
-                            adjCtrl.dateInput2.text,
-                          );
-                          Get.back();
+                          var tglA = DateFormat(
+                            'yyyy-MM-dd',
+                          ).format(DateTime.parse(adjCtrl.dateInput1.text));
+                          var tglB = DateFormat(
+                            'yyyy-MM-dd',
+                          ).format(DateTime.parse(adjCtrl.dateInput2.text));
+
+                          if (DateTime.parse(
+                            tglA,
+                          ).isAfter(DateTime.parse(tglB))) {
+                            failedDialog(
+                              context,
+                              'ERROR',
+                              'Rentang tanggal yang Anda masukkan salah',
+                            );
+                          } else {
+                            Get.back();
+                            Future.delayed(
+                              const Duration(milliseconds: 300),
+                              () async {
+                                adjCtrl.isLoading.value = true;
+                                // adjCtrl.selectedType.value = val;
+                                await adjCtrl.getReqAppUpt(
+                                  adjCtrl.selectedStatus.value,
+                                  adjCtrl.selectedType.value,
+                                  userData!.level,
+                                  userData!.id,
+                                  adjCtrl.dateInput1.text,
+                                  adjCtrl.dateInput2.text,
+                                );
+
+                                adjCtrl.dateInput1.clear();
+                                adjCtrl.dateInput2.clear();
+                                adjCtrl.selectedStatus.value = "";
+                                adjCtrl.selectedType.value = "";
+                              },
+                            );
+                          }
                         }
                       },
                     ),

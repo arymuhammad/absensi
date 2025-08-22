@@ -5,6 +5,7 @@ class LoginOffline {
   String? password;
   String? kodeCabang;
   String? namaCabang;
+  String? nik;
   String? lat;
   String? long;
   String? foto;
@@ -27,6 +28,7 @@ class LoginOffline {
     this.password,
     this.kodeCabang,
     this.namaCabang,
+    this.nik,
     this.lat,
     this.long,
     this.foto,
@@ -50,6 +52,7 @@ class LoginOffline {
     password = json['password'];
     kodeCabang = json['kode_cabang'];
     namaCabang = json['nama_cabang'];
+    nik = json['nik'].toString();
     lat = json['lat'].toString();
     long = json['long'].toString();
     foto = json['foto'];
@@ -74,6 +77,7 @@ class LoginOffline {
     data['password'] = password;
     data['kode_cabang'] = kodeCabang;
     data['nama_cabang'] = namaCabang;
+    data['nik'] = nik;
     data['foto'] = foto;
     data['lat'] = lat;
     data['long'] = long;
