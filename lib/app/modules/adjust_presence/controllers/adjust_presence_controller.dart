@@ -268,11 +268,12 @@ class AdjustPresenceController extends GetxController
     await ServiceApi().updateAbsen(data);
     selectedShift.value = "";
     succesDialog(
-      Get.context!,
-      'N',
-      'Data berhasil diupdate',
-      DialogType.success,
-      'SUKSES',
+      context: Get.context!,
+      pageAbsen: 'N',
+      desc: 'Data berhasil diupdate',
+      type: DialogType.success,
+      title: 'SUKSES',
+      btnOkOnPress: () => Get.back(),
     );
   }
 
@@ -320,11 +321,12 @@ class AdjustPresenceController extends GetxController
     if (data.isNotEmpty) {
       await ServiceApi().updateAbsen(data);
       succesDialog(
-        Get.context!,
-        'N',
-        'Data berhasil diupdate',
-        DialogType.success,
-        'SUKSES',
+        context: Get.context!,
+        pageAbsen: 'N',
+        desc: 'Data berhasil diupdate',
+        type: DialogType.success,
+        title: 'SUKSES',
+        btnOkOnPress: () => Get.back(),
       );
     }
   }

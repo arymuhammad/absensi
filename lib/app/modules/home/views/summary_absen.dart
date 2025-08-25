@@ -616,7 +616,7 @@ class SummaryAbsen extends GetView {
                                                               absenC.dataLimitAbsen.isNotEmpty &&
                                                                       absenC.dataLimitAbsen[i].jamAbsenMasuk! !=
                                                                           ""
-                                                                  ? '${absenC.dataLimitAbsen[i].jamAbsenPulang != "" ? diffHours.inHours % 24 : '-'}j${absenC.dataLimitAbsen[i].jamAbsenPulang != "" ? diffHours.inMinutes % 60 : '-'}m'
+                                                                  ? '${absenC.dataLimitAbsen[i].jamAbsenPulang != "" ? diffHours.inHours % 24 : '-'}j ${absenC.dataLimitAbsen[i].jamAbsenPulang != "" ? diffHours.inMinutes % 60 : '-'}m'
                                                                   : '-:-',
                                                               style: const TextStyle(
                                                                 // color:

@@ -100,6 +100,7 @@ class DetailVisitView extends GetView {
           ),
         ],
       ),
+  
     );
   }
 
@@ -154,7 +155,7 @@ class DetailVisitView extends GetView {
                       onTap: (tapPosition, point) {
                         // print(point.latitude);
                         // print(point.longitude);
-                         var gmaps = getGoogleMapsUrl(
+                        var gmaps = getGoogleMapsUrl(
                           point.latitude,
                           point.longitude,
                         );

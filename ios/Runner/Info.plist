@@ -54,6 +54,6 @@
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>This app needs access to location when user taking attendance</string>
 	<key>com.startapp.sdk.APPLICATION_ID</key>
-    <string>207916836</string>
+    <string>207249595</string>
 </dict>
 </plist>

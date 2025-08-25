@@ -12,6 +12,7 @@ import 'package:absensi/app/data/model/level_model.dart';
 import 'package:absensi/app/data/model/report_sales_model.dart';
 import 'package:absensi/app/data/model/req_app_model.dart';
 import 'package:absensi/app/data/model/shift_kerja_model.dart';
+import 'package:absensi/app/data/model/summary_absen_model.dart';
 import 'package:absensi/app/data/model/user_model.dart';
 import 'package:absensi/app/data/model/visit_model.dart';
 import 'package:absensi/app/modules/semua_absen/views/widget/form_filter.dart';
@@ -280,21 +281,23 @@ class ServiceApi {
         if (mode == "add") {
           Get.back();
           succesDialog(
-            Get.context!,
-            "N",
-            "Data berhasil disimpan",
-            DialogType.success,
-            'SUKSES',
+            context: Get.context!,
+            pageAbsen: "N",
+            desc: "Data berhasil disimpan",
+            type: DialogType.success,
+            title: 'SUKSES',
+            btnOkOnPress: () => Get.back(),
           );
         } else {
           // if (mode == "update") {
           Get.back();
           succesDialog(
-            Get.context!,
-            "N",
-            "Data berhasil diperbarui",
-            DialogType.success,
-            'SUKSES',
+            context: Get.context!,
+            pageAbsen: "N",
+            desc: "Data berhasil diperbarui",
+            type: DialogType.success,
+            title: 'SUKSES',
+            btnOkOnPress: () => Get.back(),
           );
           // Future.delayed(const Duration(seconds: 1), () {
           //   Get.back(closeOverlays: true);
@@ -396,11 +399,17 @@ class ServiceApi {
         if (!isOnInit) {
           Get.back();
           succesDialog(
-            Get.context,
-            "Y",
-            "Harap tidak menutup aplikasi selama proses syncron data absensi",
-            DialogType.warning,
-            'PERINGATAN',
+            context: Get.context!,
+            pageAbsen: "Y",
+            desc:
+                "Harap tidak menutup aplikasi selama proses syncron data absensi",
+            type: DialogType.warning,
+            title: 'PERINGATAN',
+            btnOkOnPress: () {
+              auth.selectedMenu(0);
+              Future.delayed(const Duration(milliseconds: 300));
+              Get.back();
+            },
           );
         } else {
           showToast('data sukses dikirim');
@@ -625,11 +634,12 @@ class ServiceApi {
 
   getUser() async {
     try {
-      final response = await http.get(Uri.parse('${baseUrl}get_user'));
+      final response = await http
+          .get(Uri.parse('${baseUrl}get_user'))
+          .timeout(const Duration(seconds: 60));
       switch (response.statusCode) {
         case 200:
           List<dynamic> result = json.decode(response.body)['data'];
-
           List<CekUser> dataUser =
               result.map((e) => CekUser.fromJson(e)).toList();
           return dataUser;
@@ -645,6 +655,8 @@ class ServiceApi {
     } on FetchDataException catch (e) {
       // print('error caught: ${e.message}');
       showToast("${e.message}");
+    } on Exception catch (e) {
+      showToast("$e");
     }
   }
 
@@ -911,11 +923,17 @@ class ServiceApi {
         if (!isOnInit) {
           Get.back();
           succesDialog(
-            Get.context,
-            "Y",
-            "Harap tidak menutup aplikasi selama proses syncron data absensi",
-            DialogType.warning,
-            'PERINGATAN',
+            context: Get.context!,
+            pageAbsen: "Y",
+            desc:
+                "Harap tidak menutup aplikasi selama proses syncron data absensi",
+            type: DialogType.warning,
+            title: 'PERINGATAN',
+            btnOkOnPress: () {
+              auth.selectedMenu(0);
+              Future.delayed(const Duration(milliseconds: 300));
+              Get.back();
+            },
           );
         } else {
           showToast('data sukses dikirim');
@@ -1312,11 +1330,13 @@ class ServiceApi {
         if (val.statusCode == 200) {
           Get.back();
           succesDialog(
-            Get.context!,
-            'N',
-            'Data berhasil dikirim\nMenunggu persetujuan IT untuk perubahan data',
-            DialogType.success,
-            'SUKSES',
+            context: Get.context!,
+            pageAbsen: 'N',
+            desc:
+                'Data berhasil dikirim\nMenunggu persetujuan IT untuk perubahan data',
+            type: DialogType.success,
+            title: 'SUKSES',
+            btnOkOnPress: () => Get.back(),
           );
         } else {
           Get.back();
@@ -1488,6 +1508,33 @@ class ServiceApi {
       }
     } on Exception catch (_) {
       showToast('Terjadi kesalahan');
+    }
+  }
+
+  getNotif(Map<String, dynamic> param) async {
+    try {
+      final response = await http
+          .post(
+            Uri.parse('${baseUrl}get_notif'),
+            // headers: {'Content-Type': 'application/json'},
+            body: jsonEncode(param),
+          )
+          .timeout(const Duration(seconds: 60));
+
+      if (response.statusCode == 200) {
+        final decoded = jsonDecode(response.body);
+        if (decoded['data'] == null) {
+          throw Exception('Response data is null');
+        }
+        SummaryAbsenModel notif = SummaryAbsenModel.fromJson(decoded['data']);
+
+        return notif;
+      } else {
+        throw Exception('Failed to load data, status: ${response.statusCode}');
+      }
+    } catch (e) {
+      showToast(e.toString());
+      return SummaryAbsenModel(); // fallback kosong untuk mencegah crash UI
     }
   }
 }

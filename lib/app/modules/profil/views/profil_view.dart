@@ -128,205 +128,210 @@ class ProfilView extends GetView<ProfilController> {
                 ),
                 const SizedBox(height: 10),
                 Expanded(
-                  child: ListView(
-                    padding: EdgeInsets.zero,
-                    children: [
-                      SizedBox(
-                        height: 250,
-                        child: Card(
-                          color: AppColors.contentColorWhite,
+                  child: RefreshIndicator(
+                    onRefresh: () {
+                      return ctr.getLastUserData(dataUser: listDataUser!);
+                    },
+                    child: ListView(
+                      padding: EdgeInsets.zero,
+                      children: [
+                        SizedBox(
+                          height: 250,
+                          child: Card(
+                            color: AppColors.contentColorWhite,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: ListView(
+                              padding: EdgeInsets.zero,
+                              physics: const NeverScrollableScrollPhysics(),
+                              children: [
+                                ListTile(
+                                  title: Text(
+                                    'Employee ID',
+                                    style: subtitleTextStyle,
+                                  ),
+                                  trailing:
+                                      listDataUser!.nik!.isEmpty
+                                          ? CsElevatedButton(
+                                            color: AppColors.itemsBackground,
+                                            fontsize: 12,
+                                            label: 'Generate ID',
+                                            onPressed:
+                                                listDataUser!.createdAt! == ""
+                                                    ? null
+                                                    : () {
+                                                      ctr.generateEmpId(
+                                                        listDataUser!,
+                                                      );
+                                                    },
+                                          )
+                                          : Text(
+                                            listDataUser!.nik!,
+                                            style: titleTextStyle,
+                                          ),
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                  ),
+                                  dense: true,
+                                ),
+                                const Divider(
+                                  indent: 15,
+                                  endIndent: 15,
+                                  height: 0,
+                                ),
+                                ListTile(
+                                  title: Text(
+                                    'Phone No.',
+                                    style: subtitleTextStyle,
+                                  ),
+                                  trailing: Text(
+                                    listDataUser!.noTelp!,
+                                    style: titleTextStyle,
+                                  ),
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                  ),
+                                  dense: true,
+                                ),
+                                const Divider(
+                                  indent: 15,
+                                  endIndent: 15,
+                                  height: 0,
+                                ),
+                                ListTile(
+                                  title: Text(
+                                    'Registered In',
+                                    style: subtitleTextStyle,
+                                  ),
+                                  trailing: Text(
+                                    listDataUser!.namaCabang!.capitalize!,
+                                    style: titleTextStyle,
+                                  ),
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                  ),
+                                  dense: true,
+                                ),
+                                const Divider(
+                                  indent: 15,
+                                  endIndent: 15,
+                                  height: 0,
+                                ),
+                                ListTile(
+                                  title: Text(
+                                    'Registered At',
+                                    style: subtitleTextStyle,
+                                  ),
+                                  trailing: Text(
+                                    listDataUser!.createdAt != ""
+                                        ? FormatWaktu.formatShortEng(
+                                          tanggal: DateTime.parse(
+                                            listDataUser!.createdAt!,
+                                          ),
+                                        )
+                                        : '-',
+                                    style: titleTextStyle,
+                                  ),
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                  ),
+                                  dense: true,
+                                ),
+                                const Divider(
+                                  indent: 15,
+                                  endIndent: 15,
+                                  height: 0,
+                                ),
+                                ListTile(
+                                  title: Text(
+                                    'Username',
+                                    style: subtitleTextStyle,
+                                  ),
+                                  trailing: Text(
+                                    listDataUser!.username!,
+                                    style: titleTextStyle,
+                                  ),
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                  ),
+                                  dense: true,
+                                ),
+                                const Divider(
+                                  indent: 15,
+                                  endIndent: 15,
+                                  height: 0,
+                                ),
+                                ListTile(
+                                  title: Text(
+                                    'Password',
+                                    style: subtitleTextStyle,
+                                  ),
+                                  trailing: Text(
+                                    '********',
+                                    style: titleTextStyle,
+                                  ),
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                  ),
+                                  dense: true,
+                                ),
+                                const Divider(
+                                  indent: 15,
+                                  endIndent: 15,
+                                  height: 0,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        Card(
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
-                          child: ListView(
-                            padding: EdgeInsets.zero,
-                            physics: const NeverScrollableScrollPhysics(),
-                            children: [
-                              ListTile(
-                                title: Text(
-                                  'Employee ID',
-                                  style: subtitleTextStyle,
-                                ),
-                                trailing:
-                                    listDataUser!.nik!.isEmpty
-                                        ? CsElevatedButton(
-                                          color: AppColors.itemsBackground,
-                                          fontsize: 12,
-                                          label: 'Generate ID',
-                                          onPressed:
-                                              listDataUser!.createdAt! == ""
-                                                  ? null
-                                                  : () {
-                                                    ctr.generateEmpId(
-                                                      listDataUser!,
-                                                    );
-                                                  },
-                                        )
-                                        : Text(
-                                          listDataUser!.nik!,
-                                          style: titleTextStyle,
-                                        ),
-                                contentPadding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                ),
-                                dense: true,
+                          child: ListTile(
+                            onTap: () {
+                              promptDialog(
+                                context: context,
+                                title: 'LOG OUT',
+                                desc: 'Anda yakin ingin keluar?',
+                                btnOkOnPress: () => auth.logout(),
+                              );
+                            },
+                            leading: Container(
+                              height: 30,
+                              width: 30,
+                              decoration: BoxDecoration(
+                                color: bgContainer,
+                                borderRadius: BorderRadius.circular(8),
                               ),
-                              const Divider(
-                                indent: 15,
-                                endIndent: 15,
-                                height: 0,
+                              child: Icon(
+                                Icons.power_settings_new_sharp,
+                                color: Colors.redAccent[700],
                               ),
-                              ListTile(
-                                title: Text(
-                                  'Phone No.',
-                                  style: subtitleTextStyle,
-                                ),
-                                trailing: Text(
-                                  listDataUser!.noTelp!,
-                                  style: titleTextStyle,
-                                ),
-                                contentPadding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                ),
-                                dense: true,
-                              ),
-                              const Divider(
-                                indent: 15,
-                                endIndent: 15,
-                                height: 0,
-                              ),
-                              ListTile(
-                                title: Text(
-                                  'Registered In',
-                                  style: subtitleTextStyle,
-                                ),
-                                trailing: Text(
-                                  listDataUser!.namaCabang!.capitalize!,
-                                  style: titleTextStyle,
-                                ),
-                                contentPadding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                ),
-                                dense: true,
-                              ),
-                              const Divider(
-                                indent: 15,
-                                endIndent: 15,
-                                height: 0,
-                              ),
-                              ListTile(
-                                title: Text(
-                                  'Registered At',
-                                  style: subtitleTextStyle,
-                                ),
-                                trailing: Text(
-                                  listDataUser!.createdAt != ""
-                                      ? FormatWaktu.formatShortEng(
-                                        tanggal: DateTime.parse(
-                                          listDataUser!.createdAt!,
-                                        ),
-                                      )
-                                      : '-',
-                                  style: titleTextStyle,
-                                ),
-                                contentPadding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                ),
-                                dense: true,
-                              ),
-                              const Divider(
-                                indent: 15,
-                                endIndent: 15,
-                                height: 0,
-                              ),
-                              ListTile(
-                                title: Text(
-                                  'Username',
-                                  style: subtitleTextStyle,
-                                ),
-                                trailing: Text(
-                                  listDataUser!.username!,
-                                  style: titleTextStyle,
-                                ),
-                                contentPadding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                ),
-                                dense: true,
-                              ),
-                              const Divider(
-                                indent: 15,
-                                endIndent: 15,
-                                height: 0,
-                              ),
-                              ListTile(
-                                title: Text(
-                                  'Password',
-                                  style: subtitleTextStyle,
-                                ),
-                                trailing: Text(
-                                  '********',
-                                  style: titleTextStyle,
-                                ),
-                                contentPadding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                ),
-                                dense: true,
-                              ),
-                              const Divider(
-                                indent: 15,
-                                endIndent: 15,
-                                height: 0,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      Card(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: ListTile(
-                          onTap: () {
-                            promptDialog(
-                              context: context,
-                              title: 'LOG OUT',
-                              desc: 'Anda yakin ingin keluar?',
-                              btnOkOnPress: () => auth.logout(),
-                            );
-                          },
-                          leading: Container(
-                            height: 30,
-                            width: 30,
-                            decoration: BoxDecoration(
-                              color: bgContainer,
-                              borderRadius: BorderRadius.circular(8),
                             ),
-                            child: Icon(
-                              Icons.power_settings_new_sharp,
-                              color: Colors.redAccent[700],
+                            title: Text(
+                              'Logout',
+                              style: TextStyle(
+                                color: Colors.redAccent[700],
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            // subtitle: Text(
+                            //   'exit app',
+                            //   style: TextStyle(
+                            //     color: subTitleColor,
+                            //     fontSize: 13,
+                            //   ),
+                            // ),
+                            trailing: Icon(
+                              Icons.keyboard_arrow_right_rounded,
+                              color: subTitleColor,
                             ),
                           ),
-                          title: Text(
-                            'Logout',
-                            style: TextStyle(
-                              color: Colors.redAccent[700],
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          // subtitle: Text(
-                          //   'exit app',
-                          //   style: TextStyle(
-                          //     color: subTitleColor,
-                          //     fontSize: 13,
-                          //   ),
-                          // ),
-                          trailing: Icon(
-                            Icons.keyboard_arrow_right_rounded,
-                            color: subTitleColor,
-                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ],

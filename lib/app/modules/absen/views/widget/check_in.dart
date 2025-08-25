@@ -159,11 +159,12 @@ checkIn(Data dataUser, double latitude, double longitude) async {
         absC.long.value = "";
         Get.back();
         succesDialog(
-          Get.context,
-          "N",
-          "Anda sudah Absen Masuk hari ini.",
-          DialogType.info,
-          'INFO',
+          context: Get.context!,
+          pageAbsen: "N",
+          desc: "Anda sudah Absen Masuk hari ini.",
+          type: DialogType.info,
+          title: 'INFO',
+          btnOkOnPress: () => Get.back(),
         );
       }
       // }
@@ -184,11 +185,12 @@ checkIn(Data dataUser, double latitude, double longitude) async {
     absC.long.value = "";
     Get.back();
     succesDialog(
-      Get.context,
-      "N",
-      "Anda sudah Absen Masuk hari ini.",
-      DialogType.info,
-      'INFO',
+      context: Get.context!,
+      pageAbsen: "N",
+      desc: "Anda sudah Absen Masuk hari ini.",
+      type: DialogType.info,
+      title: 'INFO',
+      btnOkOnPress: () => Get.back(),
     );
   }
 }

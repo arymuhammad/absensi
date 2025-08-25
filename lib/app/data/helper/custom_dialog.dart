@@ -92,13 +92,14 @@ void dialogMsgAbsen(code, msg) {
   );
 }
 
-void succesDialog(
-  context,
-  String pageAbsen,
-  String desc,
-  DialogType type,
-  String title,
-) {
+void succesDialog({
+  required BuildContext context,
+  required String pageAbsen,
+  required String desc,
+  required DialogType type,
+  required String title,
+  required Function()? btnOkOnPress,
+}) {
   AwesomeDialog(
     context: context,
     animType: AnimType.scale,
@@ -108,16 +109,7 @@ void succesDialog(
     dismissOnBackKeyPress: false,
     title: title,
     desc: desc,
-    btnOkOnPress: () {
-      if (pageAbsen == "Y") {
-        auth.selectedMenu(0);
-        Future.delayed(const Duration(milliseconds: 300));
-        Get.back();
-      } else {
-        // Get.back();
-        Get.back();
-      }
-    },
+    btnOkOnPress: btnOkOnPress,
     btnOkIcon: Icons.check_circle,
     onDismissCallback: (type) {
       debugPrint('Dialog Dissmiss from callback $type');

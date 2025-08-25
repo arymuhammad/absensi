@@ -220,11 +220,11 @@ visitIn({
     absC.selectedCabangVisit.value = "";
     Get.back();
     succesDialog(
-      Get.context,
-      "N",
-      "Anda sudah Check In hari ini",
-      DialogType.info,
-      'INFO',
+     context:  Get.context!,
+      pageAbsen: "N",
+      desc: "Anda sudah Check In hari ini",
+     type:  DialogType.info,
+      title: 'INFO',btnOkOnPress: () => Get.back(),
     );
   }
 }

@@ -224,7 +224,7 @@ class LoginController extends GetxController with GetTickerProviderStateMixin {
     // Get.reset();
     Get.back();
 
-    showToast("Logout Berhasil");
+    // showToast("Logout Berhasil");
   }
 
   selectedMenu(index) {

@@ -22,9 +22,9 @@ dialogUpdateApp() {
       barrierDismissible: false,
       title: 'Available Updates',
       titleStyle: const TextStyle(fontWeight: FontWeight.bold),
-      content: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
+      content: ListView(
+        // mainAxisAlignment: MainAxisAlignment.start,
+        // crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Divider(
             thickness: 1,

@@ -156,6 +156,7 @@ class AbsenController extends GetxController {
   var barcodeScanRes = ''.obs;
   var scannedLatLng = Rx<LatLng?>(null);
   final isEnabled = true.obs;
+  int maxRetries = 3;
 
   @override
   void onInit() async {
@@ -541,23 +542,39 @@ class AbsenController extends GetxController {
     return userCabang.value = response;
   }
 
-  timeNetwork(String timeZone) async {
-    try {
-      final response = await http
-          .get(
-            Uri.parse(
-              'https://timeapi.io/api/Time/current/zone?timeZone=$timeZone',
-            ),
-          )
-          // .then((data) => jsonDecode(data.body))
-          .timeout(const Duration(minutes: 1));
-      var result = jsonDecode(response.body);
-      timeNow = result['time'];
-      // DateTime.parse(response['dateTime']).timeZoneName;
-      // timeNow = DateFormat('HH:mm').format(DateTime.now()).toString();
-      // print(DateTime.parse(response['dateTime']).timeZoneName);
-      dateNowServer = result['dateTime'];
-    } on HandshakeException catch (_) {}
+  Future<void> timeNetwork(String timeZone) async {
+    int attempts = 0;
+    while (attempts < maxRetries) {
+      try {
+        final response = await http
+            .get(
+              Uri.parse(
+                'https://timeapi.io/api/Time/current/zone?timeZone=$timeZone',
+              ),
+            )
+            .timeout(
+              const Duration(seconds: 60),
+              onTimeout: () => http.Response('Timeout', 408),
+            );
+
+        if (response.statusCode == 200) {
+          var result = jsonDecode(response.body);
+          timeNow = result['time'];
+          dateNowServer = result['dateTime'];
+          break;
+        } else {
+          attempts++;
+          await Future.delayed(const Duration(seconds: 3));
+        }
+      } catch (e) {
+        attempts++;
+        await Future.delayed(const Duration(seconds: 3));
+      }
+    }
+
+    if (attempts == maxRetries) {
+      showToast('Gagal mengambil data waktu, coba lagi nanti');
+    }
   }
 
   getLoc(Data? dataUser) async {
@@ -1335,21 +1352,23 @@ class AbsenController extends GetxController {
           if (status != "onInit") {
             Get.back(closeOverlays: true);
             succesDialog(
-              Get.context!,
-              "N",
-              "No system updates",
-              DialogType.info,
-              'INFO',
+              context: Get.context!,
+              pageAbsen: "N",
+              desc: "No system updates",
+              type: DialogType.info,
+              title: 'INFO',
+              btnOkOnPress: () => Get.back(),
             );
           }
         }
       } else {
         succesDialog(
-          Get.context!,
-          "N",
-          "No system updates",
-          DialogType.info,
-          'INFO',
+          context: Get.context!,
+          pageAbsen: "N",
+          desc: "No system updates",
+          type: DialogType.info,
+          title: 'INFO',
+          btnOkOnPress: () => Get.back(),
         );
       }
     } on SocketException catch (e) {

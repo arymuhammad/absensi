@@ -166,11 +166,12 @@ class AddPegawaiController extends GetxController {
         if (latestVer == currVer) {
           // Get.back();
           succesDialog(
-            context,
-            "N",
-            "No system updates",
-            DialogType.info,
-            'INFO',
+            context: context,
+            pageAbsen: "N",
+            desc: "No system updates",
+            type: DialogType.info,
+            title: 'INFO',
+            btnOkOnPress: () => Get.back(),
           );
           // dialogMsgScsUpd("", "Tidak ada pembaruan sistem");
         } else {
@@ -607,7 +608,7 @@ class AddPegawaiController extends GetxController {
             "created_at": joinDate.text.isNotEmpty ? joinDate.text : null,
           };
           // loadingDialog("updating data", "");
-
+          // print(data);
           await ServiceApi().addUpdatePegawai(data, mode);
 
           // langsung update sharedpref tanpa harus re login
@@ -726,21 +727,27 @@ class AddPegawaiController extends GetxController {
         username,
       );
 
-      final response = await ServiceApi().updatePasswordUser(data);
-      Future.delayed(Duration.zero, () {
-        succesDialog(
-          context,
-          "N",
-          "Password updated successfully\nPlease re-login",
-          DialogType.success,
-          'SUCCESS',
-        );
-      });
-      cekDataUser.value = response;
+      await ServiceApi().updatePasswordUser(data);
+      // Future.delayed(Duration.zero, () {
+      Get.back();
+      succesDialog(
+        context: context,
+        pageAbsen: "N",
+        desc: "Password updated successfully\nPlease re-login",
+        type: DialogType.success,
+        title: 'SUCCESS',
+        btnOkOnPress: () {
+          // Future.delayed(const Duration(seconds: 1), () {
+            auth.logout();
+            Get.back(closeOverlays: true);
+          // });
+        },
+      );
+      // });
+      // cekDataUser.value = response;
 
       pass.clear();
-      Get.back();
-      Get.back();
+      // Get.back();
       // if (cekDataUser.isNotEmpty) {
       // } else {
       //   dialogMsg(
@@ -826,5 +833,26 @@ class AddPegawaiController extends GetxController {
       userData.id!,
       userData.username!,
     );
+  }
+
+  Future<void> getLastUserData({required Data dataUser}) async {
+    var newUser = await ServiceApi().fetchCurrentUser({
+      "username": dataUser.username!,
+      "password": dataUser.password!,
+    });
+    if (Get.isRegistered<LoginController>()) {
+      final logC = Get.find<LoginController>();
+      logC.logUser.value = newUser;
+      // update sharedpreff
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('userDataLogin', jsonEncode(newUser.toJson()));
+
+      SQLHelper.instance.updateDataUser(
+        newUser.toJson(),
+        newUser.id!,
+        newUser.username!,
+      );
+      logC.refresh();
+    }
   }
 }

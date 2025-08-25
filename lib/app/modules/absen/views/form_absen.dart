@@ -164,7 +164,7 @@ formAbsen(Data dataUser, double latitude, double longitude) async {
           Get.back();
           dialogMsgCncl(
             'Terjadi Kesalahan',
-            'Anda berada diluar area absen\nJarak anda ${(absC.distanceStore.value/1000).toStringAsFixed(2)} Km dari titik lokasi',
+            'Anda berada diluar area absen\nJarak anda ${(absC.distanceStore.value / 1000).toStringAsFixed(2)} Km dari titik lokasi',
           );
           absC.selectedShift.value = "";
           absC.selectedCabang.value = "";
@@ -322,11 +322,16 @@ formAbsen(Data dataUser, double latitude, double longitude) async {
                   absC.lat.value = "";
                   absC.long.value = "";
                   succesDialog(
-                    Get.context,
-                    "Y",
-                    "Anda sudah Absen Masuk hari ini.",
-                    DialogType.info,
-                    'INFO',
+                    context: Get.context!,
+                    pageAbsen: "Y",
+                    desc: "Anda sudah Absen Masuk hari ini.",
+                    type: DialogType.info,
+                    title: 'INFO',
+                    btnOkOnPress: () {
+                      auth.selectedMenu(0);
+                      Future.delayed(const Duration(milliseconds: 300));
+                      Get.back();
+                    },
                   );
                 }
                 // }
@@ -350,11 +355,16 @@ formAbsen(Data dataUser, double latitude, double longitude) async {
               absC.lat.value = "";
               absC.long.value = "";
               succesDialog(
-                Get.context,
-                "Y",
-                "Anda sudah Absen Masuk hari ini.",
-                DialogType.info,
-                'INFO',
+                context: Get.context!,
+                pageAbsen: "Y",
+                desc: "Anda sudah Absen Masuk hari ini.",
+                type: DialogType.info,
+                title: 'INFO',
+                btnOkOnPress: () {
+                  auth.selectedMenu(0);
+                  Future.delayed(const Duration(milliseconds: 300));
+                  Get.back();
+                },
               );
             }
           } else {

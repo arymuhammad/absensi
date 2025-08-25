@@ -42,7 +42,8 @@ class LeaveController extends GetxController {
   );
   int currentStep = 0;
   late StepProgressController stepProgressController;
-
+  int retryCount = 0;
+  final int maxRetry = 3;
   final StartAppSdk startAppSdk = StartAppSdk();
   Rx<StartAppBannerAd?> bannerAdStartApp = Rx<StartAppBannerAd?>(null);
 
@@ -70,7 +71,7 @@ class LeaveController extends GetxController {
       logC.refresh();
     }
 
-    startAppSdk.setTestAdsEnabled(false); // Aktifkan saat development
+    startAppSdk.setTestAdsEnabled(true); // Aktifkan saat development
     loadBannerAd();
   }
 
@@ -79,32 +80,23 @@ class LeaveController extends GetxController {
       bannerAdStartApp.value = await startAppSdk.loadBannerAd(
         StartAppBannerType.BANNER,
       );
+      retryCount = 0; // Reset jika berhasil
       // simpan bannerAd ke state/store supaya bisa dipakai di widget
     } on PlatformException catch (_) {
-      // print('Failed to load banner ad: ${e.message}');
-      showToast('Gagal memuat iklan banner');
-      loadBannerAd();
+      if (retryCount < maxRetry) {
+        retryCount++;
+        Future.delayed(const Duration(seconds: 3), () {
+          loadBannerAd();
+        });
+      } else {
+        showToast('Gagal memuat iklan banner setelah $maxRetry kali percobaan');
+      }
     } catch (e) {
       // print('Unexpected error: $e');
       showToast('Gagal memuat iklan banner');
-      loadBannerAd();
+      // loadBannerAd();
     }
-    // var ads = await startAppSdk
-    //     .loadBannerAd(
-    //       StartAppBannerType.BANNER,
-    //       prefs: const StartAppAdPreferences(adTag: 'primary'),
-    //       onAdClicked: () {
-    //         // print('Banner ad clicked');
-    //       },
-    //       onAdImpression: () {
-    //         // print('Banner ad impression');
-    //       },
-    //     )
-    //     .onError((error, stackTrace) {
-    //       // print('Error loading banner ad: $error');
-    //       throw UnsupportedError('$error');
-    //     });
-    // bannerAdStartApp.value = ads;
+
   }
 
   @override

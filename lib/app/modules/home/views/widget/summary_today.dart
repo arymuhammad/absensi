@@ -364,7 +364,7 @@ Widget _buildTimeCard({
                                           jamMenit: effectiveData[0].jamPulang!,
                                         ),
                                       )
-                                      ? green
+                                      ? red
                                       : FormatWaktu.formatJamMenit(
                                         jamMenit:
                                             effectiveData[0].jamAbsenPulang!,
@@ -374,7 +374,7 @@ Widget _buildTimeCard({
                                         ),
                                       )
                                       ? green
-                                      : red)
+                                      : yellow)
                                   : AppColors.mainTextColor1),
                     ),
                     child: Text(
@@ -417,7 +417,7 @@ Widget _buildTimeCard({
                                     ),
                                   )
                                   ? 'On Time'
-                                  : 'Late')
+                                  : 'Overtime')
                               : ''),
                       style: const TextStyle(
                         color: AppColors.contentColorWhite,
