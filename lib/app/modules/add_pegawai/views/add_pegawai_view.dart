@@ -21,11 +21,8 @@ class AddPegawaiView extends GetView<AddPegawaiController> {
       body: Stack(
         children: [
           Container(
-            // height: Get.mediaQuery.size.height / 2,
-            decoration: const BoxDecoration(
-                image: DecorationImage(
-                    image: AssetImage('assets/image/bg.png'),
-                    fit: BoxFit.fill)),
+            height: 250,
+            color: AppColors.itemsBackground,
           ),
           ListView(
             scrollDirection: Axis.vertical,
@@ -35,14 +32,14 @@ class AddPegawaiView extends GetView<AddPegawaiController> {
                 'WELCOME',
                 style: titleTextStyle.copyWith(
                   fontSize: 40,
-                  color: Colors.black54,
+                  color: AppColors.contentColorWhite,
                 ),
               ),
               Text(
                 'Create your account',
                 style: subtitleTextStyle.copyWith(
                   fontSize: 20,
-                  color: Colors.black54,
+                  color: AppColors.contentColorWhite,
                 ),
               ),
               const SizedBox(
