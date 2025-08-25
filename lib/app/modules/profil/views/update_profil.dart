@@ -317,7 +317,8 @@ class UpdateProfil extends GetView {
                                 ),
                               ),
                               Expanded(
-                                child: DateTimeField(enabled: userData!.createdAt!="" ?false:true,
+                                child: DateTimeField(
+                                  // enabled: userData!.createdAt!="" ?false:true,
                                   controller: ctr.joinDate,
                                   style: const TextStyle(fontSize: 14),
                                   decoration: const InputDecoration(
