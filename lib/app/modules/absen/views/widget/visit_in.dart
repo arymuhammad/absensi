@@ -113,7 +113,7 @@ visitIn({
         // submit data visit ke server
 
         await ServiceApi().submitVisit(data, false);
-        adC.loadInterstitialAd();
+        // adC.loadInterstitialAd();
         adC.showInterstitialAd(() {});
         var paramVisitToday = {
           "mode": "single",

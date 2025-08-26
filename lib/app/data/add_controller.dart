@@ -10,7 +10,7 @@ class AdController extends GetxController {
     super.onInit();
 
     startAppSdk.setTestAdsEnabled(
-      false,
+      true,
     ); // Ganti ke false kalau sudah siap release
     loadInterstitialAd();
   }

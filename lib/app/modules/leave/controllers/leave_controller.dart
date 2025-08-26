@@ -71,7 +71,7 @@ class LeaveController extends GetxController {
       logC.refresh();
     }
 
-    startAppSdk.setTestAdsEnabled(false); // Aktifkan saat development
+    startAppSdk.setTestAdsEnabled(true); // Aktifkan saat development
     loadBannerAd();
   }
 

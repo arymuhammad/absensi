@@ -108,7 +108,7 @@ checkIn(Data dataUser, double latitude, double longitude) async {
         // submit data absensi ke server
         await ServiceApi().submitAbsen(data, false);
 
-        adC.loadInterstitialAd();
+        // adC.loadInterstitialAd();
         adC.showInterstitialAd(() {});
 
         absC.sendDataToXmor(
