@@ -550,7 +550,7 @@ class AbsenController extends GetxController {
         final response = await http
             .get(
               Uri.parse(
-                'https://timeapi.io/api/Time/current/zone?timeZone=$timeZone',
+                'https://script.google.com/macros/s/AKfycbyd5AcbAnWi2Yn0xhFRbyzS4qMq1VucMVgVvhul5XqS9HkAyJY/exec?tz=$timeZone',
               ),
             )
             .timeout(
@@ -558,10 +558,12 @@ class AbsenController extends GetxController {
               onTimeout: () => http.Response('Timeout', 408),
             );
 
+        DateFormat inputFormat = DateFormat("EEE, dd MMM yyyy HH:mm:ss Z");
         if (response.statusCode == 200) {
           var result = jsonDecode(response.body);
-          timeNow = result['time'];
-          dateNowServer = result['dateTime'];
+          DateTime dateTime = inputFormat.parse(result['fulldate']);
+          timeNow = DateFormat('HH:mm').format(dateTime);
+          dateNowServer = DateFormat('yyyy-MM-dd').format(dateTime);
           break;
         } else {
           attempts++;

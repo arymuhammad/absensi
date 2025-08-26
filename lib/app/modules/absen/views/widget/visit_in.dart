@@ -48,6 +48,7 @@ visitIn({
       if (absC.image != null) {
         loadingDialog("Sending data...", "");
         absC.timeNetwork(await FlutterNativeTimezone.getLocalTimezone());
+    
         var data = {
           "status": "add",
           "id": dataUser.id,
@@ -63,9 +64,8 @@ visitIn({
                       ? absC.selectedCabangVisit.value
                       : dataUser.kodeCabang
                   : absC.rndLoc.text,
-          "jam_in":
-              //  absC.timeNow.isNotEmpty ? absC.timeNow : absC.timeNowOpt,
-              absC.timeNowOpt,
+          "jam_in": absC.timeNow.isNotEmpty ? absC.timeNow : absC.timeNowOpt,
+          // absC.timeNowOpt,
           "foto_in": File(absC.image!.path),
           "foto_out": "",
           "lat_in": latitude.toString(),
@@ -95,9 +95,8 @@ visitIn({
                         ? absC.selectedCabangVisit.value
                         : dataUser.kodeCabang
                     : absC.rndLoc.text,
-            jamIn:
-                //  absC.timeNow.isNotEmpty ? absC.timeNow : absC.timeNowOpt,
-                absC.timeNowOpt,
+            jamIn: absC.timeNow.isNotEmpty ? absC.timeNow : absC.timeNowOpt,
+            // absC.timeNowOpt,
             visitOut: '',
             jamOut: '',
             fotoIn: absC.image!.path,
@@ -171,9 +170,8 @@ visitIn({
                       ? absC.selectedCabangVisit.value
                       : dataUser.kodeCabang
                   : absC.rndLoc.text,
-          "jam_in":
-              //  absC.timeNow.isNotEmpty ? absC.timeNow : absC.timeNowOpt,
-              absC.timeNowOpt,
+          "jam_in": absC.timeNow.isNotEmpty ? absC.timeNow : absC.timeNowOpt,
+          // absC.timeNowOpt,
           "foto_in": File(absC.image!.path),
           "foto_out": "",
           "lat_in": latitude.toString(),

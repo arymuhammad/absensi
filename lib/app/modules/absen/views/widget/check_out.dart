@@ -108,8 +108,8 @@ checkOut(Data dataUser, double latitude, double longitude) async {
           ),
           "nama": dataUser.nama,
           "jam_absen_pulang":
-              // absC.timeNow.isNotEmpty ? absC.timeNow : absC.timeNowOpt,
-              absC.timeNowOpt,
+              absC.timeNow.isNotEmpty ? absC.timeNow : absC.timeNowOpt,
+              // absC.timeNowOpt,
           "foto_pulang": File(absC.image!.path),
           "lat_pulang": latitude.toString(),
           "long_pulang": longitude.toString(),
@@ -181,8 +181,8 @@ checkOut(Data dataUser, double latitude, double longitude) async {
           ),
           "nama": dataUser.nama,
           "jam_absen_pulang":
-              // absC.timeNow.isNotEmpty ? absC.timeNow : absC.timeNowOpt,
-              absC.timeNowOpt,
+              absC.timeNow.isNotEmpty ? absC.timeNow : absC.timeNowOpt,
+              // absC.timeNowOpt,
           "foto_pulang": File(absC.image!.path),
           "lat_pulang": latitude.toString(),
           "long_pulang": longitude.toString(),
@@ -201,8 +201,8 @@ checkOut(Data dataUser, double latitude, double longitude) async {
             ),
             "nama": dataUser.nama,
             "jam_absen_pulang":
-                // absC.timeNow.isNotEmpty ? absC.timeNow : absC.timeNowOpt,
-               absC.timeNowOpt,
+                absC.timeNow.isNotEmpty ? absC.timeNow : absC.timeNowOpt,
+              //  absC.timeNowOpt,
             "foto_pulang": absC.image!.path,
             "lat_pulang": latitude.toString(),
             "long_pulang": longitude.toString(),

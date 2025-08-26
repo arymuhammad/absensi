@@ -65,8 +65,8 @@ checkIn(Data dataUser, double latitude, double longitude) async {
           "jam_masuk": absC.jamMasuk.value,
           "jam_pulang": absC.jamPulang.value,
           "jam_absen_masuk":
-              // absC.timeNow.isNotEmpty ? absC.timeNow : absC.timeNowOpt,
-              absC.timeNowOpt,
+              absC.timeNow.isNotEmpty ? absC.timeNow : absC.timeNowOpt,
+              // absC.timeNowOpt,
           "foto_masuk": File(absC.image!.path),
           "lat_masuk": latitude.toString(),
           "long_masuk": longitude.toString(),
@@ -93,8 +93,8 @@ checkIn(Data dataUser, double latitude, double longitude) async {
             jamMasuk: absC.jamMasuk.value,
             jamPulang: absC.jamPulang.value,
             jamAbsenMasuk:
-                // absC.timeNow.isNotEmpty ? absC.timeNow : absC.timeNowOpt,
-                absC.timeNowOpt,
+                absC.timeNow.isNotEmpty ? absC.timeNow : absC.timeNowOpt,
+                // absC.timeNowOpt,
             jamAbsenPulang: '',
             fotoMasuk: absC.image!.path,
             latMasuk: latitude.toString(),

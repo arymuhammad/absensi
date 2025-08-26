@@ -59,8 +59,8 @@ visitOut({
                 : absC.rndLoc.text,
         "visit_in": absC.cekVisit.value.kodeStore,
         "jam_out":
-            // absC.timeNow.isNotEmpty ? absC.timeNow : absC.timeNowOpt,
-            absC.timeNowOpt,
+            absC.timeNow.isNotEmpty ? absC.timeNow : absC.timeNowOpt,
+            // absC.timeNowOpt,
         "foto_out": File(absC.image!.path),
         "lat_out": latitude.toString(),
         "long_out": longitude.toString(),
@@ -77,8 +77,8 @@ visitOut({
                       : dataUser.kodeCabang
                   : absC.rndLoc.text,
           "jam_out":
-              // absC.timeNow.isNotEmpty ? absC.timeNow : absC.timeNowOpt,
-              absC.timeNowOpt,
+              absC.timeNow.isNotEmpty ? absC.timeNow : absC.timeNowOpt,
+              // absC.timeNowOpt,
           "foto_out": absC.image!.path,
           "lat_out": latitude.toString(),
           "long_out": longitude.toString(),
