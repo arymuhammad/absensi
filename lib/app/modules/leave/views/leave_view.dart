@@ -1,7 +1,11 @@
+import 'dart:io';
+import 'dart:math' as math;
+
 import 'package:absensi/app/data/helper/app_colors.dart';
 import 'package:absensi/app/data/helper/custom_dialog.dart';
 import 'package:absensi/app/data/helper/format_waktu.dart';
 import 'package:absensi/app/data/model/login_model.dart';
+import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 import 'package:expansion_tile_group/expansion_tile_group.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -75,15 +79,33 @@ class LeaveView extends GetView<LeaveController> {
                 }
               }),
               Expanded(
-                child: RefreshIndicator(
-                  onRefresh: () {
+                child: CustomMaterialIndicator(
+                  onRefresh: () async {
+                  
+                      //  leaveC.leaveBalanceCheck(userData!);
+                      await leaveC.getLeaveReq({
+                        "type": "",
+                        "id_user": userData!.id!,
+                      });
+                   
                     // leaveC.isLoading.value = true;
-                    leaveC.leaveBalanceCheck(userData!);
-                    return leaveC.getLeaveReq({
-                      "type": "",
-                      "id_user": userData!.id!,
-                    });
                   },
+                 backgroundColor: Colors.white,
+  indicatorBuilder: (context, controller) {
+    return Padding(
+                  padding: const EdgeInsets.all(6.0),
+                  child:
+                      Platform.isAndroid
+                          ? CircularProgressIndicator(
+                            color: AppColors.itemsBackground,
+                            value:
+                                controller.state.isLoading
+                                    ? null
+                                    : math.min(controller.value, 1.0),
+                          )
+                          : const CupertinoActivityIndicator(),
+                );
+  },
                   child: Obx(
                     () =>
                         leaveC.isLoading.value

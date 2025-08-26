@@ -53,9 +53,11 @@ class HomeController extends GetxController
         // print(value);
       }
     });
-    futureSummary = Rx<Future<SummaryAbsenModel>>(
-      getSummAttPerMonth(dataUserLogin.id!),
-    );
+    if (dataUserLogin.visit == "0") {
+      futureSummary = Rx<Future<SummaryAbsenModel>>(
+        getSummAttPerMonth(dataUserLogin.id!),
+      );
+    }
     futurePendApp = Rx<Future<NotifModel>>(
       getPendingApproval(
         idUser: dataUserLogin.id!,
@@ -248,11 +250,17 @@ class HomeController extends GetxController
     required String idUser,
     required String level,
   }) async {
-    var data = {"type": "adjusment", "id_user": idUser, "level": level};
+    var data = {
+      "type": "adjusment",
+      "id_user": idUser,
+      "level": level,
+      "date1": initDate,
+      "date2": endDate,
+    };
     return summPendApp.value = await ServiceApi().getNotif(data);
   }
 
   void reloadPendingAdj({required String idUser, required String level}) {
-    futurePendApp.value = getPendingAdj(idUser: idUser, level: level);
+    futurePendAdj.value = getPendingAdj(idUser: idUser, level: level);
   }
 }

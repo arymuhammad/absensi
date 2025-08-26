@@ -1,3 +1,6 @@
+import 'dart:io';
+import 'dart:math' as math;
+
 import 'package:absensi/app/data/helper/app_colors.dart';
 import 'package:absensi/app/data/helper/const.dart';
 import 'package:absensi/app/data/helper/format_waktu.dart';
@@ -5,6 +8,7 @@ import 'package:absensi/app/data/model/login_model.dart';
 import 'package:absensi/app/modules/login/controllers/login_controller.dart';
 import 'package:absensi/app/modules/shared/elevated_button.dart';
 import 'package:absensi/app/services/service_api.dart';
+import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -128,9 +132,25 @@ class ProfilView extends GetView<ProfilController> {
                 ),
                 const SizedBox(height: 10),
                 Expanded(
-                  child: RefreshIndicator(
-                    onRefresh: () {
-                      return ctr.getLastUserData(dataUser: listDataUser!);
+                  child: CustomMaterialIndicator(
+                    onRefresh: () async {
+                      await ctr.getLastUserData(dataUser: listDataUser!);
+                    },
+                    backgroundColor: Colors.white,
+                    indicatorBuilder: (context, controller) {
+                      return Padding(
+                        padding: const EdgeInsets.all(6.0),
+                        child:
+                            Platform.isAndroid
+                                ? CircularProgressIndicator(
+                                  color: AppColors.itemsBackground,
+                                  value:
+                                      controller.state.isLoading
+                                          ? null
+                                          : math.min(controller.value, 1.0),
+                                )
+                                : const CupertinoActivityIndicator(),
+                      );
                     },
                     child: ListView(
                       padding: EdgeInsets.zero,

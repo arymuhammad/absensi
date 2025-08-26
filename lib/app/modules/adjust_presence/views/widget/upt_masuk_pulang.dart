@@ -1,6 +1,7 @@
 import 'package:absensi/app/data/model/login_model.dart';
 import 'package:absensi/app/data/model/req_app_model.dart';
 import 'package:absensi/app/modules/adjust_presence/controllers/adjust_presence_controller.dart';
+import 'package:absensi/app/modules/home/controllers/home_controller.dart';
 import 'package:absensi/app/modules/shared/text_field.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -18,7 +19,7 @@ class UptMasukPulang extends StatelessWidget {
   final ReqApp data;
   final Data? dataUser;
   final adjCtrl = Get.put(AdjustPresenceController());
-
+  final homeC = Get.find<HomeController>();
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -30,10 +31,7 @@ class UptMasukPulang extends StatelessWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'STATUS',
-                  style: subtitleTextStyle,
-                ),
+                Text('STATUS', style: subtitleTextStyle),
                 Text(
                   data.status!.replaceAll('_', ' ').toUpperCase(),
                   style: titleTextStyle.copyWith(fontSize: 14),
@@ -41,9 +39,7 @@ class UptMasukPulang extends StatelessWidget {
                 Row(
                   children: [
                     const Icon(Iconsax.clock_outline),
-                    const SizedBox(
-                      width: 5,
-                    ),
+                    const SizedBox(width: 5),
                     Text(
                       data.status == "update_masuk"
                           ? data.jamAbsenMasuk!
@@ -57,69 +53,51 @@ class UptMasukPulang extends StatelessWidget {
                   child: Row(
                     children: [
                       const Icon(Iconsax.calendar_2_outline),
-                      const SizedBox(
-                        width: 5,
-                      ),
-                      Text(
-                        data.tglPulang!,
-                        style: titleTextStyle,
-                      ),
+                      const SizedBox(width: 5),
+                      Text(data.tglPulang!, style: titleTextStyle),
                     ],
                   ),
-                )
+                ),
               ],
             ),
             SizedBox(
-                height: 70,
-                width: 70,
-                child: WidgetZoom(
-                  heroAnimationTag: data.status == "update_masuk"
-                      ? 'fotoMasuk'
-                      : 'fotoPulang',
-                  zoomWidget: Image.network(
-                      '${ServiceApi().baseUrl}${data.status == "update_masuk" ? data.fotoMasuk : data.fotoPulang}'),
-                )),
+              height: 70,
+              width: 70,
+              child: WidgetZoom(
+                heroAnimationTag:
+                    data.status == "update_masuk" ? 'fotoMasuk' : 'fotoPulang',
+                zoomWidget: Image.network(
+                  '${ServiceApi().baseUrl}${data.status == "update_masuk" ? data.fotoMasuk : data.fotoPulang}',
+                ),
+              ),
+            ),
           ],
         ),
-        const SizedBox(
-          height: 10,
-        ),
-        Text(
-          'Alasan Perubahan Data',
-          style: titleTextStyle,
-        ),
-        Text(
-          data.alasan!,
-          style: subtitleTextStyle,
-        ),
-        const SizedBox(
-          height: 10,
-        ),
+        const SizedBox(height: 10),
+        Text('Alasan Perubahan Data', style: titleTextStyle),
+        Text(data.alasan!, style: subtitleTextStyle),
+        const SizedBox(height: 10),
         Visibility(
           visible: data.accept == "" && dataUser!.level == "1" ? true : false,
           child: SizedBox(
-              height: 45,
-              child: CsTextField(
-                  controller: adjCtrl.keteranganApp, label: 'Keterangan')),
+            height: 45,
+            child: CsTextField(
+              controller: adjCtrl.keteranganApp,
+              label: 'Keterangan',
+            ),
+          ),
         ),
-        const SizedBox(
-          height: 5,
-        ),
+        const SizedBox(height: 5),
         Visibility(
-            visible: data.accept == "0" ? true : false,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Keterangan',
-                  style: titleTextStyle.copyWith(fontSize: 18),
-                ),
-                Text(
-                  data.keterangan!,
-                  style: subtitleTextStyle,
-                ),
-              ],
-            )),
+          visible: data.accept == "0" ? true : false,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Keterangan', style: titleTextStyle.copyWith(fontSize: 18)),
+              Text(data.keterangan!, style: subtitleTextStyle),
+            ],
+          ),
+        ),
         // const Divider(
         //   thickness: 2,
         // ),
@@ -139,7 +117,7 @@ class UptMasukPulang extends StatelessWidget {
                     "keterangan": adjCtrl.keteranganApp.text,
                     "id_user": data.idUser,
                     "tgl_masuk": data.tglMasuk,
-                    "status": data.status
+                    "status": data.status,
                   };
                   /////////
                   var keyJamAbsen = "";
@@ -156,18 +134,24 @@ class UptMasukPulang extends StatelessWidget {
                     "status": data.status,
                     "id_user": data.idUser,
                     "tgl_masuk": data.tglMasuk,
-                    keyJamAbsen: data.status == "update_masuk"
-                        ? data.jamAbsenMasuk
-                        : data.jamAbsenPulang,
-                    keyFotoAbsen: data.status == "update_masuk"
-                        ? data.fotoMasuk
-                        : data.fotoPulang,
+                    keyJamAbsen:
+                        data.status == "update_masuk"
+                            ? data.jamAbsenMasuk
+                            : data.jamAbsenPulang,
+                    keyFotoAbsen:
+                        data.status == "update_masuk"
+                            ? data.fotoMasuk
+                            : data.fotoPulang,
                     "tgl_pulang": data.tglPulang,
                     "lat_out": data.latOut,
                     "long_out": data.longOut,
-                    "device_info2": data.devInfo
+                    "device_info2": data.devInfo,
                   };
                   adjCtrl.appAbs(dataUptApp, dataUptAbs);
+                  homeC.reloadPendingAdj(
+                    idUser: dataUser!.id!,
+                    level: dataUser!.level!,
+                  );
                 },
               ),
               CsElevatedButton(
@@ -181,9 +165,13 @@ class UptMasukPulang extends StatelessWidget {
                     "keterangan": adjCtrl.keteranganApp.text,
                     "id_user": data.idUser,
                     "tgl_masuk": data.tglMasuk,
-                    "status": data.status
+                    "status": data.status,
                   };
                   adjCtrl.appAbs(dataUptApp, {});
+                  homeC.reloadPendingAdj(
+                    idUser: dataUser!.id!,
+                    level: dataUser!.level!,
+                  );
                 },
               ),
             ],

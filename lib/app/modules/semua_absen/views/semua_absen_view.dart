@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math' as math;
 
 import 'package:absensi/app/modules/absen/controllers/absen_controller.dart';
 import 'package:absensi/app/data/helper/app_colors.dart';
@@ -7,6 +8,7 @@ import 'package:absensi/app/data/helper/custom_dialog.dart';
 import 'package:absensi/app/data/model/login_model.dart';
 import 'package:absensi/app/modules/semua_absen/views/widget/list_item_data.dart';
 import 'package:absensi/app/modules/semua_absen/views/widget/table_calendar.dart';
+import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -113,11 +115,31 @@ class SemuaAbsenView extends GetView<SemuaAbsenController> {
                                 ],
                               ),
                             )
-                            : RefreshIndicator(
+                            : CustomMaterialIndicator(
                               onRefresh: () async {
                                 await absenC.getAllAbsen(data!.id!, '', '');
                                 absenC.searchDate.value = "";
+
                                 showToast("Page Refreshed");
+                              },
+                              backgroundColor: Colors.white,
+                              indicatorBuilder: (context, controller) {
+                                return Padding(
+                                  padding: const EdgeInsets.all(6.0),
+                                  child:
+                                      Platform.isAndroid
+                                          ? CircularProgressIndicator(
+                                            color: AppColors.itemsBackground,
+                                            value:
+                                                controller.state.isLoading
+                                                    ? null
+                                                    : math.min(
+                                                      controller.value,
+                                                      1.0,
+                                                    ),
+                                          )
+                                          : const CupertinoActivityIndicator(),
+                                );
                               },
                               child:
                                   filteredAbsen.isEmpty
@@ -145,7 +167,7 @@ class SemuaAbsenView extends GetView<SemuaAbsenController> {
                                           ),
                                         ],
                                       )
-                                      : 
+                                      :
                                       // ListView.builder(
                                       //   padding: const EdgeInsets.all(8),
                                       //   physics:
@@ -153,13 +175,13 @@ class SemuaAbsenView extends GetView<SemuaAbsenController> {
                                       //   itemCount: filteredAbsen.length,
                                       //   itemBuilder: (context, index) {
                                       //     final absen = filteredAbsen[index];
-                                           ListItemData(
-                                            data: filteredAbsen,
-                                            // Asumsi ListItemData menerima List
-                                            userData: data!,
-                                          )
-                                        // },
-                                      // ),
+                                      ListItemData(
+                                        data: filteredAbsen,
+                                        // Asumsi ListItemData menerima List
+                                        userData: data!,
+                                      ),
+                              // },
+                              // ),
                             ),
                   );
                 }),
@@ -208,7 +230,10 @@ class SemuaAbsenView extends GetView<SemuaAbsenController> {
                 backgroundColor: Colors.redAccent[700],
                 onPressed: () async {
                   if (absenC.searchAbsen.isNotEmpty) {
-                    loadingDialog('Please wait until', 'Data is ready to print');
+                    loadingDialog(
+                      'Please wait until',
+                      'Data is ready to print',
+                    );
                     await absenC.exportPdf();
                     Get.back();
                   } else {

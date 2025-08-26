@@ -1,13 +1,14 @@
+import 'dart:math' as math;
+
 import 'package:absensi/app/data/helper/const.dart';
 import 'package:absensi/app/modules/shared/elevated_button.dart';
 import 'package:absensi/app/services/service_api.dart';
+import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 import 'package:expansion_tile_group/expansion_tile_group.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
 import 'package:get/get.dart';
 import 'package:signature/signature.dart';
-
 import '../../../data/helper/app_colors.dart';
 import '../../../data/helper/custom_dialog.dart';
 import '../../../data/helper/format_waktu.dart';
@@ -19,6 +20,7 @@ class RequestLeaveView extends GetView<LeaveController> {
   RequestLeaveView({super.key, this.userData});
   final Data? userData;
   final leaveC = Get.find<LeaveController>();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -35,7 +37,8 @@ class RequestLeaveView extends GetView<LeaveController> {
       ),
       body: Stack(
         children: [
-          RefreshIndicator(
+          CustomMaterialIndicator(
+          
             onRefresh: () {
               var param = {
                 "type": "get_pending_req_leave",
@@ -45,7 +48,16 @@ class RequestLeaveView extends GetView<LeaveController> {
                 "parent_id": userData!.parentId!,
               };
               return leaveC.getLeaveReq(param);
-            },
+            }, backgroundColor: Colors.white,
+  indicatorBuilder: (context, controller) {
+    return Padding(
+      padding: const EdgeInsets.all(6.0),
+      child: CircularProgressIndicator(
+        color: Colors.redAccent,
+        value: controller.state.isLoading ? null : math.min(controller.value, 1.0),
+      ),
+    );
+  },
             child: Obx(
               () =>
                   leaveC.isLoading.value

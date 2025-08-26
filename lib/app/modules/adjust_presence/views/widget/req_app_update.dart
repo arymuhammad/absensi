@@ -1,11 +1,14 @@
+import 'dart:io';
+import 'dart:math' as math;
 import 'package:absensi/app/data/helper/app_colors.dart';
 import 'package:absensi/app/data/helper/const.dart';
-import 'package:absensi/app/data/helper/custom_dialog.dart';
 import 'package:absensi/app/data/helper/format_waktu.dart';
 import 'package:absensi/app/modules/adjust_presence/controllers/adjust_presence_controller.dart';
 import 'package:absensi/app/modules/adjust_presence/views/widget/upt_data_absen.dart';
 import 'package:absensi/app/modules/adjust_presence/views/widget/upt_masuk_pulang.dart';
+import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 import 'package:expansion_tile_group/expansion_tile_group.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icons_plus/icons_plus.dart';
@@ -70,7 +73,7 @@ class ReqAppUpdate extends GetView {
                         ],
                       )
                       : adjCtrl.listReqUpt.isEmpty
-                      ? RefreshIndicator(
+                      ? CustomMaterialIndicator(
                         onRefresh: () async {
                           adjCtrl.isLoading.value = true;
                           adjCtrl.selectedType.value = "";
@@ -87,9 +90,26 @@ class ReqAppUpdate extends GetView {
                                 ? adjCtrl.dateInput2.text
                                 : adjCtrl.lastDate,
                           );
-                          return Future.delayed(Duration.zero, () {
-                            showToast("Page Refreshed");
-                          });
+
+                          // return Future.delayed(Duration.zero, () {
+                          //   showToast("Page Refreshed");
+                          // });
+                        },
+                        backgroundColor: Colors.white,
+                        indicatorBuilder: (context, controller) {
+                          return Padding(
+                            padding: const EdgeInsets.all(6.0),
+                            child:
+                                Platform.isAndroid
+                                    ? CircularProgressIndicator(
+                                      color: AppColors.itemsBackground,
+                                      value:
+                                          controller.state.isLoading
+                                              ? null
+                                              : math.min(controller.value, 1.0),
+                                    )
+                                    : const CupertinoActivityIndicator(),
+                          );
                         },
                         child: ListView(
                           children: const [
@@ -97,9 +117,8 @@ class ReqAppUpdate extends GetView {
                           ],
                         ),
                       )
-                      : RefreshIndicator(
+                      : CustomMaterialIndicator(
                         onRefresh: () async {
-                          // adjCtrl.isLoading.value = true;
                           adjCtrl.selectedType.value = "";
                           // adjCtrl.selectedStatus.value = "";
                           await adjCtrl.getReqAppUpt(
@@ -114,9 +133,28 @@ class ReqAppUpdate extends GetView {
                                 ? adjCtrl.dateInput2.text
                                 : adjCtrl.lastDate,
                           );
-                          return Future.delayed(Duration.zero, () {
-                            showToast("Page Refreshed");
-                          });
+
+                          // adjCtrl.isLoading.value = true;
+
+                          // return Future.delayed(Duration.zero, () {
+                          //   showToast("Page Refreshed");
+                          // });
+                        },
+                        backgroundColor: Colors.white,
+                        indicatorBuilder: (context, controller) {
+                          return Padding(
+                            padding: const EdgeInsets.all(6.0),
+                            child:
+                                Platform.isAndroid
+                                    ? CircularProgressIndicator(
+                                      color: AppColors.itemsBackground,
+                                      value:
+                                          controller.state.isLoading
+                                              ? null
+                                              : math.min(controller.value, 1.0),
+                                    )
+                                    : const CupertinoActivityIndicator(),
+                          );
                         },
                         child: ListView(
                           padding: EdgeInsets.zero,

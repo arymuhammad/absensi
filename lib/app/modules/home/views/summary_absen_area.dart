@@ -1,7 +1,11 @@
+import 'dart:io';
+import 'dart:math' as math;
+
 import 'package:absensi/app/modules/absen/controllers/absen_controller.dart';
 import 'package:absensi/app/data/helper/custom_dialog.dart';
 import 'package:absensi/app/data/model/login_model.dart';
 import 'package:absensi/app/modules/home/views/widget/summary_today.dart';
+import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -21,7 +25,7 @@ class SummaryAbsenArea extends GetView {
   @override
   Widget build(BuildContext context) {
     return Expanded(
-      child: RefreshIndicator(
+      child: CustomMaterialIndicator(
         onRefresh: () async {
           var paramSingleVisit = {
             "mode": "single",
@@ -38,8 +42,23 @@ class SummaryAbsenArea extends GetView {
           absenC.isLoading.value = true;
           await absenC.getLimitVisit(paramLimitVisit);
           await absenC.getVisitToday(paramSingleVisit);
-
           showToast("Page Refreshed");
+        },
+        backgroundColor: Colors.white,
+        indicatorBuilder: (context, controller) {
+          return Padding(
+            padding: const EdgeInsets.all(6.0),
+            child:
+                Platform.isAndroid
+                    ? CircularProgressIndicator(
+                      color: AppColors.itemsBackground,
+                      value:
+                          controller.state.isLoading
+                              ? null
+                              : math.min(controller.value, 1.0),
+                    )
+                    : const CupertinoActivityIndicator(),
+          );
         },
         child: ListView(
           padding: EdgeInsets.zero,
@@ -237,7 +256,8 @@ class SummaryAbsenArea extends GetView {
                                             : userData!.nama,
                                     "nama": absenC.dataLimitVisit[i].nama!,
                                     "id_user": absenC.dataLimitVisit[i].id!,
-                                    "store": absenC.dataLimitVisit[i].namaCabang!,
+                                    "store":
+                                        absenC.dataLimitVisit[i].namaCabang!,
                                     "tgl_visit":
                                         absenC.dataLimitVisit[i].tglVisit!,
                                     "jam_in": absenC.dataLimitVisit[i].jamIn!,
@@ -263,8 +283,11 @@ class SummaryAbsenArea extends GetView {
                                     "device_info":
                                         absenC.dataLimitVisit[i].deviceInfo!,
                                     "device_info2":
-                                        absenC.dataLimitVisit[i].deviceInfo2 != ""
-                                            ? absenC.dataLimitVisit[i].deviceInfo2
+                                        absenC.dataLimitVisit[i].deviceInfo2 !=
+                                                ""
+                                            ? absenC
+                                                .dataLimitVisit[i]
+                                                .deviceInfo2
                                             : "",
                                   };
 

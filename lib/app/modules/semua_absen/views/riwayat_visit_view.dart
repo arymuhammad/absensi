@@ -1,18 +1,20 @@
+import 'dart:io';
+import 'dart:math' as math;
+
 import 'package:absensi/app/modules/absen/controllers/absen_controller.dart';
 import 'package:absensi/app/data/helper/app_colors.dart';
 import 'package:absensi/app/data/helper/const.dart';
 import 'package:absensi/app/data/helper/custom_dialog.dart';
 import 'package:absensi/app/data/model/login_model.dart';
 import 'package:absensi/app/modules/detail_absen/views/detail_visit_view.dart';
+import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-
 import 'package:get/get.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:intl/intl.dart';
 import 'package:shimmer/shimmer.dart';
-
 import '../../../data/helper/format_waktu.dart';
 
 class RiwayatVisitView extends GetView {
@@ -219,16 +221,33 @@ class RiwayatVisitView extends GetView {
                         },
                       )
                       : visitC.searchVisit.isEmpty
-                      ? RefreshIndicator(
-                        onRefresh: () {
-                          return Future.delayed(
-                            const Duration(seconds: 1),
-                            () async {
-                              visitC.isLoading.value = true;
-                              await visitC.getAllVisited(userData!.id!);
-                              visitC.searchDate.value = "";
-                              showToast("Halaman Disegarkan.");
-                            },
+                      ? CustomMaterialIndicator(
+                        onRefresh: () async {
+                          visitC.isLoading.value = true;
+                          await visitC.getAllVisited(userData!.id!);
+                          visitC.searchDate.value = "";
+
+                          showToast("Halaman Disegarkan.");
+
+                          // return Future.delayed(
+                          //   const Duration(seconds: 1),
+                          //   () async {},
+                          // );
+                        },
+                        backgroundColor: Colors.white,
+                        indicatorBuilder: (context, controller) {
+                          return Padding(
+                            padding: const EdgeInsets.all(6.0),
+                            child:
+                                Platform.isAndroid
+                                    ? CircularProgressIndicator(
+                                      color: AppColors.itemsBackground,
+                                      value:
+                                          controller.state.isLoading
+                                              ? null
+                                              : math.min(controller.value, 1.0),
+                                    )
+                                    : const CupertinoActivityIndicator(),
                           );
                         },
                         child: ListView(
@@ -249,16 +268,33 @@ class RiwayatVisitView extends GetView {
                           ],
                         ),
                       )
-                      : RefreshIndicator(
-                        onRefresh: () {
-                          return Future.delayed(
-                            const Duration(seconds: 1),
-                            () async {
-                              visitC.isLoading.value = true;
-                              await visitC.getAllVisited(userData!.id!);
-                              visitC.searchDate.value = "";
-                              showToast("Halaman Disegarkan.");
-                            },
+                      : CustomMaterialIndicator(
+                        onRefresh: () async {
+                          visitC.isLoading.value = true;
+                          await visitC.getAllVisited(userData!.id!);
+                          visitC.searchDate.value = "";
+
+                          showToast("Halaman Disegarkan.");
+
+                          // return Future.delayed(
+                          //   const Duration(seconds: 1),
+                          //   () async {},
+                          // );
+                        },
+                        backgroundColor: Colors.white,
+                        indicatorBuilder: (context, controller) {
+                          return Padding(
+                            padding: const EdgeInsets.all(6.0),
+                            child:
+                                Platform.isAndroid
+                                    ? CircularProgressIndicator(
+                                      color: AppColors.itemsBackground,
+                                      value:
+                                          controller.state.isLoading
+                                              ? null
+                                              : math.min(controller.value, 1.0),
+                                    )
+                                    : const CupertinoActivityIndicator(),
                           );
                         },
                         child: Padding(

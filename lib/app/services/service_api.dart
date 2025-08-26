@@ -1521,7 +1521,7 @@ class ServiceApi {
             body: jsonEncode(param),
           )
           .timeout(const Duration(seconds: 60));
-
+      // print(param);
       if (param['type'] == "summ_month") {
         if (response.statusCode == 200) {
           final decoded = jsonDecode(response.body);

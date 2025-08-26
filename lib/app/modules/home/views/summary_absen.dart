@@ -1,3 +1,6 @@
+import 'dart:io';
+import 'dart:math' as math;
+
 import 'package:absensi/app/data/helper/app_colors.dart';
 import 'package:absensi/app/modules/absen/controllers/absen_controller.dart';
 import 'package:absensi/app/data/helper/const.dart';
@@ -6,6 +9,7 @@ import 'package:absensi/app/data/helper/custom_dialog.dart';
 import 'package:absensi/app/data/model/login_model.dart';
 import 'package:absensi/app/modules/detail_absen/views/detail_absen_view.dart';
 import 'package:absensi/app/modules/home/views/widget/summary_today.dart';
+import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -29,30 +33,47 @@ class SummaryAbsen extends GetView {
           SummaryToday(listDataUser: userData!),
           const SizedBox(height: 15),
           Expanded(
-            child: RefreshIndicator(
-                  onRefresh: () {
-                    return Future.delayed(const Duration(seconds: 1), () async {
-                      var paramLimit = {
-                        "mode": "limit",
-                        "id_user": userData!.id,
-                        "tanggal1": absenC.initDate1,
-                        "tanggal2": absenC.initDate2,
-                      };
+            child: CustomMaterialIndicator(
+              onRefresh: () async {
+                var paramLimit = {
+                  "mode": "limit",
+                  "id_user": userData!.id,
+                  "tanggal1": absenC.initDate1,
+                  "tanggal2": absenC.initDate2,
+                };
 
-                      var paramSingle = {
-                        "mode": "single",
-                        "id_user": userData!.id,
-                        "tanggal_masuk": DateFormat(
-                          'yyyy-MM-dd',
-                        ).format(absenC.tglStream.value),
-                      };
+                var paramSingle = {
+                  "mode": "single",
+                  "id_user": userData!.id,
+                  "tanggal_masuk": DateFormat(
+                    'yyyy-MM-dd',
+                  ).format(absenC.tglStream.value),
+                };
 
-                      absenC.isLoading.value = true;
-                      await absenC.getAbsenToday(paramSingle);
-                      await absenC.getLimitAbsen(paramLimit);
-                      showToast("Page Refreshed");
-                    });
-                  },
+                absenC.isLoading.value = true;
+                await absenC.getAbsenToday(paramSingle);
+                await absenC.getLimitAbsen(paramLimit);
+
+                showToast("Page Refreshed");
+
+                // return Future.delayed(const Duration(seconds: 1), () async {});
+              },
+              backgroundColor: Colors.white,
+              indicatorBuilder: (context, controller) {
+                return Padding(
+                  padding: const EdgeInsets.all(6.0),
+                  child:
+                      Platform.isAndroid
+                          ? CircularProgressIndicator(
+                            color: AppColors.itemsBackground,
+                            value:
+                                controller.state.isLoading
+                                    ? null
+                                    : math.min(controller.value, 1.0),
+                          )
+                          : const CupertinoActivityIndicator(),
+                );
+              },
               child: ListView(
                 padding: EdgeInsets.zero,
                 children: [
@@ -108,9 +129,7 @@ class SummaryAbsen extends GetView {
                                               decoration: BoxDecoration(
                                                 color: Colors.white,
                                                 borderRadius:
-                                                    BorderRadius.circular(
-                                                      10,
-                                                    ),
+                                                    BorderRadius.circular(10),
                                               ),
                                             ),
                                           ),
@@ -129,9 +148,7 @@ class SummaryAbsen extends GetView {
                                               decoration: BoxDecoration(
                                                 color: Colors.white,
                                                 borderRadius:
-                                                    BorderRadius.circular(
-                                                      10,
-                                                    ),
+                                                    BorderRadius.circular(10),
                                               ),
                                             ),
                                           ),
@@ -140,60 +157,60 @@ class SummaryAbsen extends GetView {
                                       const SizedBox(height: 8),
                                       Shimmer.fromColors(
                                         baseColor: Colors.grey,
-                                        highlightColor:
-                                            const Color.fromARGB(
-                                              255,
-                                              238,
-                                              238,
-                                              238,
-                                            ),
+                                        highlightColor: const Color.fromARGB(
+                                          255,
+                                          238,
+                                          238,
+                                          238,
+                                        ),
                                         child: Container(
                                           width: 70,
                                           height: 15,
                                           decoration: BoxDecoration(
                                             color: Colors.white,
-                                            borderRadius:
-                                                BorderRadius.circular(10),
+                                            borderRadius: BorderRadius.circular(
+                                              10,
+                                            ),
                                           ),
                                         ),
                                       ),
                                       const SizedBox(height: 8),
                                       Shimmer.fromColors(
                                         baseColor: Colors.grey,
-                                        highlightColor:
-                                            const Color.fromARGB(
-                                              255,
-                                              238,
-                                              238,
-                                              238,
-                                            ),
+                                        highlightColor: const Color.fromARGB(
+                                          255,
+                                          238,
+                                          238,
+                                          238,
+                                        ),
                                         child: Container(
                                           width: 60,
                                           height: 15,
                                           decoration: BoxDecoration(
                                             color: Colors.white,
-                                            borderRadius:
-                                                BorderRadius.circular(10),
+                                            borderRadius: BorderRadius.circular(
+                                              10,
+                                            ),
                                           ),
                                         ),
                                       ),
                                       const SizedBox(height: 8),
                                       Shimmer.fromColors(
                                         baseColor: Colors.grey,
-                                        highlightColor:
-                                            const Color.fromARGB(
-                                              255,
-                                              238,
-                                              238,
-                                              238,
-                                            ),
+                                        highlightColor: const Color.fromARGB(
+                                          255,
+                                          238,
+                                          238,
+                                          238,
+                                        ),
                                         child: Container(
                                           width: 70,
                                           height: 15,
                                           decoration: BoxDecoration(
                                             color: Colors.white,
-                                            borderRadius:
-                                                BorderRadius.circular(10),
+                                            borderRadius: BorderRadius.circular(
+                                              10,
+                                            ),
                                           ),
                                         ),
                                       ),
@@ -214,23 +231,18 @@ class SummaryAbsen extends GetView {
                               shrinkWrap: true,
                               physics: const NeverScrollableScrollPhysics(),
                               separatorBuilder:
-                                  (context, index) =>
-                                      const SizedBox(height: 8),
+                                  (context, index) => const SizedBox(height: 8),
                               itemCount: absenC.dataLimitAbsen.length,
                               itemBuilder: (c, i) {
                                 var diffHours = const Duration();
                                 if (absenC.dataLimitAbsen.isNotEmpty &&
-                                    absenC
-                                            .dataLimitAbsen[i]
-                                            .jamAbsenPulang !=
+                                    absenC.dataLimitAbsen[i].jamAbsenPulang !=
                                         "") {
                                   if (DateTime.parse(
                                     absenC.dataLimitAbsen[i].tanggalPulang!,
                                   ).isAfter(
                                     DateTime.parse(
-                                      absenC
-                                          .dataLimitAbsen[i]
-                                          .tanggalMasuk!,
+                                      absenC.dataLimitAbsen[i].tanggalMasuk!,
                                     ),
                                   )) {
                                     diffHours = DateTime.parse(
@@ -254,7 +266,7 @@ class SummaryAbsen extends GetView {
                                 } else {
                                   diffHours = const Duration();
                                 }
-                                    
+
                                 var stsMasuk =
                                     FormatWaktu.formatJamMenit(
                                           jamMenit:
@@ -286,9 +298,7 @@ class SummaryAbsen extends GetView {
                                         ? "On Time"
                                         : "Late";
                                 var stsPulang =
-                                    absenC
-                                                .dataLimitAbsen[i]
-                                                .jamAbsenPulang! ==
+                                    absenC.dataLimitAbsen[i].jamAbsenPulang! ==
                                             ""
                                         ? "Absent"
                                         : DateTime.parse(
@@ -313,9 +323,7 @@ class SummaryAbsen extends GetView {
                                                     absenC
                                                         .dataLimitAbsen[i]
                                                         .jamAbsenMasuk!,
-                                              ).add(
-                                                const Duration(hours: 8),
-                                              ),
+                                              ).add(const Duration(hours: 8)),
                                             )
                                         ? "Over Time"
                                         : DateTime.parse(
@@ -358,7 +366,7 @@ class SummaryAbsen extends GetView {
                                         )
                                         ? 'On Time'
                                         : "Over Time";
-                                    
+
                                 return InkWell(
                                   onTap:
                                       () => Get.to(() {
@@ -368,17 +376,13 @@ class SummaryAbsen extends GetView {
                                                   ? userData!.foto
                                                   : userData!.nama,
                                           "nama":
-                                              absenC
-                                                  .dataLimitAbsen[i]
-                                                  .nama!,
+                                              absenC.dataLimitAbsen[i].nama!,
                                           "nama_shift":
                                               absenC
                                                   .dataLimitAbsen[i]
                                                   .namaShift!,
                                           "id_user":
-                                              absenC
-                                                  .dataLimitAbsen[i]
-                                                  .idUser!,
+                                              absenC.dataLimitAbsen[i].idUser!,
                                           "tanggal_masuk":
                                               absenC
                                                   .dataLimitAbsen[i]
@@ -427,27 +431,22 @@ class SummaryAbsen extends GetView {
                                                   .dataLimitAbsen[i]
                                                   .longPulang!,
                                           "device_info":
-                                              absenC
-                                                  .dataLimitAbsen[i]
-                                                  .devInfo!,
+                                              absenC.dataLimitAbsen[i].devInfo!,
                                           "device_info2":
                                               absenC
                                                   .dataLimitAbsen[i]
                                                   .devInfo2!,
                                         };
-                                    
+
                                         return DetailAbsenView(detailData);
                                       }, transition: Transition.cupertino),
                                   child: Container(
                                     decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(
-                                        5,
-                                      ),
+                                      borderRadius: BorderRadius.circular(5),
                                       color: Colors.white,
                                     ),
                                     height:
-                                        i == 0 &&
-                                                absenC.statsCon.value != ""
+                                        i == 0 && absenC.statsCon.value != ""
                                             ? 147
                                             : 85,
                                     child: Padding(
@@ -456,22 +455,18 @@ class SummaryAbsen extends GetView {
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
-                                         
                                           Row(
-                                         
                                             children: [
                                               Container(
                                                 width: 55,
-                                                padding:
-                                                    const EdgeInsets.all(8),
+                                                padding: const EdgeInsets.all(
+                                                  8,
+                                                ),
                                                 decoration: BoxDecoration(
                                                   borderRadius:
-                                                      BorderRadius.circular(
-                                                        5,
-                                                      ),
+                                                      BorderRadius.circular(5),
                                                   color:
-                                                      AppColors
-                                                          .itemsBackground,
+                                                      AppColors.itemsBackground,
                                                 ),
                                                 child: Column(
                                                   children: [
@@ -501,9 +496,7 @@ class SummaryAbsen extends GetView {
                                                       ),
                                                       style: subtitleTextStyle
                                                           .copyWith(
-                                                            color:
-                                                                Colors
-                                                                    .white,
+                                                            color: Colors.white,
                                                           ),
                                                     ),
                                                   ],
@@ -512,8 +505,7 @@ class SummaryAbsen extends GetView {
                                               const SizedBox(width: 12),
                                               Column(
                                                 crossAxisAlignment:
-                                                    CrossAxisAlignment
-                                                        .start,
+                                                    CrossAxisAlignment.start,
                                                 children: [
                                                   IntrinsicHeight(
                                                     child: Row(
@@ -533,18 +525,15 @@ class SummaryAbsen extends GetView {
                                                                 fontWeight:
                                                                     FontWeight
                                                                         .bold,
-                                                                fontSize:
-                                                                    18,
+                                                                fontSize: 18,
                                                               ),
                                                             ),
                                                             const Text(
                                                               'Check In',
                                                               style: TextStyle(
-                                                                fontSize:
-                                                                    14,
+                                                                fontSize: 14,
                                                                 color:
-                                                                    Colors
-                                                                        .grey,
+                                                                    Colors.grey,
                                                               ),
                                                             ),
                                                           ],
@@ -580,18 +569,15 @@ class SummaryAbsen extends GetView {
                                                                 fontWeight:
                                                                     FontWeight
                                                                         .bold,
-                                                                fontSize:
-                                                                    18,
+                                                                fontSize: 18,
                                                               ),
                                                             ),
                                                             const Text(
                                                               'Check Out',
                                                               style: TextStyle(
                                                                 color:
-                                                                    Colors
-                                                                        .grey,
-                                                                fontSize:
-                                                                    14,
+                                                                    Colors.grey,
+                                                                fontSize: 14,
                                                               ),
                                                             ),
                                                           ],
@@ -629,18 +615,15 @@ class SummaryAbsen extends GetView {
                                                                 fontWeight:
                                                                     FontWeight
                                                                         .bold,
-                                                                fontSize:
-                                                                    18,
+                                                                fontSize: 18,
                                                               ),
                                                             ),
                                                             const Text(
                                                               'Total Hours',
                                                               style: TextStyle(
                                                                 color:
-                                                                    Colors
-                                                                        .grey,
-                                                                fontSize:
-                                                                    14,
+                                                                    Colors.grey,
+                                                                fontSize: 14,
                                                               ),
                                                             ),
                                                           ],
@@ -655,9 +638,7 @@ class SummaryAbsen extends GetView {
                                                         HeroIcons.map_pin,
                                                         size: 16,
                                                       ),
-                                                      const SizedBox(
-                                                        width: 5,
-                                                      ),
+                                                      const SizedBox(width: 5),
                                                       Text(
                                                         absenC
                                                             .dataLimitAbsen[i]
@@ -671,27 +652,19 @@ class SummaryAbsen extends GetView {
                                             ],
                                           ),
                                           const SizedBox(height: 2),
-                                          i == 0 &&
-                                                  absenC.statsCon.value !=
-                                                      ""
+                                          i == 0 && absenC.statsCon.value != ""
                                               ? Container(
                                                 width:
-                                                    Get
-                                                        .mediaQuery
-                                                        .size
-                                                        .width,
+                                                    Get.mediaQuery.size.width,
                                                 decoration: BoxDecoration(
-                                                  color:
-                                                      const Color.fromARGB(
-                                                        118,
-                                                        255,
-                                                        139,
-                                                        128,
-                                                      ),
+                                                  color: const Color.fromARGB(
+                                                    118,
+                                                    255,
+                                                    139,
+                                                    128,
+                                                  ),
                                                   borderRadius:
-                                                      BorderRadius.circular(
-                                                        5,
-                                                      ),
+                                                      BorderRadius.circular(5),
                                                 ),
                                                 child: Padding(
                                                   padding:
@@ -702,8 +675,7 @@ class SummaryAbsen extends GetView {
                                                     absenC.statsCon.value,
                                                     style: TextStyle(
                                                       color:
-                                                          Colors
-                                                              .redAccent[700],
+                                                          Colors.redAccent[700],
                                                     ),
                                                   ),
                                                 ),

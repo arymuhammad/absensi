@@ -1,6 +1,7 @@
 import 'package:absensi/app/data/model/login_model.dart';
 import 'package:absensi/app/data/model/req_app_model.dart';
 import 'package:absensi/app/modules/adjust_presence/controllers/adjust_presence_controller.dart';
+import 'package:absensi/app/modules/home/controllers/home_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icons_plus/icons_plus.dart';
@@ -13,7 +14,7 @@ class UptShift extends StatelessWidget {
   final ReqApp data;
   final Data? dataUser;
   final adjCtrl = Get.put(AdjustPresenceController());
-
+  final homeC = Get.find<HomeController>();
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -94,6 +95,10 @@ class UptShift extends StatelessWidget {
                     "jam_pulang": data.jamPulang,
                   };
                   adjCtrl.appAbs(dataUptApp, dataUptAbs);
+                  homeC.reloadPendingAdj(
+                    idUser: dataUser!.id!,
+                    level: dataUser!.level!,
+                  );
                 },
               ),
               CsElevatedButton(
@@ -110,6 +115,10 @@ class UptShift extends StatelessWidget {
                     "status": data.status,
                   };
                   adjCtrl.appAbs(dataUptApp, {});
+                  homeC.reloadPendingAdj(
+                    idUser: dataUser!.id!,
+                    level: dataUser!.level!,
+                  );
                 },
               ),
             ],

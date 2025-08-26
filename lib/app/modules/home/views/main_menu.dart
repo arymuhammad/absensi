@@ -6,6 +6,7 @@ import 'package:absensi/app/modules/leave/views/leave_view.dart';
 import 'package:absensi/app/modules/leave/views/request_leave_view.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../data/helper/app_colors.dart';
 import '../../../data/helper/const.dart';
 import '../../../data/model/login_model.dart';
 import '../../adjust_presence/views/adjust_presence_view.dart';
@@ -33,7 +34,38 @@ class MainMenu extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Main Menu', style: titleTextStyle.copyWith(fontSize: 15)),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('Main Menu', style: titleTextStyle.copyWith(fontSize: 15)),
+                InkWell(
+                  onTap: () {
+                    homeC.reloadPendingAdj(
+                      idUser: userData!.id!,
+                      level: userData!.level!,
+                    );
+                    homeC.reloadPendingApproval(
+                      idUser: userData!.id!,
+                      kodeCabang: userData!.kodeCabang!,
+                      level: userData!.level!,
+                      parentId: userData!.parentId!,
+                    );
+                  },
+                  child: Container(
+                    height: 25,
+                    width: 25,
+                    decoration: BoxDecoration(
+                      color: AppColors.itemsBackground,
+                      borderRadius: BorderRadius.circular(50),
+                    ),
+                    child: const Icon(
+                      Icons.refresh_rounded,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ],
+            ),
             const Divider(thickness: 1),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
