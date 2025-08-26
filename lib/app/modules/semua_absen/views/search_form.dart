@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:absensi/app/data/helper/app_colors.dart';
 import 'package:absensi/app/data/model/login_model.dart';
 import 'package:absensi/app/modules/absen/controllers/absen_controller.dart';
 import 'package:absensi/app/data/helper/custom_dialog.dart';
@@ -296,6 +297,7 @@ searchForm(Data? userData) {
                       }
                     },
                     style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.itemsBackground,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30),
                       ),

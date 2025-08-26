@@ -1,9 +1,14 @@
 import 'dart:io';
+import 'dart:math' as math;
 import 'package:absensi/app/data/helper/app_colors.dart';
+import 'package:absensi/app/data/helper/custom_dialog.dart';
 import 'package:absensi/app/modules/absen/controllers/absen_controller.dart';
 import 'package:absensi/app/modules/settings/controllers/settings_controller.dart';
+import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../data/helper/const.dart';
@@ -36,7 +41,7 @@ class AboutView extends GetView {
             child: Card(
               elevation: 4,
               child: SizedBox(
-                height: 500,
+                height: 600,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -69,7 +74,10 @@ class AboutView extends GetView {
                     const Divider(),
                     Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: Text('Changelog', style: titleTextStyle.copyWith(fontSize: 18),),
+                      child: Text(
+                        'Changelog',
+                        style: titleTextStyle.copyWith(fontSize: 18),
+                      ),
                     ),
                     Obx(
                       () =>
@@ -88,53 +96,7 @@ class AboutView extends GetView {
                                 ),
                               )
                               : Expanded(
-                                child: ListView.separated(
-                                  padding: EdgeInsets.zero,
-                                  itemBuilder: (context, index) {
-                                    final data = setC.updateList[index];
-                                    return Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text('V${setC.latestVer}',style: titleTextStyle),
-                                          const SizedBox(height: 5,),
-                                          Row(
-                                            children: [
-                                              Icon(
-                                                IconData(
-                                                  int.parse(data['icon']),
-                                                  fontFamily: 'MaterialIcons',
-                                                ),
-                                                color: Color(
-                                                  int.parse(data['color']),
-                                                ),
-                                              ),
-                                              const SizedBox(width: 5),
-                                              Text(
-                                                '${data['name']}',
-                                                style: const TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 18,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                          Text(
-                                            data['desc'],
-                                            style: TextStyle(
-                                              color: Colors.grey[500],
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    );
-                                  },
-                                  separatorBuilder:
-                                      (context, index) => const Divider(),
-                                  itemCount: setC.updateList.length,
-                                ),
+                                child: buildChangelog(setC.changelog, setC),
                               ),
                     ),
                   ],
@@ -146,4 +108,100 @@ class AboutView extends GetView {
       ),
     );
   }
+}
+
+Widget buildChangelog(
+  List<Map<String, dynamic>> changelog,
+  SettingsController setC,
+) {
+  return CustomMaterialIndicator(
+    onRefresh: () async {
+      setC.isLoading.value = true;
+      final readDoc = await http
+          .get(Uri.parse('http://103.156.15.61/update apk/changeLog.xml'))
+          .timeout(const Duration(seconds: 20));
+      await setC.parseChangelogXml(readDoc.body);
+      showToast('Page Refreshed');
+    },
+    indicatorBuilder: (context, controller) {
+      return Padding(
+        padding: const EdgeInsets.all(6.0),
+        child:
+            Platform.isAndroid
+                ? CircularProgressIndicator(
+                  color: AppColors.itemsBackground,
+                  value:
+                      controller.state.isLoading
+                          ? null
+                          : math.min(controller.value, 1.0),
+                )
+                : const CupertinoActivityIndicator(),
+      );
+    },
+    child: ListView.builder(
+      padding: EdgeInsets.zero,
+      itemCount: changelog.length,
+      itemBuilder: (context, index) {
+        final versionData = changelog[index];
+        final version = versionData['version'];
+        final updates = versionData['updates'] as List<dynamic>;
+
+        return Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'V$version',
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 8),
+              ...updates.map((update) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 6),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(
+                        IconData(
+                          int.parse(update['icon']),
+                          fontFamily: 'MaterialIcons',
+                        ),
+                        color: Color(int.parse(update['color'])),
+                        size: 28,
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              update['name'],
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              update['desc'],
+                              style: TextStyle(color: Colors.grey[700]),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
+              const Divider(thickness: 1),
+            ],
+          ),
+        );
+      },
+    ),
+  );
 }

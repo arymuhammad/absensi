@@ -227,7 +227,7 @@ class RiwayatVisitView extends GetView {
                           await visitC.getAllVisited(userData!.id!);
                           visitC.searchDate.value = "";
 
-                          showToast("Halaman Disegarkan.");
+                          showToast("Page Refreshed");
 
                           // return Future.delayed(
                           //   const Duration(seconds: 1),
@@ -273,8 +273,7 @@ class RiwayatVisitView extends GetView {
                           visitC.isLoading.value = true;
                           await visitC.getAllVisited(userData!.id!);
                           visitC.searchDate.value = "";
-
-                          showToast("Halaman Disegarkan.");
+                          showToast("Page Refreshed");
 
                           // return Future.delayed(
                           //   const Duration(seconds: 1),
@@ -679,7 +678,7 @@ class RiwayatVisitView extends GetView {
                     //  Restart.restartApp();
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.contentDefBtn,
+                    backgroundColor: AppColors.itemsBackground,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(50),
                     ),
@@ -689,7 +688,7 @@ class RiwayatVisitView extends GetView {
                     'SIMPAN',
                     style: TextStyle(
                       fontSize: 15,
-                      color: AppColors.mainTextColor1,
+                      color: AppColors.contentColorWhite,
                     ),
                   ),
                 ),

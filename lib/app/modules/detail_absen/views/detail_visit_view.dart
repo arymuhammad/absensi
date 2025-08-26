@@ -1,15 +1,11 @@
 import 'package:absensi/app/data/helper/const.dart';
-import 'package:absensi/app/modules/shared/rounded_image.dart';
 import 'package:absensi/app/services/service_api.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
-
 import 'package:get/get.dart';
 import 'package:icons_plus/icons_plus.dart';
-import 'package:intl/intl.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:url_launcher/url_launcher.dart';
-
 import '../../../data/helper/app_colors.dart';
 import '../../../data/helper/format_waktu.dart';
 
@@ -100,7 +96,6 @@ class DetailVisitView extends GetView {
           ),
         ],
       ),
-  
     );
   }
 
@@ -124,12 +119,12 @@ class DetailVisitView extends GetView {
         children: [
           Container(
             height: 40,
-            decoration: BoxDecoration(
-              borderRadius: const BorderRadius.only(
+            decoration: const BoxDecoration(
+              borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(10),
                 topRight: Radius.circular(10),
               ),
-              color: mainColor,
+              color: AppColors.itemsBackground,
             ),
             child: Center(
               child: Text(

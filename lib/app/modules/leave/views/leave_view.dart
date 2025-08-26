@@ -75,37 +75,36 @@ class LeaveView extends GetView<LeaveController> {
                     child: StartAppBanner(leaveC.bannerAdStartApp.value!),
                   );
                 } else {
-                  return const Text('Memuat iklan...');
+                  return const Text('Loading Ads...');
                 }
               }),
               Expanded(
                 child: CustomMaterialIndicator(
                   onRefresh: () async {
-                  
-                      //  leaveC.leaveBalanceCheck(userData!);
-                      await leaveC.getLeaveReq({
-                        "type": "",
-                        "id_user": userData!.id!,
-                      });
-                   
+                    //  leaveC.leaveBalanceCheck(userData!);
+                    await leaveC.getLeaveReq({
+                      "type": "",
+                      "id_user": userData!.id!,
+                    });
+                    showToast('Page Refreshed');
                     // leaveC.isLoading.value = true;
                   },
-                 backgroundColor: Colors.white,
-  indicatorBuilder: (context, controller) {
-    return Padding(
-                  padding: const EdgeInsets.all(6.0),
-                  child:
-                      Platform.isAndroid
-                          ? CircularProgressIndicator(
-                            color: AppColors.itemsBackground,
-                            value:
-                                controller.state.isLoading
-                                    ? null
-                                    : math.min(controller.value, 1.0),
-                          )
-                          : const CupertinoActivityIndicator(),
-                );
-  },
+                  backgroundColor: Colors.white,
+                  indicatorBuilder: (context, controller) {
+                    return Padding(
+                      padding: const EdgeInsets.all(6.0),
+                      child:
+                          Platform.isAndroid
+                              ? CircularProgressIndicator(
+                                color: AppColors.itemsBackground,
+                                value:
+                                    controller.state.isLoading
+                                        ? null
+                                        : math.min(controller.value, 1.0),
+                              )
+                              : const CupertinoActivityIndicator(),
+                    );
+                  },
                   child: Obx(
                     () =>
                         leaveC.isLoading.value

@@ -1,15 +1,12 @@
 import 'dart:async';
 import 'dart:convert';
-
 import 'package:absensi/app/data/model/notif_model.dart';
 import 'package:absensi/app/data/model/summary_absen_model.dart';
 import 'package:absensi/app/services/service_api.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../../data/helper/manual_sse_client.dart';
 import '../../../data/model/login_model.dart';
 
 class HomeController extends GetxController

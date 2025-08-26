@@ -135,6 +135,7 @@ class ProfilView extends GetView<ProfilController> {
                   child: CustomMaterialIndicator(
                     onRefresh: () async {
                       await ctr.getLastUserData(dataUser: listDataUser!);
+                      showToast('Page Refreshed');
                     },
                     backgroundColor: Colors.white,
                     indicatorBuilder: (context, controller) {

@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:math' as math;
 
 import 'package:absensi/app/data/helper/const.dart';
@@ -38,8 +39,7 @@ class RequestLeaveView extends GetView<LeaveController> {
       body: Stack(
         children: [
           CustomMaterialIndicator(
-          
-            onRefresh: () {
+            onRefresh: () async {
               var param = {
                 "type": "get_pending_req_leave",
                 "kode_cabang": userData!.kodeCabang!,
@@ -47,17 +47,25 @@ class RequestLeaveView extends GetView<LeaveController> {
                 "level": userData!.level!,
                 "parent_id": userData!.parentId!,
               };
-              return leaveC.getLeaveReq(param);
-            }, backgroundColor: Colors.white,
-  indicatorBuilder: (context, controller) {
-    return Padding(
-      padding: const EdgeInsets.all(6.0),
-      child: CircularProgressIndicator(
-        color: Colors.redAccent,
-        value: controller.state.isLoading ? null : math.min(controller.value, 1.0),
-      ),
-    );
-  },
+              await leaveC.getLeaveReq(param);
+              showToast('Page Refreshed');
+            },
+            backgroundColor: Colors.white,
+            indicatorBuilder: (context, controller) {
+              return Padding(
+                padding: const EdgeInsets.all(6.0),
+                child:
+                    Platform.isAndroid
+                        ? CircularProgressIndicator(
+                          color: AppColors.itemsBackground,
+                          value:
+                              controller.state.isLoading
+                                  ? null
+                                  : math.min(controller.value, 1.0),
+                        )
+                        : const CupertinoActivityIndicator(),
+              );
+            },
             child: Obx(
               () =>
                   leaveC.isLoading.value

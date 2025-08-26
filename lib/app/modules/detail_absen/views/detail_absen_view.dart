@@ -149,12 +149,12 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
         children: [
           Container(
             height: 40,
-            decoration: BoxDecoration(
-              borderRadius: const BorderRadius.only(
+            decoration: const BoxDecoration(
+              borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(10),
                 topRight: Radius.circular(10),
               ),
-              color: mainColor,
+              color: AppColors.itemsBackground,
             ),
             child: Center(
               child: Text(

@@ -13,14 +13,19 @@ class SettingsController extends GetxController {
   var serverList = <ServerApi>[].obs;
   var serverSelected = "".obs;
   var updateList = [<String, dynamic>{}].obs;
+  var changelog = <Map<String, dynamic>>[].obs;
+
   var currVer = "";
   var latestVer = "";
   var isLoading = true.obs;
 
   @override
-  void onInit() {
+  void onInit() async {
     super.onInit();
-    getChangelog();
+    final readDoc = await http
+        .get(Uri.parse('http://103.156.15.61/update apk/changeLog.xml'))
+        .timeout(const Duration(seconds: 20));
+    parseChangelogXml(readDoc.body);
   }
 
   getChangelog() async {
@@ -39,12 +44,14 @@ class SettingsController extends GetxController {
         //start looping item on readDoc
         updateList.clear();
         for (final listUpdates in updates) {
+          // final version = listUpdates.findElements('versi');
           final name = listUpdates.findElements('name').first.innerText;
           final desc = listUpdates.findElements('desc').first.innerText;
           final icon = listUpdates.findElements('icon').first.innerText;
           final color = listUpdates.findElements('color').first.innerText;
 
           updateList.add({
+            'versi': latestVer,
             'name': name,
             'desc': desc,
             'icon': icon,
@@ -53,6 +60,7 @@ class SettingsController extends GetxController {
           isLoading.value = false;
           update();
         }
+        print(updateList);
         //end loop item on readDoc
         // if (compareVersion(latestVer, currVer) <= 0) {
         //   // dialogUpdateApp();
@@ -77,6 +85,42 @@ class SettingsController extends GetxController {
       isLoading.value = false;
       showToast("The connection to the server has timed out.");
     }
+  }
+
+  Future<List<Map<String, dynamic>>> parseChangelogXml(String xmlString) async {
+    final document = xml.XmlDocument.parse(xmlString);
+    final items = document.findElements('items').first;
+
+    // List<Map<String, dynamic>> changelog = [];
+
+    // parsing manual dengan asumsi versi dan update berdampingan
+    changelog.clear();
+    String currentVersion = '';
+    for (final node in items.children) {
+      if (node is xml.XmlElement) {
+        if (node.name.local == 'versi') {
+          currentVersion = node.innerText.trim();
+          changelog.add({'version': currentVersion, 'updates': []});
+        } else if (node.name.local == 'update') {
+          final name = node.findElements('name').first.innerText;
+          final desc = node.findElements('desc').first.innerText;
+          final icon = node.findElements('icon').first.innerText;
+          final color = node.findElements('color').first.innerText;
+
+          if (changelog.isNotEmpty) {
+            changelog.last['updates'].add({
+              'name': name,
+              'desc': desc,
+              'icon': icon,
+              'color': color,
+            });
+            isLoading.value = false;
+            update();
+          }
+        }
+      }
+    }
+    return changelog;
   }
 
   int compareVersion(String v1, String v2) {

@@ -9,12 +9,9 @@ import 'package:absensi/app/modules/shared/rounded_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:icons_plus/icons_plus.dart';
-import '../../../data/helper/custom_dialog.dart';
 import '../../absen/controllers/absen_controller.dart';
 import '../../adjust_presence/controllers/adjust_presence_controller.dart';
 import '../controllers/home_controller.dart';
-import 'req_app_user_view.dart';
 
 class HomeView extends GetView<HomeController> {
   HomeView({super.key, this.listDataUser});
@@ -34,7 +31,7 @@ class HomeView extends GetView<HomeController> {
             decoration: const BoxDecoration(color: AppColors.itemsBackground),
           ),
           Padding(
-            padding: const EdgeInsets.only(left: 15.0, top: 35.0, right: 15.0),
+            padding: const EdgeInsets.only(left: 15.0, top: 40.0, right: 15.0),
             child: Column(
               children: [
                 Row(
@@ -98,58 +95,6 @@ class HomeView extends GetView<HomeController> {
                         ),
                       ],
                     ),
-
-                    // IconButton(
-                    //   tooltip: "Messages",
-                    //   // padding: EdgeInsets.zero,
-                    //   //  constraints: BoxConstraints(),
-                    //   onPressed: () {
-                    //     adjCtrl.getReqAppUpt(
-                    //       '',
-                    //       '',
-                    //       listDataUser!.level,
-                    //       listDataUser!.id,
-                    //       adjCtrl.initDate,
-                    //       adjCtrl.lastDate,
-                    //     );
-                    //     Get.to(
-                    //       () => ReqAppUserView(userData: listDataUser!),
-                    //       transition: Transition.cupertino,
-                    //     );
-                    //   },
-                    //   icon: const Badge(
-                    //     isLabelVisible: true,
-                    //     label: Text("99"),
-                    //     // offset: Offset(8, 8),
-                    //     //  backgroundColor: Theme.of(context).colorScheme.secondary,
-                    //     child: Icon(
-                    //       Icons.circle_notifications_rounded,
-                    //       color: AppColors.contentColorWhite,
-                    //       size: 32,
-                    //     ),
-                    //   ),
-                    // ),
-                    // const SizedBox(width: 10),
-                    // Container(
-                    //   height: 40,
-                    //   width: 40,
-                    //   // padding: const EdgeInsets.all(5),
-                    //   decoration: BoxDecoration(
-                    //     borderRadius: BorderRadius.circular(10),
-                    //     color: Colors.white,
-                    //   ),
-                    //   child: IconButton(
-                    //     onPressed: () {
-                    //       promptDialog(
-                    //         context: context,
-                    //         title: 'LOG OUT',
-                    //         desc: 'Are you sure you want to log out?',
-                    //         btnOkOnPress: () => auth.logout(),
-                    //       );
-                    //     },
-                    //     icon: Icon(Icons.logout_rounded, color: red, size: 30),
-                    //   ),
-                    // ),
                   ],
                 ),
                 const SizedBox(height: 20),

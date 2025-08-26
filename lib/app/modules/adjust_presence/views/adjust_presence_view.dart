@@ -1,3 +1,4 @@
+import 'package:absensi/app/data/helper/app_colors.dart';
 import 'package:absensi/app/modules/adjust_presence/views/widget/adjust_data.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -14,16 +15,9 @@ class AdjustPresenceView extends GetView<AdjustPresenceController> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('ADJUST PRESENCE'),
+        title: const Text('Adjust Presence'),
         centerTitle: true,
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage('assets/image/new_bg_app.jpg'),
-              fit: BoxFit.cover,
-            ),
-          ),
-        ),
+        backgroundColor: AppColors.itemsBackground,
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -33,31 +27,23 @@ class AdjustPresenceView extends GetView<AdjustPresenceController> {
               height: 45,
               decoration: BoxDecoration(
                 color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(
-                  25.0,
-                ),
+                borderRadius: BorderRadius.circular(25.0),
               ),
               child: TabBar(
                 controller: ctrl.tabController,
                 // give the indicator a decoration (color and border radius)
                 indicator: BoxDecoration(
-                  borderRadius: BorderRadius.circular(
-                    25.0,
-                  ),
+                  borderRadius: BorderRadius.circular(25.0),
                   color: Colors.green,
                 ),
                 labelColor: Colors.white,
                 unselectedLabelColor: Colors.black,
                 tabs: const [
                   // first tab [you can add an icon using the icon property]
-                  Tab(
-                    text: 'Adjust Presence Data',
-                  ),
+                  Tab(text: 'Adjust Presence Data'),
 
                   // second tab [you can add an icon using the icon property]
-                  Tab(
-                    text: 'Request Approval ',
-                  ),
+                  Tab(text: 'Request Approval '),
                 ],
               ),
             ),
@@ -68,13 +54,11 @@ class AdjustPresenceView extends GetView<AdjustPresenceController> {
                   // first tab bar view widget
                   Padding(
                     padding: const EdgeInsets.fromLTRB(8.0, 12, 8.0, 8.0),
-                    child: Center(child: AdjustData(userData: data!,)),
+                    child: Center(child: AdjustData(userData: data!)),
                   ),
 
                   // second tab bar view widget
-                  Center(
-                    child: ReqAppUpdate(dataUser:data!),
-                  ),
+                  Center(child: ReqAppUpdate(dataUser: data!)),
                 ],
               ),
             ),

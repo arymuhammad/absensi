@@ -1,6 +1,5 @@
 import 'package:absensi/app/data/helper/app_colors.dart';
 import 'package:absensi/app/data/helper/const.dart';
-import 'package:absensi/app/data/helper/custom_dialog.dart';
 import 'package:absensi/app/data/model/login_model.dart';
 import 'package:absensi/app/modules/add_pegawai/controllers/add_pegawai_controller.dart';
 import 'package:absensi/app/modules/settings/views/about_view.dart';
@@ -12,7 +11,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icons_plus/icons_plus.dart';
-
 // import '../../alarm/views/alarm_view.dart';
 import '../controllers/settings_controller.dart';
 
@@ -29,7 +27,7 @@ class SettingsView extends GetView<SettingsController> {
           // ),
           Container(
             height: 250,
-            decoration: BoxDecoration(color: AppColors.itemsBackground),
+            decoration: const BoxDecoration(color: AppColors.itemsBackground),
           ),
           Padding(
             padding: const EdgeInsets.only(top: 110, left: 15.0, right: 15.0),
@@ -69,9 +67,9 @@ class SettingsView extends GetView<SettingsController> {
                                 color: bgContainer,
                                 borderRadius: BorderRadius.circular(8),
                               ),
-                              child: Icon(
+                              child: const Icon(
                                 Iconsax.profile_circle_bold,
-                                color: mainColor,
+                                color: AppColors.itemsBackground,
                               ),
                             ),
                             trailing: const Icon(
@@ -102,7 +100,7 @@ class SettingsView extends GetView<SettingsController> {
                           //         color: bgContainer,
                           //         borderRadius: BorderRadius.circular(8)),
                           //     child:
-                          //         Icon(FontAwesome.face_smile, color: mainColor),
+                          //         Icon(FontAwesome.face_smile, color: AppColors.itemsBackground),
                           //   ),
                           //   trailing:
                           //       const Icon(Icons.keyboard_arrow_right_rounded),
@@ -129,7 +127,7 @@ class SettingsView extends GetView<SettingsController> {
                                 color: bgContainer,
                                 borderRadius: BorderRadius.circular(8),
                               ),
-                              child: Icon(Iconsax.key_bulk, color: mainColor),
+                              child: const Icon(Iconsax.key_bulk, color: AppColors.itemsBackground),
                             ),
                             title: Text(
                               'Security',
@@ -164,9 +162,9 @@ class SettingsView extends GetView<SettingsController> {
                                 color: bgContainer,
                                 borderRadius: BorderRadius.circular(8),
                               ),
-                              child: Icon(
+                              child: const Icon(
                                 Bootstrap.database_fill_exclamation,
-                                color: mainColor,
+                                color: AppColors.itemsBackground,
                               ),
                             ),
                             title: Text(
@@ -201,7 +199,7 @@ class SettingsView extends GetView<SettingsController> {
                           //     decoration: BoxDecoration(
                           //         color: bgContainer,
                           //         borderRadius: BorderRadius.circular(8)),
-                          //     child: Icon(Bootstrap.alarm_fill, color: mainColor),
+                          //     child: Icon(Bootstrap.alarm_fill, color: AppColors.itemsBackground),
                           //   ),
                           //   title: Text(
                           //     'Alarm',
@@ -227,9 +225,9 @@ class SettingsView extends GetView<SettingsController> {
                                   color: bgContainer,
                                   borderRadius: BorderRadius.circular(8),
                                 ),
-                                child: Icon(
+                                child: const Icon(
                                   Iconsax.user_add_bold,
-                                  color: mainColor,
+                                  color: AppColors.itemsBackground,
                                 ),
                               ),
                               title: Text(
@@ -266,9 +264,9 @@ class SettingsView extends GetView<SettingsController> {
                                 color: bgContainer,
                                 borderRadius: BorderRadius.circular(8),
                               ),
-                              child: Icon(
+                              child: const Icon(
                                 Iconsax.info_circle_bold,
-                                color: mainColor,
+                                color: AppColors.itemsBackground,
                               ),
                             ),
                             title: Text(
