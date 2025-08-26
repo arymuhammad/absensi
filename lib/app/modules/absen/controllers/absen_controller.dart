@@ -363,13 +363,12 @@ class AbsenController extends GetxController {
               // log(data.toString());
               await ServiceApi().submitAbsen(data, true);
             }
+            getAbsenToday(paramSingle);
+            getLimitAbsen(paramLimit);
             _sub.cancel();
           } else {
             _sub.cancel();
           }
-
-          getAbsenToday(paramSingle);
-          getLimitAbsen(paramLimit);
         } else {
           await cekDataAbsen(
             "pulang",
@@ -397,16 +396,16 @@ class AbsenController extends GetxController {
                   "device_info2": i.devInfo2!,
                 };
                 await ServiceApi().submitAbsen(data, true);
-                _sub.cancel();
               }
+              getAbsenToday(paramSingle);
+              getLimitAbsen(paramLimit);
+              _sub.cancel();
             } else {
               _sub.cancel();
             }
           } else {
             _sub.cancel();
           }
-          getAbsenToday(paramSingle);
-          getLimitAbsen(paramLimit);
         }
         // urut.value++;
         // end cek absen
@@ -457,14 +456,14 @@ class AbsenController extends GetxController {
                 // log(data.toString());
                 await ServiceApi().submitVisit(data, true);
               }
+              getVisitToday(paramSingleVisit);
+              getLimitVisit(paramLimitVisit);
               _sub.cancel();
             } else {
               // timerStat.value = false;
               // startTimer(0);
               _sub.cancel();
             }
-            getVisitToday(paramSingleVisit);
-            getLimitVisit(paramLimitVisit);
           } else {
             await cekDataVisit(
               tempDataVisit.length == 1 ? "pulang" : "pulangv2",
@@ -508,6 +507,8 @@ class AbsenController extends GetxController {
               _sub.cancel();
             }
           }
+        } else {
+          _sub.cancel();
         }
       }
     });

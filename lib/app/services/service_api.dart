@@ -9,6 +9,7 @@ import 'package:absensi/app/data/model/cek_user_model.dart';
 import 'package:absensi/app/data/model/cek_visit_model.dart';
 import 'package:absensi/app/data/model/leave_model.dart';
 import 'package:absensi/app/data/model/level_model.dart';
+import 'package:absensi/app/data/model/notif_model.dart';
 import 'package:absensi/app/data/model/report_sales_model.dart';
 import 'package:absensi/app/data/model/req_app_model.dart';
 import 'package:absensi/app/data/model/shift_kerja_model.dart';
@@ -1521,20 +1522,46 @@ class ServiceApi {
           )
           .timeout(const Duration(seconds: 60));
 
-      if (response.statusCode == 200) {
-        final decoded = jsonDecode(response.body);
-        if (decoded['data'] == null) {
-          throw Exception('Response data is null');
-        }
-        SummaryAbsenModel notif = SummaryAbsenModel.fromJson(decoded['data']);
+      if (param['type'] == "summ_month") {
+        if (response.statusCode == 200) {
+          final decoded = jsonDecode(response.body);
+          if (decoded['data'] == null) {
+            throw Exception('Response data is null');
+          }
+          SummaryAbsenModel notif = SummaryAbsenModel.fromJson(decoded['data']);
 
-        return notif;
-      } else {
-        throw Exception('Failed to load data, status: ${response.statusCode}');
+          return notif;
+        } else {
+          throw Exception(
+            'Failed to load data, status: ${response.statusCode}',
+          );
+        }
+      }
+      // else if (param['type'] == "approval") {
+      else {
+        if (response.statusCode == 200) {
+          final decoded = jsonDecode(response.body);
+          if (decoded['data'] == null) {
+            throw Exception('Response data is null');
+          }
+          NotifModel notif = NotifModel.fromJson(decoded['data']);
+
+          return notif;
+        } else {
+          throw Exception(
+            'Failed to load data, status: ${response.statusCode}',
+          );
+        }
       }
     } catch (e) {
       showToast(e.toString());
-      return SummaryAbsenModel(); // fallback kosong untuk mencegah crash UI
+      // print(param);
+      if (param['type'] == "summ_month") {
+        return SummaryAbsenModel(); // fallback kosong untuk mencegah crash UI
+      } else {
+        // else if (param['type'] == "approval") {
+        return NotifModel(); // fallback kosong untuk mencegah crash UI
+      }
     }
   }
 }

@@ -19,6 +19,14 @@ class HomeController extends GetxController
   var summAttPerMonth = SummaryAbsenModel().obs;
   late Rx<Future<SummaryAbsenModel>> futureSummary =
       Rx<Future<SummaryAbsenModel>>(Future.value(SummaryAbsenModel()));
+  var summPendApp = NotifModel().obs;
+  late Rx<Future<NotifModel>> futurePendApp = Rx<Future<NotifModel>>(
+    Future.value(NotifModel(totalRequest: 0)),
+  );
+  var summPendAdj = NotifModel().obs;
+  late Rx<Future<NotifModel>> futurePendAdj = Rx<Future<NotifModel>>(
+    Future.value(NotifModel(totalNotif: 0)),
+  );
 
   var initDate = DateFormat('yyyy-MM-dd').format(
     DateTime.parse(
@@ -47,6 +55,17 @@ class HomeController extends GetxController
     });
     futureSummary = Rx<Future<SummaryAbsenModel>>(
       getSummAttPerMonth(dataUserLogin.id!),
+    );
+    futurePendApp = Rx<Future<NotifModel>>(
+      getPendingApproval(
+        idUser: dataUserLogin.id!,
+        kodeCabang: dataUserLogin.kodeCabang!,
+        level: dataUserLogin.level!,
+        parentId: dataUserLogin.parentId!,
+      ),
+    );
+    futurePendAdj = Rx<Future<NotifModel>>(
+      getPendingAdj(idUser: dataUserLogin.id!, level: dataUserLogin.level!),
     );
     super.onInit();
   }
@@ -140,66 +159,100 @@ class HomeController extends GetxController
     futureSummary.value = getSummAttPerMonth(idUser);
   }
 
-  Stream<NotifModel> getPendingApproval({
+  Future<NotifModel> getPendingApproval({
+    required String idUser,
+    required String kodeCabang,
+    required String level,
+    required String parentId,
+  }) async {
+    var data = {
+      "type": "approval",
+      "id_user": idUser,
+      "kode_cabang": kodeCabang,
+      "level": level,
+      "parent_id": parentId,
+    };
+    return summPendApp.value = await ServiceApi().getNotif(data);
+    // // StreamController<NotifModel> controller = StreamController();
+
+    // // void connect() {
+    // //   final url = Uri.parse(
+    // //     '${dotenv.env['STREAM_NOTIF_URL']}?type=approval&kode_cabang=$kodeCabang&id_user=$idUser&level=$level&parent_id=$parentId',
+    // //   );
+    // //   // print( '${dotenv.env['STREAM_NOTIF_URL']}?type=approval&kode_cabang=$kodeCabang&id_user=$idUser&level=$level&parent_id=$parentId');
+    // //   final sseClient = ManualSseClient(url);
+
+    // //   sseClient.connect().listen(
+    // //     (dataStr) {
+    // //       //  print('Received raw data: $dataStr');
+    // //       try {
+    // //         final jsonData = jsonDecode(dataStr);
+    // //         // print(jsonData);
+    // //         if (jsonData is Map<String, dynamic> &&
+    // //             jsonData['success'] == true &&
+    // //             jsonData['data'] != null) {
+    // //           final model = NotifModel.fromJson(jsonData['data']);
+    // //           // print('---------');
+    // //           // print(model);
+    // //           if (!controller.isClosed) controller.add(model);
+    // //         } else {
+    // //           if (!controller.isClosed) {
+    // //             controller.addError('Tidak berhasil mendapatkan data');
+    // //           }
+    // //         }
+    // //       } catch (e) {
+    // //         if (!controller.isClosed) {
+    // //           controller.addError('Parse JSON gagal: $e');
+    // //         }
+    // //       }
+    // //     },
+    // //     onError: (error) async {
+    // //       if (!controller.isClosed) controller.addError(error);
+    // //       // Reconnect after delay
+    // //       await Future.delayed(const Duration(seconds: 5));
+    // //       if (!controller.isClosed) connect();
+    // //     },
+    // //     onDone: () async {
+    // //       // Reconnect after delay
+    // //       await Future.delayed(const Duration(seconds: 5));
+    // //       if (!controller.isClosed) connect();
+    // //     },
+    // //     cancelOnError: true,
+    // //   );
+    // }
+
+    // connect();
+
+    // controller.onCancel = () {
+    //   controller.close();
+    // };
+
+    // return controller.stream;
+  }
+
+  void reloadPendingApproval({
     required String idUser,
     required String kodeCabang,
     required String level,
     required String parentId,
   }) {
-    StreamController<NotifModel> controller = StreamController();
+    futurePendApp.value = getPendingApproval(
+      idUser: idUser,
+      kodeCabang: kodeCabang,
+      level: level,
+      parentId: parentId,
+    );
+  }
 
-    void connect() {
-      final url = Uri.parse(
-        '${dotenv.env['STREAM_NOTIF_URL']}?type=approval&kode_cabang=$kodeCabang&id_user=$idUser&level=$level&parent_id=$parentId',
-      );
-      // print( '${dotenv.env['STREAM_NOTIF_URL']}?type=approval&kode_cabang=$kodeCabang&id_user=$idUser&level=$level&parent_id=$parentId');
-      final sseClient = ManualSseClient(url);
+  Future<NotifModel> getPendingAdj({
+    required String idUser,
+    required String level,
+  }) async {
+    var data = {"type": "adjusment", "id_user": idUser, "level": level};
+    return summPendApp.value = await ServiceApi().getNotif(data);
+  }
 
-      sseClient.connect().listen(
-        (dataStr) {
-          //  print('Received raw data: $dataStr');
-          try {
-            final jsonData = jsonDecode(dataStr);
-            // print(jsonData);
-            if (jsonData is Map<String, dynamic> &&
-                jsonData['success'] == true &&
-                jsonData['data'] != null) {
-              final model = NotifModel.fromJson(jsonData['data']);
-              // print('---------');
-              // print(model);
-              if (!controller.isClosed) controller.add(model);
-            } else {
-              if (!controller.isClosed) {
-                controller.addError('Tidak berhasil mendapatkan data');
-              }
-            }
-          } catch (e) {
-            if (!controller.isClosed) {
-              controller.addError('Parse JSON gagal: $e');
-            }
-          }
-        },
-        onError: (error) async {
-          if (!controller.isClosed) controller.addError(error);
-          // Reconnect after delay
-          await Future.delayed(const Duration(seconds: 5));
-          if (!controller.isClosed) connect();
-        },
-        onDone: () async {
-          // Reconnect after delay
-          await Future.delayed(const Duration(seconds: 5));
-          if (!controller.isClosed) connect();
-        },
-        cancelOnError: true,
-      );
-    }
-
-    connect();
-
-    controller.onCancel = () {
-      controller.close();
-    };
-
-    return controller.stream;
+  void reloadPendingAdj({required String idUser, required String level}) {
+    futurePendApp.value = getPendingAdj(idUser: idUser, level: level);
   }
 }

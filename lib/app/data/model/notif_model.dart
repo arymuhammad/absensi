@@ -4,7 +4,7 @@ class NotifModel {
 
   NotifModel({this.totalRequest, this.totalNotif});
   NotifModel.fromJson(Map<String, dynamic> json) {
-    totalRequest = json['total_request']??0;
-    totalNotif = json['total']??0;
+    totalRequest = int.tryParse(json['total_request']?.toString() ?? '0') ?? 0;
+    totalNotif = int.tryParse(json['total']?.toString() ?? '0') ?? 0;
   }
 }

@@ -94,62 +94,66 @@ class MainMenu extends StatelessWidget {
                                   borderRadius: BorderRadius.circular(10),
                                   color: Colors.white,
                                 ),
-                                child: StreamBuilder<NotifModel>(
-                                  stream: homeC.getPendingApproval(
-                                    idUser: userData!.id!,
-                                    kodeCabang: userData!.kodeCabang!,
-                                    level: userData!.level!,
-                                    parentId: userData!.parentId!,
-                                  ),
-                                  builder: (context, snapshot) {
-                                    return Stack(
-                                      // alignment: Alignment.center,
-                                      clipBehavior: Clip.none,
-                                      children: [
-                                        Image.asset(
-                                          'assets/image/req-leave.png',
-                                          // width: 40,
-                                          // height: 40,
-                                        ),
-                                        if (snapshot.connectionState ==
-                                            ConnectionState.waiting)
-                                          const Positioned(
-                                            top: -2,
-                                            right: -2,
-                                            child: SizedBox(
-                                              width: 16,
-                                              height: 16,
-                                              child: CircularProgressIndicator(
-                                                strokeWidth: 2,
-                                              ),
-                                            ),
-                                          )
-                                        else if (snapshot.hasError)
-                                          const Positioned(
-                                            top: -2,
-                                            right: -2,
-                                            child: Icon(
-                                              Icons.error,
-                                              color: Colors.red,
-                                              size: 16,
-                                            ),
-                                          )
-                                        else if (snapshot.hasData &&
-                                            snapshot.data!.totalRequest! > 0)
-                                          Positioned(
-                                            top: -4,
-                                            right: -4,
-                                            child: Badge(
-                                              isLabelVisible: true,
-                                              label: Text(
-                                                snapshot.data!.totalRequest!
-                                                    .toString(),
-                                              ),
-                                            ),
+                                child: Obx(
+                                  () => FutureBuilder<NotifModel>(
+                                    future: homeC.futurePendApp.value,
+                                    // (
+                                    //   idUser: userData!.id!,
+                                    //   kodeCabang: userData!.kodeCabang!,
+                                    //   level: userData!.level!,
+                                    //   parentId: userData!.parentId!,
+                                    // ),
+                                    builder: (context, snapshot) {
+                                      return Stack(
+                                        // alignment: Alignment.center,
+                                        clipBehavior: Clip.none,
+                                        children: [
+                                          Image.asset(
+                                            'assets/image/req-leave.png',
+                                            // width: 40,
+                                            // height: 40,
                                           ),
-                                      ],
-                                    );
-                                  },
+                                          if (snapshot.connectionState ==
+                                              ConnectionState.waiting)
+                                            const Positioned(
+                                              top: -2,
+                                              right: -2,
+                                              child: SizedBox(
+                                                width: 16,
+                                                height: 16,
+                                                child:
+                                                    CircularProgressIndicator(
+                                                      strokeWidth: 2,
+                                                    ),
+                                              ),
+                                            )
+                                          else if (snapshot.hasError)
+                                            const Positioned(
+                                              top: -2,
+                                              right: -2,
+                                              child: Icon(
+                                                Icons.error,
+                                                color: Colors.red,
+                                                size: 16,
+                                              ),
+                                            )
+                                          else if (snapshot.hasData &&
+                                              snapshot.data!.totalRequest! > 0)
+                                            Positioned(
+                                              top: -4,
+                                              right: -4,
+                                              child: Badge(
+                                                isLabelVisible: true,
+                                                label: Text(
+                                                  snapshot.data!.totalRequest!
+                                                      .toString(),
+                                                ),
+                                              ),
+                                            ),
+                                        ],
+                                      );
+                                    },
+                                  ),
                                 ),
                               ),
                             ),
@@ -214,7 +218,6 @@ class MainMenu extends StatelessWidget {
                             InkWell(
                               onTap: () {
                                 Get.to(() {
-                                
                                   adjCtrl.getReqAppUpt(
                                     '',
                                     '',
@@ -234,60 +237,60 @@ class MainMenu extends StatelessWidget {
                                   borderRadius: BorderRadius.circular(10),
                                   color: Colors.white,
                                 ),
-                                child: StreamBuilder<NotifModel>(
-                                  stream: adjCtrl.getAdjusmentData(
-                                    idUser: userData!.id!,
-                                    level: userData!.level!,
-                                  ),
-                                  builder: (context, snapshot) {
-                                    return Stack(
-                                      // alignment: Alignment.center,
-                                      clipBehavior: Clip.none,
-                                      children: [
-                                        Image.asset(
-                                          'assets/image/notif.png',
-                                          // height: 40,
-                                          // width: 40,
-                                        ),
-                                        if (snapshot.connectionState ==
-                                            ConnectionState.waiting)
-                                          const Positioned(
-                                            top: -2,
-                                            right: -2,
-                                            child: SizedBox(
-                                              width: 16,
-                                              height: 16,
-                                              child: CircularProgressIndicator(
-                                                strokeWidth: 2,
-                                              ),
-                                            ),
-                                          )
-                                        else if (snapshot.hasError)
-                                          const Positioned(
-                                            top: -2,
-                                            right: -2,
-                                            child: Icon(
-                                              Icons.error,
-                                              color: Colors.red,
-                                              size: 16,
-                                            ),
-                                          )
-                                        else if (snapshot.hasData &&
-                                            snapshot.data!.totalNotif! > 0)
-                                          Positioned(
-                                            top: -4,
-                                            right: -4,
-                                            child: Badge(
-                                              isLabelVisible: true,
-                                              label: Text(
-                                                snapshot.data!.totalNotif!
-                                                    .toString(),
-                                              ),
-                                            ),
+                                child: Obx(
+                                  () => FutureBuilder<NotifModel>(
+                                    future: homeC.futurePendAdj.value,
+                                    builder: (context, snapshot) {
+                                      return Stack(
+                                        // alignment: Alignment.center,
+                                        clipBehavior: Clip.none,
+                                        children: [
+                                          Image.asset(
+                                            'assets/image/notif.png',
+                                            // height: 40,
+                                            // width: 40,
                                           ),
-                                      ],
-                                    );
-                                  },
+                                          if (snapshot.connectionState ==
+                                              ConnectionState.waiting)
+                                            const Positioned(
+                                              top: -2,
+                                              right: -2,
+                                              child: SizedBox(
+                                                width: 16,
+                                                height: 16,
+                                                child:
+                                                    CircularProgressIndicator(
+                                                      strokeWidth: 2,
+                                                    ),
+                                              ),
+                                            )
+                                          else if (snapshot.hasError)
+                                            const Positioned(
+                                              top: -2,
+                                              right: -2,
+                                              child: Icon(
+                                                Icons.error,
+                                                color: Colors.red,
+                                                size: 16,
+                                              ),
+                                            )
+                                          else if (snapshot.hasData &&
+                                              snapshot.data!.totalNotif! > 0)
+                                            Positioned(
+                                              top: -4,
+                                              right: -4,
+                                              child: Badge(
+                                                isLabelVisible: true,
+                                                label: Text(
+                                                  snapshot.data!.totalNotif!
+                                                      .toString(),
+                                                ),
+                                              ),
+                                            ),
+                                        ],
+                                      );
+                                    },
+                                  ),
                                 ),
                               ),
                             ),

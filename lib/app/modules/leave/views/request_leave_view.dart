@@ -24,7 +24,7 @@ class RequestLeaveView extends GetView<LeaveController> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Request Leave',
+          'Approval',
           style: titleTextStyle.copyWith(
             fontSize: 18,
             color: AppColors.contentColorWhite,
