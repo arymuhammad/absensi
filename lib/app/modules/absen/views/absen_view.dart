@@ -311,7 +311,7 @@ class AbsenView extends GetView<AbsenController> {
                               "please fill in the location of the mall/city",
                             );
                           } else {
-                            loadingDialog("Mengirim Data...", "");
+                            loadingDialog("open the camera", "");
                             absenC.stsAbsenSelected.value == "Check In"
                                 ? await visitIn(
                                   dataUser: data!,
@@ -334,7 +334,7 @@ class AbsenView extends GetView<AbsenController> {
                               absenC.selectedShift.isEmpty) {
                             showToast("please select shift first");
                           } else {
-                            loadingDialog("Mengirim Data...", "");
+                            loadingDialog("open the camera", "");
                             absenC.stsAbsenSelected.value == "Check In"
                                 ? await checkIn(
                                   data!,

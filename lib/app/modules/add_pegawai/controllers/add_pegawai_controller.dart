@@ -96,11 +96,12 @@ class AddPegawaiController extends GetxController {
       currVer = packageInfo.version;
       // String buildNumber = packageInfo.buildNumber;
     });
-
-    final DeviceInfoNullSafety deviceInfoNullSafety = DeviceInfoNullSafety();
-    Map<String, dynamic> abiInfo = await deviceInfoNullSafety.abiInfo;
-    var abi = abiInfo.entries.toList();
-    supportedAbi = abi[1].value;
+    if (Platform.isAndroid) {
+      final DeviceInfoNullSafety deviceInfoNullSafety = DeviceInfoNullSafety();
+      Map<String, dynamic> abiInfo = await deviceInfoNullSafety.abiInfo;
+      var abi = abiInfo.entries.toList();
+      supportedAbi = abi[1].value;
+    }
   }
 
   @override
@@ -738,8 +739,8 @@ class AddPegawaiController extends GetxController {
         title: 'SUCCESS',
         btnOkOnPress: () {
           // Future.delayed(const Duration(seconds: 1), () {
-            auth.logout();
-            Get.back(closeOverlays: true);
+          auth.logout();
+          Get.back(closeOverlays: true);
           // });
         },
       );
