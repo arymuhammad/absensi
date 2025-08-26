@@ -46,7 +46,7 @@ visitIn({
       await absC.uploadFotoAbsen();
       Get.back();
       if (absC.image != null) {
-        loadingDialog("Sedang mengirim data...", "");
+        loadingDialog("Sending data...", "");
         absC.timeNetwork(await FlutterNativeTimezone.getLocalTimezone());
         var data = {
           "status": "add",
@@ -63,7 +63,9 @@ visitIn({
                       ? absC.selectedCabangVisit.value
                       : dataUser.kodeCabang
                   : absC.rndLoc.text,
-          "jam_in": absC.timeNow.isNotEmpty ? absC.timeNow : absC.timeNowOpt,
+          "jam_in":
+              //  absC.timeNow.isNotEmpty ? absC.timeNow : absC.timeNowOpt,
+              absC.timeNowOpt,
           "foto_in": File(absC.image!.path),
           "foto_out": "",
           "lat_in": latitude.toString(),
@@ -93,7 +95,9 @@ visitIn({
                         ? absC.selectedCabangVisit.value
                         : dataUser.kodeCabang
                     : absC.rndLoc.text,
-            jamIn: absC.timeNow.isNotEmpty ? absC.timeNow : absC.timeNowOpt,
+            jamIn:
+                //  absC.timeNow.isNotEmpty ? absC.timeNow : absC.timeNowOpt,
+                absC.timeNowOpt,
             visitOut: '',
             jamOut: '',
             fotoIn: absC.image!.path,
@@ -150,7 +154,7 @@ visitIn({
       await absC.uploadFotoAbsen();
       Get.back();
       if (absC.image != null) {
-        loadingDialog("Sedang mengirim data...", "");
+        loadingDialog("Sending data...", "");
         absC.timeNetwork(await FlutterNativeTimezone.getLocalTimezone());
         var data = {
           "status": "add",
@@ -167,7 +171,9 @@ visitIn({
                       ? absC.selectedCabangVisit.value
                       : dataUser.kodeCabang
                   : absC.rndLoc.text,
-          "jam_in": absC.timeNow.isNotEmpty ? absC.timeNow : absC.timeNowOpt,
+          "jam_in":
+              //  absC.timeNow.isNotEmpty ? absC.timeNow : absC.timeNowOpt,
+              absC.timeNowOpt,
           "foto_in": File(absC.image!.path),
           "foto_out": "",
           "lat_in": latitude.toString(),
@@ -220,11 +226,12 @@ visitIn({
     absC.selectedCabangVisit.value = "";
     Get.back();
     succesDialog(
-     context:  Get.context!,
+      context: Get.context!,
       pageAbsen: "N",
       desc: "Anda sudah Check In hari ini",
-     type:  DialogType.info,
-      title: 'INFO',btnOkOnPress: () => Get.back(),
+      type: DialogType.info,
+      title: 'INFO',
+      btnOkOnPress: () => Get.back(),
     );
   }
 }

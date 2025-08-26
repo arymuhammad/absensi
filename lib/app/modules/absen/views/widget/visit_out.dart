@@ -11,7 +11,8 @@ import '../../../../data/helper/db_helper.dart';
 import '../../../../services/service_api.dart';
 import '../../controllers/absen_controller.dart';
 
-final absC = Get.find<AbsenController>();final adC = Get.put(AdController());
+final absC = Get.find<AbsenController>();
+final adC = Get.put(AdController());
 visitOut({
   required Data dataUser,
   required double latitude,
@@ -39,7 +40,7 @@ visitOut({
     await absC.uploadFotoAbsen();
     Get.back();
     if (absC.image != null) {
-      loadingDialog("Sedang mengirim data...", "");
+      loadingDialog("Sending data...", "");
       absC.timeNetwork(await FlutterNativeTimezone.getLocalTimezone());
       var data = {
         "status": "update",
@@ -57,7 +58,9 @@ visitOut({
                     : dataUser.kodeCabang
                 : absC.rndLoc.text,
         "visit_in": absC.cekVisit.value.kodeStore,
-        "jam_out": absC.timeNow.isNotEmpty ? absC.timeNow : absC.timeNowOpt,
+        "jam_out":
+            // absC.timeNow.isNotEmpty ? absC.timeNow : absC.timeNowOpt,
+            absC.timeNowOpt,
         "foto_out": File(absC.image!.path),
         "lat_out": latitude.toString(),
         "long_out": longitude.toString(),
@@ -73,7 +76,9 @@ visitOut({
                       ? absC.selectedCabangVisit.value
                       : dataUser.kodeCabang
                   : absC.rndLoc.text,
-          "jam_out": absC.timeNow.isNotEmpty ? absC.timeNow : absC.timeNowOpt,
+          "jam_out":
+              // absC.timeNow.isNotEmpty ? absC.timeNow : absC.timeNowOpt,
+              absC.timeNowOpt,
           "foto_out": absC.image!.path,
           "lat_out": latitude.toString(),
           "long_out": longitude.toString(),
@@ -96,7 +101,7 @@ visitOut({
       await ServiceApi().submitVisit(data, false);
 
       adC.loadInterstitialAd();
-        adC.showInterstitialAd(() {});
+      adC.showInterstitialAd(() {});
       // Get.back();
       // succesDialog(Get.context, "Y",
       //     "Harap tidak menutup aplikasi selama proses syncron data absensi");

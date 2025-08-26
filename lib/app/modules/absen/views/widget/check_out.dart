@@ -73,7 +73,7 @@ checkOut(Data dataUser, double latitude, double longitude) async {
     // if (absC.cekAbsen.value.total == "1") {
     // face detectionhr
     //  await Get.to(() => const FaceDetection());
-    
+
     await absC.uploadFotoAbsen();
     Get.back();
 
@@ -91,7 +91,7 @@ checkOut(Data dataUser, double latitude, double longitude) async {
       );
 
       if (localDataAbs.isEmpty) {
-        loadingDialog("Mengirim data...", "");
+        loadingDialog("Sending data...", "");
         absC.timeNetwork(await FlutterNativeTimezone.getLocalTimezone());
         var data = {
           "status": "update",
@@ -108,7 +108,8 @@ checkOut(Data dataUser, double latitude, double longitude) async {
           ),
           "nama": dataUser.nama,
           "jam_absen_pulang":
-              absC.timeNow.isNotEmpty ? absC.timeNow : absC.timeNowOpt,
+              // absC.timeNow.isNotEmpty ? absC.timeNow : absC.timeNowOpt,
+              absC.timeNowOpt,
           "foto_pulang": File(absC.image!.path),
           "lat_pulang": latitude.toString(),
           "long_pulang": longitude.toString(),
@@ -163,7 +164,7 @@ checkOut(Data dataUser, double latitude, double longitude) async {
         // OLD STATEMENT
         // && localDataAbs[0].tanggalPulang == null
 
-        loadingDialog("Mengirim data...", "");
+        loadingDialog("Sending data...", "");
         absC.timeNetwork(await FlutterNativeTimezone.getLocalTimezone());
         var data = {
           "status": "update",
@@ -180,7 +181,8 @@ checkOut(Data dataUser, double latitude, double longitude) async {
           ),
           "nama": dataUser.nama,
           "jam_absen_pulang":
-              absC.timeNow.isNotEmpty ? absC.timeNow : absC.timeNowOpt,
+              // absC.timeNow.isNotEmpty ? absC.timeNow : absC.timeNowOpt,
+              absC.timeNowOpt,
           "foto_pulang": File(absC.image!.path),
           "lat_pulang": latitude.toString(),
           "long_pulang": longitude.toString(),
@@ -199,7 +201,8 @@ checkOut(Data dataUser, double latitude, double longitude) async {
             ),
             "nama": dataUser.nama,
             "jam_absen_pulang":
-                absC.timeNow.isNotEmpty ? absC.timeNow : absC.timeNowOpt,
+                // absC.timeNow.isNotEmpty ? absC.timeNow : absC.timeNowOpt,
+               absC.timeNowOpt,
             "foto_pulang": absC.image!.path,
             "lat_pulang": latitude.toString(),
             "long_pulang": longitude.toString(),
