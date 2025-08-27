@@ -71,7 +71,7 @@ class LeaveController extends GetxController {
       logC.refresh();
     }
 
-    startAppSdk.setTestAdsEnabled(true); // Aktifkan saat development
+    startAppSdk.setTestAdsEnabled(false); // Aktifkan saat development
     loadBannerAd();
   }
 
@@ -96,7 +96,6 @@ class LeaveController extends GetxController {
       showToast('Gagal memuat iklan banner');
       // loadBannerAd();
     }
-
   }
 
   @override
