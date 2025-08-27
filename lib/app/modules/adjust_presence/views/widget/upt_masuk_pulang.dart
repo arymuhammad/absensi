@@ -152,6 +152,7 @@ class UptMasukPulang extends StatelessWidget {
                     idUser: dataUser!.id!,
                     level: dataUser!.level!,
                   );
+                  homeC.refresh();
                 },
               ),
               CsElevatedButton(
@@ -172,6 +173,7 @@ class UptMasukPulang extends StatelessWidget {
                     idUser: dataUser!.id!,
                     level: dataUser!.level!,
                   );
+                  homeC.refresh();
                 },
               ),
             ],
