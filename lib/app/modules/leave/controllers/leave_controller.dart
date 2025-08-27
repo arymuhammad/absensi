@@ -96,7 +96,6 @@ class LeaveController extends GetxController {
       showToast('Gagal memuat iklan banner');
       // loadBannerAd();
     }
-
   }
 
   @override
