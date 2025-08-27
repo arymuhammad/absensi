@@ -41,7 +41,7 @@ visitOut({
     Get.back();
     if (absC.image != null) {
       loadingDialog("Sending data...", "");
-      absC.timeNetwork(await FlutterNativeTimezone.getLocalTimezone());
+     await absC.timeNetwork(await FlutterNativeTimezone.getLocalTimezone());
       var data = {
         "status": "update",
         "id": dataUser.id,

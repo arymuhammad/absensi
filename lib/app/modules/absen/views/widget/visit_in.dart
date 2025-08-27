@@ -47,8 +47,8 @@ visitIn({
       Get.back();
       if (absC.image != null) {
         loadingDialog("Sending data...", "");
-        absC.timeNetwork(await FlutterNativeTimezone.getLocalTimezone());
-    
+        await absC.timeNetwork(await FlutterNativeTimezone.getLocalTimezone());
+
         var data = {
           "status": "add",
           "id": dataUser.id,
@@ -154,7 +154,7 @@ visitIn({
       Get.back();
       if (absC.image != null) {
         loadingDialog("Sending data...", "");
-        absC.timeNetwork(await FlutterNativeTimezone.getLocalTimezone());
+        await absC.timeNetwork(await FlutterNativeTimezone.getLocalTimezone());
         var data = {
           "status": "add",
           "id": dataUser.id,

@@ -92,7 +92,7 @@ checkOut(Data dataUser, double latitude, double longitude) async {
 
       if (localDataAbs.isEmpty) {
         loadingDialog("Sending data...", "");
-        absC.timeNetwork(await FlutterNativeTimezone.getLocalTimezone());
+        await absC.timeNetwork(await FlutterNativeTimezone.getLocalTimezone());
         var data = {
           "status": "update",
           "id": dataUser.id,
@@ -109,7 +109,7 @@ checkOut(Data dataUser, double latitude, double longitude) async {
           "nama": dataUser.nama,
           "jam_absen_pulang":
               absC.timeNow.isNotEmpty ? absC.timeNow : absC.timeNowOpt,
-              // absC.timeNowOpt,
+          // absC.timeNowOpt,
           "foto_pulang": File(absC.image!.path),
           "lat_pulang": latitude.toString(),
           "long_pulang": longitude.toString(),
@@ -165,7 +165,7 @@ checkOut(Data dataUser, double latitude, double longitude) async {
         // && localDataAbs[0].tanggalPulang == null
 
         loadingDialog("Sending data...", "");
-        absC.timeNetwork(await FlutterNativeTimezone.getLocalTimezone());
+        await absC.timeNetwork(await FlutterNativeTimezone.getLocalTimezone());
         var data = {
           "status": "update",
           "id": dataUser.id,
@@ -182,7 +182,7 @@ checkOut(Data dataUser, double latitude, double longitude) async {
           "nama": dataUser.nama,
           "jam_absen_pulang":
               absC.timeNow.isNotEmpty ? absC.timeNow : absC.timeNowOpt,
-              // absC.timeNowOpt,
+          // absC.timeNowOpt,
           "foto_pulang": File(absC.image!.path),
           "lat_pulang": latitude.toString(),
           "long_pulang": longitude.toString(),
@@ -202,7 +202,7 @@ checkOut(Data dataUser, double latitude, double longitude) async {
             "nama": dataUser.nama,
             "jam_absen_pulang":
                 absC.timeNow.isNotEmpty ? absC.timeNow : absC.timeNowOpt,
-              //  absC.timeNowOpt,
+            //  absC.timeNowOpt,
             "foto_pulang": absC.image!.path,
             "lat_pulang": latitude.toString(),
             "long_pulang": longitude.toString(),

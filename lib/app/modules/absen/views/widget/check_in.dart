@@ -47,7 +47,7 @@ checkIn(Data dataUser, double latitude, double longitude) async {
       );
       if (localDataAbs.isEmpty) {
         loadingDialog("Sending data...", "");
-        absC.timeNetwork(await FlutterNativeTimezone.getLocalTimezone());
+        await absC.timeNetwork(await FlutterNativeTimezone.getLocalTimezone());
         var data = {
           "status": "add",
           "id": dataUser.id,
