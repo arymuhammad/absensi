@@ -31,13 +31,14 @@ import '../data/model/dept_model.dart';
 import '../data/model/foto_profil_model.dart';
 import '../data/model/login_model.dart';
 // import '../data/model/server_api_model.dart';
+import '../data/model/payslip_model.dart';
 import '../data/model/users_model.dart';
 import 'app_exceptions.dart';
 
 class ServiceApi {
   // var baseUrlPath = "https://attendance.urbanco.id/api/"; // poduction
   // var baseUrlPath = "https://88.222.214.157/"; // dev
-  var baseUrl = dotenv.env['API_URL']; // dev
+  var baseUrl = dotenv.env['API_LOCAL']; // dev
   // var baseUrlPath = BASEURL.PATH; // dev
 
   var isLoading = false.obs;
@@ -403,9 +404,9 @@ class ServiceApi {
             context: Get.context!,
             pageAbsen: "Y",
             desc:
-                "Harap tidak menutup aplikasi selama proses syncron data absensi",
+                "Please do not close the application during the attendance data synchronization process.",
             type: DialogType.warning,
-            title: 'PERINGATAN',
+            title: 'Warning',
             btnOkOnPress: () {
               auth.selectedMenu(0);
               Future.delayed(const Duration(milliseconds: 300));
@@ -413,7 +414,7 @@ class ServiceApi {
             },
           );
         } else {
-          showToast('data sukses dikirim');
+          showToast('Attendance data sent successfully');
         }
       });
       // var responseBytes = await res.stream.toBytes();
@@ -431,7 +432,7 @@ class ServiceApi {
         failedDialog(
           Get.context,
           'ERROR',
-          'Tidak ada koneksi internet\nHarap mencoba kembali',
+          'No internet connection\nPlease try again',
         );
       }
     } on TimeoutException {
@@ -439,14 +440,14 @@ class ServiceApi {
       failedDialog(
         Get.context,
         'ERROR',
-        'Waktu habis. Silahkan mencoba kembali',
+        'Time out. Please try again.',
       );
     } catch (e) {
       if (!isOnInit) {
         Get.back();
-        showToast('Terjadi kesalahan saat mengirim data');
+        showToast('An error occurred while sending data');
       } else {
-        showToast('Terjadi kesalahan saat mengirim data\n$e');
+        showToast('An error occurred while sending data\n$e');
         // failedDialog(Get.context, 'ERROR', e.toString());
       }
     }
@@ -1562,6 +1563,28 @@ class ServiceApi {
         // else if (param['type'] == "approval") {
         return NotifModel(); // fallback kosong untuk mencegah crash UI
       }
+    }
+  }
+
+  getPaySlip(Map<String, dynamic> data) async {
+    try {
+      final response = await http
+          .post(Uri.parse('${baseUrl}payslip'), body: data)
+          .timeout(const Duration(seconds: 60));
+      if (response.statusCode == 200) {
+        // print(response.body);
+        final decoded = json.decode(response.body);
+        if (decoded['data'] == null || decoded['data'].isEmpty) {
+          // Jika data kosong, return null atau objek PayslipModel dengan status khusus
+          return null;
+        }
+        PayslipModel dataPayslip = PayslipModel.fromJson(decoded['data']);
+        return dataPayslip;
+      } else {
+        throw Exception('Failed to load data, status: ${response.statusCode}');
+      }
+    } on Exception catch (e) {
+      throw Exception(e.toString());
     }
   }
 }

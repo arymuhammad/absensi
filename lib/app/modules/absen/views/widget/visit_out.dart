@@ -33,8 +33,8 @@ visitOut({
     Get.back();
     failedDialog(
       Get.context,
-      "Peringatan",
-      "Data Check In tidak ditemukan\n\nPastikan nama/lokasi Checkout\nsama dengan nama/lokasi Check In",
+      "Warning",
+      "Check In data not found\n\nMake sure the Checkout name/location\nis the same as the Check In name/location",
     );
   } else {
     await absC.uploadFotoAbsen();
@@ -133,7 +133,7 @@ visitOut({
       absC.rndLoc.clear();
     } else {
       Get.back();
-      failedDialog(Get.context, "Peringatan", "Check Out dibatalkan");
+      failedDialog(Get.context, "Warning", "Check out was cancelled");
     }
   }
 }

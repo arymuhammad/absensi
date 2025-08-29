@@ -146,7 +146,7 @@ visitIn({
         absC.long.value = "";
       } else {
         Get.back();
-        failedDialog(Get.context, "Peringatan", "Visit dibatalkan");
+        failedDialog(Get.context, "Warning", "Check in was cancelled");
       }
     } else {
       // langsung kirim ke server
@@ -214,7 +214,7 @@ visitIn({
         absC.long.value = "";
       } else {
         Get.back();
-        failedDialog(Get.context, "Peringatan", "Visit dibatalkan");
+        failedDialog(Get.context, "Warning", "Check in was cancelled");
       }
     }
   } else {
@@ -226,7 +226,7 @@ visitIn({
     succesDialog(
       context: Get.context!,
       pageAbsen: "N",
-      desc: "Anda sudah Check In hari ini",
+      desc: "You have checked in today",
       type: DialogType.info,
       title: 'INFO',
       btnOkOnPress: () => Get.back(),

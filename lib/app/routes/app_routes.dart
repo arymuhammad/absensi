@@ -18,6 +18,7 @@ abstract class Routes {
   static const ADJUST_PRESENCE = _Paths.ADJUST_PRESENCE;
   static const REQUEST_APPROVAL = _Paths.REQUEST_APPROVAL;
   static const LEAVE = _Paths.LEAVE;
+  static const PAY_SLIP = _Paths.PAY_SLIP;
 }
 
 abstract class _Paths {
@@ -37,4 +38,5 @@ abstract class _Paths {
   static const ADJUST_PRESENCE = '/adjust-presence';
   static const REQUEST_APPROVAL = '/request-approval';
   static const LEAVE = '/leave';
+  static const PAY_SLIP = '/pay-slip';
 }

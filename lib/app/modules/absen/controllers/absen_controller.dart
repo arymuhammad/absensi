@@ -238,13 +238,15 @@ class AbsenController extends GetxController {
           var abi = abiInfo.entries.toList();
           supportedAbi = abi[1].value;
           checkForUpdates("onInit");
-        } else {
-          launchUrl(
-            Uri.parse(
-              'https://apps.apple.com/us/app/urbanco-spot/id6476486235',
-            ),
-          );
-        }
+        } 
+        // disable redirect to appstore for ios when update is available
+        // else {
+        //   launchUrl(
+        //     Uri.parse(
+        //       'https://apps.apple.com/us/app/urbanco-spot/id6476486235',
+        //     ),
+        //   );
+        // }
       }
     }
 

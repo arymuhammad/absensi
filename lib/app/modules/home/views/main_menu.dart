@@ -11,6 +11,8 @@ import '../../../data/helper/const.dart';
 import '../../../data/model/login_model.dart';
 import '../../adjust_presence/views/adjust_presence_view.dart';
 import '../../leave/controllers/leave_controller.dart';
+import '../../pay_slip/controllers/pay_slip_controller.dart';
+import '../../pay_slip/views/pay_slip_view.dart';
 import '../../semua_absen/views/monitoring_absen_view.dart';
 import 'req_app_user_view.dart';
 
@@ -22,6 +24,7 @@ class MainMenu extends StatelessWidget {
   final adjCtrl = Get.find<AdjustPresenceController>();
   final leaveC = Get.find<LeaveController>();
   final homeC = Get.find<HomeController>();
+  final payC = Get.put(PaySlipController());
   // final logC = Get.find<LoginController>();
   @override
   Widget build(BuildContext context) {
@@ -329,6 +332,55 @@ class MainMenu extends StatelessWidget {
 
                             const Text(
                               'Notification\n',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(fontSize: 15),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(width: 18),
+                      ],
+                    ),
+                  ),
+
+                  Visibility(
+                    // visible:
+                    //     userData!.parentId == "3" || userData!.parentId == "4"
+                    //         ? true
+                    //         : false,
+                    child: Row(
+                      children: [
+                        Column(
+                          children: [
+                            InkWell(
+                              onTap: () {
+                                Get.to(() {
+                                  // payC.getPaySlip(
+                                  //   empId: userData!.nik!,
+                                  //   branch: userData!.kodeCabang!,
+                                  //   date1: payC.initDate.value,
+                                  //   date2: payC.endDate.value,
+                                  // );
+                                  return PaySlipView(userData: userData!);
+                                }, transition: Transition.cupertino);
+                              },
+                              child: Container(
+                                height: 50,
+                                width: 50,
+                                padding: const EdgeInsets.all(5),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  color: Colors.white,
+                                ),
+                                child: Image.asset(
+                                  'assets/image/payslip.png',
+                                  // height: 40,
+                                  // width: 40,
+                                ),
+                              ),
+                            ),
+
+                            const Text(
+                              'PaySlip\n',
                               textAlign: TextAlign.center,
                               style: TextStyle(fontSize: 15),
                             ),

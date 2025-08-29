@@ -10,6 +10,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:month_year_picker/month_year_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:splash_screen_view/SplashScreenView.dart';
 import 'app/modules/home/views/bottom_navbar.dart';
@@ -59,12 +60,14 @@ void main() async {
         fontFamily: 'Nunito',
       ),
       home: SplashScreenView(
-        navigateRoute: 
+        navigateRoute:
         // LeaveView(userData: auth.logUser.value),
-
-         Obx(() => auth.isAuth.value
-            ? BottomNavBar(listDataUser: auth.logUser.value)
-            : const LoginView()),
+        Obx(
+          () =>
+              auth.isAuth.value
+                  ? BottomNavBar(listDataUser: auth.logUser.value)
+                  : const LoginView(),
+        ),
         duration: 2700,
         imageSize: 70,
         imageSrc: "assets/image/logo2.png",
@@ -77,6 +80,7 @@ void main() async {
         pageRouteTransition: PageRouteTransition.SlideTransition,
         backgroundColor: AppColors.itemsBackground,
       ),
+      localizationsDelegates: const [MonthYearPickerLocalizations.delegate],
       getPages: AppPages.routes,
       navigatorObservers: [FlutterSmartDialog.observer],
       builder: FlutterSmartDialog.init(),

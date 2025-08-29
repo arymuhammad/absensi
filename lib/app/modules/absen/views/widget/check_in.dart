@@ -32,13 +32,7 @@ checkIn(Data dataUser, double latitude, double longitude) async {
     Get.back();
 
     if (absC.image != null) {
-      // loadingDialog("Memproses data wajah", "");
-      // await absC.matchFaces(dataUser.id!);
-      // Get.back();
-      // if (absC.similarityStatus.value == "failed") {
-      //   failedDialog(
-      //       Get.context!, 'ERROR', 'Wajah tidak dikenali');
-      // } else {
+     
       // CEK ABSEN MASUK HARI INI, JIKA HASIL = 0, ABSEN MASUK
 
       var localDataAbs = await SQLHelper.instance.getAbsenToday(
@@ -163,7 +157,7 @@ checkIn(Data dataUser, double latitude, double longitude) async {
         succesDialog(
           context: Get.context!,
           pageAbsen: "N",
-          desc: "Anda sudah Absen Masuk hari ini.",
+          desc: "You have checked in today",
           type: DialogType.info,
           title: 'INFO',
           btnOkOnPress: () => Get.back(),
@@ -177,7 +171,7 @@ checkIn(Data dataUser, double latitude, double longitude) async {
       absC.lat.value = "";
       absC.long.value = "";
       Get.back();
-      failedDialog(Get.context, "Peringatan", "Absen Masuk dibatalkan");
+      failedDialog(Get.context, "Warning", "Check in was cancelled");
     }
   } else {
     absC.stsAbsenSelected.value = "";
@@ -189,7 +183,7 @@ checkIn(Data dataUser, double latitude, double longitude) async {
     succesDialog(
       context: Get.context!,
       pageAbsen: "N",
-      desc: "Anda sudah Absen Masuk hari ini.",
+      desc: "You have checked in today",
       type: DialogType.info,
       title: 'INFO',
       btnOkOnPress: () => Get.back(),
