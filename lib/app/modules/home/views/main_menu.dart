@@ -47,12 +47,30 @@ class MainMenu extends StatelessWidget {
                       idUser: userData!.id!,
                       level: userData!.level!,
                     );
-                    homeC.reloadPendingApproval(
-                      idUser: userData!.id!,
-                      kodeCabang: userData!.kodeCabang!,
-                      level: userData!.level!,
-                      parentId: userData!.parentId!,
-                    );
+                    if ((userData!.parentId == "3" &&
+                            (userData!.level == "19" ||
+                                userData!.level == "26")) ||
+                        (userData!.parentId == "4" &&
+                            (userData!.level == "1" ||
+                                userData!.level == "43")) ||
+                        (userData!.parentId == "5" &&
+                            userData!.level == "77") ||
+                        (userData!.parentId == "7" &&
+                            userData!.level == "23") ||
+                        (userData!.parentId == "8" &&
+                            userData!.level == "18") ||
+                        (userData!.parentId == "9" &&
+                            userData!.level == "41") ||
+                        (userData!.parentId == "2" &&
+                            userData!.level == "10") ||
+                        (userData!.parentId == "1")) {
+                      homeC.reloadPendingApproval(
+                        idUser: userData!.id!,
+                        kodeCabang: userData!.kodeCabang!,
+                        level: userData!.level!,
+                        parentId: userData!.parentId!,
+                      );
+                    }
                   },
                   child: Container(
                     height: 25,

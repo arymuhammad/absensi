@@ -18,7 +18,7 @@ import '../../../../data/model/login_model.dart';
 class SummaryToday extends StatelessWidget {
   SummaryToday({super.key, this.listDataUser});
   final Data? listDataUser;
-  final homeC = Get.put(HomeController());
+  final homeC = Get.find<HomeController>();
   final absenC = Get.find<AbsenController>();
 
   @override

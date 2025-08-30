@@ -55,14 +55,25 @@ class HomeController extends GetxController
         getSummAttPerMonth(dataUserLogin.id!),
       );
     }
-    futurePendApp = Rx<Future<NotifModel>>(
-      getPendingApproval(
-        idUser: dataUserLogin.id!,
-        kodeCabang: dataUserLogin.kodeCabang!,
-        level: dataUserLogin.level!,
-        parentId: dataUserLogin.parentId!,
-      ),
-    );
+    if ((dataUserLogin.parentId == "3" &&
+            (dataUserLogin.level == "19" || dataUserLogin.level == "26")) ||
+        (dataUserLogin.parentId == "4" &&
+            (dataUserLogin.level == "1" || dataUserLogin.level == "43")) ||
+        (dataUserLogin.parentId == "5" && dataUserLogin.level == "77") ||
+        (dataUserLogin.parentId == "7" && dataUserLogin.level == "23") ||
+        (dataUserLogin.parentId == "8" && dataUserLogin.level == "18") ||
+        (dataUserLogin.parentId == "9" && dataUserLogin.level == "41") ||
+        (dataUserLogin.parentId == "2" && dataUserLogin.level == "10") ||
+        (dataUserLogin.parentId == "1")) {
+      futurePendApp = Rx<Future<NotifModel>>(
+        getPendingApproval(
+          idUser: dataUserLogin.id!,
+          kodeCabang: dataUserLogin.kodeCabang!,
+          level: dataUserLogin.level!,
+          parentId: dataUserLogin.parentId!,
+        ),
+      );
+    }
     futurePendAdj = Rx<Future<NotifModel>>(
       getPendingAdj(idUser: dataUserLogin.id!, level: dataUserLogin.level!),
     );
@@ -99,58 +110,6 @@ class HomeController extends GetxController
       "id_user": idUser,
     };
     return summAttPerMonth.value = await ServiceApi().getNotif(data);
-
-    // StreamController<SummaryAbsenModel> controller = StreamController();
-
-    // void connect() {
-    //   final url = Uri.parse(
-    //     '${dotenv.env['STREAM_NOTIF_URL']}?type=summ_month&date1=$initDate&date2=$endDate&id_user=$idUser',
-    //   );
-    // print( '${dotenv.env['STREAM_NOTIF_URL']}?type=summ_month&date1=$initDate&date2=$endDate&id_user=$idUser');
-    // final sseClient = ManualSseClient(url);
-
-    //   sseClient.connect().listen(
-    //     (dataStr) {
-    //       try {
-    //         final jsonData = jsonDecode(dataStr);
-    //         if (jsonData is Map<String, dynamic> &&
-    //             jsonData['success'] == true &&
-    //             jsonData['data'] != null) {
-    //           final model = SummaryAbsenModel.fromJson(jsonData['data']);
-    //           if (!controller.isClosed) controller.add(model);
-    //         } else {
-    //           if (!controller.isClosed) {
-    //             controller.addError('Tidak berhasil mendapatkan data');
-    //           }
-    //         }
-    //       } catch (e) {
-    //         if (!controller.isClosed) {
-    //           controller.addError('Parse JSON gagal: $e');
-    //         }
-    //       }
-    //     },
-    //     onError: (error) async {
-    //       if (!controller.isClosed) controller.addError(error);
-    //       // Reconnect after delay
-    //       await Future.delayed(const Duration(seconds: 5));
-    //       if (!controller.isClosed) connect();
-    //     },
-    //     onDone: () async {
-    //       // Reconnect after delay
-    //       await Future.delayed(const Duration(seconds: 5));
-    //       if (!controller.isClosed) connect();
-    //     },
-    //     cancelOnError: true,
-    //   );
-    // }
-
-    // connect();
-
-    // controller.onCancel = () {
-    //   controller.close();
-    // };
-
-    // return controller.stream;
   }
 
   // Fungsi ini untuk reload data dipanggil dari UI (refresh button)
@@ -172,61 +131,6 @@ class HomeController extends GetxController
       "parent_id": parentId,
     };
     return summPendApp.value = await ServiceApi().getNotif(data);
-    // // StreamController<NotifModel> controller = StreamController();
-
-    // // void connect() {
-    // //   final url = Uri.parse(
-    // //     '${dotenv.env['STREAM_NOTIF_URL']}?type=approval&kode_cabang=$kodeCabang&id_user=$idUser&level=$level&parent_id=$parentId',
-    // //   );
-    // //   // print( '${dotenv.env['STREAM_NOTIF_URL']}?type=approval&kode_cabang=$kodeCabang&id_user=$idUser&level=$level&parent_id=$parentId');
-    // //   final sseClient = ManualSseClient(url);
-
-    // //   sseClient.connect().listen(
-    // //     (dataStr) {
-    // //       //  print('Received raw data: $dataStr');
-    // //       try {
-    // //         final jsonData = jsonDecode(dataStr);
-    // //         // print(jsonData);
-    // //         if (jsonData is Map<String, dynamic> &&
-    // //             jsonData['success'] == true &&
-    // //             jsonData['data'] != null) {
-    // //           final model = NotifModel.fromJson(jsonData['data']);
-    // //           // print('---------');
-    // //           // print(model);
-    // //           if (!controller.isClosed) controller.add(model);
-    // //         } else {
-    // //           if (!controller.isClosed) {
-    // //             controller.addError('Tidak berhasil mendapatkan data');
-    // //           }
-    // //         }
-    // //       } catch (e) {
-    // //         if (!controller.isClosed) {
-    // //           controller.addError('Parse JSON gagal: $e');
-    // //         }
-    // //       }
-    // //     },
-    // //     onError: (error) async {
-    // //       if (!controller.isClosed) controller.addError(error);
-    // //       // Reconnect after delay
-    // //       await Future.delayed(const Duration(seconds: 5));
-    // //       if (!controller.isClosed) connect();
-    // //     },
-    // //     onDone: () async {
-    // //       // Reconnect after delay
-    // //       await Future.delayed(const Duration(seconds: 5));
-    // //       if (!controller.isClosed) connect();
-    // //     },
-    // //     cancelOnError: true,
-    // //   );
-    // }
-
-    // connect();
-
-    // controller.onCancel = () {
-    //   controller.close();
-    // };
-
-    // return controller.stream;
   }
 
   void reloadPendingApproval({

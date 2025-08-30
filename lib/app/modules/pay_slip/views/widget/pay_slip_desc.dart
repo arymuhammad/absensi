@@ -2,12 +2,8 @@ import 'package:absensi/app/data/helper/const.dart';
 import 'package:absensi/app/data/helper/currency_format.dart';
 import 'package:absensi/app/data/helper/format_waktu.dart';
 import 'package:absensi/app/data/model/payslip_model.dart';
-import 'package:absensi/app/modules/pay_slip/controllers/pay_slip_controller.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-
 import '../../../../data/helper/app_colors.dart';
 
 class PaySlipDesc extends StatelessWidget {

@@ -13,7 +13,7 @@ import '../../../../data/helper/const.dart';
 class SummaryPerMonth extends StatelessWidget {
   SummaryPerMonth({super.key, this.userData});
   final Data? userData;
-  final absenC = Get.put(HomeController());
+  final absenC = Get.find<HomeController>();
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -27,18 +27,18 @@ class SummaryPerMonth extends StatelessWidget {
                 'Summary for this Month',
                 style: titleTextStyle.copyWith(fontSize: 15),
               ),
-              InkWell(
-                onTap: () => absenC.reloadSummary(userData!.id!),
-                child: Container(
-                  height: 30,
-                  width: 30,
-                  decoration: BoxDecoration(
-                    color: AppColors.itemsBackground,
-                    borderRadius: BorderRadius.circular(50),
-                  ),
-                  child: const Icon(Icons.refresh_rounded, color: Colors.white),
-                ),
-              ),
+              // InkWell(
+              //   onTap: () => absenC.reloadSummary(userData!.id!),
+              //   child: Container(
+              //     height: 30,
+              //     width: 30,
+              //     decoration: BoxDecoration(
+              //       color: AppColors.itemsBackground,
+              //       borderRadius: BorderRadius.circular(50),
+              //     ),
+              //     child: const Icon(Icons.refresh_rounded, color: Colors.white),
+              //   ),
+              // ),
             ],
           ),
           const SizedBox(height: 5),

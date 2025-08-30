@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:absensi/app/data/add_controller.dart';
 import 'package:absensi/app/modules/absen/controllers/absen_controller.dart';
+import 'package:absensi/app/modules/home/controllers/home_controller.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter_native_timezone_updated_gradle/flutter_native_timezone.dart';
 import 'package:get/get.dart';
@@ -14,6 +15,7 @@ import '../../../../data/model/login_model.dart';
 import '../../../../services/service_api.dart';
 
 final absC = Get.find<AbsenController>();
+final homeC = Get.find<HomeController>();
 final adC = Get.put(AdController());
 checkIn(Data dataUser, double latitude, double longitude) async {
   await absC.cekDataAbsen(
@@ -32,7 +34,6 @@ checkIn(Data dataUser, double latitude, double longitude) async {
     Get.back();
 
     if (absC.image != null) {
-     
       // CEK ABSEN MASUK HARI INI, JIKA HASIL = 0, ABSEN MASUK
 
       var localDataAbs = await SQLHelper.instance.getAbsenToday(
@@ -60,7 +61,7 @@ checkIn(Data dataUser, double latitude, double longitude) async {
           "jam_pulang": absC.jamPulang.value,
           "jam_absen_masuk":
               absC.timeNow.isNotEmpty ? absC.timeNow : absC.timeNowOpt,
-              // absC.timeNowOpt,
+          // absC.timeNowOpt,
           "foto_masuk": File(absC.image!.path),
           "lat_masuk": latitude.toString(),
           "long_masuk": longitude.toString(),
@@ -88,7 +89,7 @@ checkIn(Data dataUser, double latitude, double longitude) async {
             jamPulang: absC.jamPulang.value,
             jamAbsenMasuk:
                 absC.timeNow.isNotEmpty ? absC.timeNow : absC.timeNowOpt,
-                // absC.timeNowOpt,
+            // absC.timeNowOpt,
             jamAbsenPulang: '',
             fotoMasuk: absC.image!.path,
             latMasuk: latitude.toString(),
@@ -140,6 +141,7 @@ checkIn(Data dataUser, double latitude, double longitude) async {
         };
         absC.getAbsenToday(paramAbsenToday);
         absC.getLimitAbsen(paramLimitAbsen);
+        homeC.reloadSummary(dataUser.id!);
         absC.startTimer(10);
         absC.resend();
         absC.stsAbsenSelected.value = "";

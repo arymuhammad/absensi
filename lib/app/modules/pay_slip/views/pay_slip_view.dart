@@ -4,7 +4,6 @@ import 'package:absensi/app/data/helper/app_colors.dart';
 import 'package:absensi/app/data/model/login_model.dart';
 import 'package:absensi/app/data/model/payslip_model.dart';
 import 'package:absensi/app/modules/pay_slip/views/widget/pay_slip_desc.dart';
-import 'package:absensi/app/modules/shared/dropdown.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -36,7 +35,6 @@ class PaySlipView extends GetView<PaySlipController> {
             children: [
               DateTimeField(
                 controller: payC.datePeriode,
-                // style: const TextStyle(fontSize: 14),
                 decoration: const InputDecoration(
                   contentPadding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
                   prefixIcon: Icon(Icons.calendar_month_sharp),

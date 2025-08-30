@@ -26,8 +26,6 @@ import 'package:latlong2/latlong.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'package:url_launcher/url_launcher.dart';
-
 import 'package:xml/xml.dart' as xml;
 import '../../../data/model/login_model.dart';
 import '../../../services/service_api.dart';

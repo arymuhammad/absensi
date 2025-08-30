@@ -24,7 +24,7 @@ Future<bool> cekAbsenBefore9AM(Data? data) async {
   TimeOfDay currentTime = TimeOfDay.fromDateTime(now);
 
   // Set the target time to 7:00 AM
-  TimeOfDay targetTime = const TimeOfDay(hour: 09, minute: 01);
+  TimeOfDay targetTime = const TimeOfDay(hour: 12, minute: 01);
 
   // Convert TimeOfDay to DateTime for proper comparison
   DateTime currentDateTime = DateTime(
@@ -76,10 +76,22 @@ Widget buildAbsen({required Data? data}) {
             absC.stsAbsenSelected.value = "Check Out";
           });
           // kondisi ketika absen pulang kosong ditemukan
-          return const Center(
-            child: Text(
-              "Absen pulang kemarin masih kosong. Silahkan Check out terlebih dahulu sebelum Check in",
-            ),
+          return Column(
+            children: [
+              const Center(
+                child: Text(
+                  "Absen pulang kemarin masih kosong. Silahkan Check out terlebih dahulu sebelum Check in",
+                ),
+              ),
+          CsDropdownCabang(
+                hintText: data!.namaCabang,
+                dataUser: data,
+                value:
+                    absC.selectedCabang.value == ""
+                        ? null
+                        : absC.selectedCabang.value,
+              ),
+            ],
           );
         } else {
           return Column(
@@ -157,7 +169,7 @@ Widget buildAbsen({required Data? data}) {
                           absC.selectedShift.value = "";
                           dialogMsg(
                             'INFO',
-                            'Cannot select this shift before 15:00 local time.\n\nPlease select another shift',
+                            'Cannot select this shift before\n15:00 local time.\n\nPlease select another shift',
                           );
                         } else {
                           absC.selectedShift.value = val!;

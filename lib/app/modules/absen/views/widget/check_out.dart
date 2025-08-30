@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:absensi/app/data/add_controller.dart';
 import 'package:absensi/app/data/model/login_model.dart';
 import 'package:absensi/app/modules/absen/controllers/absen_controller.dart';
+import 'package:absensi/app/modules/home/controllers/home_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_timezone_updated_gradle/flutter_native_timezone.dart';
 import 'package:get/get.dart';
@@ -12,6 +13,7 @@ import '../../../../data/helper/db_helper.dart';
 import '../../../../services/service_api.dart';
 
 final absC = Get.find<AbsenController>();
+final homeC = Get.find<HomeController>();
 final adC = Get.put(AdController());
 checkOut(Data dataUser, double latitude, double longitude) async {
   // print('Check out woy');
@@ -24,7 +26,7 @@ checkOut(Data dataUser, double latitude, double longitude) async {
   // Detail waktu
   DateTime now = DateTime.now();
   TimeOfDay currentTime = TimeOfDay.fromDateTime(now);
-  TimeOfDay targetTime = const TimeOfDay(hour: 09, minute: 01);
+  TimeOfDay targetTime = const TimeOfDay(hour: 12, minute: 01);
   DateTime currentDateTime = DateTime(
     now.year,
     now.month,
@@ -125,6 +127,7 @@ checkOut(Data dataUser, double latitude, double longitude) async {
 
           absC.getAbsenToday(paramAbsenToday);
           absC.getLimitAbsen(paramLimitAbsen);
+           homeC.reloadSummary(dataUser.id!);
           absC.stsAbsenSelected.value = "";
           absC.selectedShift.value = "";
           absC.selectedCabang.value = "";
@@ -216,6 +219,7 @@ checkOut(Data dataUser, double latitude, double longitude) async {
 
           absC.getAbsenToday(paramAbsenToday);
           absC.getLimitAbsen(paramLimitAbsen);
+           homeC.reloadSummary(dataUser.id!);
           absC.startTimer(10);
           absC.resend();
           absC.stsAbsenSelected.value = "";
@@ -336,6 +340,7 @@ checkOut(Data dataUser, double latitude, double longitude) async {
             };
             absC.getAbsenToday(paramAbsenToday);
             absC.getLimitAbsen(paramLimitAbsen);
+             homeC.reloadSummary(dataUser.id!);
             // absC.startTimer(30);
             // absC.resend();
             absC.stsAbsenSelected.value = "";
@@ -446,6 +451,7 @@ checkOut(Data dataUser, double latitude, double longitude) async {
             };
             absC.getAbsenToday(paramAbsenToday);
             absC.getLimitAbsen(paramLimitAbsen);
+             homeC.reloadSummary(dataUser.id!);
             absC.startTimer(10);
             absC.resend();
             absC.stsAbsenSelected.value = "";
@@ -571,6 +577,7 @@ checkOut(Data dataUser, double latitude, double longitude) async {
           };
           absC.getAbsenToday(paramAbsenToday);
           absC.getLimitAbsen(paramLimitAbsen);
+           homeC.reloadSummary(dataUser.id!);
           // absC.startTimer(30);
           // absC.resend();
           absC.stsAbsenSelected.value = "";
@@ -681,6 +688,7 @@ checkOut(Data dataUser, double latitude, double longitude) async {
           };
           absC.getAbsenToday(paramAbsenToday);
           absC.getLimitAbsen(paramLimitAbsen);
+           homeC.reloadSummary(dataUser.id!);
           absC.startTimer(10);
           absC.resend();
           absC.stsAbsenSelected.value = "";

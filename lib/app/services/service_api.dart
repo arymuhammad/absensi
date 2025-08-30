@@ -38,7 +38,7 @@ import 'app_exceptions.dart';
 class ServiceApi {
   // var baseUrlPath = "https://attendance.urbanco.id/api/"; // poduction
   // var baseUrlPath = "https://88.222.214.157/"; // dev
-  var baseUrl = dotenv.env['API_LOCAL']; // dev
+  var baseUrl = dotenv.env['API_URL']; // dev
   // var baseUrlPath = BASEURL.PATH; // dev
 
   var isLoading = false.obs;
@@ -437,11 +437,7 @@ class ServiceApi {
       }
     } on TimeoutException {
       Get.back();
-      failedDialog(
-        Get.context,
-        'ERROR',
-        'Time out. Please try again.',
-      );
+      failedDialog(Get.context, 'ERROR', 'Time out. Please try again.');
     } catch (e) {
       if (!isOnInit) {
         Get.back();

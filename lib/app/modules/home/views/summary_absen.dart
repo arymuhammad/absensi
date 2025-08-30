@@ -8,6 +8,7 @@ import 'package:absensi/app/data/helper/format_waktu.dart';
 import 'package:absensi/app/data/helper/custom_dialog.dart';
 import 'package:absensi/app/data/model/login_model.dart';
 import 'package:absensi/app/modules/detail_absen/views/detail_absen_view.dart';
+import 'package:absensi/app/modules/home/controllers/home_controller.dart';
 import 'package:absensi/app/modules/home/views/widget/summary_today.dart';
 import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 import 'package:flutter/cupertino.dart';
@@ -23,7 +24,8 @@ import 'widget/summary_per_month.dart';
 class SummaryAbsen extends GetView {
   SummaryAbsen({super.key, this.userData});
   final Data? userData;
-  final absenC = Get.put(AbsenController());
+  final absenC = Get.find<AbsenController>();
+  final homeC = Get.find<HomeController>();
 
   @override
   Widget build(BuildContext context) {
@@ -51,6 +53,7 @@ class SummaryAbsen extends GetView {
                 };
 
                 absenC.isLoading.value = true;
+                homeC.reloadSummary(userData!.id!);
                 await absenC.getAbsenToday(paramSingle);
                 await absenC.getLimitAbsen(paramLimit);
 
