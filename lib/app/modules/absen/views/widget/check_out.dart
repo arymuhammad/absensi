@@ -26,7 +26,7 @@ checkOut(Data dataUser, double latitude, double longitude) async {
   // Detail waktu
   DateTime now = DateTime.now();
   TimeOfDay currentTime = TimeOfDay.fromDateTime(now);
-  TimeOfDay targetTime = const TimeOfDay(hour: 12, minute: 01);
+  TimeOfDay targetTime = const TimeOfDay(hour: 09, minute: 01);
   DateTime currentDateTime = DateTime(
     now.year,
     now.month,

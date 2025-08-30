@@ -24,7 +24,7 @@ Future<bool> cekAbsenBefore9AM(Data? data) async {
   TimeOfDay currentTime = TimeOfDay.fromDateTime(now);
 
   // Set the target time to 7:00 AM
-  TimeOfDay targetTime = const TimeOfDay(hour: 12, minute: 01);
+  TimeOfDay targetTime = const TimeOfDay(hour: 09, minute: 01);
 
   // Convert TimeOfDay to DateTime for proper comparison
   DateTime currentDateTime = DateTime(
