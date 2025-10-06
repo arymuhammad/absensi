@@ -26,11 +26,6 @@ class LeaveView extends GetView<LeaveController> {
 
   @override
   Widget build(BuildContext context) {
-    // List<String>? sS = const ['Apply', 'Store Manager', 'Area Manager', 'HR'];
-    // List<String>? sM = const ['Apply', 'Area Manager', 'HR'];
-    // List<String>? aM = const ['Apply', 'Operational Manager', 'HR'];
-    // List<String>? hD = const ['Apply', 'General Manager', 'HR'];
-    // List<String>? hS = const ['Apply', 'Head of Division', 'HR'];
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -177,7 +172,17 @@ class LeaveView extends GetView<LeaveController> {
 
                                       // Fungsi untuk dapatkan nodeTitles berdasarkan kondisi user dan totalSteps
                                       List<String> getNodeTitles() {
-                                        if (leave.parentId == "3") {
+                                        if (leave.parentId == "2") {
+                                          return [
+                                            'Apply',
+                                            leave.levelId == "29" ||
+                                                    leave.levelId == "80" ||
+                                                    leave.levelId == "60"
+                                                ? 'General Manager'
+                                                : 'Operational Manager',
+                                            'HRD',
+                                          ];
+                                        } else if (leave.parentId == "3") {
                                           if (leave.levelId == "19" ||
                                               leave.levelId == "50" ||
                                               leave.levelId == "59") {
@@ -322,8 +327,33 @@ class LeaveView extends GetView<LeaveController> {
                                           if (totalSteps == 3) {
                                             if (leave.acc3 == null) {
                                               // Step 1 - berdasarkan acc2 dan userData
-
-                                              if (leave.parentId == "3") {
+                                              if (leave.parentId == "2") {
+                                                if (leave.levelId == "29" ||
+                                                    leave.levelId == "80" ||
+                                                    leave.levelId == "60") {
+                                                  stepLabel =
+                                                      leave.acc2 == "0" ||
+                                                              leave.acc2 == null
+                                                          ? "General Manager"
+                                                          : "HRD";
+                                                  currentStep =
+                                                      leave.acc2 == null
+                                                          ? 0
+                                                          : 1;
+                                                } else {
+                                                  // print(leave.levelId);
+                                                  stepLabel =
+                                                      leave.acc2 == "0" ||
+                                                              leave.acc2 == null
+                                                          ? "Operational Manager"
+                                                          : "HRD";
+                                                  currentStep =
+                                                      leave.acc2 == null
+                                                          ? 0
+                                                          : 1;
+                                                }
+                                              } else if (leave.parentId ==
+                                                  "3") {
                                                 if (leave.levelId == "19" ||
                                                     leave.levelId == "59") {
                                                   stepLabel =

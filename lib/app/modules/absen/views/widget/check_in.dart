@@ -43,6 +43,17 @@ checkIn(Data dataUser, double latitude, double longitude) async {
       if (localDataAbs.isEmpty) {
         loadingDialog("Sending data...", "");
         await absC.timeNetwork(await FlutterNativeTimezone.getLocalTimezone());
+        if (absC.selectedShift.value == "5") {
+          absC.jamMasuk.value =
+              absC.timeNow.isNotEmpty ? absC.timeNow : absC.timeNowOpt;
+          absC.jamPulang.value = DateFormat("HH:mm").format(
+            absC.dateNowServer.isNotEmpty
+                ? DateTime.parse(
+                  absC.dateNowServer,
+                ).add(const Duration(hours: 8))
+                : absC.tglStream.value.add(const Duration(hours: 8)),
+          );
+        }
         var data = {
           "status": "add",
           "id": dataUser.id,
@@ -67,6 +78,7 @@ checkIn(Data dataUser, double latitude, double longitude) async {
           "long_masuk": longitude.toString(),
           "device_info": absC.devInfo.value,
         };
+        // print(data);
 
         //submit data absensi ke local storage
         SQLHelper.instance.insertDataAbsen(

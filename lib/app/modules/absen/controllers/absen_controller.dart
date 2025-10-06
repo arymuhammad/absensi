@@ -11,6 +11,7 @@ import 'package:absensi/app/modules/home/views/dialog_update_app.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:device_marketing_names/device_marketing_names.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 // import 'package:flutter_face_api/flutter_face_api.dart';
 import 'package:flutter_native_timezone_updated_gradle/flutter_native_timezone.dart';
 // import 'package:flutter_timezone/flutter_timezone.dart';
@@ -236,7 +237,7 @@ class AbsenController extends GetxController {
           var abi = abiInfo.entries.toList();
           supportedAbi = abi[1].value;
           checkForUpdates("onInit");
-        } 
+        }
         // disable redirect to appstore for ios when update is available
         // else {
         //   launchUrl(
@@ -544,39 +545,84 @@ class AbsenController extends GetxController {
   }
 
   Future<void> timeNetwork(String timeZone) async {
-    int attempts = 0;
-    while (attempts < maxRetries) {
-      try {
-        final response = await http
-            .get(
-              Uri.parse(
-                'https://script.google.com/macros/s/AKfycbyd5AcbAnWi2Yn0xhFRbyzS4qMq1VucMVgVvhul5XqS9HkAyJY/exec?tz=$timeZone',
-              ),
-            )
-            .timeout(
-              const Duration(seconds: 60),
-              onTimeout: () => http.Response('Timeout', 408),
-            );
+    // int attempts = 0;
+    // while (attempts < maxRetries) {
+    try {
+      final response = await http
+          .get(
+            Uri.parse(
+              // 'https://script.google.com/macros/s/AKfycbyd5AcbAnWi2Yn0xhFRbyzS4qMq1VucMVgVvhul5XqS9HkAyJY/exec?tz=$timeZone',
+              'https://timeapi.io/api/time/current/zone?timeZone=$timeZone',
+            ),
+          )
+          .timeout(
+            const Duration(seconds: 10),
+            onTimeout: () => http.Response('Timeout', 408),
+          );
+      // print('https://timeapi.io/api/time/current/zone?timeZone=$timeZone');
 
-        DateFormat inputFormat = DateFormat("EEE, dd MMM yyyy HH:mm:ss Z");
-        if (response.statusCode == 200) {
-          var result = jsonDecode(response.body);
-          DateTime dateTime = inputFormat.parse(result['fulldate']);
-          timeNow = DateFormat('HH:mm').format(dateTime);
-          dateNowServer = DateFormat('yyyy-MM-dd').format(dateTime);
-          break;
-        } else {
-          attempts++;
-          await Future.delayed(const Duration(seconds: 3));
-        }
-      } catch (e) {
-        attempts++;
-        await Future.delayed(const Duration(seconds: 3));
+      // DateFormat inputFormat = DateFormat("EEE, dd MMM yyyy HH:mm:ss Z");
+      if (response.statusCode == 200) {
+        var result = jsonDecode(response.body);
+        // DateTime dateTime = inputFormat.parse(result['fulldate']);
+        // timeNow = DateFormat('HH:mm').format(dateTime);
+        timeNow = result['time'];
+        // dateNowServer = DateFormat('yyyy-MM-dd').format(dateTime);
+        dateNowServer = result['dateTime'];
+        // break;
+        // } else {
+        //   attempts++;
+        //   await Future.delayed(const Duration(seconds: 3));
+        // }
+      } else {
+        // Jika gagal, coba ambil dari URL alternatif
+
+        await fallbackTimeNetwork(
+          timeZone,
+          dotenv.env['API_KEY_WORLDTIME_API'],
+        );
       }
+    } catch (e) {
+      // Get.back();
+      showToast(e.toString());
+      fallbackTimeNetwork(timeZone, dotenv.env['API_KEY_WORLDTIME_API']);
+      // attempts++;
+      // await Future.delayed(const Duration(seconds: 3));
     }
 
-    if (attempts == maxRetries) {
-      showToast('Gagal mengambil data waktu, coba lagi nanti');
+    // if (attempts == maxRetries) {
+    //   showToast('Gagal mengambil data waktu, coba lagi nanti');
+    // }
+  }
+
+  Future<void> fallbackTimeNetwork(String timeZone, String? apiKey) async {
+    try {
+      var url = 'https://world-time-api3.p.rapidapi.com/timezone/$timeZone';
+      var headers = <String, String>{};
+      if (apiKey != null) {
+        headers['x-rapidapi-key'] = apiKey;
+        headers['x-rapidapi-host'] = 'world-time-api3.p.rapidapi.com';
+      }
+
+      final response = await http
+          .get(Uri.parse(url), headers: headers)
+          .timeout(
+            const Duration(seconds: 20),
+            onTimeout: () => http.Response('Timeout', 408),
+          );
+
+      if (response.statusCode == 200) {
+        var result = jsonDecode(response.body);
+        // Format data tergantung response API tersebut
+        timeNow =  DateFormat('HH:mm').format(DateTime.parse(result['time']));
+        dateNowServer = result['datetime'] ?? '';
+      } else {
+        // Get.back();
+        showToast('Gagal mengambil data waktu dari API cadangan');
+      }
+    } catch (e) {
+      // Get.back();
+      showToast('Error saat mengambil data waktu: $e');
     }
   }
 
@@ -608,18 +654,18 @@ class AbsenController extends GetxController {
       List<Placemark> placemarks = await placemarkFromCoordinates(
         position.latitude,
         position.longitude,
-      ).timeout(const Duration(seconds: 10));
+      ).timeout(const Duration(seconds: 15));
 
       lokasi.value =
           '${placemarks[0].street!}, ${placemarks[0].subLocality!}\n${placemarks[0].subAdministrativeArea!}, ${placemarks[0].administrativeArea!}';
       // print(lokasi.value);
     } on TimeoutException {
       isLoading.value = false;
-      isEnabled.value = false;
       showToast("Failed to get location, please try again.");
       return Future.error('Timeout while getting location');
     } catch (e) {
       isLoading.value = false;
+      isEnabled.value = false;
       showToast("There is an error: $e");
       return Future.error(e.toString());
     }
@@ -721,12 +767,13 @@ class AbsenController extends GetxController {
 
       Position loc = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
-        timeLimit: const Duration(seconds: 20),
+        timeLimit: const Duration(seconds: 15),
         // forceAndroidLocationManager: true
         //
       );
       if (loc.isMocked) {
         isLoading.value = false;
+        isEnabled.value = false;
         failedDialog(
           Get.context,
           'Warning',
@@ -791,6 +838,7 @@ class AbsenController extends GetxController {
               barcodeScanRes.value.split(' ')[2] != "URBAN&CO" ||
           barcodeScanRes.isNotEmpty &&
               barcodeScanRes.value.split(' ').length < 2) {
+        selectedCabang.value = "";
         isLoading.value = false;
         isEnabled.value = false;
         distanceStore.value = 0.0;
@@ -817,7 +865,7 @@ class AbsenController extends GetxController {
         try {
           userPosition = await Geolocator.getCurrentPosition(
             desiredAccuracy: LocationAccuracy.high,
-            timeLimit: const Duration(seconds: 10),
+            timeLimit: const Duration(seconds: 15),
           );
           Get.back();
         } catch (e) {
@@ -840,31 +888,26 @@ class AbsenController extends GetxController {
 
         // Step 4: Validasi
         if (distanceMeter <= 100) {
+          selectedCabang.value = barcodeScanRes.value.split(' ')[3];
+          latFromGps.value = userPosition.latitude;
+          longFromGps.value = userPosition.longitude;
           isLoading.value = false;
           isEnabled.value = true;
           locNote.value = "You are in the radius area";
           showToast(
             'Location validation successful. You are within the QR code area.',
           );
-          // ScaffoldMessenger.of(Get.context!).showSnackBar(
-          //   const SnackBar(
-          //     content: Text(
-          //       "Validasi lokasi berhasil. Anda berada di dalam area QR",
-          //     ),
-          //   ),
-          // );
+
           // Lanjutkan proses absensi/kehadiran
         } else {
-          showToast(
-            'Validation failed! You are outside the QR area. (${distanceMeter.toStringAsFixed(1)} m)',
-          );
-          // ScaffoldMessenger.of(Get.context!).showSnackBar(
-          //   SnackBar(
-          //     content: Text(
-          //       "Gagal validasi! Anda di luar area QR (${distanceMeter.toStringAsFixed(1)} m)",
-          //     ),
-          //   ),
-          // );
+          selectedCabang.value = "";
+          isLoading.value = false;
+          isEnabled.value = false;
+          locNote.value =
+              "You are outside the QR area (${(distanceMeter / 1000).toStringAsFixed(2)} Km)";
+          distanceStore.value = distanceMeter;
+          showToast('Validation failed!');
+
           // Tolak absensi/scan, bisa kasih opsi retry
         }
       }

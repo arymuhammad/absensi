@@ -3,6 +3,7 @@ import 'package:absensi/app/data/helper/currency_format.dart';
 import 'package:absensi/app/data/helper/format_waktu.dart';
 import 'package:absensi/app/data/model/payslip_model.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import '../../../../data/helper/app_colors.dart';
 
@@ -25,52 +26,92 @@ class PaySlipDesc extends StatelessWidget {
             spacing: 2,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              const SizedBox(height: 5),
+              Center(
+                child: Text(
+                  'SLIP GAJI KARYAWAN',
+                  style: titleTextStyle.copyWith(fontSize: 16),
+                ),
+              ),
               const SizedBox(height: 10),
-               Center(child: Text('SLIP GAJI KARYAWAN', style: titleTextStyle.copyWith(fontSize: 16),)),
-              const SizedBox(height: 20),
               Padding(
                 padding: const EdgeInsets.only(left: 8.0, right: 8),
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      children: [
-                        const SizedBox(width: 120, child: Text('Periode')),
-                        Text(
-                          ': ${DateFormat.yMMMM('id').format(DateTime.parse(data.createdAt!))}',
-                        ),
-                      ],
+                    Text(
+                      'Periode',
+                      style: subtitleTextStyle.copyWith(
+                        fontSize: 15,
+                        fontWeight: FontWeight.normal,
+                      ),
                     ),
-                    Row(
-                      children: [
-                        const SizedBox(width: 120, child: Text('Nama Karyawan')),
-                        Text(': ${data.empName!}'),
-                      ],
+                    Text(
+                      DateFormat.yMMMM(
+                        'id',
+                      ).format(DateTime.parse(data.createdAt!)),
+                      style: titleTextStyle.copyWith(
+                        fontSize: 17,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                    Row(
-                      children: [
-                        const SizedBox(width: 120, child: Text('Jabatan')),
-                        Text(': ${data.position!}'),
-                      ],
+                    const SizedBox(height: 6),
+                    Text(
+                      'Nama Karyawan',
+                      style: subtitleTextStyle.copyWith(
+                        fontSize: 15,
+                        fontWeight: FontWeight.normal,
+                      ),
                     ),
-                    Row(
-                      children: [
-                        const SizedBox(width: 120, child: Text('Tanggal Masuk')),
-                        Text(
-                          ': ${FormatWaktu.formatIndo(tanggal: (DateTime.parse(data.joinDate!)))}',
-                        ),
-                      ],
+                    Text(
+                      '${data.empName!.capitalize}',
+                      style: titleTextStyle.copyWith(
+                        fontSize: 17,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      'Jabatan',
+                      style: subtitleTextStyle.copyWith(
+                        fontSize: 15,
+                        fontWeight: FontWeight.normal,
+                      ),
+                    ),
+                    Text(
+                      '${data.position!.capitalize}',
+                      style: titleTextStyle.copyWith(
+                        fontSize: 17,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      'Tanggal Gabung',
+                      style: subtitleTextStyle.copyWith(
+                        fontSize: 15,
+                        fontWeight: FontWeight.normal,
+                      ),
+                    ),
+                    
+                    Text(
+                      '${FormatWaktu.formatIndo(tanggal: (DateTime.parse(data.joinDate!)))}',
+                      style: titleTextStyle.copyWith(
+                        fontSize: 17,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 10),
               Padding(
                 padding: const EdgeInsets.only(left: 8.0, right: 8),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Penerimaan',
+                      'PENERIMAAN',
                       style: titleTextStyle.copyWith(fontSize: 16),
                     ),
                   ],
@@ -155,14 +196,14 @@ class PaySlipDesc extends StatelessWidget {
                   ),
                 ),
                 padding: const EdgeInsets.symmetric(
-                  vertical: 8,
+                  vertical: 4,
                   horizontal: 10,
                 ), // beri padding supaya text tidak mepet
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Total Penerimaan',
+                      'TOTAL PENERIMAAN',
                       style: titleTextStyle.copyWith(
                         fontSize: 16,
                         color: Colors.white,
@@ -205,7 +246,7 @@ class PaySlipDesc extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Pemotongan',
+                      'POTONGAN',
                       style: titleTextStyle.copyWith(fontSize: 16),
                     ),
                   ],
@@ -224,9 +265,28 @@ class PaySlipDesc extends StatelessWidget {
                         fontWeight: FontWeight.normal,
                       ),
                     ),
-                    Text(
-                      CurrencyFormat.convertToIdr(int.parse(data.lateCut!), 0),
-                      style: const TextStyle(fontSize: 15),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        SizedBox(
+                          width: 30,
+                          child: Text(
+                            'x ${data.totalLate!}',
+                            textAlign: TextAlign.left,
+                          ),
+                        ),
+                        SizedBox(
+                          width: 80,
+                          child: Text(
+                            CurrencyFormat.convertToIdr(
+                              int.parse(data.lateCut!),
+                              0,
+                            ),
+                            style: const TextStyle(fontSize: 15),
+                            textAlign: TextAlign.right,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -244,12 +304,28 @@ class PaySlipDesc extends StatelessWidget {
                         fontWeight: FontWeight.normal,
                       ),
                     ),
-                    Text(
-                      CurrencyFormat.convertToIdr(
-                        int.parse(data.absentCut!),
-                        0,
-                      ),
-                      style: const TextStyle(fontSize: 15),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        SizedBox(
+                          width: 30,
+                          child: Text(
+                            'x ${data.totalAbsent!}',
+                            textAlign: TextAlign.left,
+                          ),
+                        ),
+                        SizedBox(
+                          width: 80,
+                          child: Text(
+                            CurrencyFormat.convertToIdr(
+                              int.parse(data.absentCut!),
+                              0,
+                            ),
+                            style: const TextStyle(fontSize: 15),
+                            textAlign: TextAlign.right,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -267,9 +343,27 @@ class PaySlipDesc extends StatelessWidget {
                         fontWeight: FontWeight.normal,
                       ),
                     ),
-                    Text(
-                      CurrencyFormat.convertToIdr(int.parse(data.sickCut!), 0),
-                      style: const TextStyle(fontSize: 15),
+                    Row(
+                      children: [
+                        SizedBox(
+                          width: 30,
+                          child: Text(
+                            'x ${data.totalSick!}',
+                            textAlign: TextAlign.left,
+                          ),
+                        ),
+                        SizedBox(
+                          width: 80,
+                          child: Text(
+                            CurrencyFormat.convertToIdr(
+                              int.parse(data.sickCut!),
+                              0,
+                            ),
+                            style: const TextStyle(fontSize: 15),
+                            textAlign: TextAlign.right,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -287,12 +381,27 @@ class PaySlipDesc extends StatelessWidget {
                         fontWeight: FontWeight.normal,
                       ),
                     ),
-                    Text(
-                      CurrencyFormat.convertToIdr(
-                        int.parse(data.clearanceCut!),
-                        0,
-                      ),
-                      style: const TextStyle(fontSize: 15),
+                    Row(
+                      children: [
+                        SizedBox(
+                          width: 30,
+                          child: Text(
+                            'x ${data.totalClearance!}',
+                            textAlign: TextAlign.left,
+                          ),
+                        ),
+                        SizedBox(
+                          width: 80,
+                          child: Text(
+                            CurrencyFormat.convertToIdr(
+                              int.parse(data.clearanceCut!),
+                              0,
+                            ),
+                            style: const TextStyle(fontSize: 15),
+                            textAlign: TextAlign.right,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -337,7 +446,7 @@ class PaySlipDesc extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Total Pemotongan',
+                      'TOTAL POTONGAN',
                       style: titleTextStyle.copyWith(
                         fontSize: 16,
                         color: Colors.white,
@@ -376,7 +485,7 @@ class PaySlipDesc extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Total Diterima',
+                'TOTAL DITERIMA',
                 style: titleTextStyle.copyWith(
                   fontSize: 16,
                   color: Colors.white,

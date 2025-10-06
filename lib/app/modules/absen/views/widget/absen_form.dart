@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:absensi/app/modules/absen/controllers/absen_controller.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_native_timezone_updated_gradle/flutter_native_timezone.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import '../../../../data/helper/custom_dialog.dart';
@@ -83,7 +84,7 @@ Widget buildAbsen({required Data? data}) {
                   "Absen pulang kemarin masih kosong. Silahkan Check out terlebih dahulu sebelum Check in",
                 ),
               ),
-          CsDropdownCabang(
+              CsDropdownCabang(
                 hintText: data!.namaCabang,
                 dataUser: data,
                 value:
@@ -148,8 +149,16 @@ Widget buildAbsen({required Data? data}) {
                         absC.selectedShift.value == ""
                             ? null
                             : absC.selectedShift.value,
-                    onChanged: (val) {
+                    onChanged: (val) async {
                       if (val == "5") {
+                        loadingDialog(
+                          "retrieve time data from the network",
+                          '',
+                        );
+                        await absC.timeNetwork(
+                          await FlutterNativeTimezone.getLocalTimezone(),
+                        );
+                        Get.back();
                         if (FormatWaktu.formatJamMenit(
                               jamMenit:
                                   absC.timeNow.isNotEmpty
@@ -182,6 +191,8 @@ Widget buildAbsen({required Data? data}) {
                               absC.dateNowServer,
                             ).add(const Duration(hours: 8)),
                           );
+                          // print(absC.dateNowServer);
+                          // print(absC.jamPulang.value);
                           dialogMsg(
                             'INFO',
                             'Make sure the work shift selected is appropriate',

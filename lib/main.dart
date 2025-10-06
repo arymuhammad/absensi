@@ -20,13 +20,6 @@ import 'app/routes/app_pages.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: "assets/.env");
-  // MobileAds.instance.initialize();
-
-  // Set perangkat sebagai perangkat pengujian (optional, jika menggunakan unit iklan asli)
-  // MobileAds.instance.updateRequestConfiguration(
-  //   RequestConfiguration(testDeviceIds: ['a3519a15-f383-4deb-9d8c-ca776249f420'])
-  // );
-
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
