@@ -24,7 +24,7 @@ class _CustomQrScannerPageState extends State<CustomQrScannerPage> {
   void _onQRViewCreated(QRViewController ctrl) {
     controller = ctrl;
     controller!.scannedDataStream.listen((scanData) {
-      if (scanData.code!.split(' ').length <= 2) {
+      if (scanData.code!.split(' ').length < 3) {
         controller?.pauseCamera();
         Navigator.of(context).pop();
         showToast('QR tidak dikenali');
