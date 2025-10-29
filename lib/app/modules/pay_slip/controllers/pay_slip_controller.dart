@@ -7,7 +7,8 @@ import '../../../data/model/payslip_model.dart';
 
 class PaySlipController extends GetxController {
   var isLoading = true.obs;
-  var payData = PayslipModel().obs;
+  // var payData = PayslipModel().obs;
+  var paySlipFuture = Future<PayslipModel?>.value(null).obs;
   final datePeriode = TextEditingController();
   final initDate =
       DateFormat('yyyy-MM-dd')
@@ -39,7 +40,7 @@ class PaySlipController extends GetxController {
     super.onClose();
   }
 
-  Future<PayslipModel?>getPaySlip({
+  Future<PayslipModel?> getPaySlip({
     required String empId,
     required String date1,
     required String date2,
@@ -51,8 +52,9 @@ class PaySlipController extends GetxController {
       "date2": date2,
       "branch": branch,
     };
-    final response = await ServiceApi().getPaySlip(data);
+    final response = ServiceApi().getPaySlip(data);
+    print(data);
     isLoading.value = false;
-    return payData.value = response;
+    return paySlipFuture.value = response;
   }
 }

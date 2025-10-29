@@ -5,6 +5,7 @@ import 'package:absensi/app/data/model/login_model.dart';
 import 'package:absensi/app/modules/absen/controllers/absen_controller.dart';
 import 'package:absensi/app/modules/home/controllers/home_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_native_timezone_updated_gradle/flutter_native_timezone.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -64,8 +65,12 @@ checkOut(Data dataUser, double latitude, double longitude) async {
         if (localDataAbs.isEmpty) {
           // Proses kirim data absen pulang baru
           loadingDialog("Sending data...", "");
-          await absC.timeNetwork(
+          // await absC.timeNetwork(
+          //   await FlutterNativeTimezone.getLocalTimezone(),
+          // );
+          await absC.fallbackTimeNetwork(
             await FlutterNativeTimezone.getLocalTimezone(),
+            dotenv.env['API_KEY_WORLDTIME_API'],
           );
 
           var data = {
@@ -127,7 +132,7 @@ checkOut(Data dataUser, double latitude, double longitude) async {
 
           absC.getAbsenToday(paramAbsenToday);
           absC.getLimitAbsen(paramLimitAbsen);
-           homeC.reloadSummary(dataUser.id!);
+          homeC.reloadSummary(dataUser.id!);
           absC.stsAbsenSelected.value = "";
           absC.selectedShift.value = "";
           absC.selectedCabang.value = "";
@@ -136,8 +141,13 @@ checkOut(Data dataUser, double latitude, double longitude) async {
         } else if (localDataAbs.isNotEmpty) {
           // Jika data absen hari ini ditemukan, lakukan update lokal dan server
           loadingDialog("Sending data...", "");
-          await absC.timeNetwork(
+          // await absC.timeNetwork(
+          //   await FlutterNativeTimezone.getLocalTimezone(),
+          // );
+
+          await absC.fallbackTimeNetwork(
             await FlutterNativeTimezone.getLocalTimezone(),
+            dotenv.env['API_KEY_WORLDTIME_API'],
           );
 
           var data = {
@@ -219,7 +229,7 @@ checkOut(Data dataUser, double latitude, double longitude) async {
 
           absC.getAbsenToday(paramAbsenToday);
           absC.getLimitAbsen(paramLimitAbsen);
-           homeC.reloadSummary(dataUser.id!);
+          homeC.reloadSummary(dataUser.id!);
           absC.startTimer(10);
           absC.resend();
           absC.stsAbsenSelected.value = "";
@@ -257,13 +267,10 @@ checkOut(Data dataUser, double latitude, double longitude) async {
           "Check in data not found\nPlease check in first",
         );
       } else {
-        
-
         await absC.uploadFotoAbsen();
         Get.back();
 
         if (absC.image != null) {
-        
           var localDataAbs = await SQLHelper.instance.getAbsenToday(
             dataUser.id!,
             absC.dateNow,
@@ -271,8 +278,12 @@ checkOut(Data dataUser, double latitude, double longitude) async {
 
           if (localDataAbs.isEmpty) {
             loadingDialog("Sending data...", "");
-            await absC.timeNetwork(
+            // await absC.timeNetwork(
+            //   await FlutterNativeTimezone.getLocalTimezone(),
+            // );
+            await absC.fallbackTimeNetwork(
               await FlutterNativeTimezone.getLocalTimezone(),
+              dotenv.env['API_KEY_WORLDTIME_API'],
             );
             var data = {
               "status": "update",
@@ -340,7 +351,7 @@ checkOut(Data dataUser, double latitude, double longitude) async {
             };
             absC.getAbsenToday(paramAbsenToday);
             absC.getLimitAbsen(paramLimitAbsen);
-             homeC.reloadSummary(dataUser.id!);
+            homeC.reloadSummary(dataUser.id!);
             // absC.startTimer(30);
             // absC.resend();
             absC.stsAbsenSelected.value = "";
@@ -353,8 +364,12 @@ checkOut(Data dataUser, double latitude, double longitude) async {
             // && localDataAbs[0].tanggalPulang == null
 
             loadingDialog("Sending data...", "");
-            await absC.timeNetwork(
+            // await absC.timeNetwork(
+            //   await FlutterNativeTimezone.getLocalTimezone(),
+            // );
+            await absC.fallbackTimeNetwork(
               await FlutterNativeTimezone.getLocalTimezone(),
+              dotenv.env['API_KEY_WORLDTIME_API'],
             );
             var data = {
               "status": "update",
@@ -451,7 +466,7 @@ checkOut(Data dataUser, double latitude, double longitude) async {
             };
             absC.getAbsenToday(paramAbsenToday);
             absC.getLimitAbsen(paramLimitAbsen);
-             homeC.reloadSummary(dataUser.id!);
+            homeC.reloadSummary(dataUser.id!);
             absC.startTimer(10);
             absC.resend();
             absC.stsAbsenSelected.value = "";
@@ -460,7 +475,6 @@ checkOut(Data dataUser, double latitude, double longitude) async {
             absC.lat.value = "";
             absC.long.value = "";
           }
-        
         } else {
           absC.stsAbsenSelected.value = "";
           absC.selectedShift.value = "";
@@ -508,8 +522,12 @@ checkOut(Data dataUser, double latitude, double longitude) async {
 
         if (localDataAbs.isEmpty) {
           loadingDialog("Sending data...", "");
-          await absC.timeNetwork(
+          // await absC.timeNetwork(
+          //   await FlutterNativeTimezone.getLocalTimezone(),
+          // );
+          await absC.fallbackTimeNetwork(
             await FlutterNativeTimezone.getLocalTimezone(),
+            dotenv.env['API_KEY_WORLDTIME_API'],
           );
           var data = {
             "status": "update",
@@ -577,7 +595,7 @@ checkOut(Data dataUser, double latitude, double longitude) async {
           };
           absC.getAbsenToday(paramAbsenToday);
           absC.getLimitAbsen(paramLimitAbsen);
-           homeC.reloadSummary(dataUser.id!);
+          homeC.reloadSummary(dataUser.id!);
           // absC.startTimer(30);
           // absC.resend();
           absC.stsAbsenSelected.value = "";
@@ -590,8 +608,12 @@ checkOut(Data dataUser, double latitude, double longitude) async {
           // && localDataAbs[0].tanggalPulang == null
 
           loadingDialog("Sending data...", "");
-          await absC.timeNetwork(
+          // await absC.timeNetwork(
+          //   await FlutterNativeTimezone.getLocalTimezone(),
+          // );
+          await absC.fallbackTimeNetwork(
             await FlutterNativeTimezone.getLocalTimezone(),
+            dotenv.env['API_KEY_WORLDTIME_API'],
           );
           var data = {
             "status": "update",
@@ -688,7 +710,7 @@ checkOut(Data dataUser, double latitude, double longitude) async {
           };
           absC.getAbsenToday(paramAbsenToday);
           absC.getLimitAbsen(paramLimitAbsen);
-           homeC.reloadSummary(dataUser.id!);
+          homeC.reloadSummary(dataUser.id!);
           absC.startTimer(10);
           absC.resend();
           absC.stsAbsenSelected.value = "";

@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:absensi/app/data/add_controller.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_native_timezone_updated_gradle/flutter_native_timezone.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -47,8 +48,11 @@ visitIn({
       Get.back();
       if (absC.image != null) {
         loadingDialog("Sending data...", "");
-        await absC.timeNetwork(await FlutterNativeTimezone.getLocalTimezone());
-
+        // await absC.timeNetwork(await FlutterNativeTimezone.getLocalTimezone());
+        await absC.fallbackTimeNetwork(
+          await FlutterNativeTimezone.getLocalTimezone(),
+          dotenv.env['API_KEY_WORLDTIME_API'],
+        );
         var data = {
           "status": "add",
           "id": dataUser.id,
@@ -154,7 +158,11 @@ visitIn({
       Get.back();
       if (absC.image != null) {
         loadingDialog("Sending data...", "");
-        await absC.timeNetwork(await FlutterNativeTimezone.getLocalTimezone());
+        // await absC.timeNetwork(await FlutterNativeTimezone.getLocalTimezone());
+        await absC.fallbackTimeNetwork(
+          await FlutterNativeTimezone.getLocalTimezone(),
+          dotenv.env['API_KEY_WORLDTIME_API'],
+        );
         var data = {
           "status": "add",
           "id": dataUser.id,

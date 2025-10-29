@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:absensi/app/modules/absen/controllers/absen_controller.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_native_timezone_updated_gradle/flutter_native_timezone.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -155,8 +156,12 @@ Widget buildAbsen({required Data? data}) {
                           "retrieve time data from the network",
                           '',
                         );
-                        await absC.timeNetwork(
+                        // await absC.timeNetwork(
+                        //   await FlutterNativeTimezone.getLocalTimezone(),
+                        // );
+                        await absC.fallbackTimeNetwork(
                           await FlutterNativeTimezone.getLocalTimezone(),
+                          dotenv.env['API_KEY_WORLDTIME_API'],
                         );
                         Get.back();
                         if (FormatWaktu.formatJamMenit(

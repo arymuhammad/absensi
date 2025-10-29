@@ -4,6 +4,7 @@ import 'package:absensi/app/data/add_controller.dart';
 import 'package:absensi/app/modules/absen/controllers/absen_controller.dart';
 import 'package:absensi/app/modules/home/controllers/home_controller.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_native_timezone_updated_gradle/flutter_native_timezone.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -42,7 +43,11 @@ checkIn(Data dataUser, double latitude, double longitude) async {
       );
       if (localDataAbs.isEmpty) {
         loadingDialog("Sending data...", "");
-        await absC.timeNetwork(await FlutterNativeTimezone.getLocalTimezone());
+        // await absC.timeNetwork(await FlutterNativeTimezone.getLocalTimezone());
+        await absC.fallbackTimeNetwork(
+          await FlutterNativeTimezone.getLocalTimezone(),
+          dotenv.env['API_KEY_WORLDTIME_API'],
+        );
         if (absC.selectedShift.value == "5") {
           absC.jamMasuk.value =
               absC.timeNow.isNotEmpty ? absC.timeNow : absC.timeNowOpt;

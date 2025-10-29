@@ -17,7 +17,8 @@ class PayslipModel {
   late String? sickCut;
   late String? totalClearance;
   late String? clearanceCut;
-  late String? pijarCut;
+  late String? customCutName;
+  late String? totalCustomCut;
   late String? totalReceipts;
   late String? totalCut;
   late String? totalReceivedByEmp;
@@ -42,7 +43,8 @@ class PayslipModel {
     this.sickCut,
     this.totalClearance,
     this.clearanceCut,
-    this.pijarCut,
+    this.customCutName,
+    this.totalCustomCut,
     this.totalReceipts,
     this.totalCut,
     this.totalReceivedByEmp,
@@ -68,7 +70,8 @@ class PayslipModel {
     sickCut = json['sick_cut'];
     totalClearance = json['total_clearance'];
     clearanceCut = json['clearance_cut'];
-    pijarCut = json['pijar_cut'];
+    customCutName = json['cst_cut_name'];
+    totalCustomCut = json['total_cst_cut'];
     totalReceipts = json['total_receipts'];
     totalCut = json['total_cut'];
     totalReceivedByEmp = json['total_received_by_emp'];

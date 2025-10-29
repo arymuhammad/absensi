@@ -26,7 +26,7 @@ dialogAbsenView(Data dataUser, latitude, longitude) async {
   } else {
     //absen
     var previous = DateFormat('yyyy-MM-dd').format(DateTime.parse(
-            absC.dateNowServer.isNotEmpty ? absC.dateNowServer : absC.dateNow)
+            absC.dateNowServer.isNotEmpty ? absC.dateNowServer : absC.dateNow).toLocal()
         .add(const Duration(days: -1)));
     // Get the current time
     DateTime now = DateTime.now();
@@ -116,7 +116,7 @@ dialogAbsenView(Data dataUser, latitude, longitude) async {
                         "id": dataUser.id,
                         "tanggal_masuk": previous,
                         "tanggal_pulang": DateFormat('yyyy-MM-dd')
-                            .format(DateTime.parse(absC.dateNowServer.isNotEmpty? absC.dateNowServer:absC.dateNow)),
+                            .format(DateTime.parse(absC.dateNowServer.isNotEmpty? absC.dateNowServer:absC.dateNow).toLocal()),
                         "nama": dataUser.nama,
                         "jam_absen_pulang": absC.timeNow.isNotEmpty?absC.timeNow:absC.timeNowOpt,
                         "foto_pulang":  File(absC.image!.path),
@@ -127,7 +127,7 @@ dialogAbsenView(Data dataUser, latitude, longitude) async {
 
                       SQLHelper.instance.updateDataAbsen({
                         "tanggal_pulang": DateFormat('yyyy-MM-dd')
-                            .format(DateTime.parse(absC.dateNowServer.isNotEmpty? absC.dateNowServer:absC.dateNow)),
+                            .format(DateTime.parse(absC.dateNowServer.isNotEmpty? absC.dateNowServer:absC.dateNow).toLocal()),
                         "nama": dataUser.nama,
                         "jam_absen_pulang": absC.timeNow.isNotEmpty?absC.timeNow:absC.timeNowOpt,
                         "foto_pulang": absC.image!.path,
@@ -142,7 +142,7 @@ dialogAbsenView(Data dataUser, latitude, longitude) async {
                           dataUser.id!,
                           "clock_out",
                           DateFormat('yyyy-MM-dd HH:mm:ss')
-                              .format(DateTime.parse(absC.dateNowServer)),
+                              .format(DateTime.parse(absC.dateNowServer).toLocal()),
                           absC.cekAbsen.value.idShift!,
                           latitude.toString(),
                           longitude.toString(),
@@ -155,7 +155,7 @@ dialogAbsenView(Data dataUser, latitude, longitude) async {
                         "mode": "single",
                         "id_user": dataUser.id,
                         "tanggal_masuk": DateFormat('yyyy-MM-dd')
-                            .format(DateTime.parse(absC.dateNowServer.isNotEmpty? absC.dateNowServer:absC.dateNow))
+                            .format(DateTime.parse(absC.dateNowServer.isNotEmpty? absC.dateNowServer:absC.dateNow).toLocal())
                       };
 
                       var paramLimitAbsen = {

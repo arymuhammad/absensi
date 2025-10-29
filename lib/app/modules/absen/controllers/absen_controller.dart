@@ -101,19 +101,7 @@ class AbsenController extends GetxController {
   final TextEditingController filterVisit = TextEditingController();
   final ImagePicker picker = ImagePicker();
   XFile? image;
-  // MatchFacesImage? mfImage1;
-  // MatchFacesImage? mfImage2;
-  // var faceDatas = DataWajah().obs;
 
-  // var status = "nil";
-  // var similarityStatus = "".obs;
-  // var livenessStatus = "nil";
-  // var uiImage1 = Image.asset('assets/images/portrait.png');
-  // var uiImage2 = Image.asset('assets/images/portrait.png');
-  // var faceSdk = FaceSDK.instance;
-
-  // set status(String val) => _status = val;
-  // set similarityStatus(String val) => _similarityStatus = val;
 
   var searchDate = "".obs;
   var calendarFormat = CalendarFormat.month.obs;
@@ -166,9 +154,12 @@ class AbsenController extends GetxController {
     userCab = TextEditingController();
     rndLoc = TextEditingController();
     selectedDate.value = null;
-    // if (!await initialize()) return;
-    // status = "Ready";
-    timeNetwork(await FlutterNativeTimezone.getLocalTimezone());
+ 
+    // timeNetwork(await FlutterNativeTimezone.getLocalTimezone());
+    fallbackTimeNetwork(
+      await FlutterNativeTimezone.getLocalTimezone(),
+      dotenv.env['API_KEY_WORLDTIME_API'],
+    );
     Timer.periodic(const Duration(seconds: 1), (Timer t) async => timeNowOpt);
 
     SharedPreferences pref = await SharedPreferences.getInstance();
@@ -256,18 +247,7 @@ class AbsenController extends GetxController {
       paramLimitVisit,
       dataUserLogin,
     );
-    // after 2 sec
-    if (!Get.isRegistered<AdController>()) {
-      Get.put(AdController());
-    }
-    final adC = Get.find<AdController>();
-
-    await adC.loadInterstitialAd();
-    // Future.delayed(const Duration(seconds: 2), () {
-    //   adC.showInterstitialAd(() {
-    //     // print('Iklan interstitial ditutup');
-    //   });
-    // });
+    
   }
 
   @override
@@ -544,56 +524,54 @@ class AbsenController extends GetxController {
     return userCabang.value = response;
   }
 
-  Future<void> timeNetwork(String timeZone) async {
-    // int attempts = 0;
-    // while (attempts < maxRetries) {
-    try {
-      final response = await http
-          .get(
-            Uri.parse(
-              // 'https://script.google.com/macros/s/AKfycbyd5AcbAnWi2Yn0xhFRbyzS4qMq1VucMVgVvhul5XqS9HkAyJY/exec?tz=$timeZone',
-              'https://timeapi.io/api/time/current/zone?timeZone=$timeZone',
-            ),
-          )
-          .timeout(
-            const Duration(seconds: 10),
-            onTimeout: () => http.Response('Timeout', 408),
-          );
-      // print('https://timeapi.io/api/time/current/zone?timeZone=$timeZone');
+  // Future<void> timeNetwork(String timeZone) async {
+  //   // int attempts = 0;
+  //   // while (attempts < maxRetries) {
+  //   try {
+  //     final response = await http
+  //         .get(
+  //           Uri.parse(
+  //             // 'https://script.google.com/macros/s/AKfycbyd5AcbAnWi2Yn0xhFRbyzS4qMq1VucMVgVvhul5XqS9HkAyJY/exec?tz=$timeZone',
+  //             'https://timeapi.io/api/time/current/zone?timeZone=$timeZone',
+  //           ),
+  //         )
+  //         .timeout(
+  //           const Duration(seconds: 10),
+  //           onTimeout: () => http.Response('Timeout', 408),
+  //         );
+  //     // print('https://timeapi.io/api/time/current/zone?timeZone=$timeZone');
 
-      // DateFormat inputFormat = DateFormat("EEE, dd MMM yyyy HH:mm:ss Z");
-      if (response.statusCode == 200) {
-        var result = jsonDecode(response.body);
-        // DateTime dateTime = inputFormat.parse(result['fulldate']);
-        // timeNow = DateFormat('HH:mm').format(dateTime);
-        timeNow = result['time'];
-        // dateNowServer = DateFormat('yyyy-MM-dd').format(dateTime);
-        dateNowServer = result['dateTime'];
-        // break;
-        // } else {
-        //   attempts++;
-        //   await Future.delayed(const Duration(seconds: 3));
-        // }
-      } else {
-        // Jika gagal, coba ambil dari URL alternatif
+  //     // DateFormat inputFormat = DateFormat("EEE, dd MMM yyyy HH:mm:ss Z");
+  //     if (response.statusCode == 200) {
+  //       var result = jsonDecode(response.body);
+  //       // DateTime dateTime = inputFormat.parse(result['fulldate']);
+  //       // timeNow = DateFormat('HH:mm').format(dateTime);
+  //       timeNow = result['time'];
+  //       // dateNowServer = DateFormat('yyyy-MM-dd').format(dateTime);
+  //       dateNowServer = result['dateTime'];
+  //       // break;
+  //       // } else {
+  //       //   attempts++;
+  //       //   await Future.delayed(const Duration(seconds: 3));
+  //       // }
+  //     } else {
+  //       // Jika gagal, coba ambil dari URL alternatif
 
-        await fallbackTimeNetwork(
-          timeZone,
-          dotenv.env['API_KEY_WORLDTIME_API'],
-        );
-      }
-    } catch (e) {
-      // Get.back();
-      showToast(e.toString());
-      fallbackTimeNetwork(timeZone, dotenv.env['API_KEY_WORLDTIME_API']);
-      // attempts++;
-      // await Future.delayed(const Duration(seconds: 3));
-    }
+  //       await fallbackTimeNetwork(
+  //         timeZone,
+  //         dotenv.env['API_KEY_WORLDTIME_API'],
+  //       );
+  //     }
+  //   } catch (e) {
+  //     // Get.back();
+  //     showToast(e.toString());
+  //     fallbackTimeNetwork(timeZone, dotenv.env['API_KEY_WORLDTIME_API']);
+  //     // attempts++;
+  //     // await Future.delayed(const Duration(seconds: 3));
+  //   }
 
-    // if (attempts == maxRetries) {
-    //   showToast('Gagal mengambil data waktu, coba lagi nanti');
-    // }
-  }
+   
+  // }
 
   Future<void> fallbackTimeNetwork(String timeZone, String? apiKey) async {
     try {
@@ -614,8 +592,10 @@ class AbsenController extends GetxController {
       if (response.statusCode == 200) {
         var result = jsonDecode(response.body);
         // Format data tergantung response API tersebut
-        timeNow =  DateFormat('HH:mm').format(DateTime.parse(result['time']));
-        dateNowServer = result['datetime'] ?? '';
+        timeNow = DateFormat(
+          'HH:mm',
+        ).format(DateTime.parse(result['datetime']).toLocal());
+        dateNowServer = result['datetime'];
       } else {
         // Get.back();
         showToast('Gagal mengambil data waktu dari API cadangan');

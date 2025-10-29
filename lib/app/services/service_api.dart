@@ -1562,7 +1562,7 @@ class ServiceApi {
     }
   }
 
-  getPaySlip(Map<String, dynamic> data) async {
+  Future<PayslipModel?>getPaySlip(Map<String, dynamic> data) async {
     try {
       final response = await http
           .post(Uri.parse('${baseUrl}payslip'), body: data)

@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:absensi/app/data/model/login_model.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_native_timezone_updated_gradle/flutter_native_timezone.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -41,7 +42,11 @@ visitOut({
     Get.back();
     if (absC.image != null) {
       loadingDialog("Sending data...", "");
-     await absC.timeNetwork(await FlutterNativeTimezone.getLocalTimezone());
+      //  await absC.timeNetwork(await FlutterNativeTimezone.getLocalTimezone());
+      await absC.fallbackTimeNetwork(
+        await FlutterNativeTimezone.getLocalTimezone(),
+        dotenv.env['API_KEY_WORLDTIME_API'],
+      );
       var data = {
         "status": "update",
         "id": dataUser.id,
@@ -58,9 +63,8 @@ visitOut({
                     : dataUser.kodeCabang
                 : absC.rndLoc.text,
         "visit_in": absC.cekVisit.value.kodeStore,
-        "jam_out":
-            absC.timeNow.isNotEmpty ? absC.timeNow : absC.timeNowOpt,
-            // absC.timeNowOpt,
+        "jam_out": absC.timeNow.isNotEmpty ? absC.timeNow : absC.timeNowOpt,
+        // absC.timeNowOpt,
         "foto_out": File(absC.image!.path),
         "lat_out": latitude.toString(),
         "long_out": longitude.toString(),
@@ -76,9 +80,8 @@ visitOut({
                       ? absC.selectedCabangVisit.value
                       : dataUser.kodeCabang
                   : absC.rndLoc.text,
-          "jam_out":
-              absC.timeNow.isNotEmpty ? absC.timeNow : absC.timeNowOpt,
-              // absC.timeNowOpt,
+          "jam_out": absC.timeNow.isNotEmpty ? absC.timeNow : absC.timeNowOpt,
+          // absC.timeNowOpt,
           "foto_out": absC.image!.path,
           "lat_out": latitude.toString(),
           "long_out": longitude.toString(),

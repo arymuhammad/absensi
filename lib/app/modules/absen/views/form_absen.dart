@@ -100,7 +100,7 @@ formAbsen(Data dataUser, double latitude, double longitude) async {
                     absC.jamPulang.value = DateFormat("HH:mm").format(
                       DateTime.parse(
                         absC.dateNowServer,
-                      ).add(const Duration(hours: 8)),
+                      ).toLocal().add(const Duration(hours: 8)),
                     );
                     dialogMsg(
                       'INFO',
@@ -181,7 +181,7 @@ formAbsen(Data dataUser, double latitude, double longitude) async {
                   absC.dateNowServer.isNotEmpty
                       ? absC.dateNowServer
                       : absC.dateNow,
-                ),
+                ).toLocal(),
               ),
             );
 
@@ -215,7 +215,7 @@ formAbsen(Data dataUser, double latitude, double longitude) async {
                         absC.dateNowServer.isNotEmpty
                             ? absC.dateNowServer
                             : absC.dateNow,
-                      ),
+                      ).toLocal(),
                     ),
                     "kode_cabang":
                         absC.selectedCabang.isNotEmpty
@@ -244,7 +244,7 @@ formAbsen(Data dataUser, double latitude, double longitude) async {
                           absC.dateNowServer.isNotEmpty
                               ? absC.dateNowServer
                               : absC.dateNow,
-                        ),
+                        ).toLocal(),
                       ),
                       kodeCabang:
                           absC.selectedCabang.isNotEmpty
@@ -278,7 +278,7 @@ formAbsen(Data dataUser, double latitude, double longitude) async {
                     "clock_in",
                     DateFormat(
                       'yyyy-MM-dd HH:mm:ss',
-                    ).format(DateTime.parse(absC.dateNowServer)),
+                    ).format(DateTime.parse(absC.dateNowServer).toLocal()),
                     absC.selectedShift.value,
                     latitude.toString(),
                     longitude.toString(),
@@ -296,7 +296,7 @@ formAbsen(Data dataUser, double latitude, double longitude) async {
                         absC.dateNowServer.isNotEmpty
                             ? absC.dateNowServer
                             : absC.dateNow,
-                      ),
+                      ).toLocal(),
                     ),
                   };
 
@@ -407,7 +407,7 @@ formAbsen(Data dataUser, double latitude, double longitude) async {
                     absC.dateNowServer.isNotEmpty
                         ? absC.dateNowServer
                         : absC.dateNow,
-                  ),
+                  ).toLocal(),
                 ),
               );
               // log(absC.cekAbsen.value.total.toString(), name: 'MASUK');
@@ -460,14 +460,14 @@ formAbsen(Data dataUser, double latitude, double longitude) async {
                           absC.dateNowServer.isNotEmpty
                               ? absC.dateNowServer
                               : absC.dateNow,
-                        ),
+                        ).toLocal(),
                       ),
                       "tanggal_pulang": DateFormat('yyyy-MM-dd').format(
                         DateTime.parse(
                           absC.dateNowServer.isNotEmpty
                               ? absC.dateNowServer
                               : absC.dateNow,
-                        ),
+                        ).toLocal(),
                       ),
                       "nama": dataUser.nama,
                       "jam_absen_pulang":
@@ -487,7 +487,7 @@ formAbsen(Data dataUser, double latitude, double longitude) async {
                       "clock_out",
                       DateFormat(
                         'yyyy-MM-dd HH:mm:ss',
-                      ).format(DateTime.parse(absC.dateNowServer)),
+                      ).format(DateTime.parse(absC.dateNowServer).toLocal()),
                       absC.cekAbsen.value.idShift!,
                       latitude.toString(),
                       longitude.toString(),
@@ -505,7 +505,7 @@ formAbsen(Data dataUser, double latitude, double longitude) async {
                           absC.dateNowServer.isNotEmpty
                               ? absC.dateNowServer
                               : absC.dateNow,
-                        ),
+                        ).toLocal(),
                       ),
                     };
 
@@ -537,14 +537,14 @@ formAbsen(Data dataUser, double latitude, double longitude) async {
                           absC.dateNowServer.isNotEmpty
                               ? absC.dateNowServer
                               : absC.dateNow,
-                        ),
+                        ).toLocal(),
                       ),
                       "tanggal_pulang": DateFormat('yyyy-MM-dd').format(
                         DateTime.parse(
                           absC.dateNowServer.isNotEmpty
                               ? absC.dateNowServer
                               : absC.dateNow,
-                        ),
+                        ).toLocal(),
                       ),
                       "nama": dataUser.nama,
                       "jam_absen_pulang":
@@ -565,7 +565,7 @@ formAbsen(Data dataUser, double latitude, double longitude) async {
                             absC.dateNowServer.isNotEmpty
                                 ? absC.dateNowServer
                                 : absC.dateNow,
-                          ),
+                          ).toLocal(),
                         ),
                         "nama": dataUser.nama,
                         "jam_absen_pulang":
@@ -583,7 +583,7 @@ formAbsen(Data dataUser, double latitude, double longitude) async {
                           absC.dateNowServer.isNotEmpty
                               ? absC.dateNowServer
                               : absC.dateNow,
-                        ),
+                        ).toLocal(),
                       ),
                     );
 
@@ -595,7 +595,7 @@ formAbsen(Data dataUser, double latitude, double longitude) async {
                       "clock_out",
                       DateFormat(
                         'yyyy-MM-dd HH:mm:ss',
-                      ).format(DateTime.parse(absC.dateNowServer)),
+                      ).format(DateTime.parse(absC.dateNowServer).toLocal()),
                       absC.cekAbsen.value.idShift!,
                       latitude.toString(),
                       longitude.toString(),
@@ -613,7 +613,7 @@ formAbsen(Data dataUser, double latitude, double longitude) async {
                           absC.dateNowServer.isNotEmpty
                               ? absC.dateNowServer
                               : absC.dateNow,
-                        ),
+                        ).toLocal(),
                       ),
                     };
 
