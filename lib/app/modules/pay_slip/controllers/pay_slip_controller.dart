@@ -53,7 +53,7 @@ class PaySlipController extends GetxController {
       "branch": branch,
     };
     final response = ServiceApi().getPaySlip(data);
-    print(data);
+    // print(data);
     isLoading.value = false;
     return paySlipFuture.value = response;
   }
