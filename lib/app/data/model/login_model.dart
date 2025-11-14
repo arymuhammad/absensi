@@ -76,7 +76,7 @@ class Data {
     nik = json['nik']??'';
     lat = json['lat'];
     long = json['long'];
-    foto = json['foto'];
+    foto = json['foto']??'';
     noTelp = json['no_telp'];
     level = json['level'];
     levelUser = json['level_user'];

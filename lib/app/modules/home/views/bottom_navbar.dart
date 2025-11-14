@@ -50,7 +50,7 @@ class BottomNavBar extends GetView {
       body: Obx(
         () => IndexedStack(index: loginC.selected.value, children: widgetList),
       ),
-     
+
       bottomNavigationBar: Obx(
         () => BottomBarInspiredOutside(
           items: items,
@@ -78,7 +78,7 @@ class BottomNavBar extends GetView {
               loc.searchDate.value = "";
               listDataUser.visit == "1"
                   ? loc.getAllVisited(listDataUser.id!)
-                  : loc.getAllAbsen(listDataUser.id!,'','');
+                  : loc.getAllAbsen(listDataUser.id!, '', '');
             } else if (index == 2) {
               loc.isLoading.value = true;
               loc.lokasi.value = "";

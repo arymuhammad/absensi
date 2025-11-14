@@ -352,7 +352,7 @@ class AddPegawaiView extends GetView<AddPegawaiController> {
                 padding: const EdgeInsets.symmetric(horizontal: 105),
                 child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.contentDefBtn,
+                        backgroundColor: AppColors.itemsBackground,
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(50)),
                         minimumSize: const Size(70, 50)),

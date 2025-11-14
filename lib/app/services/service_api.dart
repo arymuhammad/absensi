@@ -26,12 +26,14 @@ import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 
 import '../data/helper/custom_dialog.dart';
+import '../data/model/PayslipStoreModel.dart';
 import '../data/model/absen_model.dart';
 import '../data/model/dept_model.dart';
 import '../data/model/foto_profil_model.dart';
 import '../data/model/login_model.dart';
 // import '../data/model/server_api_model.dart';
 import '../data/model/payslip_model.dart';
+import '../data/model/payslip_result_model.dart';
 import '../data/model/users_model.dart';
 import 'app_exceptions.dart';
 
@@ -1562,20 +1564,22 @@ class ServiceApi {
     }
   }
 
-  Future<PayslipModel?>getPaySlip(Map<String, dynamic> data) async {
+  Future<PayslipResult?> getPaySlip(Map<String, dynamic> data) async {
     try {
       final response = await http
           .post(Uri.parse('${baseUrl}payslip'), body: data)
           .timeout(const Duration(seconds: 60));
       if (response.statusCode == 200) {
-        // print(response.body);
         final decoded = json.decode(response.body);
         if (decoded['data'] == null || decoded['data'].isEmpty) {
           // Jika data kosong, return null atau objek PayslipModel dengan status khusus
           return null;
         }
-        PayslipModel dataPayslip = PayslipModel.fromJson(decoded['data']);
-        return dataPayslip;
+        if (data['branch'] == "HO000") {
+        return PayslipResult(payslipModel: PayslipModel.fromJson(decoded['data']));
+        } else {
+            return PayslipResult(payslipStoreModel: PayslipStoreModel.fromJson(decoded['data']));
+        }
       } else {
         throw Exception('Failed to load data, status: ${response.statusCode}');
       }

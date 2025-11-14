@@ -414,6 +414,7 @@ class AddPegawaiController extends GetxController {
             brandCabang.value = "";
             lstUser.clear();
             lstPhone.clear();
+            image = null;
           }
         } else {
           var data = {
@@ -460,6 +461,7 @@ class AddPegawaiController extends GetxController {
             brandCabang.value = "";
             lstUser.clear();
             lstPhone.clear();
+            image = null;
           }
         }
       } else {
@@ -494,13 +496,14 @@ class AddPegawaiController extends GetxController {
           "created_at": joinDate.text.isNotEmpty ? joinDate.text : null,
         };
 
-        if (lstPhone.contains(telp.text)) {
+        if (telp.text == dataUser.noTelp) {
           Get.back();
           warningDialog(
             Get.context!,
             "Warning",
             "This phone number is already registered\nPlease enter another phone number",
           );
+          isLoading.value = false;
         } else {
           await ServiceApi().addUpdatePegawai(data, mode);
           // langsung update sharedpref tanpa harus re login
@@ -581,16 +584,19 @@ class AddPegawaiController extends GetxController {
           brandCabang.value = "";
           lstPhone.clear();
           isLoading.value = false;
+          image = null;
         }
         // Get.back();
       } else {
-        if (lstPhone.contains(telp.text)) {
+        // if (lstPhone.contains(telp.text)) {
+        if (telp.text == dataUser.noTelp) {
           Get.back();
           warningDialog(
             Get.context!,
             "Warning",
             "This phone number is already registered\nPlease enter another phone number",
           );
+          isLoading.value = false;
         } else {
           var data = {
             "status": mode,
@@ -679,6 +685,7 @@ class AddPegawaiController extends GetxController {
           brandCabang.value = "";
           lstPhone.clear();
           isLoading.value = false;
+          image = null;
         }
       }
     }

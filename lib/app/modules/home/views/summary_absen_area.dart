@@ -246,285 +246,334 @@ class SummaryAbsenArea extends GetView {
                             diffHours = const Duration();
                           }
 
-                          return InkWell(
-                            onTap:
-                                () => Get.to(() {
-                                  var detailData = {
-                                    "foto_profil":
-                                        userData!.foto != ""
-                                            ? userData!.foto
-                                            : userData!.nama,
-                                    "nama": absenC.dataLimitVisit[i].nama!,
-                                    "id_user": absenC.dataLimitVisit[i].id!,
-                                    "store":
-                                        absenC.dataLimitVisit[i].namaCabang!,
-                                    "tgl_visit":
-                                        absenC.dataLimitVisit[i].tglVisit!,
-                                    "jam_in": absenC.dataLimitVisit[i].jamIn!,
-                                    "foto_in": absenC.dataLimitVisit[i].fotoIn!,
-                                    "jam_out":
-                                        absenC.dataLimitVisit[i].jamOut != ""
-                                            ? absenC.dataLimitVisit[i].jamOut!
-                                            : "",
-                                    "foto_out":
-                                        absenC.dataLimitVisit[i].fotoOut != ""
-                                            ? absenC.dataLimitVisit[i].fotoOut!
-                                            : "",
-                                    "lat_in": absenC.dataLimitVisit[i].latIn!,
-                                    "long_in": absenC.dataLimitVisit[i].longIn!,
-                                    "lat_out":
-                                        absenC.dataLimitVisit[i].latOut != ""
-                                            ? absenC.dataLimitVisit[i].latOut!
-                                            : "",
-                                    "long_out":
-                                        absenC.dataLimitVisit[i].longOut != ""
-                                            ? absenC.dataLimitVisit[i].longOut!
-                                            : "",
-                                    "device_info":
-                                        absenC.dataLimitVisit[i].deviceInfo!,
-                                    "device_info2":
-                                        absenC.dataLimitVisit[i].deviceInfo2 !=
-                                                ""
-                                            ? absenC
-                                                .dataLimitVisit[i]
-                                                .deviceInfo2
-                                            : "",
-                                  };
+                          return LayoutBuilder(
+                            builder: (context, constraints) {
+                              double maxWidth = constraints.maxWidth;
 
-                                  return DetailVisitView(detailData);
-                                }, transition: Transition.cupertino),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(5),
-                                color: Colors.white,
-                              ),
-                              height:
-                                  i == 0 && absenC.statsCon.value != ""
-                                      ? 147
-                                      : 85,
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Container(
-                                          width: 55,
-                                          padding: const EdgeInsets.all(8),
-                                          decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.circular(
-                                              5,
-                                            ),
-                                            color: AppColors.itemsBackground,
-                                          ),
-                                          child: Column(
-                                            children: [
-                                              // Tanggal
-                                              Text(
-                                                FormatWaktu.formatTanggal(
-                                                  tanggal:
-                                                      absenC
-                                                          .dataLimitVisit[i]
-                                                          .tglVisit!,
-                                                ),
-                                                style: titleTextStyle.copyWith(
-                                                  fontSize: 30,
-                                                  color:
-                                                      AppColors
-                                                          .contentColorWhite,
-                                                ),
-                                              ),
-                                              // Hari
-                                              Text(
-                                                FormatWaktu.formatHariEn(
-                                                  tanggal:
-                                                      absenC
-                                                          .dataLimitVisit[i]
-                                                          .tglVisit!,
-                                                ),
-                                                style: subtitleTextStyle
-                                                    .copyWith(
-                                                      color: Colors.white,
-                                                    ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        const SizedBox(width: 12),
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            IntrinsicHeight(
-                                              child: Row(
-                                                children: [
-                                                  Column(
-                                                    children: [
-                                                      Text(
-                                                        absenC
-                                                            .dataLimitVisit[i]
-                                                            .jamIn!,
-                                                        style: const TextStyle(
-                                                          // color:
-                                                          //     stsMasuk == "Late"
-                                                          //         ? red
-                                                          //         : green,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          fontSize: 18,
-                                                        ),
-                                                      ),
-                                                      const Text(
-                                                        'Check In',
-                                                        style: TextStyle(
-                                                          fontSize: 14,
-                                                          color: Colors.grey,
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  const SizedBox(width: 5),
-                                                  const VerticalDivider(
-                                                    color:
-                                                        Colors
-                                                            .grey, // Warna garis
-                                                    // thickness:
-                                                    //     1, // Ketebalan garis
-                                                    width:
-                                                        25, // Lebar box pembungkus
-                                                    // indent: 20, // Jarak dari atas
-                                                    endIndent: 5,
-                                                  ),
-                                                  Column(
-                                                    children: [
-                                                      Text(
-                                                        absenC
-                                                            .dataLimitVisit[i]
-                                                            .jamOut!,
-                                                        style: const TextStyle(
-                                                          // color:
-                                                          //     stsPulang ==
-                                                          //                 "Early" ||
-                                                          //             stsPulang ==
-                                                          //                 "Absent"
-                                                          //         ? red
-                                                          //         : green,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          fontSize: 18,
-                                                        ),
-                                                      ),
-                                                      const Text(
-                                                        'Check Out',
-                                                        style: TextStyle(
-                                                          color: Colors.grey,
-                                                          fontSize: 14,
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  const SizedBox(width: 5),
-                                                  const VerticalDivider(
-                                                    color:
-                                                        Colors
-                                                            .grey, // Warna garis
-                                                    // thickness:
-                                                    //     1, // Ketebalan garis
-                                                    width:
-                                                        25, // Lebar box pembungkus
-                                                    // indent: 20, // Jarak dari atas
-                                                    endIndent: 5,
-                                                  ),
-                                                  Column(
-                                                    children: [
-                                                      Text(
-                                                        absenC
-                                                                    .dataLimitVisit
-                                                                    .isNotEmpty &&
-                                                                absenC
-                                                                        .dataLimitVisit[i]
-                                                                        .jamIn! !=
-                                                                    ""
-                                                            ? '${absenC.dataLimitVisit[i].jamOut != "" ? diffHours.inHours % 24 : '-'}j ${absenC.dataLimitVisit[i].jamOut != "" ? diffHours.inMinutes % 60 : '-'}m'
-                                                            : '-:-',
-                                                        style: const TextStyle(
-                                                          // color:
-                                                          //     stsPulang ==
-                                                          //                 "Pulang Cepat" ||
-                                                          //             stsPulang ==
-                                                          //                 "Belum Absen"
-                                                          //         ? red
-                                                          //         : green,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          fontSize: 18,
-                                                        ),
-                                                      ),
-                                                      const Text(
-                                                        'Total Hours',
-                                                        style: TextStyle(
-                                                          color: Colors.grey,
-                                                          fontSize: 14,
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                            const SizedBox(height: 5),
-                                            Row(
-                                              children: [
-                                                const Icon(
-                                                  HeroIcons.map_pin,
-                                                  size: 16,
-                                                ),
-                                                const SizedBox(width: 5),
-                                                Text(
-                                                  absenC
+                              return InkWell(
+                              onTap:
+                                  () => Get.to(() {
+                                    var detailData = {
+                                      "foto_profil":
+                                          userData!.foto != ""
+                                              ? userData!.foto
+                                              : userData!.nama,
+                                      "nama": absenC.dataLimitVisit[i].nama!,
+                                      "id_user": absenC.dataLimitVisit[i].id!,
+                                      "store":
+                                          absenC.dataLimitVisit[i].namaCabang!,
+                                      "tgl_visit":
+                                          absenC.dataLimitVisit[i].tglVisit!,
+                                      "jam_in": absenC.dataLimitVisit[i].jamIn!,
+                                      "foto_in":
+                                          absenC.dataLimitVisit[i].fotoIn!,
+                                      "jam_out":
+                                          absenC.dataLimitVisit[i].jamOut != ""
+                                              ? absenC.dataLimitVisit[i].jamOut!
+                                              : "",
+                                      "foto_out":
+                                          absenC.dataLimitVisit[i].fotoOut != ""
+                                              ? absenC
+                                                  .dataLimitVisit[i]
+                                                  .fotoOut!
+                                              : "",
+                                      "lat_in": absenC.dataLimitVisit[i].latIn!,
+                                      "long_in":
+                                          absenC.dataLimitVisit[i].longIn!,
+                                      "lat_out":
+                                          absenC.dataLimitVisit[i].latOut != ""
+                                              ? absenC.dataLimitVisit[i].latOut!
+                                              : "",
+                                      "long_out":
+                                          absenC.dataLimitVisit[i].longOut != ""
+                                              ? absenC
+                                                  .dataLimitVisit[i]
+                                                  .longOut!
+                                              : "",
+                                      "device_info":
+                                          absenC.dataLimitVisit[i].deviceInfo!,
+                                      "device_info2":
+                                          absenC
                                                       .dataLimitVisit[i]
-                                                      .namaCabang!
-                                                      .capitalize!,
+                                                      .deviceInfo2 !=
+                                                  ""
+                                              ? absenC
+                                                  .dataLimitVisit[i]
+                                                  .deviceInfo2
+                                              : "",
+                                    };
+
+                                    return DetailVisitView(detailData);
+                                  }, transition: Transition.cupertino),
+                              child: Container(width: maxWidth,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(5),
+                                  color: Colors.white,
+                                ),
+                                height:
+                                    i == 0 && absenC.statsCon.value != ""
+                                        ? 147
+                                        : 85,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Container(
+                                            width: maxWidth * 0.15,
+                                            padding: const EdgeInsets.all(8),
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(5),
+                                              color: AppColors.itemsBackground,
+                                            ),
+                                            child: Column(
+                                              children: [
+                                                // Tanggal
+                                                Text(
+                                                  FormatWaktu.formatTanggal(
+                                                    tanggal:
+                                                        absenC
+                                                            .dataLimitVisit[i]
+                                                            .tglVisit!,
+                                                  ),
+                                                  style: titleTextStyle.copyWith(
+                                                    fontSize:     maxWidth *
+                                                                    0.06,
+                                                    color:
+                                                        AppColors
+                                                            .contentColorWhite,
+                                                  ), maxLines: 1,
+                                                          overflow:
+                                                              TextOverflow
+                                                                  .ellipsis,
+                                                ),
+                                                // Hari
+                                                Text(
+                                                  FormatWaktu.formatHariEn(
+                                                    tanggal:
+                                                        absenC
+                                                            .dataLimitVisit[i]
+                                                            .tglVisit!,
+                                                  ),
+                                                  style: subtitleTextStyle
+                                                      .copyWith(
+                                                        color: Colors.white,
+                                                      ), maxLines: 1,
+                                                          overflow:
+                                                              TextOverflow
+                                                                  .ellipsis,
                                                 ),
                                               ],
                                             ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 2),
-                                    i == 0 && absenC.statsCon.value != ""
-                                        ? Container(
-                                          width: Get.mediaQuery.size.width,
-                                          decoration: BoxDecoration(
-                                            color: const Color.fromARGB(
-                                              118,
-                                              255,
-                                              139,
-                                              128,
-                                            ),
-                                            borderRadius: BorderRadius.circular(
-                                              5,
+                                          ),
+                                          const SizedBox(width: 12),
+                                          SizedBox(  width: maxWidth * 0.7,
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                IntrinsicHeight(
+                                                  child: Row(
+                                                    children: [
+                                                      Column(
+                                                        children: [
+                                                          Text(
+                                                            absenC
+                                                                .dataLimitVisit[i]
+                                                                .jamIn!,
+                                                            style: TextStyle(
+                                                              // color:
+                                                              //     stsMasuk == "Late"
+                                                              //         ? red
+                                                              //         : green,
+                                                              fontWeight:
+                                                                  FontWeight.bold,
+                                                              fontSize: maxWidth *
+                                                                          0.05,
+                                                            ),
+                                                          ),
+                                                          const Text(
+                                                            'Check In',
+                                                            style: TextStyle(
+                                                              fontSize: 14,
+                                                              color: Colors.grey,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      const SizedBox(width: 5),
+                                                      const VerticalDivider(
+                                                        color:
+                                                            Colors
+                                                                .grey, // Warna garis
+                                                        // thickness:
+                                                        //     1, // Ketebalan garis
+                                                        width:
+                                                            25, // Lebar box pembungkus
+                                                        // indent: 20, // Jarak dari atas
+                                                        endIndent: 5,
+                                                      ),
+                                                      Column(
+                                                        children: [
+                                                          Text(
+                                                            absenC
+                                                                .dataLimitVisit[i]
+                                                                .jamOut!,
+                                                            style: TextStyle(
+                                                              // color:
+                                                              //     stsPulang ==
+                                                              //                 "Early" ||
+                                                              //             stsPulang ==
+                                                              //                 "Absent"
+                                                              //         ? red
+                                                              //         : green,
+                                                              fontWeight:
+                                                                  FontWeight.bold,
+                                                              fontSize:  maxWidth *
+                                                                          0.05,
+                                                            ),
+                                                          ),
+                                                          const Text(
+                                                            'Check Out',
+                                                            style: TextStyle(
+                                                              color: Colors.grey,
+                                                              fontSize: 14,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      const SizedBox(width: 5),
+                                                      const VerticalDivider(
+                                                        color:
+                                                            Colors
+                                                                .grey, // Warna garis
+                                                        // thickness:
+                                                        //     1, // Ketebalan garis
+                                                        width:
+                                                            25, // Lebar box pembungkus
+                                                        // indent: 20, // Jarak dari atas
+                                                        endIndent: 5,
+                                                      ),
+                                                      Column(
+                                                        children: [
+                                                          Text(
+                                                            absenC
+                                                                        .dataLimitVisit
+                                                                        .isNotEmpty &&
+                                                                    absenC
+                                                                            .dataLimitVisit[i]
+                                                                            .jamIn! !=
+                                                                        ""
+                                                                ? '${absenC.dataLimitVisit[i].jamOut != "" ? diffHours.inHours % 24 : '-'}j ${absenC.dataLimitVisit[i].jamOut != "" ? diffHours.inMinutes % 60 : '-'}m'
+                                                                : '-:-',
+                                                            style: TextStyle(
+                                                              // color:
+                                                              //     stsPulang ==
+                                                              //                 "Pulang Cepat" ||
+                                                              //             stsPulang ==
+                                                              //                 "Belum Absen"
+                                                              //         ? red
+                                                              //         : green,
+                                                              fontWeight:
+                                                                  FontWeight.bold,
+                                                              fontSize:  maxWidth *
+                                                                          0.05,
+                                                            ),
+                                                          ),
+                                                          const Text(
+                                                            'Total Hours',
+                                                            style: TextStyle(
+                                                              color: Colors.grey,
+                                                              fontSize: 14,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 3),
+                                                Container( decoration: BoxDecoration(
+                                                            color:
+                                                                AppColors
+                                                                    .itemsBackground,
+                                                            borderRadius:
+                                                                BorderRadius.circular(
+                                                                  8,
+                                                                ),
+                                                          ),
+                                                          padding:
+                                                              const EdgeInsets.only(
+                                                                left: 5,
+                                                                right: 5,
+                                                              ),
+                                                          child:Row( mainAxisSize:
+                                                                MainAxisSize
+                                                                    .min,
+                                                    children: [
+                                                      const Icon(
+                                                        HeroIcons.map_pin,
+                                                        size: 16, color:
+                                                                    AppColors
+                                                                        .contentColorWhite,
+                                                      ),
+                                                      const SizedBox(width: 5),
+                                                      Text(
+                                                        absenC
+                                                            .dataLimitVisit[i]
+                                                            .namaCabang!
+                                                            .capitalize!, style: const TextStyle(
+                                                                  color:
+                                                                      AppColors
+                                                                          .contentColorWhite,
+                                                                ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ],
                                             ),
                                           ),
-                                          child: Padding(
-                                            padding: const EdgeInsets.only(
-                                              left: 8.0,
+                                        ],
+                                      ),
+                                      const SizedBox(height: 2),
+                                      i == 0 && absenC.statsCon.value != ""
+                                          ? Container(
+                                            width: Get.mediaQuery.size.width,
+                                            decoration: BoxDecoration(
+                                              color: const Color.fromARGB(
+                                                118,
+                                                255,
+                                                139,
+                                                128,
+                                              ),
+                                              borderRadius:
+                                                  BorderRadius.circular(5),
                                             ),
-                                            child: Text(
-                                              absenC.statsCon.value,
-                                              style: TextStyle(
-                                                color: Colors.redAccent[700],
+                                            child: Padding(
+                                              padding: const EdgeInsets.only(
+                                                left: 8.0,
+                                              ),
+                                              child: Text(
+                                                absenC.statsCon.value,
+                                                style: TextStyle(
+                                                  color: Colors.redAccent[700],
+                                                ),
                                               ),
                                             ),
-                                          ),
-                                        )
-                                        : Container(),
-                                  ],
+                                          )
+                                          : Container(),
+                                    ],
+                                  ),
                                 ),
                               ),
-                            ),
+                            );
+                            },
+                            
                           );
                         },
                       ),

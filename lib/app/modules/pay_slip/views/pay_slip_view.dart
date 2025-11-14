@@ -4,6 +4,7 @@ import 'dart:math' as math;
 import 'package:absensi/app/data/helper/app_colors.dart';
 import 'package:absensi/app/data/model/login_model.dart';
 import 'package:absensi/app/data/model/payslip_model.dart';
+import 'package:absensi/app/data/model/payslip_result_model.dart';
 import 'package:absensi/app/modules/pay_slip/views/widget/pay_slip_desc.dart';
 import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
@@ -15,8 +16,11 @@ import 'package:intl/intl.dart';
 import 'package:month_year_picker/month_year_picker.dart';
 
 import '../../../data/helper/const.dart';
+import '../../../data/helper/currency_format.dart';
 import '../../../data/helper/custom_dialog.dart';
+import '../../../data/model/PayslipStoreModel.dart';
 import '../controllers/pay_slip_controller.dart';
+import 'widget/pay_slip_store_desc.dart';
 
 class PaySlipView extends GetView<PaySlipController> {
   PaySlipView({super.key, this.userData});
@@ -25,6 +29,8 @@ class PaySlipView extends GetView<PaySlipController> {
 
   @override
   Widget build(BuildContext context) {
+    late PayslipResult? payslip;
+    late PayslipResult? payslipstore;
     return Scaffold(
       appBar: AppBar(
         title: Text('PaySlip', style: titleTextStyle.copyWith(fontSize: 18)),
@@ -65,13 +71,20 @@ class PaySlipView extends GetView<PaySlipController> {
                     'yyyy-MM-dd',
                   ).format(DateTime(periode.year, periode.month + 1, 0));
                   payC.isLoading.value = true;
-                  
-                  payC.getPaySlip(
-                    empId: userData!.nik!,
-                    date1: payC.initDate.value,
-                    date2: payC.endDate.value,
-                    branch: userData!.kodeCabang!,
-                  );
+
+                  userData!.kodeCabang == "HO000"
+                      ? payC.getPaySlip(
+                        empId: userData!.nik!,
+                        date1: payC.initDate.value,
+                        date2: payC.endDate.value,
+                        branch: userData!.kodeCabang!,
+                      )
+                      : payC.getPaySlipStore(
+                        empId: userData!.nik!,
+                        date1: payC.initDate.value,
+                        date2: payC.endDate.value,
+                        branch: userData!.kodeCabang!,
+                      );
                 }
               },
               format: DateFormat("MMM yyyy"),
@@ -86,71 +99,132 @@ class PaySlipView extends GetView<PaySlipController> {
             ),
             const SizedBox(height: 15),
             Expanded(
-                      child: Obx(
-                        () => CustomMaterialIndicator(
-                          onRefresh: () async {
-                            await payC.getPaySlip(
-                              empId: userData!.nik!,
-                              date1: payC.initDate.value,
-                              date2: payC.endDate.value,
-                              branch: userData!.kodeCabang!,
-                            );
-                            showToast('Page Refreshed');
-                          },
-                          backgroundColor: Colors.white,
-                          indicatorBuilder: (context, controller) {
-                            return Padding(
-                              padding: const EdgeInsets.all(6.0),
-                              child:
-                                  Platform.isAndroid
-                                      ? CircularProgressIndicator(
-                                        color: AppColors.itemsBackground,
-                                        value:
-                                            controller.state.isLoading
-                                                ? null
-                                                : math.min(
-                                                  controller.value,
-                                                  1.0,
-                                                ),
-                                      )
-                                      : const CupertinoActivityIndicator(),
-                            );
-                          },
-                          child: FutureBuilder<PayslipModel?>(
-                            future: payC.paySlipFuture.value,
-                            builder: (context, snapshot) {
-                              if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                                return const Center(
-                                  child: CircularProgressIndicator(),
-                                );
-                              } else if (snapshot.hasError) {
-                                return Center(
-                                  child: Text('Error: ${snapshot.error}'),
-                                );
-                              } else if (!snapshot.hasData ||
-                                  snapshot.data == null) {
-                                return Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
+              child: Obx(
+                () => CustomMaterialIndicator(
+                  onRefresh: () async {
+                    if (userData!.kodeCabang! == "HO000") {
+                      await payC.getPaySlip(
+                        empId: userData!.nik!,
+                        date1: payC.initDate.value,
+                        date2: payC.endDate.value,
+                        branch: userData!.kodeCabang!,
+                      );
+                      showToast('Page Refreshed');
+                    } else {
+                      await payC.getPaySlipStore(
+                        empId: userData!.nik!,
+                        date1: payC.initDate.value,
+                        date2: payC.endDate.value,
+                        branch: userData!.kodeCabang!,
+                      );
+                      showToast('Page Refreshed');
+                    }
+                  },
+                  backgroundColor: Colors.white,
+                  indicatorBuilder: (context, controller) {
+                    return Padding(
+                      padding: const EdgeInsets.all(6.0),
+                      child:
+                          Platform.isAndroid
+                              ? CircularProgressIndicator(
+                                color: AppColors.itemsBackground,
+                                value:
+                                    controller.state.isLoading
+                                        ? null
+                                        : math.min(controller.value, 1.0),
+                              )
+                              : const CupertinoActivityIndicator(),
+                    );
+                  },
+                  child: FutureBuilder<PayslipResult?>(
+                    future:
+                        userData!.kodeCabang! == "HO000"
+                            ? payC.paySlipFuture.value
+                            : payC.paySlipStoreFuture.value,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                      } else if (snapshot.hasError) {
+                        return Center(child: Text('Error: ${snapshot.error}'));
+                      } else if (!snapshot.hasData || snapshot.data == null) {
+                        return Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Image.asset('assets/image/payslip.png', scale: 2),
+                            const SizedBox(height: 10),
+                            const Text('Tidak ada data slip gaji tersedia'),
+                          ],
+                        );
+                      } else {
+                        if (userData!.kodeCabang! == "HO000") {
+                          payslip = snapshot.data! as PayslipResult?;
+                        } else {
+                          payslipstore = snapshot.data! as PayslipResult?;
+                        }
+                        return Stack(
+                          children: [
+                            ListView(
+                              children: [
+                                userData!.kodeCabang! == "HO000"
+                                    ? PaySlipDesc(data: payslip!)
+                                    : PaySlipStoreDesc(data: payslipstore!),
+                              ],
+                            ),
+                            Positioned(
+                              left: 0,
+                              right: 0,
+                              bottom: 0,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: AppColors.itemsBackground,
+                                  borderRadius: BorderRadius.circular(10)
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 8,
+                                  horizontal: 10,
+                                ),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Image.asset('assets/image/payslip.png', scale: 2),
-                                                          const SizedBox(height: 10),
-                                    const Text(
-                                      'Tidak ada data slip gaji tersedia',
+                                    Text(
+                                      'TOTAL DITERIMA',
+                                      style: titleTextStyle.copyWith(
+                                        fontSize: 16,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    Text(
+                                      CurrencyFormat.convertToIdr(
+                                        int.parse(
+                                          userData!.kodeCabang! == "HO000"
+                                              ? payslip!
+                                                  .payslipModel!
+                                                  .totalReceivedByEmp!
+                                              : payslipstore!
+                                                  .payslipStoreModel!
+                                                  .netSalaryRoundTf!,
+                                        ),
+                                        0,
+                                      ),
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
                                   ],
-                                );
-                              } else {
-                                final payslip = snapshot.data!;
-                                return ListView(
-                                  children: [PaySlipDesc(data: payslip)],
-                                );
-                              }
-                            },
-                          ),
-                        ),
-                      ),
-                    )
+                                ),
+                              ),
+                            ),
+                          ],
+                        );
+                      }
+                    },
+                  ),
+                ),
+              ),
+            ),
             // Obx(
             //   () => FutureBuilder<PayslipModel?>(
             //     future: payC.getPaySlip(

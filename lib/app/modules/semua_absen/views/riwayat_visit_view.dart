@@ -323,267 +323,334 @@ class RiwayatVisitView extends GetView {
                                 diffHours = const Duration();
                               }
 
-                              return InkWell(
-                                onTap: () {
-                                  var detailData = {
-                                    "foto_profil":
-                                        userData!.foto != ""
-                                            ? userData!.foto
-                                            : userData!.nama,
-                                    "nama": visit.nama!,
-                                    "id_user": visit.id!,
-                                    "store": visit.namaCabang!,
-                                    "tgl_visit": visit.tglVisit!,
-                                    "jam_in": visit.jamIn!,
-                                    "foto_in": visit.fotoIn!,
-                                    "jam_out":
-                                        visit.jamOut != "" ? visit.jamOut! : "",
-                                    "foto_out":
-                                        visit.fotoOut != ""
-                                            ? visit.fotoOut!
-                                            : "",
-                                    "lat_in": visit.latIn!,
-                                    "long_in": visit.longIn!,
-                                    "lat_out":
-                                        visit.latOut != "" ? visit.latOut! : "",
-                                    "long_out":
-                                        visit.longOut != ""
-                                            ? visit.longOut!
-                                            : "",
-                                    "device_info": visit.deviceInfo!,
-                                    "device_info2":
-                                        visit.deviceInfo2 != ""
-                                            ? visitC.searchVisit[i].deviceInfo2
-                                            : "",
-                                  };
-                                  Get.to(() => DetailVisitView(detailData));
-                                },
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(5),
-                                    color: Colors.white,
-                                  ),
-                                  height:
-                                      i == 0 && visitC.statsCon.value != ""
-                                          ? 147
-                                          : 85,
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Row(
+                              return LayoutBuilder(
+                                builder: (context, constraints) {
+                                  double maxWidth = constraints.maxWidth;
+                                  return InkWell(
+                                    onTap: () {
+                                      var detailData = {
+                                        "foto_profil":
+                                            userData!.foto != ""
+                                                ? userData!.foto
+                                                : userData!.nama,
+                                        "nama": visit.nama!,
+                                        "id_user": visit.id!,
+                                        "store": visit.namaCabang!,
+                                        "tgl_visit": visit.tglVisit!,
+                                        "jam_in": visit.jamIn!,
+                                        "foto_in": visit.fotoIn!,
+                                        "jam_out":
+                                            visit.jamOut != ""
+                                                ? visit.jamOut!
+                                                : "",
+                                        "foto_out":
+                                            visit.fotoOut != ""
+                                                ? visit.fotoOut!
+                                                : "",
+                                        "lat_in": visit.latIn!,
+                                        "long_in": visit.longIn!,
+                                        "lat_out":
+                                            visit.latOut != ""
+                                                ? visit.latOut!
+                                                : "",
+                                        "long_out":
+                                            visit.longOut != ""
+                                                ? visit.longOut!
+                                                : "",
+                                        "device_info": visit.deviceInfo!,
+                                        "device_info2":
+                                            visit.deviceInfo2 != ""
+                                                ? visitC
+                                                    .searchVisit[i]
+                                                    .deviceInfo2
+                                                : "",
+                                      };
+                                      Get.to(() => DetailVisitView(detailData));
+                                    },
+                                    child: Container( width: maxWidth,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(5),
+                                        color: Colors.white,
+                                      ),
+                                      height:
+                                          i == 0 && visitC.statsCon.value != ""
+                                              ? 147
+                                              : 85,
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
-                                            Container(
-                                              width: 55,
-                                              padding: const EdgeInsets.all(8),
-                                              decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(5),
-                                                color:
-                                                    AppColors.itemsBackground,
-                                              ),
-                                              child: Column(
-                                                children: [
-                                                  // Tanggal
-                                                  Text(
-                                                    FormatWaktu.formatTanggal(
-                                                      tanggal: visit.tglVisit!,
-                                                    ),
-                                                    style: titleTextStyle.copyWith(
-                                                      fontSize: 30,
-                                                      color:
-                                                          AppColors
-                                                              .contentColorWhite,
-                                                    ),
-                                                  ),
-                                                  // Hari
-                                                  Text(
-                                                    FormatWaktu.formatHariEn(
-                                                      tanggal: visit.tglVisit!,
-                                                    ),
-                                                    style: subtitleTextStyle
-                                                        .copyWith(
-                                                          color: Colors.white,
-                                                        ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                            const SizedBox(width: 12),
-                                            Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
+                                            Row(
                                               children: [
-                                                IntrinsicHeight(
-                                                  child: Row(
+                                                Container(
+                                                width: maxWidth * 0.15,
+                                                  padding: const EdgeInsets.all(
+                                                    8,
+                                                  ),
+                                                  decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          5,
+                                                        ),
+                                                    color:
+                                                        AppColors
+                                                            .itemsBackground,
+                                                  ),
+                                                  child: Column(
                                                     children: [
-                                                      Column(
-                                                        children: [
-                                                          Text(
-                                                            visit.jamIn!,
-                                                            style: const TextStyle(
-                                                              // color:
-                                                              //     stsMasuk == "Late"
-                                                              //         ? red
-                                                              //         : green,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                              fontSize: 18,
-                                                            ),
-                                                          ),
-                                                          const Text(
-                                                            'Check In',
-                                                            style: TextStyle(
-                                                              fontSize: 14,
+                                                      // Tanggal
+                                                      Text(
+                                                        FormatWaktu.formatTanggal(
+                                                          tanggal:
+                                                              visit.tglVisit!,
+                                                        ),
+                                                        style: titleTextStyle
+                                                            .copyWith(
+                                                              fontSize:   maxWidth *
+                                                                    0.06,
                                                               color:
-                                                                  Colors.grey,
-                                                            ),
-                                                          ),
-                                                        ],
+                                                                  AppColors
+                                                                      .contentColorWhite,
+                                                            ),  maxLines: 1,
+                                                          overflow:
+                                                              TextOverflow
+                                                                  .ellipsis,
                                                       ),
-                                                      const SizedBox(width: 5),
-                                                      const VerticalDivider(
-                                                        color:
-                                                            Colors
-                                                                .grey, // Warna garis
-                                                        // thickness:
-                                                        //     1, // Ketebalan garis
-                                                        width:
-                                                            25, // Lebar box pembungkus
-                                                        // indent: 20, // Jarak dari atas
-                                                        endIndent: 5,
-                                                      ),
-                                                      Column(
-                                                        children: [
-                                                          Text(
-                                                            visit.jamOut!,
-                                                            style: const TextStyle(
-                                                              // color:
-                                                              //     stsPulang ==
-                                                              //                 "Early" ||
-                                                              //             stsPulang ==
-                                                              //                 "Absent"
-                                                              //         ? red
-                                                              //         : green,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                              fontSize: 18,
-                                                            ),
-                                                          ),
-                                                          const Text(
-                                                            'Check Out',
-                                                            style: TextStyle(
+                                                      // Hari
+                                                      Text(
+                                                        FormatWaktu.formatHariEn(
+                                                          tanggal:
+                                                              visit.tglVisit!,
+                                                        ),
+                                                        style: subtitleTextStyle
+                                                            .copyWith(
                                                               color:
-                                                                  Colors.grey,
-                                                              fontSize: 14,
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                      const SizedBox(width: 5),
-                                                      const VerticalDivider(
-                                                        color:
-                                                            Colors
-                                                                .grey, // Warna garis
-                                                        // thickness:
-                                                        //     1, // Ketebalan garis
-                                                        width:
-                                                            25, // Lebar box pembungkus
-                                                        // indent: 20, // Jarak dari atas
-                                                        endIndent: 5,
-                                                      ),
-                                                      Column(
-                                                        children: [
-                                                          Text(
-                                                            visitC
-                                                                        .searchVisit
-                                                                        .isNotEmpty &&
-                                                                    visit.jamIn! !=
-                                                                        ""
-                                                                ? '${visit.jamOut != "" ? diffHours.inHours % 24 : '-'}j ${visit.jamOut != "" ? diffHours.inMinutes % 60 : '-'}m'
-                                                                : '-:-',
-                                                            style: const TextStyle(
-                                                              // color:
-                                                              //     stsPulang ==
-                                                              //                 "Pulang Cepat" ||
-                                                              //             stsPulang ==
-                                                              //                 "Belum Absen"
-                                                              //         ? red
-                                                              //         : green,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                              fontSize: 18,
-                                                            ),
-                                                          ),
-                                                          const Text(
-                                                            'Total Hours',
-                                                            style: TextStyle(
-                                                              color:
-                                                                  Colors.grey,
-                                                              fontSize: 14,
-                                                            ),
-                                                          ),
-                                                        ],
+                                                                  Colors.white,
+                                                            ),  maxLines: 1,
+                                                          overflow:
+                                                              TextOverflow
+                                                                  .ellipsis,
                                                       ),
                                                     ],
                                                   ),
                                                 ),
-                                                const SizedBox(height: 5),
-                                                Row(
-                                                  children: [
-                                                    const Icon(
-                                                      HeroIcons.map_pin,
-                                                      size: 16,
-                                                    ),
-                                                    const SizedBox(width: 5),
-                                                    Text(
-                                                      visit
-                                                          .namaCabang!
-                                                          .capitalize!,
-                                                    ),
-                                                  ],
+                                                const SizedBox(width: 12),
+                                                SizedBox( width: maxWidth * 0.7,
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment.start,
+                                                    children: [
+                                                      IntrinsicHeight(
+                                                        child: Row(
+                                                          children: [
+                                                            Column(
+                                                              children: [
+                                                                Text(
+                                                                  visit.jamIn!,
+                                                                  style: TextStyle(
+                                                                    // color:
+                                                                    //     stsMasuk == "Late"
+                                                                    //         ? red
+                                                                    //         : green,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                    fontSize: maxWidth *
+                                                                          0.05,
+                                                                  ),
+                                                                ),
+                                                                const Text(
+                                                                  'Check In',
+                                                                  style: TextStyle(
+                                                                    fontSize: 14,
+                                                                    color:
+                                                                        Colors
+                                                                            .grey,
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                            const SizedBox(
+                                                              width: 5,
+                                                            ),
+                                                            const VerticalDivider(
+                                                              color:
+                                                                  Colors
+                                                                      .grey, // Warna garis
+                                                              // thickness:
+                                                              //     1, // Ketebalan garis
+                                                              width:
+                                                                  25, // Lebar box pembungkus
+                                                              // indent: 20, // Jarak dari atas
+                                                              endIndent: 5,
+                                                            ),
+                                                            Column(
+                                                              children: [
+                                                                Text(
+                                                                  visit.jamOut!,
+                                                                  style: TextStyle(
+                                                                    // color:
+                                                                    //     stsPulang ==
+                                                                    //                 "Early" ||
+                                                                    //             stsPulang ==
+                                                                    //                 "Absent"
+                                                                    //         ? red
+                                                                    //         : green,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                    fontSize:  maxWidth *
+                                                                          0.05,
+                                                                  ),
+                                                                ),
+                                                                const Text(
+                                                                  'Check Out',
+                                                                  style: TextStyle(
+                                                                    color:
+                                                                        Colors
+                                                                            .grey,
+                                                                    fontSize: 14,
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                            const SizedBox(
+                                                              width: 5,
+                                                            ),
+                                                            const VerticalDivider(
+                                                              color:
+                                                                  Colors
+                                                                      .grey, // Warna garis
+                                                              // thickness:
+                                                              //     1, // Ketebalan garis
+                                                              width:
+                                                                  25, // Lebar box pembungkus
+                                                              // indent: 20, // Jarak dari atas
+                                                              endIndent: 5,
+                                                            ),
+                                                            Column(
+                                                              children: [
+                                                                Text(
+                                                                  visitC.searchVisit.isNotEmpty &&
+                                                                          visit.jamIn! !=
+                                                                              ""
+                                                                      ? '${visit.jamOut != "" ? diffHours.inHours % 24 : '-'}j ${visit.jamOut != "" ? diffHours.inMinutes % 60 : '-'}m'
+                                                                      : '-:-',
+                                                                  style: TextStyle(
+                                                                    // color:
+                                                                    //     stsPulang ==
+                                                                    //                 "Pulang Cepat" ||
+                                                                    //             stsPulang ==
+                                                                    //                 "Belum Absen"
+                                                                    //         ? red
+                                                                    //         : green,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                    fontSize: maxWidth * 0.05,
+                                                                  ),
+                                                                ),
+                                                                const Text(
+                                                                  'Total Hours',
+                                                                  style: TextStyle(
+                                                                    color:
+                                                                        Colors
+                                                                            .grey,
+                                                                    fontSize: 14,
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                      const SizedBox(height: 3),
+                                                      Container( decoration: BoxDecoration(
+                                                            color:
+                                                                AppColors
+                                                                    .itemsBackground,
+                                                            borderRadius:
+                                                                BorderRadius.circular(
+                                                                  8,
+                                                                ),
+                                                          ),
+                                                          padding:
+                                                              const EdgeInsets.only(
+                                                                left: 5,
+                                                                right: 5,
+                                                              ),
+                                                          child: Row(  mainAxisSize:
+                                                                MainAxisSize
+                                                                    .min,
+                                                          children: [
+                                                            const Icon(
+                                                              HeroIcons.map_pin,
+                                                              size: 16,  color:
+                                                                    AppColors
+                                                                        .contentColorWhite,
+                                                            ),
+                                                            const SizedBox(
+                                                              width: 5,
+                                                            ),
+                                                            Text(
+                                                              visit
+                                                                  .namaCabang!
+                                                                  .capitalize!,  style: const TextStyle(
+                                                                  color:
+                                                                      AppColors
+                                                                          .contentColorWhite,
+                                                                ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
                                                 ),
                                               ],
                                             ),
+                                            const SizedBox(height: 2),
+                                            i == 0 &&
+                                                    visitC.statsCon.value != ""
+                                                ? Container(
+                                                  width:
+                                                      Get.mediaQuery.size.width,
+                                                  decoration: BoxDecoration(
+                                                    color: const Color.fromARGB(
+                                                      118,
+                                                      255,
+                                                      139,
+                                                      128,
+                                                    ),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          5,
+                                                        ),
+                                                  ),
+                                                  child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                          left: 8.0,
+                                                        ),
+                                                    child: Text(
+                                                      visitC.statsCon.value,
+                                                      style: TextStyle(
+                                                        color:
+                                                            Colors
+                                                                .redAccent[700],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                )
+                                                : Container(),
                                           ],
                                         ),
-                                        const SizedBox(height: 2),
-                                        i == 0 && visitC.statsCon.value != ""
-                                            ? Container(
-                                              width: Get.mediaQuery.size.width,
-                                              decoration: BoxDecoration(
-                                                color: const Color.fromARGB(
-                                                  118,
-                                                  255,
-                                                  139,
-                                                  128,
-                                                ),
-                                                borderRadius:
-                                                    BorderRadius.circular(5),
-                                              ),
-                                              child: Padding(
-                                                padding: const EdgeInsets.only(
-                                                  left: 8.0,
-                                                ),
-                                                child: Text(
-                                                  visitC.statsCon.value,
-                                                  style: TextStyle(
-                                                    color:
-                                                        Colors.redAccent[700],
-                                                  ),
-                                                ),
-                                              ),
-                                            )
-                                            : Container(),
-                                      ],
+                                      ),
                                     ),
-                                  ),
-                                ),
+                                  );
+                                },
                               );
                             },
                           ),

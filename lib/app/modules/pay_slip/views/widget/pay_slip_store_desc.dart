@@ -1,15 +1,13 @@
 import 'package:absensi/app/data/helper/const.dart';
 import 'package:absensi/app/data/helper/currency_format.dart';
 import 'package:absensi/app/data/helper/format_waktu.dart';
-import 'package:absensi/app/data/model/payslip_model.dart';
+import 'package:absensi/app/data/model/payslip_result_model.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import '../../../../data/helper/app_colors.dart';
-import '../../../../data/model/payslip_result_model.dart';
 
-class PaySlipDesc extends StatelessWidget {
-  const PaySlipDesc({super.key, required this.data});
+class PaySlipStoreDesc extends StatelessWidget {
+  const PaySlipStoreDesc({super.key, required this.data});
   final PayslipResult data;
 
   @override
@@ -58,9 +56,11 @@ class PaySlipDesc extends StatelessWidget {
                                     ),
                                   ),
                                   Text(
-                                    DateFormat.yMMMM(
-                                      'id',
-                                    ).format(DateTime.parse(data.payslipModel!.createdAt!)),
+                                    DateFormat.yMMMM('id').format(
+                                      DateTime.parse(
+                                        data.payslipStoreModel!.createdAt!,
+                                      ),
+                                    ),
                                     style: titleTextStyle.copyWith(
                                       fontSize: 17,
                                       fontWeight: FontWeight.bold,
@@ -73,14 +73,14 @@ class PaySlipDesc extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'Total Hari Kerja',
+                                  'Jabatan',
                                   style: subtitleTextStyle.copyWith(
                                     fontSize: 15,
                                     fontWeight: FontWeight.normal,
                                   ),
                                 ),
                                 Text(
-                                  data.payslipModel!.totalWorkDay!,
+                                  data.payslipStoreModel!.position!,
                                   style: titleTextStyle.copyWith(
                                     fontSize: 17,
                                     fontWeight: FontWeight.bold,
@@ -107,7 +107,7 @@ class PaySlipDesc extends StatelessWidget {
                                     ),
                                   ),
                                   Text(
-                                    '${data.payslipModel!.empName!.capitalize}',
+                                    data.payslipStoreModel!.empName!,
                                     style: titleTextStyle.copyWith(
                                       fontSize: 17,
                                       fontWeight: FontWeight.bold,
@@ -128,7 +128,7 @@ class PaySlipDesc extends StatelessWidget {
                                 ),
 
                                 Text(
-                                  '${FormatWaktu.formatShortEng(tanggal: (DateTime.parse(data.payslipModel!.joinDate!)))}',
+                                  '${FormatWaktu.formatShortEng(tanggal: (DateTime.parse(data.payslipStoreModel!.joinDate!)))}',
                                   style: titleTextStyle.copyWith(
                                     fontSize: 17,
                                     fontWeight: FontWeight.bold,
@@ -138,22 +138,6 @@ class PaySlipDesc extends StatelessWidget {
                             ),
                           ],
                         ),
-                        const SizedBox(height: 6),
-                        Text(
-                          'Jabatan',
-                          style: subtitleTextStyle.copyWith(
-                            fontSize: 15,
-                            fontWeight: FontWeight.normal,
-                          ),
-                        ),
-                        Text(
-                          '${data.payslipModel!.position!.capitalize}',
-                          style: titleTextStyle.copyWith(
-                            fontSize: 17,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 6),
                       ],
                     ),
                   ),
@@ -185,7 +169,7 @@ class PaySlipDesc extends StatelessWidget {
                         ),
                         Text(
                           CurrencyFormat.convertToIdr(
-                            int.parse(data.payslipModel!.basicSalary!),
+                            int.parse(data.payslipStoreModel!.basicSalary!),
                             0,
                           ),
                           style: const TextStyle(fontSize: 15),
@@ -200,7 +184,7 @@ class PaySlipDesc extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          'Tunjangan',
+                          'Tj Jabatan',
                           style: subtitleTextStyle.copyWith(
                             fontSize: 15,
                             fontWeight: FontWeight.normal,
@@ -208,7 +192,73 @@ class PaySlipDesc extends StatelessWidget {
                         ),
                         Text(
                           CurrencyFormat.convertToIdr(
-                            int.parse(data.payslipModel!.allowance!),
+                            int.parse(data.payslipStoreModel!.allowance!),
+                            0,
+                          ),
+                          style: const TextStyle(fontSize: 15),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 8.0, right: 8),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Tj Kehadiran',
+                          style: subtitleTextStyle.copyWith(
+                            fontSize: 15,
+                            fontWeight: FontWeight.normal,
+                          ),
+                        ),
+                        Text(
+                          CurrencyFormat.convertToIdr(
+                            int.parse(data.payslipStoreModel!.presenceAllowance!),
+                            0,
+                          ),
+                          style: const TextStyle(fontSize: 15),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 8.0, right: 8),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Tj Kejauhan',
+                          style: subtitleTextStyle.copyWith(
+                            fontSize: 15,
+                            fontWeight: FontWeight.normal,
+                          ),
+                        ),
+                        Text(
+                          CurrencyFormat.convertToIdr(
+                            int.parse(data.payslipStoreModel!.rangeSubsidy!),
+                            0,
+                          ),
+                          style: const TextStyle(fontSize: 15),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 8.0, right: 8),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Tj Kost',
+                          style: subtitleTextStyle.copyWith(
+                            fontSize: 15,
+                            fontWeight: FontWeight.normal,
+                          ),
+                        ),
+                        Text(
+                          CurrencyFormat.convertToIdr(
+                            int.parse(data.payslipStoreModel!.boardingAllowance!),
                             0,
                           ),
                           style: const TextStyle(fontSize: 15),
@@ -223,6 +273,28 @@ class PaySlipDesc extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
+                          'Bonus',
+                          style: subtitleTextStyle.copyWith(
+                            fontSize: 15,
+                            fontWeight: FontWeight.normal,
+                          ),
+                        ),
+                        Text(
+                          CurrencyFormat.convertToIdr(
+                            int.parse(data.payslipStoreModel!.bonus!),
+                            0,
+                          ),
+                          style: const TextStyle(fontSize: 15),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 8.0, right: 8),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
                           'Refund',
                           style: subtitleTextStyle.copyWith(
                             fontSize: 15,
@@ -231,7 +303,29 @@ class PaySlipDesc extends StatelessWidget {
                         ),
                         Text(
                           CurrencyFormat.convertToIdr(
-                            int.parse(data.payslipModel!.refund!),
+                            int.parse(data.payslipStoreModel!.refund!),
+                            0,
+                          ),
+                          style: const TextStyle(fontSize: 15),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 8.0, right: 8),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Lembur',
+                          style: subtitleTextStyle.copyWith(
+                            fontSize: 15,
+                            fontWeight: FontWeight.normal,
+                          ),
+                        ),
+                        Text(
+                          CurrencyFormat.convertToIdr(
+                            int.parse(data.payslipStoreModel!.overtime!),
                             0,
                           ),
                           style: const TextStyle(fontSize: 15),
@@ -267,7 +361,9 @@ class PaySlipDesc extends StatelessWidget {
                         ),
                         Text(
                           CurrencyFormat.convertToIdr(
-                            int.parse(data.payslipModel!.totalReceipts!),
+                            int.parse(
+                              data.payslipStoreModel!.totalIncome!,
+                            ),
                             0,
                           ),
                           style: const TextStyle(
@@ -297,7 +393,7 @@ class PaySlipDesc extends StatelessWidget {
                 children: [
                   // Center(child: Text('SLIP GAJI KARYAWAN'),)
                   Padding(
-                    padding: const EdgeInsets.only(left: 8.0, right: 8),
+                    padding: const EdgeInsets.only(left: 8.0, right: 8, top: 8),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -309,6 +405,34 @@ class PaySlipDesc extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 10),
+
+                  // const SizedBox(height: 5),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 8.0, right: 8),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'A / I / S',
+                          style: subtitleTextStyle.copyWith(
+                            fontSize: 15,
+                            fontWeight: FontWeight.normal,
+                          ),
+                        ),
+                        SizedBox(
+                          width: 100,
+                          child: Text(
+                            CurrencyFormat.convertToIdr(
+                              int.parse(data.payslipStoreModel!.ais!),
+                              0,
+                            ),
+                            style: const TextStyle(fontSize: 15),
+                            textAlign: TextAlign.right,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                   Padding(
                     padding: const EdgeInsets.only(left: 8.0, right: 8),
                     child: Row(
@@ -321,163 +445,17 @@ class PaySlipDesc extends StatelessWidget {
                             fontWeight: FontWeight.normal,
                           ),
                         ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            SizedBox(
-                              width: 30,
-                              child: Text(
-                                'x ${data.payslipModel!.totalLate!}',
-                                textAlign: TextAlign.left,
-                              ),
+
+                        SizedBox(
+                          width: 100,
+                          child: Text(
+                            CurrencyFormat.convertToIdr(
+                              int.parse(data.payslipStoreModel!.late!),
+                              0,
                             ),
-                            SizedBox(
-                              width: 80,
-                              child: Text(
-                                CurrencyFormat.convertToIdr(
-                                  int.parse(data.payslipModel!.lateCut!),
-                                  0,
-                                ),
-                                style: const TextStyle(fontSize: 15),
-                                textAlign: TextAlign.right,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  // const SizedBox(height: 5),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 8.0, right: 8),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Alpa',
-                          style: subtitleTextStyle.copyWith(
-                            fontSize: 15,
-                            fontWeight: FontWeight.normal,
+                            style: const TextStyle(fontSize: 15),
+                            textAlign: TextAlign.right,
                           ),
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            SizedBox(
-                              width: 30,
-                              child: Text(
-                                'x ${data.payslipModel!.totalAbsent!}',
-                                textAlign: TextAlign.left,
-                              ),
-                            ),
-                            SizedBox(
-                              width: 80,
-                              child: Text(
-                                CurrencyFormat.convertToIdr(
-                                  int.parse(data.payslipModel!.absentCut!),
-                                  0,
-                                ),
-                                style: const TextStyle(fontSize: 15),
-                                textAlign: TextAlign.right,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  // const SizedBox(height: 5),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 8.0, right: 8),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Sakit',
-                          style: subtitleTextStyle.copyWith(
-                            fontSize: 15,
-                            fontWeight: FontWeight.normal,
-                          ),
-                        ),
-                        Row(
-                          children: [
-                            SizedBox(
-                              width: 30,
-                              child: Text(
-                                'x ${data.payslipModel!.totalSick!}',
-                                textAlign: TextAlign.left,
-                              ),
-                            ),
-                            SizedBox(
-                              width: 80,
-                              child: Text(
-                                CurrencyFormat.convertToIdr(
-                                  int.parse(data.payslipModel!.sickCut!),
-                                  0,
-                                ),
-                                style: const TextStyle(fontSize: 15),
-                                textAlign: TextAlign.right,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  // const SizedBox(height: 5),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 8.0, right: 8),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Izin',
-                          style: subtitleTextStyle.copyWith(
-                            fontSize: 15,
-                            fontWeight: FontWeight.normal,
-                          ),
-                        ),
-                        Row(
-                          children: [
-                            SizedBox(
-                              width: 30,
-                              child: Text(
-                                'x ${data.payslipModel!.totalClearance!}',
-                                textAlign: TextAlign.left,
-                              ),
-                            ),
-                            SizedBox(
-                              width: 80,
-                              child: Text(
-                                CurrencyFormat.convertToIdr(
-                                  int.parse(data.payslipModel!.clearanceCut!),
-                                  0,
-                                ),
-                                style: const TextStyle(fontSize: 15),
-                                textAlign: TextAlign.right,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  // const SizedBox(height: 5),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 8.0, right: 8),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'BPJS Kesehatan',
-                          style: subtitleTextStyle.copyWith(
-                            fontSize: 15,
-                            fontWeight: FontWeight.normal,
-                          ),
-                        ),
-                        Text(
-                          CurrencyFormat.convertToIdr(int.parse(data.payslipModel!.bpjs!), 0),
-                          style: const TextStyle(fontSize: 15),
                         ),
                       ],
                     ),
@@ -488,20 +466,77 @@ class PaySlipDesc extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          data.payslipModel!.customCutName ?? '',
+                          'Seragam / ID',
                           style: subtitleTextStyle.copyWith(
                             fontSize: 15,
                             fontWeight: FontWeight.normal,
                           ),
                         ),
+
+                        SizedBox(
+                          width: 100,
+                          child: Text(
+                            CurrencyFormat.convertToIdr(
+                              int.parse(data.payslipStoreModel!.uniform!),
+                              0,
+                            ),
+                            style: const TextStyle(fontSize: 15),
+                            textAlign: TextAlign.right,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 8.0, right: 8),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
                         Text(
-                          data.payslipModel!.totalCustomCut!.isEmpty
-                              ? ''
-                              : CurrencyFormat.convertToIdr(
-                                int.parse(data.payslipModel!.totalCustomCut!),
-                                0,
-                              ),
-                          style: const TextStyle(fontSize: 15),
+                          'SO',
+                          style: subtitleTextStyle.copyWith(
+                            fontSize: 15,
+                            fontWeight: FontWeight.normal,
+                          ),
+                        ),
+
+                        SizedBox(
+                          width: 100,
+                          child: Text(
+                            CurrencyFormat.convertToIdr(
+                              int.parse(data.payslipStoreModel!.so!),
+                              0,
+                            ),
+                            style: const TextStyle(fontSize: 15),
+                            textAlign: TextAlign.right,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 8.0, right: 8),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Deposit',
+                          style: subtitleTextStyle.copyWith(
+                            fontSize: 15,
+                            fontWeight: FontWeight.normal,
+                          ),
+                        ),
+
+                        SizedBox(
+                          width: 100,
+                          child: Text(
+                            CurrencyFormat.convertToIdr(
+                              int.parse(data.payslipStoreModel!.deposit!),
+                              0,
+                            ),
+                            style: const TextStyle(fontSize: 15),
+                            textAlign: TextAlign.right,
+                          ),
                         ),
                       ],
                     ),
@@ -534,7 +569,7 @@ class PaySlipDesc extends StatelessWidget {
                         ),
                         Text(
                           CurrencyFormat.convertToIdr(
-                            int.parse(data.payslipModel!.totalCut!),
+                            int.parse(data.payslipStoreModel!.totalCut!),
                             0,
                           ),
                           style: const TextStyle(
@@ -577,7 +612,7 @@ class PaySlipDesc extends StatelessWidget {
             //       ),
             //       Text(
             //         CurrencyFormat.convertToIdr(
-            //           int.parse(data.payslipModel!.totalReceivedByEmp!),
+            //           int.parse(data.payslipStoreModel!.netSalaryRoundTf!),
             //           0,
             //         ),
             //         style: const TextStyle(

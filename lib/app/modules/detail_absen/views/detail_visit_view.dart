@@ -227,9 +227,10 @@ class DetailVisitView extends GetView {
                               children: [
                                 Row(
                                   children: [
-                                    const Text('Name'),
-                                    const SizedBox(width: 5),
-                                    const SizedBox(width: 44),
+                                    const SizedBox(
+                                      width: 72,
+                                      child: Text('Name')),
+                                 
                                     Text(
                                       ': ${data["nama"].toString().substring(0, data["nama"].toString().length > 20 ? 20 : data["nama"].toString().length) + (data["nama"].toString().length > 18 ? '...' : '').toString().capitalize!}',
                                       maxLines: 1,
@@ -240,22 +241,21 @@ class DetailVisitView extends GetView {
                                 Row(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const Text('Store'),
-                                    const SizedBox(width: 53),
+                                    const SizedBox(
+                                      width: 72,
+                                      child: Text('Store')),
                                     SizedBox(
                                       width: Get.mediaQuery.size.width * 0.35,
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [Text(': ${data['store']}')],
+                                      child: Text(': ${data['store'].toString().capitalize}',
                                       ),
                                     ),
                                   ],
                                 ),
                                 Row(
                                   children: [
-                                    Text(isIn ? 'Check In' : 'Check Out'),
-                                    SizedBox(width: isIn ? 33 : 21),
+                                    SizedBox(
+                                      width: 72,
+                                      child: Text(isIn ? 'Check In' : 'Check Out')),
                                     Text(
                                       ': ${isIn ? data['jam_in'] : data['jam_out']}',
                                     ),
@@ -266,8 +266,9 @@ class DetailVisitView extends GetView {
                                   mainAxisAlignment: MainAxisAlignment.end,
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const Text('Device Info'),
-                                    const SizedBox(width: 17),
+                                    const SizedBox(
+                                      width: 72,
+                                      child: Text('Device Info')),
                                     Container(
                                       constraints: BoxConstraints(
                                         maxWidth:
@@ -275,7 +276,7 @@ class DetailVisitView extends GetView {
                                             0.3,
                                       ),
                                       child: Text(
-                                        ": ${isIn ? data['device_info'] : data['device_info2']}",
+                                        ": ${isIn ? data['device_info'].toString().capitalize : data['device_info2'].toString().capitalize}",
                                       ),
                                     ),
                                   ],
