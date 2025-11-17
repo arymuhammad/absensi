@@ -19,6 +19,10 @@ final absC = Get.find<AbsenController>();
 final homeC = Get.find<HomeController>();
 final adC = Get.put(AdController());
 checkIn(Data dataUser, double latitude, double longitude) async {
+  await absC.fallbackTimeNetwork(
+    await FlutterNativeTimezone.getLocalTimezone(),
+    dotenv.env['API_KEY_WORLDTIME_API'],
+  );
   await absC.cekDataAbsen(
     "masuk",
     dataUser.id!,

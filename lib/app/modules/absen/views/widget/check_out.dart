@@ -18,6 +18,10 @@ final homeC = Get.find<HomeController>();
 final adC = Get.put(AdController());
 checkOut(Data dataUser, double latitude, double longitude) async {
   // print('Check out woy');
+    await absC.fallbackTimeNetwork(
+    await FlutterNativeTimezone.getLocalTimezone(),
+    dotenv.env['API_KEY_WORLDTIME_API'],
+  );
   var previous = DateFormat('yyyy-MM-dd').format(
     DateTime.parse(
       absC.dateNowServer.isNotEmpty ? absC.dateNowServer : absC.dateNow,
