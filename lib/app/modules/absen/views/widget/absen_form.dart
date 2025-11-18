@@ -170,7 +170,7 @@ Widget buildAbsen({required Data? data}) {
                                       ? absC.timeNow
                                       : absC.timeNowOpt,
                             ).isAfter(
-                              FormatWaktu.formatJamMenit(jamMenit: '11:59'),
+                              FormatWaktu.formatJamMenit(jamMenit: '08:59'),
                             ) &&
                             FormatWaktu.formatJamMenit(
                               jamMenit:
