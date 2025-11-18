@@ -170,7 +170,7 @@ Widget buildAbsen({required Data? data}) {
                                       ? absC.timeNow
                                       : absC.timeNowOpt,
                             ).isAfter(
-                              FormatWaktu.formatJamMenit(jamMenit: '08:59'),
+                              FormatWaktu.formatJamMenit(jamMenit: '11:59'),
                             ) &&
                             FormatWaktu.formatJamMenit(
                               jamMenit:
@@ -187,15 +187,16 @@ Widget buildAbsen({required Data? data}) {
                           );
                         } else {
                           absC.selectedShift.value = val!;
-                          absC.jamMasuk.value =
-                              absC.timeNow.isNotEmpty
-                                  ? absC.timeNow
-                                  : absC.timeNowOpt;
-                          absC.jamPulang.value = DateFormat("HH:mm").format(
-                            DateTime.parse(
-                              absC.dateNowServer,
-                            ).add(const Duration(hours: 8)),
-                          );
+                          // add duration 8 hour for shift 5 moved to check_in page, before submiting data presence (json) 
+                          // absC.jamMasuk.value =
+                          //     absC.timeNow.isNotEmpty
+                          //         ? absC.timeNow
+                          //         : absC.timeNowOpt;
+                          // absC.jamPulang.value = DateFormat("HH:mm").format(
+                          //   DateTime.parse(
+                          //     absC.dateNowServer,
+                          //   ).toLocal().add(const Duration(hours: 8)),
+                          // );
                           // print(absC.dateNowServer);
                           // print(absC.jamPulang.value);
                           dialogMsg(

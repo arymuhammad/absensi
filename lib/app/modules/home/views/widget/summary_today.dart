@@ -7,6 +7,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icons_plus/icons_plus.dart';
+import 'package:intl/intl.dart';
 import 'package:marquee/marquee.dart';
 
 import '../../../../data/helper/app_colors.dart';
@@ -26,7 +27,7 @@ class SummaryToday extends StatelessWidget {
     return Stack(
       children: [
         Container(
-          padding: const EdgeInsets.only(left:10, top: 5, right: 10),
+          padding: const EdgeInsets.only(left: 10, top: 5, right: 10),
           height: 180,
           decoration: BoxDecoration(
             color: AppColors.itemsBackground,
@@ -79,7 +80,7 @@ class SummaryToday extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.fromLTRB(0, 30, 0, 0),
           child: Container(
-            height: listDataUser!.visit == "1" ? 170 : 150,
+            height: listDataUser!.visit == "1" ? 170 : 170,
             decoration: BoxDecoration(
               color: AppColors.contentColorWhite,
               borderRadius: BorderRadius.circular(10),
@@ -145,7 +146,7 @@ class SummaryToday extends StatelessWidget {
                                     absenC.dataVisit.isNotEmpty &&
                                             absenC.dataVisit[0].namaCabang! !=
                                                 ""
-                                        ? absenC.dataVisit[0].namaCabang!
+                                        ? absenC.dataVisit[0].namaCabang!.capitalize!
                                         : '-',
                                     style: titleTextStyle.copyWith(
                                       color: Colors.grey,
@@ -214,6 +215,102 @@ class SummaryToday extends StatelessWidget {
                           ],
                         ),
                       ),
+
+                      Visibility(
+                        visible: listDataUser!.visit !="1",
+                        child: Obx(
+                          (() =>
+                              absenC.dataAbsen.isEmpty
+                                  ? const Text(
+                                    'counting time...',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontFamily: 'Nunito',
+                                      color: Colors.grey,
+                                    ),
+                                  )
+                                  : StreamBuilder<Duration>(
+                                    stream: absenC.countdownToCheckout(
+                                      DateFormat('HH:mm').parse(
+                                       absenC.dataAbsen[0].jamAbsenMasuk!
+                                           
+                                      ),
+                                    ),
+                                    builder: (context, snapshot) {
+                                      if (snapshot.hasData) {
+                                        final remaining = snapshot.data!;
+                                        if (remaining == Duration.zero) {
+                                          return const Row(
+                                            children: [
+                                              Text(
+                                                'It`s time to Check Out',
+                                                style: TextStyle(
+                                                  fontSize: 15,
+                                                  color: AppColors.contentColorGreenAccent,
+                                                  fontWeight: FontWeight.bold,
+                                                  fontFamily: 'Nunito',
+                                                ),
+                                              ),
+                                            ],
+                                          );
+                                        }
+                                        return Row(
+                                          children: [
+                                            const Icon(
+                                              Icons.history_toggle_off,
+                                              size: 20,
+                                              color: Colors.grey,
+                                            ),
+                                            const SizedBox(width: 2),
+                                            RichText(
+                                              text: TextSpan(
+                                                text: '',
+                        
+                                                children: [
+                                                  TextSpan(
+                                                    text: absenC.formatDuration(
+                                                      remaining,
+                                                    ),
+                                                    style: const TextStyle(
+                                                      fontSize: 14,
+                                                      fontWeight: FontWeight.bold,
+                                                      color:
+                                                          AppColors
+                                                              .contentColorRed,
+                                                    ),
+                                                  ),
+                                                  const TextSpan(
+                                                    text: ' until you Check Out',
+                                                    style: TextStyle(
+                                                      fontSize: 14,
+                                                      fontFamily: 'Nunito',
+                                                      fontWeight: FontWeight.bold,
+                                                      color: Colors.grey,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ],
+                                        );
+                                      } else {
+                                        return const Row(
+                                          children: [
+                                            Text(
+                                              'counting time...',
+                                              style: TextStyle(
+                                                fontSize: 14,
+                                                fontFamily: 'Nunito',
+                                                color: Colors.grey,
+                                              ),
+                                            ),
+                                          ],
+                                        );
+                                      }
+                                    },
+                                  )),
+                        ),
+                      ),
                       Visibility(
                         visible: listDataUser!.visit == "1" ? false : true,
                         child: Container(
@@ -224,7 +321,7 @@ class SummaryToday extends StatelessWidget {
                           ),
                           child: Row(
                             children: [
-                              const SizedBox(width: 5,),
+                              const SizedBox(width: 5),
                               const Icon(
                                 Icons.campaign_rounded,
                                 size: 18.0,

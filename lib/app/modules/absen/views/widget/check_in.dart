@@ -59,7 +59,7 @@ checkIn(Data dataUser, double latitude, double longitude) async {
             absC.dateNowServer.isNotEmpty
                 ? DateTime.parse(
                   absC.dateNowServer,
-                ).add(const Duration(hours: 8))
+                ).toLocal().add(const Duration(hours: 8))
                 : absC.tglStream.value.add(const Duration(hours: 8)),
           );
         }

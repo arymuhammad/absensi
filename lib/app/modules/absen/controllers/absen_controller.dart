@@ -103,7 +103,6 @@ class AbsenController extends GetxController {
   final ImagePicker picker = ImagePicker();
   XFile? image;
 
-
   var searchDate = "".obs;
   var calendarFormat = CalendarFormat.month.obs;
   Rxn<DateTime> selectedDate = Rxn<DateTime>();
@@ -155,7 +154,7 @@ class AbsenController extends GetxController {
     userCab = TextEditingController();
     rndLoc = TextEditingController();
     selectedDate.value = null;
- 
+
     // timeNetwork(await FlutterNativeTimezone.getLocalTimezone());
     fallbackTimeNetwork(
       await FlutterNativeTimezone.getLocalTimezone(),
@@ -248,7 +247,6 @@ class AbsenController extends GetxController {
       paramLimitVisit,
       dataUserLogin,
     );
-    
   }
 
   @override
@@ -571,7 +569,6 @@ class AbsenController extends GetxController {
   //     // await Future.delayed(const Duration(seconds: 3));
   //   }
 
-   
   // }
 
   Future<void> fallbackTimeNetwork(String timeZone, String? apiKey) async {
@@ -1649,7 +1646,7 @@ class AbsenController extends GetxController {
     rndLoc.clear();
   }
 
-Future<void> getLastUserData({required Data dataUser}) async {
+  Future<void> getLastUserData({required Data dataUser}) async {
     var newUser = await ServiceApi().fetchCurrentUser({
       "username": dataUser.username!,
       "password": dataUser.password!,
@@ -1668,5 +1665,34 @@ Future<void> getLastUserData({required Data dataUser}) async {
       );
       logC.refresh();
     }
+  }
+
+  Stream<Duration> countdownToCheckout(DateTime checkInTime) async* {
+    // Hitung jam pulang = jam masuk + 8 jam
+    final checkOutTime = checkInTime.add(const Duration(hours: 8));
+
+    while (true) {
+      final now = DateTime.now();
+      final endTime = DateTime(
+        now.year,
+        now.month,
+        now.day,
+        checkOutTime.hour,
+        checkOutTime.minute,
+      );
+      Duration diff = endTime.difference(now);
+      if (diff.isNegative) {
+        diff = Duration.zero;
+      }
+      yield diff;
+      await Future.delayed(const Duration(seconds: 1));
+    }
+  }
+
+  String formatDuration(Duration duration) {
+    final hours = duration.inHours.toString().padLeft(2, '0');
+    final minutes = (duration.inMinutes % 60).toString().padLeft(2, '0');
+    final seconds = (duration.inSeconds % 60).toString().padLeft(2, '0');
+    return '$hours:$minutes:$seconds';
   }
 }
