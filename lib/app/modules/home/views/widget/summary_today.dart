@@ -221,14 +221,7 @@ class SummaryToday extends StatelessWidget {
                         child: Obx(
                           (() =>
                               absenC.dataAbsen.isEmpty
-                                  ? const Text(
-                                    'counting time...',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      fontFamily: 'Nunito',
-                                      color: Colors.grey,
-                                    ),
-                                  )
+                                  ? Container()
                                   : StreamBuilder<Duration>(
                                     stream: absenC.countdownToCheckout(
                                       DateFormat('HH:mm').parse(
