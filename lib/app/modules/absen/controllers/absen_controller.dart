@@ -39,6 +39,7 @@ import 'package:printing/printing.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:device_info_null_safety/device_info_null_safety.dart';
 
+import '../../login/controllers/login_controller.dart';
 import '../views/widget/custom_qr_page.dart';
 // import 'package:flutter_face_api/flutter_face_api.dart' as regula;
 
@@ -1646,5 +1647,26 @@ class AbsenController extends GetxController {
     store.clear();
     userCab.clear();
     rndLoc.clear();
+  }
+
+Future<void> getLastUserData({required Data dataUser}) async {
+    var newUser = await ServiceApi().fetchCurrentUser({
+      "username": dataUser.username!,
+      "password": dataUser.password!,
+    });
+    if (Get.isRegistered<LoginController>()) {
+      final logC = Get.find<LoginController>();
+      logC.logUser.value = newUser;
+      // update sharedpreff
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('userDataLogin', jsonEncode(newUser.toJson()));
+
+      SQLHelper.instance.updateDataUser(
+        newUser.toJson(),
+        newUser.id!,
+        newUser.username!,
+      );
+      logC.refresh();
+    }
   }
 }

@@ -58,9 +58,7 @@ class PaySlipDesc extends StatelessWidget {
                                     ),
                                   ),
                                   Text(
-                                    DateFormat.yMMMM(
-                                      'id',
-                                    ).format(DateTime.parse(data.payslipModel!.createdAt!)),
+                                    '${data.payslipModel!.periode!.capitalize} ${DateFormat.y('id').format(DateTime.parse(data.payslipModel!.createdAt!))}',
                                     style: titleTextStyle.copyWith(
                                       fontSize: 17,
                                       fontWeight: FontWeight.bold,
@@ -254,7 +252,7 @@ class PaySlipDesc extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(
                       vertical: 8,
                       horizontal: 10,
-                    ),  // beri padding supaya text tidak mepet
+                    ), // beri padding supaya text tidak mepet
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -476,7 +474,10 @@ class PaySlipDesc extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          CurrencyFormat.convertToIdr(int.parse(data.payslipModel!.bpjs!), 0),
+                          CurrencyFormat.convertToIdr(
+                            int.parse(data.payslipModel!.bpjs!),
+                            0,
+                          ),
                           style: const TextStyle(fontSize: 15),
                         ),
                       ],

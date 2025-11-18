@@ -144,6 +144,7 @@ Widget buildChangelog(
       itemBuilder: (context, index) {
         final versionData = changelog[index];
         final version = versionData['version'];
+        final releaseDate = versionData['release_date'];
         final updates = versionData['updates'] as List<dynamic>;
 
         return Padding(
@@ -151,12 +152,41 @@ Widget buildChangelog(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'V$version',
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
+              Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                       Text(
+                        'Version',
+                        style: subtitleTextStyle,
+                      ),
+                      Text(
+                        'V$version',
+                        style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                  const SizedBox(width: 5),
+                  
+                    ],
+                  ),
+                  const SizedBox(height:4),
+                  Column(crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Release Date', style: subtitleTextStyle,),
+                      Text(
+                        releaseDate,
+                        style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
               const SizedBox(height: 8),
               ...updates.map((update) {

@@ -1,18 +1,14 @@
 import 'dart:async';
-import 'dart:io';
-
 import 'package:absensi/app/data/model/server_api_model.dart';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:xml/xml.dart' as xml;
 
-import '../../../data/helper/custom_dialog.dart';
 
 class SettingsController extends GetxController {
   var serverList = <ServerApi>[].obs;
   var serverSelected = "".obs;
-  var updateList = [<String, dynamic>{}].obs;
+  // var updateList = [<String, dynamic>{}].obs;
   var changelog = <Map<String, dynamic>>[].obs;
 
   var currVer = "";
@@ -28,64 +24,64 @@ class SettingsController extends GetxController {
     parseChangelogXml(readDoc.body);
   }
 
-  getChangelog() async {
-    try {
-      final readDoc = await http
-          .get(Uri.parse('http://103.156.15.61/update apk/changeLog.xml'))
-          .timeout(const Duration(seconds: 20));
+  // getChangelog() async {
+  //   try {
+  //     final readDoc = await http
+  //         .get(Uri.parse('http://103.156.15.61/update apk/changeLog.xml'))
+  //         .timeout(const Duration(seconds: 20));
 
-      if (readDoc.statusCode == 200) {
-        updateList.clear();
-        //parsing readDoc
-        final document = xml.XmlDocument.parse(readDoc.body);
-        final itemsNode = document.findElements('items').first;
-        final updates = itemsNode.findElements('update');
-        latestVer = itemsNode.findElements('versi').first.innerText;
-        //start looping item on readDoc
-        updateList.clear();
-        for (final listUpdates in updates) {
-          // final version = listUpdates.findElements('versi');
-          final name = listUpdates.findElements('name').first.innerText;
-          final desc = listUpdates.findElements('desc').first.innerText;
-          final icon = listUpdates.findElements('icon').first.innerText;
-          final color = listUpdates.findElements('color').first.innerText;
+  //     if (readDoc.statusCode == 200) {
+  //       // updateList.clear();
+  //       //parsing readDoc
+  //       final document = xml.XmlDocument.parse(readDoc.body);
+  //       final itemsNode = document.findElements('items').first;
+  //       final updates = itemsNode.findElements('update');
+  //       latestVer = itemsNode.findElements('versi').first.innerText;
+  //       //start looping item on readDoc
+  //       // updateList.clear();
+  //       // for (final listUpdates in updates) {
+  //       //   // final version = listUpdates.findElements('versi');
+  //       //   final name = listUpdates.findElements('name').first.innerText;
+  //       //   final desc = listUpdates.findElements('desc').first.innerText;
+  //       //   final icon = listUpdates.findElements('icon').first.innerText;
+  //       //   final color = listUpdates.findElements('color').first.innerText;
 
-          updateList.add({
-            'versi': latestVer,
-            'name': name,
-            'desc': desc,
-            'icon': icon,
-            'color': color,
-          });
-          isLoading.value = false;
-          update();
-        }
-        print(updateList);
-        //end loop item on readDoc
-        // if (compareVersion(latestVer, currVer) <= 0) {
-        //   // dialogUpdateApp();
-        // }
-      } else {
-        isLoading.value = false;
-        showToast("URL was not found.");
-      }
-    } on SocketException catch (e) {
-      isLoading.value = false;
-      Get.defaultDialog(
-        title: e.toString(),
-        middleText: 'Check your internet connection',
-        textConfirm: 'Refresh',
-        confirmTextColor: Colors.white,
-        onConfirm: () {
-          getChangelog();
-          Get.back(closeOverlays: true);
-        },
-      );
-    } on TimeoutException catch (_) {
-      isLoading.value = false;
-      showToast("The connection to the server has timed out.");
-    }
-  }
+  //         // updateList.add({
+  //         //   'versi': latestVer,
+  //         //   'name': name,
+  //         //   'desc': desc,
+  //         //   'icon': icon,
+  //         //   'color': color,
+  //         // });
+  //         // isLoading.value = false;
+  //         // update();
+  //       // }
+  //       // print(updateList);
+  //       //end loop item on readDoc
+  //       // if (compareVersion(latestVer, currVer) <= 0) {
+  //       //   // dialogUpdateApp();
+  //       // }
+  //     } else {
+  //       isLoading.value = false;
+  //       showToast("URL was not found.");
+  //     }
+  //   } on SocketException catch (e) {
+  //     isLoading.value = false;
+  //     Get.defaultDialog(
+  //       title: e.toString(),
+  //       middleText: 'Check your internet connection',
+  //       textConfirm: 'Refresh',
+  //       confirmTextColor: Colors.white,
+  //       onConfirm: () {
+  //         getChangelog();
+  //         Get.back(closeOverlays: true);
+  //       },
+  //     );
+  //   } on TimeoutException catch (_) {
+  //     isLoading.value = false;
+  //     showToast("The connection to the server has timed out.");
+  //   }
+  // }
 
   Future<List<Map<String, dynamic>>> parseChangelogXml(String xmlString) async {
     final document = xml.XmlDocument.parse(xmlString);
@@ -96,29 +92,53 @@ class SettingsController extends GetxController {
     // parsing manual dengan asumsi versi dan update berdampingan
     changelog.clear();
     String currentVersion = '';
+    String releaseDate = '';
+    List<Map<String, dynamic>> updates = [];
     for (final node in items.children) {
       if (node is xml.XmlElement) {
+        //  releaseDate =
+        //      node.findElements('tgl').first.innerText
+        //
         if (node.name.local == 'versi') {
+          if (currentVersion != '') {
+            changelog.add({
+              'version': currentVersion,
+              'release_date': releaseDate,
+              'updates': updates,
+            });
+            updates = []; // reset untuk versi baru
+          }
           currentVersion = node.innerText.trim();
-          changelog.add({'version': currentVersion, 'updates': []});
+
+          releaseDate = '';
+        } else if (node.name.local == 'tgl') {
+          releaseDate = node.innerText.trim();
         } else if (node.name.local == 'update') {
           final name = node.findElements('name').first.innerText;
           final desc = node.findElements('desc').first.innerText;
           final icon = node.findElements('icon').first.innerText;
           final color = node.findElements('color').first.innerText;
 
-          if (changelog.isNotEmpty) {
-            changelog.last['updates'].add({
+          // if (changelog.isNotEmpty) {
+            updates.add({
               'name': name,
               'desc': desc,
               'icon': icon,
               'color': color,
             });
             isLoading.value = false;
-            update();
-          }
+
+            // update();
+          // }
         }
       }
+    }
+    if (currentVersion != '') {
+      changelog.add({
+        'version': currentVersion,
+        'release_date': releaseDate,
+        'updates': updates,
+      });
     }
     return changelog;
   }

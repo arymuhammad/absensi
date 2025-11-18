@@ -54,6 +54,8 @@ class SummaryAbsen extends GetView {
 
                 absenC.isLoading.value = true;
                 homeC.reloadSummary(userData!.id!);
+                await absenC.getLastUserData(dataUser: userData!);
+                showToast('Page Refreshed');
                 await absenC.getAbsenToday(paramSingle);
                 await absenC.getLimitAbsen(paramLimit);
 
@@ -645,7 +647,7 @@ class SummaryAbsen extends GetView {
                                                                                 ""
                                                                         ? '${absenC.dataLimitAbsen[i].jamAbsenPulang != "" ? diffHours.inHours % 24 : '-'}j ${absenC.dataLimitAbsen[i].jamAbsenPulang != "" ? diffHours.inMinutes % 60 : '-'}m'
                                                                         : '-:-',
-                                                                    style:  TextStyle(
+                                                                    style: TextStyle(
                                                                       // color:
                                                                       //     stsPulang ==
                                                                       //                 "Pulang Cepat" ||
@@ -657,7 +659,8 @@ class SummaryAbsen extends GetView {
                                                                           FontWeight
                                                                               .bold,
                                                                       fontSize:
-                                                                         maxWidth * 0.05,
+                                                                          maxWidth *
+                                                                          0.05,
                                                                     ),
                                                                   ),
                                                                   const Text(

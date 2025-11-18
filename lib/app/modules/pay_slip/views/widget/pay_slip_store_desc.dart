@@ -3,6 +3,7 @@ import 'package:absensi/app/data/helper/currency_format.dart';
 import 'package:absensi/app/data/helper/format_waktu.dart';
 import 'package:absensi/app/data/model/payslip_result_model.dart';
 import 'package:flutter/material.dart';
+import 'package:get/utils.dart';
 import 'package:intl/intl.dart';
 import '../../../../data/helper/app_colors.dart';
 
@@ -56,11 +57,7 @@ class PaySlipStoreDesc extends StatelessWidget {
                                     ),
                                   ),
                                   Text(
-                                    DateFormat.yMMMM('id').format(
-                                      DateTime.parse(
-                                        data.payslipStoreModel!.createdAt!,
-                                      ),
-                                    ),
+                                    '  ${data.payslipStoreModel!.periode!.capitalize} ${DateFormat.y('id').format(DateTime.parse(data.payslipStoreModel!.createdAt!))}',
                                     style: titleTextStyle.copyWith(
                                       fontSize: 17,
                                       fontWeight: FontWeight.bold,
@@ -214,7 +211,9 @@ class PaySlipStoreDesc extends StatelessWidget {
                         ),
                         Text(
                           CurrencyFormat.convertToIdr(
-                            int.parse(data.payslipStoreModel!.presenceAllowance!),
+                            int.parse(
+                              data.payslipStoreModel!.presenceAllowance!,
+                            ),
                             0,
                           ),
                           style: const TextStyle(fontSize: 15),
@@ -258,7 +257,9 @@ class PaySlipStoreDesc extends StatelessWidget {
                         ),
                         Text(
                           CurrencyFormat.convertToIdr(
-                            int.parse(data.payslipStoreModel!.boardingAllowance!),
+                            int.parse(
+                              data.payslipStoreModel!.boardingAllowance!,
+                            ),
                             0,
                           ),
                           style: const TextStyle(fontSize: 15),
@@ -348,7 +349,7 @@ class PaySlipStoreDesc extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(
                       vertical: 8,
                       horizontal: 10,
-                    ),  // beri padding supaya text tidak mepet
+                    ), // beri padding supaya text tidak mepet
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -361,9 +362,7 @@ class PaySlipStoreDesc extends StatelessWidget {
                         ),
                         Text(
                           CurrencyFormat.convertToIdr(
-                            int.parse(
-                              data.payslipStoreModel!.totalIncome!,
-                            ),
+                            int.parse(data.payslipStoreModel!.totalIncome!),
                             0,
                           ),
                           style: const TextStyle(
