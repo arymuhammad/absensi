@@ -18,6 +18,8 @@ import 'package:icons_plus/icons_plus.dart';
 import 'package:intl/intl.dart';
 import 'package:shimmer/shimmer.dart';
 
+import '../../../data/helper/duration_count.dart';
+import '../../shared/history_card.dart';
 import 'main_menu.dart';
 import 'widget/summary_per_month.dart';
 
@@ -88,9 +90,12 @@ class SummaryAbsen extends GetView {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        'Attendance History',
-                        style: titleTextStyle.copyWith(fontSize: 15),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 10.0, top: 5),
+                        child: Text(
+                          'Attendance History',
+                          style: titleTextStyle.copyWith(fontSize: 15),
+                        ),
                       ),
                     ],
                   ),
@@ -236,546 +241,117 @@ class SummaryAbsen extends GetView {
                               shrinkWrap: true,
                               physics: const NeverScrollableScrollPhysics(),
                               separatorBuilder:
-                                  (context, index) => const SizedBox(height: 8),
+                                  (context, index) => const SizedBox(height: 0),
                               itemCount: absenC.dataLimitAbsen.length,
                               itemBuilder: (c, i) {
-                                var diffHours = const Duration();
-                                if (absenC.dataLimitAbsen.isNotEmpty &&
-                                    absenC.dataLimitAbsen[i].jamAbsenPulang !=
-                                        "") {
-                                  if (DateTime.parse(
-                                    absenC.dataLimitAbsen[i].tanggalPulang!,
-                                  ).isAfter(
-                                    DateTime.parse(
-                                      absenC.dataLimitAbsen[i].tanggalMasuk!,
-                                    ),
-                                  )) {
-                                    diffHours = DateTime.parse(
-                                          '${absenC.dataLimitAbsen[i].tanggalMasuk!} ${absenC.dataLimitAbsen[i].jamAbsenPulang!}',
-                                        )
-                                        .add(const Duration(hours: -1))
-                                        .difference(
-                                          DateTime.parse(
-                                            '${absenC.dataLimitAbsen[i].tanggalPulang!} ${absenC.dataLimitAbsen[i].jamAbsenMasuk!}',
-                                          ),
-                                        );
-                                  } else {
-                                    diffHours = DateTime.parse(
-                                      '${absenC.dataLimitAbsen[i].tanggalMasuk!} ${absenC.dataLimitAbsen[i].jamAbsenPulang!}',
-                                    ).difference(
-                                      DateTime.parse(
-                                        '${absenC.dataLimitAbsen[i].tanggalPulang!} ${absenC.dataLimitAbsen[i].jamAbsenMasuk!}',
-                                      ),
-                                    );
-                                  }
-                                } else {
-                                  diffHours = const Duration();
-                                }
+                                final d = absenC.dataLimitAbsen[i];
 
                                 var stsMasuk =
                                     FormatWaktu.formatJamMenit(
-                                          jamMenit:
-                                              absenC
-                                                  .dataLimitAbsen[i]
-                                                  .jamAbsenMasuk!,
+                                          jamMenit: d.jamAbsenMasuk!,
                                         ).isBefore(
                                           FormatWaktu.formatJamMenit(
-                                            jamMenit:
-                                                absenC
-                                                    .dataLimitAbsen[i]
-                                                    .jamMasuk!,
+                                            jamMenit: d.jamMasuk!,
                                           ),
                                         )
                                         ? "Early"
                                         : FormatWaktu.formatJamMenit(
-                                          jamMenit:
-                                              absenC
-                                                  .dataLimitAbsen[i]
-                                                  .jamAbsenMasuk!,
+                                          jamMenit: d.jamAbsenMasuk!,
                                         ).isAtSameMomentAs(
                                           FormatWaktu.formatJamMenit(
-                                            jamMenit:
-                                                absenC
-                                                    .dataLimitAbsen[i]
-                                                    .jamMasuk!,
+                                            jamMenit: d.jamMasuk!,
                                           ),
                                         )
                                         ? "On Time"
                                         : "Late";
                                 var stsPulang =
-                                    absenC.dataLimitAbsen[i].jamAbsenPulang! ==
-                                            ""
+                                    d.jamAbsenPulang! == ""
                                         ? "Absent"
                                         : DateTime.parse(
-                                              absenC
-                                                  .dataLimitAbsen[i]
-                                                  .tanggalPulang!,
+                                              d.tanggalPulang!,
                                             ).isAfter(
-                                              DateTime.parse(
-                                                absenC
-                                                    .dataLimitAbsen[i]
-                                                    .tanggalMasuk!,
-                                              ),
+                                              DateTime.parse(d.tanggalMasuk!),
                                             ) &&
                                             FormatWaktu.formatJamMenit(
-                                              jamMenit:
-                                                  absenC
-                                                      .dataLimitAbsen[i]
-                                                      .jamAbsenPulang!,
+                                              jamMenit: d.jamAbsenPulang!,
                                             ).isAfter(
                                               FormatWaktu.formatJamMenit(
-                                                jamMenit:
-                                                    absenC
-                                                        .dataLimitAbsen[i]
-                                                        .jamAbsenMasuk!,
+                                                jamMenit: d.jamAbsenMasuk!,
                                               ).add(const Duration(hours: 8)),
                                             )
                                         ? "Over Time"
                                         : DateTime.parse(
-                                              absenC
-                                                  .dataLimitAbsen[i]
-                                                  .tanggalPulang!,
+                                              d.tanggalPulang!,
                                             ).isAtSameMomentAs(
-                                              DateTime.parse(
-                                                absenC
-                                                    .dataLimitAbsen[i]
-                                                    .tanggalMasuk!,
-                                              ),
+                                              DateTime.parse(d.tanggalMasuk!),
                                             ) &&
                                             FormatWaktu.formatJamMenit(
-                                              jamMenit:
-                                                  absenC
-                                                      .dataLimitAbsen[i]
-                                                      .jamAbsenPulang!,
+                                              jamMenit: d.jamAbsenPulang!,
                                             ).isBefore(
                                               FormatWaktu.formatJamMenit(
-                                                jamMenit:
-                                                    absenC
-                                                        .dataLimitAbsen[i]
-                                                        .jamPulang!,
+                                                jamMenit: d.jamPulang!,
                                               ),
                                             )
                                         ? "Early"
                                         : FormatWaktu.formatJamMenit(
-                                          jamMenit:
-                                              absenC
-                                                  .dataLimitAbsen[i]
-                                                  .jamAbsenPulang!,
+                                          jamMenit: d.jamAbsenPulang!,
                                         ).isAtSameMomentAs(
                                           FormatWaktu.formatJamMenit(
-                                            jamMenit:
-                                                absenC
-                                                    .dataLimitAbsen[i]
-                                                    .jamPulang!,
+                                            jamMenit: d.jamPulang!,
                                           ),
                                         )
                                         ? 'On Time'
                                         : "Over Time";
+                                //
+                                return InkWell(
+                                  onTap:
+                                      () => Get.to(() {
+                                        var detailData = {
+                                          "foto_profil":
+                                              userData!.foto != ""
+                                                  ? userData!.foto
+                                                  : userData!.nama,
+                                          "nama": d.nama!,
+                                          "id_shift": d.idShift!,
+                                          "nama_shift": d.namaShift!,
+                                          "id_user": d.idUser!,
+                                          "kode_cabang":d.kodeCabang,
+                                          "tanggal_masuk": d.tanggalMasuk!,
+                                          "tanggal_pulang":
+                                              d.tanggalPulang != null
+                                                  ? d.tanggalPulang!
+                                                  : "",
+                                          "jam_masuk": stsMasuk,
+                                          "jam_pulang": stsPulang,
+                                          "jam_absen_masuk": d.jamAbsenMasuk!,
+                                          "jam_absen_pulang": d.jamAbsenPulang!,
+                                          "foto_masuk": d.fotoMasuk!,
+                                          "foto_pulang": d.fotoPulang!,
+                                          "lat_masuk": d.latMasuk!,
+                                          "long_masuk": d.longMasuk!,
+                                          "lat_pulang": d.latPulang!,
+                                          "long_pulang": d.longPulang!,
+                                          "device_info": d.devInfo!,
+                                          "device_info2": d.devInfo2!,
+                                        };
 
-                                return LayoutBuilder(
-                                  builder: (context, constraints) {
-                                    double maxWidth = constraints.maxWidth;
-                                    return InkWell(
-                                      onTap:
-                                          () => Get.to(() {
-                                            var detailData = {
-                                              "foto_profil":
-                                                  userData!.foto != ""
-                                                      ? userData!.foto
-                                                      : userData!.nama,
-                                              "nama":
-                                                  absenC
-                                                      .dataLimitAbsen[i]
-                                                      .nama!,
-                                              "nama_shift":
-                                                  absenC
-                                                      .dataLimitAbsen[i]
-                                                      .namaShift!,
-                                              "id_user":
-                                                  absenC
-                                                      .dataLimitAbsen[i]
-                                                      .idUser!,
-                                              "tanggal_masuk":
-                                                  absenC
-                                                      .dataLimitAbsen[i]
-                                                      .tanggalMasuk!,
-                                              "tanggal_pulang":
-                                                  absenC
-                                                              .dataLimitAbsen[i]
-                                                              .tanggalPulang !=
-                                                          null
-                                                      ? absenC
-                                                          .dataLimitAbsen[i]
-                                                          .tanggalPulang!
-                                                      : "",
-                                              "jam_masuk": stsMasuk,
-                                              "jam_pulang": stsPulang,
-                                              "jam_absen_masuk":
-                                                  absenC
-                                                      .dataLimitAbsen[i]
-                                                      .jamAbsenMasuk!,
-                                              "jam_absen_pulang":
-                                                  absenC
-                                                      .dataLimitAbsen[i]
-                                                      .jamAbsenPulang!,
-                                              "foto_masuk":
-                                                  absenC
-                                                      .dataLimitAbsen[i]
-                                                      .fotoMasuk!,
-                                              "foto_pulang":
-                                                  absenC
-                                                      .dataLimitAbsen[i]
-                                                      .fotoPulang!,
-                                              "lat_masuk":
-                                                  absenC
-                                                      .dataLimitAbsen[i]
-                                                      .latMasuk!,
-                                              "long_masuk":
-                                                  absenC
-                                                      .dataLimitAbsen[i]
-                                                      .longMasuk!,
-                                              "lat_pulang":
-                                                  absenC
-                                                      .dataLimitAbsen[i]
-                                                      .latPulang!,
-                                              "long_pulang":
-                                                  absenC
-                                                      .dataLimitAbsen[i]
-                                                      .longPulang!,
-                                              "device_info":
-                                                  absenC
-                                                      .dataLimitAbsen[i]
-                                                      .devInfo!,
-                                              "device_info2":
-                                                  absenC
-                                                      .dataLimitAbsen[i]
-                                                      .devInfo2!,
-                                            };
-
-                                            return DetailAbsenView(detailData);
-                                          }, transition: Transition.cupertino),
-                                      child: Container(
-                                        width: maxWidth,
-                                        decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(
-                                            5,
-                                          ),
-                                          color: Colors.white,
-                                        ),
-                                        height:
-                                            i == 0 &&
-                                                    absenC.statsCon.value != ""
-                                                ? 147
-                                                : 85,
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Row(
-                                                children: [
-                                                  Container(
-                                                    width: maxWidth * 0.15,
-                                                    padding:
-                                                        const EdgeInsets.all(8),
-                                                    decoration: BoxDecoration(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                            5,
-                                                          ),
-                                                      color:
-                                                          AppColors
-                                                              .itemsBackground,
-                                                    ),
-                                                    child: Column(
-                                                      children: [
-                                                        // Tanggal
-                                                        Text(
-                                                          FormatWaktu.formatTanggal(
-                                                            tanggal:
-                                                                absenC
-                                                                    .dataLimitAbsen[i]
-                                                                    .tanggalMasuk!,
-                                                          ),
-                                                          style: titleTextStyle
-                                                              .copyWith(
-                                                                fontSize:
-                                                                    maxWidth *
-                                                                    0.06,
-                                                                color:
-                                                                    AppColors
-                                                                        .contentColorWhite,
-                                                              ),
-                                                          maxLines: 1,
-                                                          overflow:
-                                                              TextOverflow
-                                                                  .ellipsis,
-                                                        ),
-                                                        // Hari
-                                                        Text(
-                                                          FormatWaktu.formatHariEn(
-                                                            tanggal:
-                                                                absenC
-                                                                    .dataLimitAbsen[i]
-                                                                    .tanggalMasuk!,
-                                                          ),
-                                                          style: subtitleTextStyle
-                                                              .copyWith(
-                                                                color:
-                                                                    Colors
-                                                                        .white,
-                                                              ),
-                                                          maxLines: 1,
-                                                          overflow:
-                                                              TextOverflow
-                                                                  .ellipsis,
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                  const SizedBox(width: 12),
-                                                  SizedBox(
-                                                    width: maxWidth * 0.7,
-                                                    child: Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      children: [
-                                                        IntrinsicHeight(
-                                                          child: Row(
-                                                            children: [
-                                                              Column(
-                                                                children: [
-                                                                  Text(
-                                                                    absenC
-                                                                        .dataLimitAbsen[i]
-                                                                        .jamAbsenMasuk!,
-                                                                    style: TextStyle(
-                                                                      color:
-                                                                          stsMasuk ==
-                                                                                  "Late"
-                                                                              ? red
-                                                                              : green,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .bold,
-                                                                      fontSize:
-                                                                          maxWidth *
-                                                                          0.05,
-                                                                    ),
-                                                                  ),
-                                                                  const Text(
-                                                                    'Check In',
-                                                                    style: TextStyle(
-                                                                      fontSize:
-                                                                          14,
-                                                                      color:
-                                                                          Colors
-                                                                              .grey,
-                                                                    ),
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                              const SizedBox(
-                                                                width: 5,
-                                                              ),
-                                                              const VerticalDivider(
-                                                                color:
-                                                                    Colors
-                                                                        .grey, // Warna garis
-                                                                // thickness:
-                                                                //     1, // Ketebalan garis
-                                                                width:
-                                                                    25, // Lebar box pembungkus
-                                                                // indent: 20, // Jarak dari atas
-                                                                endIndent: 5,
-                                                              ),
-                                                              Column(
-                                                                children: [
-                                                                  Text(
-                                                                    absenC
-                                                                        .dataLimitAbsen[i]
-                                                                        .jamAbsenPulang!,
-                                                                    style: TextStyle(
-                                                                      color:
-                                                                          stsPulang ==
-                                                                                      "Early" ||
-                                                                                  stsPulang ==
-                                                                                      "Absent"
-                                                                              ? red
-                                                                              : green,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .bold,
-                                                                      fontSize:
-                                                                          maxWidth *
-                                                                          0.05,
-                                                                    ),
-                                                                  ),
-                                                                  const Text(
-                                                                    'Check Out',
-                                                                    style: TextStyle(
-                                                                      color:
-                                                                          Colors
-                                                                              .grey,
-                                                                      fontSize:
-                                                                          14,
-                                                                    ),
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                              const SizedBox(
-                                                                width: 5,
-                                                              ),
-                                                              const VerticalDivider(
-                                                                color:
-                                                                    Colors
-                                                                        .grey, // Warna garis
-                                                                // thickness:
-                                                                //     1, // Ketebalan garis
-                                                                width:
-                                                                    25, // Lebar box pembungkus
-                                                                // indent: 20, // Jarak dari atas
-                                                                endIndent: 5,
-                                                              ),
-                                                              Column(
-                                                                children: [
-                                                                  Text(
-                                                                    absenC.dataLimitAbsen.isNotEmpty &&
-                                                                            absenC.dataLimitAbsen[i].jamAbsenMasuk! !=
-                                                                                ""
-                                                                        ? '${absenC.dataLimitAbsen[i].jamAbsenPulang != "" ? diffHours.inHours % 24 : '-'}j ${absenC.dataLimitAbsen[i].jamAbsenPulang != "" ? diffHours.inMinutes % 60 : '-'}m'
-                                                                        : '-:-',
-                                                                    style: TextStyle(
-                                                                      // color:
-                                                                      //     stsPulang ==
-                                                                      //                 "Pulang Cepat" ||
-                                                                      //             stsPulang ==
-                                                                      //                 "Belum Absen"
-                                                                      //         ? red
-                                                                      //         : green,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .bold,
-                                                                      fontSize:
-                                                                          maxWidth *
-                                                                          0.05,
-                                                                    ),
-                                                                  ),
-                                                                  const Text(
-                                                                    'Total Hours',
-                                                                    style: TextStyle(
-                                                                      color:
-                                                                          Colors
-                                                                              .grey,
-                                                                      fontSize:
-                                                                          14,
-                                                                    ),
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                            ],
-                                                          ),
-                                                        ),
-                                                        const SizedBox(
-                                                          height: 3,
-                                                        ),
-                                                        Container(
-                                                          decoration: BoxDecoration(
-                                                            color:
-                                                                AppColors
-                                                                    .itemsBackground,
-                                                            borderRadius:
-                                                                BorderRadius.circular(
-                                                                  8,
-                                                                ),
-                                                          ),
-                                                          padding:
-                                                              const EdgeInsets.only(
-                                                                left: 5,
-                                                                right: 5,
-                                                              ),
-                                                          child: Row(
-                                                            mainAxisSize:
-                                                                MainAxisSize
-                                                                    .min,
-                                                            children: [
-                                                              const Icon(
-                                                                HeroIcons
-                                                                    .map_pin,
-                                                                size: 16,
-                                                                color:
-                                                                    AppColors
-                                                                        .contentColorWhite,
-                                                              ),
-                                                              const SizedBox(
-                                                                width: 5,
-                                                              ),
-                                                              Text(
-                                                                absenC
-                                                                    .dataLimitAbsen[i]
-                                                                    .namaCabang!
-                                                                    .capitalize!,
-                                                                style: const TextStyle(
-                                                                  color:
-                                                                      AppColors
-                                                                          .contentColorWhite,
-                                                                ),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                              const SizedBox(height: 2),
-                                              i == 0 &&
-                                                      absenC.statsCon.value !=
-                                                          ""
-                                                  ? Container(
-                                                    width:
-                                                        Get
-                                                            .mediaQuery
-                                                            .size
-                                                            .width,
-                                                    decoration: BoxDecoration(
-                                                      color:
-                                                          const Color.fromARGB(
-                                                            118,
-                                                            255,
-                                                            139,
-                                                            128,
-                                                          ),
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                            5,
-                                                          ),
-                                                    ),
-                                                    child: Padding(
-                                                      padding:
-                                                          const EdgeInsets.only(
-                                                            left: 8.0,
-                                                          ),
-                                                      child: Text(
-                                                        absenC.statsCon.value,
-                                                        style: TextStyle(
-                                                          color:
-                                                              Colors
-                                                                  .redAccent[700],
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  )
-                                                  : Container(),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    );
-                                  },
+                                        return DetailAbsenView(detailData);
+                                      }, transition: Transition.cupertino),
+                                  child: HistoryCard(
+                                    date: DateTime.parse(d.tanggalMasuk!),
+                                    checkIn: safe(d.jamAbsenMasuk),
+                                    checkOut: safe(d.jamAbsenPulang),
+                                    duration: hitungDurasi(
+                                      tglMasuk: d.tanggalMasuk,
+                                      jamMasuk: d.jamAbsenMasuk,
+                                      tglPulang: d.tanggalPulang,
+                                      jamPulang: d.jamAbsenPulang,
+                                    ),
+                                    location: safe(d.namaCabang),
+                                    isValid: d.jamAbsenMasuk != null,
+                                    stsM: stsMasuk,
+                                    stsP: stsPulang,
+                                  ),
                                 );
                               },
                             ),
@@ -788,4 +364,9 @@ class SummaryAbsen extends GetView {
       ),
     );
   }
+}
+
+String safe(String? v, [String fallback = '-']) {
+  if (v == null || v.isEmpty) return fallback;
+  return v;
 }

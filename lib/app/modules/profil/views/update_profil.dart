@@ -13,6 +13,7 @@ import 'package:intl/intl.dart';
 
 import '../../../data/helper/const.dart';
 import '../../../services/service_api.dart';
+import '../../shared/input_decoration.dart';
 
 class UpdateProfil extends GetView {
   UpdateProfil({super.key, this.userData});
@@ -38,7 +39,13 @@ class UpdateProfil extends GetView {
           // const CsBgImg(),
           Container(
             height: 250,
-            decoration: const BoxDecoration(color: AppColors.itemsBackground),
+           decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color(0xFF1B2541), Color(0xFF3949AB)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
           ),
           Padding(
             padding: const EdgeInsets.only(top: 150, left: 15.0, right: 15.0),
@@ -54,8 +61,9 @@ class UpdateProfil extends GetView {
                 ),
                 Expanded(
                   child: Card(
+                    color: Colors.blueGrey[100],
                     child: Padding(
-                      padding: const EdgeInsets.all(8.0),
+                      padding: const EdgeInsets.all(10.0),
                       child: ListView(
                         padding: EdgeInsets.zero,
                         children: [
@@ -67,7 +75,7 @@ class UpdateProfil extends GetView {
                                   child: Column(
                                     children: [
                                       SizedBox(
-                                        height: 50,
+                                        height: 44,
                                         child: DropdownButtonFormField(
                                           value:
                                               ctr.brandCabang.value == ""
@@ -92,19 +100,15 @@ class UpdateProfil extends GetView {
                                                     ),
                                                   )
                                                   .toList(),
-                                          decoration: const InputDecoration(
-                                            contentPadding: EdgeInsets.all(5),
-                                            labelText: 'Brand',
-                                            filled: true,
-                                            fillColor: Colors.white,
-                                            border: OutlineInputBorder(),
+                                          decoration: inputDecoration(
+                                            label: 'Brand',
                                           ),
                                           dropdownColor: Colors.white,
                                         ),
                                       ),
                                       const SizedBox(height: 10),
                                       SizedBox(
-                                        height: 50,
+                                        height: 44,
                                         child: FutureBuilder(
                                           future: ctr.getCabang(),
                                           builder: (context, snapshot) {
@@ -122,17 +126,8 @@ class UpdateProfil extends GetView {
                                                     TextFieldConfiguration(
                                                       controller: ctr.store,
                                                       decoration:
-                                                          const InputDecoration(
-                                                            contentPadding:
-                                                                EdgeInsets.all(
-                                                                  5,
-                                                                ),
-                                                            labelText: 'Branch',
-                                                            border:
-                                                                OutlineInputBorder(),
-                                                            filled: true,
-                                                            fillColor:
-                                                                Colors.white,
+                                                          inputDecoration(
+                                                            label: 'Branch',
                                                           ),
                                                     ),
                                                 suggestionsCallback: (pattern) {
@@ -213,8 +208,8 @@ class UpdateProfil extends GetView {
                                             c.webImage.isNotEmpty) {
                                           return kIsWeb
                                               ? Container(
-                                                height: 110,
-                                                width: 110,
+                                                height: 100,
+                                                width: 100,
                                                 decoration: BoxDecoration(
                                                   color: Colors.grey[300],
                                                 ),
@@ -226,8 +221,8 @@ class UpdateProfil extends GetView {
                                               : Stack(
                                                 children: [
                                                   Container(
-                                                    height: 110,
-                                                    width: 110,
+                                                    height: 100,
+                                                    width: 100,
                                                     decoration: BoxDecoration(
                                                       color: Colors.grey[300],
                                                     ),
@@ -250,8 +245,8 @@ class UpdateProfil extends GetView {
                                           return Stack(
                                             children: [
                                               Container(
-                                                height: 110,
-                                                width: 110,
+                                                height: 95,
+                                                width: 95,
                                                 decoration: BoxDecoration(
                                                   color: Colors.grey[300],
                                                 ),
@@ -286,68 +281,61 @@ class UpdateProfil extends GetView {
                           ),
                           const SizedBox(height: 10),
                           SizedBox(
-                            height: 50,
+                            height: 44,
                             child: TextField(
                               controller: ctr.name..text = userData!.nama!,
-                              decoration: const InputDecoration(
-                                labelText: 'Full Name',
-                                border: OutlineInputBorder(),
-                                filled: true,
-                                fillColor: Colors.white,
-                              ),
+                              decoration: inputDecoration(label: 'Full Name'),
                             ),
                           ),
                           const SizedBox(height: 10),
                           Row(
                             children: [
                               Expanded(
+                                flex: 2,
                                 child: SizedBox(
-                                  height: 48,
+                                  height: 44,
                                   child: TextField(
                                     controller: ctr.telp,
-                                    decoration: InputDecoration(
-                                      labelText: 'Phone No',
-                                      hintText: userData!.noTelp!,
-                                      filled: true,
-                                      fillColor: Colors.white,
-                                      border: const OutlineInputBorder(),
-                                    ),
                                     keyboardType: TextInputType.phone,
+                                    decoration: inputDecoration(
+                                      label: 'Phone No',
+                                      hint: userData!.noTelp!,
+                                    ),
                                   ),
                                 ),
                               ),
+                              const SizedBox(width: 3),
                               Expanded(
-                                child: DateTimeField(
-                                  // enabled: userData!.createdAt!="" ?false:true,
-                                  controller: ctr.joinDate,
-                                  style: const TextStyle(fontSize: 14),
-                                  decoration: const InputDecoration(
-                                    contentPadding: EdgeInsets.all(0.5),
-                                    prefixIcon: Icon(
-                                      Iconsax.calendar_edit_outline,
+                                flex: 2,
+                                child: SizedBox(
+                                  height: 44,
+                                  child: DateTimeField(
+                                    // enabled: userData!.createdAt!="" ?false:true,
+                                    controller: ctr.joinDate,
+                                    style: const TextStyle(fontSize: 14),
+                                    decoration: inputDecoration(
+                                      label: '',
+                                      hint: 'Join Date',
+                                      prefixIcon: Iconsax.calendar_edit_outline,
                                     ),
-                                    hintText: 'Join Date',
-                                    filled: true,
-                                    fillColor: Colors.white,
-                                    border: OutlineInputBorder(),
+                                    format: DateFormat("yyyy-MM-dd"),
+                                    onShowPicker: (context, currentValue) {
+                                      return showDatePicker(
+                                        context: context,
+                                        firstDate: DateTime(1900),
+                                        initialDate:
+                                            currentValue ?? DateTime.now(),
+                                        lastDate: DateTime(2100),
+                                      );
+                                    },
                                   ),
-                                  format: DateFormat("yyyy-MM-dd"),
-                                  onShowPicker: (context, currentValue) {
-                                    return showDatePicker(
-                                      context: context,
-                                      firstDate: DateTime(1900),
-                                      initialDate:
-                                          currentValue ?? DateTime.now(),
-                                      lastDate: DateTime(2100),
-                                    );
-                                  },
                                 ),
                               ),
                             ],
                           ),
                           const SizedBox(height: 10),
                           SizedBox(
-                            height: 50,
+                            height: 44,
                             child: FutureBuilder(
                               future: ctr.getLevel(),
                               builder: (context, snapshot) {
@@ -365,19 +353,11 @@ class UpdateProfil extends GetView {
                                           controller:
                                               ctr.level
                                                 ..text = userData!.levelUser!,
-                                          decoration: InputDecoration(
-                                            labelText: 'User Level',
-                                            border: const OutlineInputBorder(),
-                                            filled: true,
-                                            fillColor: Colors.white,
-                                            suffixIcon: IconButton(
-                                              onPressed: () {
-                                                ctr.level.clear();
-                                              },
-                                              icon: const Icon(
+                                          decoration: inputDecoration(
+                                            label: 'User Level',
+                                            suffixIcon:
                                                 Icons.highlight_remove_rounded,
-                                              ),
-                                            ),
+                                            onPressed: () => ctr.level.clear(),
                                           ),
                                         ),
                                     suggestionsCallback: (pattern) {

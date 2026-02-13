@@ -51,7 +51,7 @@ class MonitoringAbsenView extends GetView {
                   elevation: 8,
                   child: TextField(
                     controller: absenC.filterAbsen,
-                    onChanged: (data) => absenC.filterDataAbsen(data),
+                    onChanged: (data) => absenC.filterDataAbsen,
                     decoration: InputDecoration(
                       prefixIcon: const Icon(Icons.search),
                       hintText: 'Cari berdasarkan tanggal',

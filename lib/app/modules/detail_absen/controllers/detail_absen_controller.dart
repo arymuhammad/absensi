@@ -9,8 +9,6 @@ import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
-
-import '../../../data/add_controller.dart';
 import '../../../data/helper/custom_dialog.dart';
 import '../../../data/helper/db_helper.dart';
 import '../../../data/model/shift_kerja_model.dart';
@@ -86,7 +84,7 @@ class DetailAbsenController extends GetxController {
     }
   }
 
-  submitApproval(String id, String nama) async {
+  submitApproval(String id, String nama, String kodeCabang) async {
     if (jamAbsenMasuk.text != "" && jamAbsenPulang.text == "") {
       if (alasan.text == "") {
         failedDialog(
@@ -105,6 +103,7 @@ class DetailAbsenController extends GetxController {
           var data = {
             "status": "update_masuk",
             "id_user": id,
+            "kode_cabang": kodeCabang,
             "nama": nama,
             "jam_absen_masuk": jamAbsenMasuk.text,
             "tgl_masuk": tglMasuk.text,
@@ -114,13 +113,13 @@ class DetailAbsenController extends GetxController {
           loadingDialog("Mengirim data...", "");
           await ServiceApi().reqUpdateAbs(data);
           // after 2 sec
-          if (!Get.isRegistered<AdController>()) {
-            Get.put(AdController());
-            Get.find<AdController>().loadInterstitialAd();
-          }
-          Future.delayed(const Duration(seconds: 2), () {
-            Get.find<AdController>().showInterstitialAd(() {});
-          });
+          // if (!Get.isRegistered<AdController>()) {
+          //   Get.put(AdController());
+          //   Get.find<AdController>().loadInterstitialAd();
+          // }
+          // Future.delayed(const Duration(seconds: 2), () {
+          //   Get.find<AdController>().showInterstitialAd(() {});
+          // });
           jamAbsenMasuk.clear();
           image == null;
         }
@@ -148,6 +147,7 @@ class DetailAbsenController extends GetxController {
             var data = {
               "status": "update_pulang",
               "id_user": id,
+              "kode_cabang": kodeCabang,
               "nama": nama,
               "tgl_masuk": tglMasuk.text,
               "tgl_pulang": tglPulang.text,
@@ -160,13 +160,13 @@ class DetailAbsenController extends GetxController {
             };
             await ServiceApi().reqUpdateAbs(data);
             // after 2 sec
-            if (!Get.isRegistered<AdController>()) {
-              Get.put(AdController());
-              Get.find<AdController>().loadInterstitialAd();
-            }
-            Future.delayed(const Duration(seconds: 2), () {
-              Get.find<AdController>().showInterstitialAd(() {});
-            });
+            // if (!Get.isRegistered<AdController>()) {
+            //   Get.put(AdController());
+            //   Get.find<AdController>().loadInterstitialAd();
+            // }
+            // Future.delayed(const Duration(seconds: 2), () {
+            //   Get.find<AdController>().showInterstitialAd(() {});
+            // });
             tglPulang.clear();
             jamAbsenPulang.clear();
             image2 == null;
@@ -200,6 +200,7 @@ class DetailAbsenController extends GetxController {
             var data = {
               "status": "update_data_absen",
               "id_user": id,
+              "kode_cabang": kodeCabang,
               "nama": nama,
               "tgl_masuk": tglMasuk.text,
               "tgl_pulang": tglPulang.text,
@@ -214,13 +215,13 @@ class DetailAbsenController extends GetxController {
             };
             await ServiceApi().reqUpdateAbs(data);
             // after 2 sec
-            if (!Get.isRegistered<AdController>()) {
-              Get.put(AdController());
-              Get.find<AdController>().loadInterstitialAd();
-            }
-            Future.delayed(const Duration(seconds: 2), () {
-              Get.find<AdController>().showInterstitialAd(() {});
-            });
+            // if (!Get.isRegistered<AdController>()) {
+            //   Get.put(AdController());
+            //   Get.find<AdController>().loadInterstitialAd();
+            // }
+            // Future.delayed(const Duration(seconds: 2), () {
+            //   Get.find<AdController>().showInterstitialAd(() {});
+            // });
             tglPulang.clear();
             jamAbsenMasuk.clear();
             jamAbsenMasuk.clear();
@@ -242,6 +243,7 @@ class DetailAbsenController extends GetxController {
         var data = {
           "status": "update_shift",
           "id_user": id,
+          "kode_cabang":kodeCabang,
           "nama": nama,
           "id_shift": selectedShift.value,
           "jam_masuk": jamMasuk.value,
@@ -252,13 +254,13 @@ class DetailAbsenController extends GetxController {
         loadingDialog("Mengirim data...", "");
         await ServiceApi().reqUpdateAbs(data);
         // after 2 sec
-        if (!Get.isRegistered<AdController>()) {
-          Get.put(AdController());
-          Get.find<AdController>().loadInterstitialAd();
-        }
-        Future.delayed(const Duration(seconds: 2), () {
-          Get.find<AdController>().showInterstitialAd(() {});
-        });
+        // if (!Get.isRegistered<AdController>()) {
+        //   Get.put(AdController());
+        //   Get.find<AdController>().loadInterstitialAd();
+        // }
+        // Future.delayed(const Duration(seconds: 2), () {
+        //   Get.find<AdController>().showInterstitialAd(() {});
+        // });
         selectedShift.value = "";
         jamMasuk.value = "";
         jamPulang.value = "";

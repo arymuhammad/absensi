@@ -2,6 +2,7 @@ class PayslipModel {
   late String? periode;
   late String? empId;
   late String? empName;
+  late String? empStat;
   late String? position;
   late String? joinDate;
   late String? totalWorkDay;
@@ -28,6 +29,7 @@ class PayslipModel {
     this.periode,
     this.empId,
     this.empName,
+    this.empStat,
     this.position,
     this.joinDate,
     this.totalWorkDay,
@@ -55,6 +57,7 @@ class PayslipModel {
     periode = json['periode'];
     empId = json['emp_id'];
     empName = json['emp_name'];
+    empStat = json['emp_stat'];
     position = json['position'];
     joinDate = json['join_date'];
     totalWorkDay = json['total_work_days'];

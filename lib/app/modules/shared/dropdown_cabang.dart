@@ -36,35 +36,53 @@ class CsDropdownCabang extends StatelessWidget {
           );
           final dropdownValue = hasValueInItems ? value : null;
 
-          return DropdownButtonFormField(
-            decoration: InputDecoration(
-              border: const OutlineInputBorder(),
-              hintText: hintText,
-            ),
-            value: dropdownValue,
-            onChanged: (data) {
-              if (data == null) return;
-              absC.selectedCabang.value = data;
-
-              for (int i = 0; i < uniqueCabang.length; i++) {
-                if (uniqueCabang[i].kodeCabang == data) {
-                  absC.lat.value = uniqueCabang[i].lat!;
-                  absC.long.value = uniqueCabang[i].long!;
-                  break;
+          return SizedBox(
+            height: 40,
+            child: DropdownButtonFormField(
+              decoration: InputDecoration(
+                fillColor: Colors.white,
+                  filled: true,
+                  isDense: true, // 🔑 biar tinggi tetap rapih
+                  contentPadding: const EdgeInsets.all(5),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide.none,
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide.none,
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide.none,
+                  ),
+                hintText: hintText,
+              ),
+              value: dropdownValue,
+              onChanged: (data) {
+                if (data == null) return;
+                absC.selectedCabang.value = data;
+            
+                for (int i = 0; i < uniqueCabang.length; i++) {
+                  if (uniqueCabang[i].kodeCabang == data) {
+                    absC.lat.value = uniqueCabang[i].lat!;
+                    absC.long.value = uniqueCabang[i].long!;
+                    break;
+                  }
                 }
-              }
-              absC.isLoading.value = true;
-              absC.getLoc(dataUser!);
-            },
-            items:
-                uniqueCabang
-                    .map(
-                      (e) => DropdownMenuItem(
-                        value: e.kodeCabang,
-                        child: Text(e.namaCabang.toString()),
-                      ),
-                    )
-                    .toList(),
+                absC.isLoading.value = true;
+                absC.getLoc(dataUser!);
+              },
+              items:
+                  uniqueCabang
+                      .map(
+                        (e) => DropdownMenuItem(
+                          value: e.kodeCabang,
+                          child: Text(e.namaCabang.toString()),
+                        ),
+                      )
+                      .toList(),
+            ),
           );
         } else if (snapshot.hasError) {
           return Text('${snapshot.error}');

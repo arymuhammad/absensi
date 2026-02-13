@@ -1,21 +1,21 @@
 import 'dart:io';
 import 'dart:math' as math;
 
-import 'package:absensi/app/data/helper/app_colors.dart';
 import 'package:absensi/app/data/helper/const.dart';
 import 'package:absensi/app/data/helper/format_waktu.dart';
 import 'package:absensi/app/data/model/login_model.dart';
 import 'package:absensi/app/modules/login/controllers/login_controller.dart';
-import 'package:absensi/app/modules/shared/elevated_button.dart';
 import 'package:absensi/app/services/service_api.dart';
 import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:photo_view/photo_view.dart';
+import '../../../data/helper/app_colors.dart';
 import '../../../data/helper/custom_dialog.dart';
 import '../../add_pegawai/controllers/add_pegawai_controller.dart';
 import '../controllers/profil_controller.dart';
+import 'update_profil.dart';
 
 class ProfilView extends GetView<ProfilController> {
   ProfilView({super.key, this.listDataUser});
@@ -25,33 +25,80 @@ class ProfilView extends GetView<ProfilController> {
 
   @override
   Widget build(BuildContext context) {
+    final imgUrl = '${ServiceApi().baseUrl}${listDataUser!.foto!}';
     return Scaffold(
       body: Stack(
         children: [
-          // const CsBgImg(),
+          /// HEADER GRADIENT + GLOW
           Container(
-            height: 180,
-            decoration: const BoxDecoration(color: AppColors.itemsBackground),
+            height: 260,
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color(0xFF1B2541), Color(0xFF3949AB)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
           ),
+
+          /// GLOW EFFECT
+          Positioned(
+            top: 80,
+            left: -40,
+            right: -40,
+            child: Container(
+              height: 200,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(200),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.blueAccent.withOpacity(.35),
+                    blurRadius: 120,
+                    spreadRadius: 20,
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          /// BACKGROUND CARD BESAR
+          Positioned(
+            top: 180,
+            left: 16,
+            right: 16,
+            bottom: 0,
+            child: Container(
+              decoration: const BoxDecoration(
+                color: Color(0xFFF2F4F8),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+              ),
+            ),
+          ),
+
+          /// CONTENT AREA
           Padding(
-            padding: const EdgeInsets.only(top: 115, left: 8.0, right: 8.0),
+            padding: const EdgeInsets.only(top: 100, left: 32, right: 32),
             child: Column(
               children: [
+                /// AVATAR FLOATING
                 Container(
-                  height:
-                      130, // sedikit lebih besar dari ukuran ClipOval supaya border terlihat
-                  width: 130,
+                  height: 160,
+                  width: 160,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    border: Border.all(
-                      color: Colors.white,
-                      width: 4,
-                    ), // border putih tebal 4
+                    border: Border.all(color: Colors.white, width: 6),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(.25),
+                        blurRadius: 25,
+                        offset: const Offset(0, 12),
+                      ),
+                    ],
                   ),
                   child: ClipOval(
                     child: SizedBox(
-                      height: 120,
-                      width: 120,
+                      height: 150,
+                      width: 150,
                       child: InkWell(
                         onTap: () {
                           showDialog(
@@ -69,9 +116,6 @@ class ProfilView extends GetView<ProfilController> {
                                     backgroundDecoration: const BoxDecoration(
                                       color: Colors.black,
                                     ),
-                                    minScale: PhotoViewComputedScale.contained,
-                                    maxScale:
-                                        PhotoViewComputedScale.covered * 3,
                                   ),
                                 ),
                               );
@@ -79,37 +123,30 @@ class ProfilView extends GetView<ProfilController> {
                           );
                         },
                         child: Image.network(
-                          '${ServiceApi().baseUrl}${listDataUser!.foto!}',
+                          listDataUser!.foto != ""
+                              ? imgUrl
+                              : "https://ui-avatars.com/api/?name=${listDataUser!.nama!}",
                           fit: BoxFit.cover,
-                          errorBuilder:
-                              (context, error, stackTrace) => Image.network(
-                                "https://ui-avatars.com/api/?name=${listDataUser!.nama}",
-                                fit: BoxFit.cover,
-                              ),
-                          loadingBuilder: (context, child, loadingProgress) {
-                            if (loadingProgress == null) return child;
-                            return Center(
-                              child: CircularProgressIndicator(
-                                value:
-                                    loadingProgress.expectedTotalBytes != null
-                                        ? loadingProgress
-                                                .cumulativeBytesLoaded /
-                                            loadingProgress.expectedTotalBytes!
-                                        : null,
-                              ),
-                            );
-                          },
                         ),
                       ),
                     ),
                   ),
                 ),
-                const SizedBox(height: 10),
+
+                const SizedBox(height: 13),
+
+                /// NAME
                 Text(
                   listDataUser!.nama!,
-                  style: titleTextStyle.copyWith(fontSize: 20),
+                  style: titleTextStyle.copyWith(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-                const SizedBox(height: 5),
+
+                const SizedBox(height: 6),
+
+                /// USER INFO
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -117,7 +154,7 @@ class ProfilView extends GetView<ProfilController> {
                     Text(' - ', style: subtitleTextStyle),
                     Text(listDataUser!.levelUser!, style: subtitleTextStyle),
                     Visibility(
-                      visible: listDataUser!.idRegion! != "" ? true : false,
+                      visible: listDataUser!.idRegion! != "",
                       child: Row(
                         children: [
                           Text(' - ', style: subtitleTextStyle),
@@ -130,7 +167,10 @@ class ProfilView extends GetView<ProfilController> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 10),
+
+                const SizedBox(height: 8),
+
+                /// MAIN LIST
                 Expanded(
                   child: CustomMaterialIndicator(
                     onRefresh: () async {
@@ -156,55 +196,78 @@ class ProfilView extends GetView<ProfilController> {
                     child: ListView(
                       padding: EdgeInsets.zero,
                       children: [
+                        /// CARD DATA USER
                         SizedBox(
                           height: 250,
                           child: Card(
-                            color: AppColors.contentColorWhite,
+                            elevation: 8,
+                            shadowColor: Colors.black12,
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
+                              borderRadius: BorderRadius.circular(20),
                             ),
                             child: ListView(
                               padding: EdgeInsets.zero,
                               physics: const NeverScrollableScrollPhysics(),
                               children: [
                                 ListTile(
-                                  title: Text(
-                                    'Employee ID',
-                                    style: subtitleTextStyle,
-                                  ),
-                                  trailing:
-                                      listDataUser!.nik!.isEmpty
-                                          ? CsElevatedButton(
-                                            color: AppColors.itemsBackground,
-                                            fontsize: 12,
-                                            label: 'Generate ID',
-                                            onPressed:
-                                                listDataUser!.createdAt! == ""
-                                                    ? null
-                                                    : () {
-                                                      ctr.generateEmpId(
-                                                        listDataUser!,
-                                                      );
-                                                    },
-                                          )
-                                          : Text(
-                                            listDataUser!.nik!,
-                                            style: titleTextStyle,
+                                  title: Row(
+                                    children: [
+                                      Container(
+                                        width: 20,
+                                        height: 20,
+                                        decoration: BoxDecoration(
+                                          color: Colors.blue[50],
+                                          borderRadius: BorderRadius.circular(
+                                            5,
                                           ),
+                                        ),
+                                        child: const Icon(
+                                          Icons.work,
+                                          size: 15,
+                                          color: Colors.lightBlue,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 2),
+                                      Text(
+                                        'Employee ID',
+                                        style: subtitleTextStyle,
+                                      ),
+                                    ],
+                                  ),
+                                  trailing: Text(
+                                    listDataUser!.nik!,
+                                    style: titleTextStyle,
+                                  ),
                                   contentPadding: const EdgeInsets.symmetric(
                                     horizontal: 16,
                                   ),
                                   dense: true,
                                 ),
-                                const Divider(
-                                  indent: 15,
-                                  endIndent: 15,
-                                  height: 0,
-                                ),
+                                const Divider(height: 0),
                                 ListTile(
-                                  title: Text(
-                                    'Phone No.',
-                                    style: subtitleTextStyle,
+                                  title: Row(
+                                    children: [
+                                      Container(
+                                        width: 20,
+                                        height: 20,
+                                        decoration: BoxDecoration(
+                                          color: Colors.blue[50],
+                                          borderRadius: BorderRadius.circular(
+                                            5,
+                                          ),
+                                        ),
+                                        child: const Icon(
+                                          Icons.phone,
+                                          size: 15,
+                                          color: Colors.lightBlue,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 2),
+                                      Text(
+                                        'Phone No.',
+                                        style: subtitleTextStyle,
+                                      ),
+                                    ],
                                   ),
                                   trailing: Text(
                                     listDataUser!.noTelp!,
@@ -215,34 +278,71 @@ class ProfilView extends GetView<ProfilController> {
                                   ),
                                   dense: true,
                                 ),
-                                const Divider(
-                                  indent: 15,
-                                  endIndent: 15,
-                                  height: 0,
-                                ),
+                                const Divider(height: 0),
                                 ListTile(
-                                  title: Text(
-                                    'Registered In',
-                                    style: subtitleTextStyle,
+                                  title: Row(
+                                    children: [
+                                      Container(
+                                        width: 20,
+                                        height: 20,
+                                        decoration: BoxDecoration(
+                                          color: Colors.blue[50],
+                                          borderRadius: BorderRadius.circular(
+                                            5,
+                                          ),
+                                        ),
+                                        child: const Icon(
+                                          Icons.location_pin,
+                                          size: 15,
+                                          color: Colors.lightBlue,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 2),
+                                      Text(
+                                        'Registered In',
+                                        style: subtitleTextStyle,
+                                      ),
+                                    ],
                                   ),
                                   trailing: Text(
                                     listDataUser!.namaCabang!.capitalize!,
-                                    style: titleTextStyle,
+                                    style: titleTextStyle.copyWith(
+                                      fontSize:
+                                          listDataUser!.namaCabang!.length > 21
+                                              ? 11
+                                              : 15,
+                                    ),
                                   ),
                                   contentPadding: const EdgeInsets.symmetric(
                                     horizontal: 16,
                                   ),
                                   dense: true,
                                 ),
-                                const Divider(
-                                  indent: 15,
-                                  endIndent: 15,
-                                  height: 0,
-                                ),
+                                const Divider(height: 0),
                                 ListTile(
-                                  title: Text(
-                                    'Registered At',
-                                    style: subtitleTextStyle,
+                                  title: Row(
+                                    children: [
+                                      Container(
+                                        width: 20,
+                                        height: 20,
+                                        decoration: BoxDecoration(
+                                          color: Colors.blue[50],
+                                          borderRadius: BorderRadius.circular(
+                                            5,
+                                          ),
+                                        ),
+                                        child: const Icon(
+                                          Icons.calendar_month_outlined,
+                                          size: 15,
+                                          color: Colors.lightBlue,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 2),
+                                      Text(
+                                        'Registered At',
+                                        style: subtitleTextStyle,
+                                      ),
+                                    ],
                                   ),
                                   trailing: Text(
                                     listDataUser!.createdAt != ""
@@ -259,15 +359,31 @@ class ProfilView extends GetView<ProfilController> {
                                   ),
                                   dense: true,
                                 ),
-                                const Divider(
-                                  indent: 15,
-                                  endIndent: 15,
-                                  height: 0,
-                                ),
+                                const Divider(height: 0),
                                 ListTile(
-                                  title: Text(
-                                    'Username',
-                                    style: subtitleTextStyle,
+                                  title: Row(
+                                    children: [
+                                      Container(
+                                        width: 20,
+                                        height: 20,
+                                        decoration: BoxDecoration(
+                                          color: Colors.blue[50],
+                                          borderRadius: BorderRadius.circular(
+                                            5,
+                                          ),
+                                        ),
+                                        child: const Icon(
+                                          Icons.account_circle,
+                                          size: 15,
+                                          color: Colors.lightBlue,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 2),
+                                      Text(
+                                        'Username',
+                                        style: subtitleTextStyle,
+                                      ),
+                                    ],
                                   ),
                                   trailing: Text(
                                     listDataUser!.username!,
@@ -278,37 +394,42 @@ class ProfilView extends GetView<ProfilController> {
                                   ),
                                   dense: true,
                                 ),
-                                const Divider(
-                                  indent: 15,
-                                  endIndent: 15,
-                                  height: 0,
-                                ),
-                                ListTile(
-                                  title: Text(
-                                    'Password',
-                                    style: subtitleTextStyle,
-                                  ),
-                                  trailing: Text(
-                                    '********',
-                                    style: titleTextStyle,
-                                  ),
-                                  contentPadding: const EdgeInsets.symmetric(
-                                    horizontal: 16,
-                                  ),
-                                  dense: true,
-                                ),
-                                const Divider(
-                                  indent: 15,
-                                  endIndent: 15,
-                                  height: 0,
-                                ),
                               ],
                             ),
                           ),
                         ),
+
+                        const SizedBox(height: 6),
+
+                        /// EDIT PROFILE
                         Card(
+                          elevation: 6,
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: ListTile(
+                            onTap: () {
+                              Get.to(
+                                () => UpdateProfil(userData: listDataUser!),
+                              );
+                            },
+                            title: const Text(
+                              'Edit Profile',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            trailing: const Icon(
+                              Icons.keyboard_arrow_right_rounded,
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(height: 3),
+
+                        /// LOGOUT
+                        Card(
+                          elevation: 6,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
                           ),
                           child: ListTile(
                             onTap: () {
@@ -319,35 +440,15 @@ class ProfilView extends GetView<ProfilController> {
                                 btnOkOnPress: () => auth.logout(),
                               );
                             },
-                            leading: Container(
-                              height: 30,
-                              width: 30,
-                              decoration: BoxDecoration(
-                                color: bgContainer,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Icon(
-                                Icons.power_settings_new_sharp,
-                                color: Colors.redAccent[700],
-                              ),
-                            ),
-                            title: Text(
+                            title: const Text(
                               'Logout',
                               style: TextStyle(
-                                color: Colors.redAccent[700],
+                                color: Colors.red,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                            // subtitle: Text(
-                            //   'exit app',
-                            //   style: TextStyle(
-                            //     color: subTitleColor,
-                            //     fontSize: 13,
-                            //   ),
-                            // ),
-                            trailing: Icon(
+                            trailing: const Icon(
                               Icons.keyboard_arrow_right_rounded,
-                              color: subTitleColor,
                             ),
                           ),
                         ),
@@ -359,35 +460,28 @@ class ProfilView extends GetView<ProfilController> {
             ),
           ),
 
-          Positioned(
-            top: 60,
-            left: 20,
-            right: 20,
-            bottom: 0,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    const Icon(
-                      CupertinoIcons.person_alt_circle,
-                      size: 25,
-                      color: AppColors.contentColorWhite,
-                    ),
-                    const SizedBox(width: 5),
-                    Text(
-                      'Profile',
-                      style: titleTextStyle.copyWith(
-                        fontSize: 18,
-                        color: AppColors.contentColorWhite,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
+          /// TITLE HEADER
+          // Positioned(
+          //   top: 60,
+          //   left: 20,
+          //   child: Row(
+          //     children: [
+          //       const Icon(
+          //         CupertinoIcons.person_alt_circle,
+          //         size: 25,
+          //         color: Colors.white,
+          //       ),
+          //       const SizedBox(width: 6),
+          //       Text(
+          //         'Profile',
+          //         style: titleTextStyle.copyWith(
+          //           fontSize: 18,
+          //           color: Colors.white,
+          //         ),
+          //       ),
+          //     ],
+          //   ),
+          // ),
         ],
       ),
     );

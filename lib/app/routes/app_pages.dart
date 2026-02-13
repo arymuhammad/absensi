@@ -15,6 +15,8 @@ import '../modules/login/bindings/login_binding.dart';
 import '../modules/login/views/login_view.dart';
 import '../modules/pay_slip/bindings/pay_slip_binding.dart';
 import '../modules/pay_slip/views/pay_slip_view.dart';
+import '../modules/ping/bindings/ping_binding.dart';
+import '../modules/ping/views/ping_view.dart';
 import '../modules/profil/bindings/profil_binding.dart';
 import '../modules/profil/views/profil_view.dart';
 import '../modules/semua_absen/bindings/semua_absen_binding.dart';
@@ -94,6 +96,11 @@ class AppPages {
       name: _Paths.PAY_SLIP,
       page: () => PaySlipView(),
       binding: PaySlipBinding(),
+    ),
+    GetPage(
+      name: _Paths.PING,
+      page: () => const PingIndicator(host: ''),
+      binding: PingBinding(),
     ),
   ];
 }

@@ -109,7 +109,7 @@ _buildAbsen(Data userData, HomeController absenC) {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Container(
-                          height: 30,
+                          height: 15,
                           alignment: Alignment.center,
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.center,
@@ -157,7 +157,7 @@ _buildAbsen(Data userData, HomeController absenC) {
                     child: Column(
                       children: [
                         Container(
-                          height: 30,
+                          height: 15,
                           alignment: Alignment.center,
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.center,
@@ -213,7 +213,7 @@ _buildAbsen(Data userData, HomeController absenC) {
                     child: Column(
                       children: [
                         Container(
-                          height: 30,
+                          height: 15,
                           alignment: Alignment.center,
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.center,

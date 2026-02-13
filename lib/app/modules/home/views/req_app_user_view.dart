@@ -33,6 +33,13 @@ class ReqAppUserView extends GetView {
         // iconTheme: const IconThemeData(color: Colors.black,),
         centerTitle: true,
         actions: [Container()],
+        flexibleSpace: Container(decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color(0xFF1B2541), Color(0xFF3949AB)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),),
       ),
       extendBodyBehindAppBar: true,
       body: Stack(

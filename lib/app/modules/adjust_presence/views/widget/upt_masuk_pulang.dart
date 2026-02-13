@@ -11,6 +11,7 @@ import 'package:icons_plus/icons_plus.dart';
 import 'package:widget_zoom/widget_zoom.dart';
 
 import '../../../../data/helper/const.dart';
+import '../../../../data/helper/convert_time.dart';
 import '../../../../services/service_api.dart';
 import '../../../shared/elevated_button.dart';
 
@@ -22,6 +23,7 @@ class UptMasukPulang extends StatelessWidget {
   final homeC = Get.find<HomeController>();
   @override
   Widget build(BuildContext context) {
+    final levelId = dataUser!.level;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -78,7 +80,10 @@ class UptMasukPulang extends StatelessWidget {
         Text(data.alasan!, style: subtitleTextStyle),
         const SizedBox(height: 10),
         Visibility(
-          visible: data.accept == "" && dataUser!.level == "1" ? true : false,
+          visible:
+              data.accept == "" && (['1', '26']).contains(levelId)
+                  ? true
+                  : false,
           child: SizedBox(
             height: 45,
             child: CsTextField(
@@ -102,7 +107,10 @@ class UptMasukPulang extends StatelessWidget {
         //   thickness: 2,
         // ),
         Visibility(
-          visible: data.accept == "" && dataUser!.level == "1" ? true : false,
+          visible:
+              data.accept == "" && (['1', '26']).contains(levelId)
+                  ? true
+                  : false,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
@@ -135,9 +143,10 @@ class UptMasukPulang extends StatelessWidget {
                     "id_user": data.idUser,
                     "tgl_masuk": data.tglMasuk,
                     keyJamAbsen:
-                        data.status == "update_masuk"
-                            ? data.jamAbsenMasuk
-                            : data.jamAbsenPulang,
+                        (data.status == "update_masuk"
+                                ? data.jamAbsenMasuk
+                                : data.jamAbsenPulang)
+                            .to24Hour(),
                     keyFotoAbsen:
                         data.status == "update_masuk"
                             ? data.fotoMasuk
@@ -152,6 +161,7 @@ class UptMasukPulang extends StatelessWidget {
                     idUser: dataUser!.id!,
                     level: dataUser!.level!,
                   );
+                  homeC.futurePendAdj.value;
                   homeC.refresh();
                 },
               ),
@@ -173,6 +183,7 @@ class UptMasukPulang extends StatelessWidget {
                     idUser: dataUser!.id!,
                     level: dataUser!.level!,
                   );
+                  homeC.futurePendAdj.value;
                   homeC.refresh();
                 },
               ),

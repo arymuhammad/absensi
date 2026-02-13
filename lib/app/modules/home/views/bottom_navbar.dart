@@ -54,6 +54,7 @@ class BottomNavBar extends GetView {
       bottomNavigationBar: Obx(
         () => BottomBarInspiredOutside(
           items: items,
+          titleStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, letterSpacing: 0.1),
           backgroundColor: AppColors.contentColorWhite,
           indexSelected: loginC.selected.value,
           color: Colors.grey,

@@ -4,7 +4,6 @@ import 'package:absensi/app/data/model/login_model.dart';
 import 'package:absensi/app/modules/add_pegawai/controllers/add_pegawai_controller.dart';
 import 'package:absensi/app/modules/settings/views/about_view.dart';
 import 'package:absensi/app/modules/settings/views/backup_view.dart';
-import 'package:absensi/app/modules/profil/views/update_profil.dart';
 import 'package:absensi/app/modules/profil/views/verifikasi_update_password.dart';
 import 'package:absensi/app/routes/app_pages.dart';
 import 'package:flutter/cupertino.dart';
@@ -27,7 +26,13 @@ class SettingsView extends GetView<SettingsController> {
           // ),
           Container(
             height: 250,
-            decoration: const BoxDecoration(color: AppColors.itemsBackground),
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color(0xFF1B2541), Color(0xFF3949AB)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
           ),
           Padding(
             padding: const EdgeInsets.only(top: 110, left: 15.0, right: 15.0),
@@ -45,43 +50,43 @@ class SettingsView extends GetView<SettingsController> {
                       child: ListView(
                         padding: const EdgeInsets.all(10),
                         children: [
-                          ListTile(
-                            title: Text(
-                              'Profile Settings',
-                              style: TextStyle(
-                                color: titleColor,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            subtitle: Text(
-                              'Update Profile',
-                              style: TextStyle(
-                                color: subTitleColor,
-                                fontSize: 13,
-                              ),
-                            ),
-                            leading: Container(
-                              height: 40,
-                              width: 40,
-                              decoration: BoxDecoration(
-                                color: bgContainer,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: const Icon(
-                                Iconsax.profile_circle_bold,
-                                color: AppColors.itemsBackground,
-                              ),
-                            ),
-                            trailing: const Icon(
-                              Icons.keyboard_arrow_right_rounded,
-                            ),
-                            onTap: () {
-                              Get.to(
-                                () => UpdateProfil(userData: listDataUser!),
-                                transition: Transition.cupertino,
-                              );
-                            },
-                          ),
+                          // ListTile(
+                          //   title: Text(
+                          //     'Profile Settings',
+                          //     style: TextStyle(
+                          //       color: titleColor,
+                          //       fontWeight: FontWeight.bold,
+                          //     ),
+                          //   ),
+                          //   subtitle: Text(
+                          //     'Update Profile',
+                          //     style: TextStyle(
+                          //       color: subTitleColor,
+                          //       fontSize: 13,
+                          //     ),
+                          //   ),
+                          //   leading: Container(
+                          //     height: 40,
+                          //     width: 40,
+                          //     decoration: BoxDecoration(
+                          //       color: bgContainer,
+                          //       borderRadius: BorderRadius.circular(8),
+                          //     ),
+                          //     child: const Icon(
+                          //       Iconsax.profile_circle_bold,
+                          //       color: AppColors.itemsBackground,
+                          //     ),
+                          //   ),
+                          //   trailing: const Icon(
+                          //     Icons.keyboard_arrow_right_rounded,
+                          //   ),
+                          //   onTap: () {
+                          //     Get.to(
+                          //       () => UpdateProfil(userData: listDataUser!),
+                          //       transition: Transition.cupertino,
+                          //     );
+                          //   },
+                          // ),
                           // ListTile(
                           //   title: Text(
                           //     'Data Wajah',
@@ -339,29 +344,33 @@ class SettingsView extends GetView<SettingsController> {
           Positioned(
             top: 60,
             left: 20,
-            right: 0,
+            right: 20,
             bottom: 0,
             child: Row(
-              // mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Padding(
-                  padding: EdgeInsets.only(top: 1.0),
-                  child: Icon(
-                    CupertinoIcons.gear_alt_fill,
-                    size: 25,
-                    color: AppColors.contentColorWhite,
-                  ),
+                Row(
+                  children: [
+                    const Padding(
+                      padding: EdgeInsets.only(top: 1.0),
+                      child: Icon(
+                        CupertinoIcons.gear_alt_fill,
+                        size: 25,
+                        color: AppColors.contentColorWhite,
+                      ),
+                    ),
+                    const SizedBox(width: 5),
+                    Text(
+                      'Setting',
+                      style: titleTextStyle.copyWith(
+                        fontSize: 18,
+                        color: AppColors.contentColorWhite,
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(width: 5),
-                Text(
-                  'Setting',
-                  style: titleTextStyle.copyWith(
-                    fontSize: 18,
-                    color: AppColors.contentColorWhite,
-                  ),
-                ),
-              ],
+              ]
             ),
           ),
         ],

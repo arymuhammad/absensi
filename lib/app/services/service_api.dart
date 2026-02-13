@@ -1375,8 +1375,8 @@ class ServiceApi {
             ),
           )
           .timeout(const Duration(minutes: 1));
-      // print(
-      //     '${baseUrl}get_reqUptAbs?accept=$accept&type=$type&level=$level&id_user=$idUser&date1=$date1&date2=$date2');
+      print(
+          '${baseUrl}get_reqUptAbs?accept=$accept&type=$type&level=$level&id_user=$idUser&date1=$date1&date2=$date2');
       switch (response.statusCode) {
         case 200:
           List<dynamic> listData = json.decode(response.body)['data'];
@@ -1576,9 +1576,13 @@ class ServiceApi {
           return null;
         }
         if (data['branch'] == "HO000") {
-        return PayslipResult(payslipModel: PayslipModel.fromJson(decoded['data']));
+          return PayslipResult(
+            payslipModel: PayslipModel.fromJson(decoded['data']),
+          );
         } else {
-            return PayslipResult(payslipStoreModel: PayslipStoreModel.fromJson(decoded['data']));
+          return PayslipResult(
+            payslipStoreModel: PayslipStoreModel.fromJson(decoded['data']),
+          );
         }
       } else {
         throw Exception('Failed to load data, status: ${response.statusCode}');

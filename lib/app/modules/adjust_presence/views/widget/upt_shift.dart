@@ -17,6 +17,7 @@ class UptShift extends StatelessWidget {
   final homeC = Get.find<HomeController>();
   @override
   Widget build(BuildContext context) {
+    final levelId = dataUser!.level;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -47,7 +48,10 @@ class UptShift extends StatelessWidget {
         Text(data.alasan!, style: subtitleTextStyle),
         const SizedBox(height: 10),
         Visibility(
-          visible: data.accept == "" && dataUser!.level == "1" ? true : false,
+          visible:
+              data.accept == "" && (['1', '26']).contains(levelId)
+                  ? true
+                  : false,
           child: SizedBox(
             height: 45,
             child: CsTextField(
@@ -68,7 +72,10 @@ class UptShift extends StatelessWidget {
           ),
         ),
         Visibility(
-          visible: data.accept == "" && dataUser!.level == "1" ? true : false,
+          visible:
+              data.accept == "" && (['1', '26']).contains(levelId)
+                  ? true
+                  : false,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
@@ -99,6 +106,7 @@ class UptShift extends StatelessWidget {
                     idUser: dataUser!.id!,
                     level: dataUser!.level!,
                   );
+                  homeC.futurePendAdj.value;
                 },
               ),
               CsElevatedButton(
@@ -119,6 +127,7 @@ class UptShift extends StatelessWidget {
                     idUser: dataUser!.id!,
                     level: dataUser!.level!,
                   );
+                  homeC.futurePendAdj.value;
                 },
               ),
             ],

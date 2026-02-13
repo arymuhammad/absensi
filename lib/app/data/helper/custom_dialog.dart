@@ -129,7 +129,7 @@ warningDialog(context, title, desc) {
     desc: desc,
     btnOkOnPress: () {},
     btnOkIcon: Icons.cancel,
-    btnOkText: 'Tutup',
+    btnOkText: 'Close',
     btnOkColor: Colors.yellowAccent[700],
     onDismissCallback: (type) {
       debugPrint('Dialog Dissmiss from callback $type');

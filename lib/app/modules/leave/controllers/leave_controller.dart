@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:absensi/app/data/helper/custom_dialog.dart';
 import 'package:absensi/app/data/model/leave_model.dart';
 import 'package:absensi/app/data/model/login_model.dart';
@@ -63,40 +62,15 @@ class LeaveController extends GetxController {
       "username": dataUser.username!,
       "password": dataUser.password!,
     });
-    if (Get.isRegistered<LoginController>()) {
+    
       final logC = Get.find<LoginController>();
       logC.logUser.update((val) {
         val!.leaveBalance = newUsr.leaveBalance!;
       });
       logC.refresh();
-    }
-
-    startAppSdk.setTestAdsEnabled(false); // Aktifkan saat development
-    loadBannerAd();
+  
   }
 
-  Future<void> loadBannerAd() async {
-    try {
-      bannerAdStartApp.value = await startAppSdk.loadBannerAd(
-        StartAppBannerType.BANNER,
-      );
-      retryCount = 0; // Reset jika berhasil
-      // simpan bannerAd ke state/store supaya bisa dipakai di widget
-    } on PlatformException catch (_) {
-      if (retryCount < maxRetry) {
-        retryCount++;
-        Future.delayed(const Duration(seconds: 3), () {
-          loadBannerAd();
-        });
-      } else {
-        showToast('Gagal memuat iklan banner setelah $maxRetry kali percobaan');
-      }
-    } catch (e) {
-      // print('Unexpected error: $e');
-      showToast('Gagal memuat iklan banner');
-      // loadBannerAd();
-    }
-  }
 
   @override
   void onClose() {
@@ -108,7 +82,6 @@ class LeaveController extends GetxController {
     reasonLeave.dispose();
     addrLeave.dispose();
     phone.dispose();
-    bannerAdStartApp.value?.dispose();
     super.onClose();
   }
 

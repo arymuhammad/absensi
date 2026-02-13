@@ -1,234 +1,228 @@
 import 'dart:io';
-import 'package:absensi/app/modules/absen/controllers/absen_controller.dart';
+// import 'package:absensi/app/modules/absen/controllers/absen_controller.dart';
+import 'package:absensi/app/modules/semua_absen/views/widget/form_filter.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:flutter_native_timezone_updated_gradle/flutter_native_timezone.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import '../../../../data/helper/custom_dialog.dart';
 import '../../../../data/helper/format_waktu.dart';
+import '../../../../data/helper/time_service.dart';
 import '../../../../data/model/login_model.dart';
 import '../../../shared/dropdown_cabang.dart';
 import '../../../shared/dropdown_shift_kerja.dart';
 
-final absC = Get.find<AbsenController>();
+// /// =======================================================
+// /// CACHE STATE (DATE-AWARE)
+// /// =======================================================
+// // bool _absenChecked = false;
+// // Future<bool>? _cekAbsenFuture;
+// // String? _lastCheckedDate;
 
-Future<bool> cekAbsenBefore9AM(Data? data) async {
-  //absen
-  var previous = DateFormat('yyyy-MM-dd').format(
-    DateTime.parse(
-      absC.dateNowServer.isNotEmpty ? absC.dateNowServer : absC.dateNow,
-    ).add(const Duration(days: -1)),
-  );
-  // Get the current time
-  DateTime now = DateTime.now();
-  TimeOfDay currentTime = TimeOfDay.fromDateTime(now);
+// /// =======================================================
+// /// CEK ABSEN SEBELUM JAM 09:01 (PAKAI TimeService)
+// /// =======================================================
+// Future<bool> cekAbsenBefore9AM(Data? data) async {
+//   final now = TimeService.nowLocal();
+//   // final today = DateFormat('yyyy-MM-dd').format(now);
 
-  // Set the target time to 7:00 AM
-  TimeOfDay targetTime = const TimeOfDay(hour: 09, minute: 01);
+//   final previous = DateFormat('yyyy-MM-dd').format(
+//     DateTime.parse(
+//       absenC.dateNowServer.isNotEmpty ? absenC.dateNowServer : absenC.dateNow,
+//     ).subtract(const Duration(days: 1)),
+//   );
 
-  // Convert TimeOfDay to DateTime for proper comparison
-  DateTime currentDateTime = DateTime(
-    now.year,
-    now.month,
-    now.day,
-    currentTime.hour,
-    currentTime.minute,
-  );
-  DateTime targetDateTime = DateTime(
-    now.year,
-    now.month,
-    now.day,
-    targetTime.hour,
-    targetTime.minute,
-  );
+//   final currentDateTime = DateTime(
+//     now.year,
+//     now.month,
+//     now.day,
+//     now.hour,
+//     now.minute,
+//   );
 
-  // Compare the current time with the target time
-  bool isBefore9AM = currentDateTime.isBefore(targetDateTime);
-  // print(isBefore9AM);
+//   final targetDateTime = DateTime(now.year, now.month, now.day, 15, 1);
 
-  // if (isBefore9AM) {
+//   final isBefore9AM = currentDateTime.isBefore(targetDateTime);
 
-  if (isBefore9AM) {
-    await absC.cekDataAbsen("pulang", data!.id!, previous);
-    return absC.cekAbsen.value.total == "1" &&
-        absC.cekAbsen.value.idShift != "0";
-  }
-  return false;
-}
+//   if (isBefore9AM) {
+//     await absenC.cekDataAbsen("pulang", data!.id!, previous);
 
+//     final mustCheckout =
+//         absenC.cekAbsen.value.total == "1" &&
+//         absenC.cekAbsen.value.idShift != "0";
+
+//     /// 🔐 SINGLE SOURCE OF TRUTH
+//     absenC.mustCheckoutYesterday.value = mustCheckout;
+//     return mustCheckout;
+//   }
+
+//   absenC.mustCheckoutYesterday.value = false;
+//   return false;
+// }
+
+/// =======================================================
+/// UI BUILDER
+/// =======================================================
 Widget buildAbsen({required Data? data}) {
-  return FutureBuilder<bool>(
-    future: cekAbsenBefore9AM(data),
-    builder: (context, snapshot) {
-      if (snapshot.connectionState == ConnectionState.waiting) {
-        // tampilkan loading saat sedang cek async
-        return Center(
-          child:
-              Platform.isAndroid
-                  ? const CircularProgressIndicator()
-                  : const CupertinoActivityIndicator(),
-        );
-      } else if (snapshot.hasData) {
-        bool snapData = snapshot.data!;
-        if (snapData) {
-          // print('snappppp ${snapData}');
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            absC.stsAbsenSelected.value = "Check Out";
-          });
-          // kondisi ketika absen pulang kosong ditemukan
-          return Column(
-            children: [
-              const Center(
-                child: Text(
-                  "Absen pulang kemarin masih kosong. Silahkan Check out terlebih dahulu sebelum Check in",
+  // final today = DateFormat('yyyy-MM-dd').format(TimeService.nowLocal());
+
+  /// 🔄 RESET JIKA TANGGAL BERGANTI
+  // if (_lastCheckedDate != today) {
+  //   _lastCheckedDate = today;
+  //   _absenChecked = false;
+  //   _cekAbsenFuture = null;
+
+  //   absenC.mustCheckoutYesterday.value = false;
+  //   absenC.stsAbsenSelected.value = "";
+  // }
+
+  // if (!_absenChecked) {
+  //   _cekAbsenFuture = cekAbsenBefore9AM(data);
+  //   _absenChecked = true;
+  // }
+
+  return Obx(() {
+    if (absenC.isCheckingAbsen.value) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    /// 🔴 WAJIB CHECKOUT KEMARIN
+    if (absenC.mustCheckoutYesterday.value) {
+      // WidgetsBinding.instance.addPostFrameCallback((_) {
+      //   absenC.stsAbsenSelected.value = "Check Out";
+      // });
+
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Padding(
+            padding: EdgeInsets.only(left: 8.0),
+            child: Text(
+              "Absen pulang kemarin masih kosong.\nSilahkan Check Out terlebih dahulu",
+             style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+          ),
+          const SizedBox(height: 8),
+          CsDropdownCabang(
+            hintText: data!.namaCabang,
+            dataUser: data,
+            value:
+                absenC.selectedCabang.value.isEmpty
+                    ? null
+                    : absenC.selectedCabang.value,
+          ),
+        ],
+      );
+    }
+
+    /// ===================================================
+    /// 🟢 NORMAL ABSEN HARI INI
+    /// ===================================================
+    return Column(
+      children: [
+        /// STATUS ABSEN
+        Obx(
+          () => SizedBox(
+            height: 40,
+            child: DropdownButtonFormField<String>(
+              key: const ValueKey('sts_absen'),
+              decoration: InputDecoration(
+                fillColor: Colors.white,
+                filled: true,
+                isDense: true,
+                contentPadding: const EdgeInsets.all(5),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide.none,
                 ),
+                label: const Text('Select one'),
               ),
-              CsDropdownCabang(
-                hintText: data!.namaCabang,
-                dataUser: data,
-                value:
-                    absC.selectedCabang.value == ""
-                        ? null
-                        : absC.selectedCabang.value,
-              ),
-            ],
-          );
-        } else {
-          return Column(
-            children: [
-              Obx(
-                () => DropdownButtonFormField<String>(
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    label: Text('Select one'),
-                  ),
-                  value:
-                      absC.stsAbsenSelected.isEmpty
-                          ? null
-                          : absC.stsAbsenSelected.value,
-                  items:
-                      absC.stsAbsen
-                          .map(
-                            (e) => DropdownMenuItem<String>(
-                              value: e,
-                              child: Text(e),
-                            ),
-                          )
-                          .toList(),
-                  onChanged: (val) {
-                    if (val != null) {
-                      absC.stsAbsenSelected.value = val;
-                      // print(absC.stsAbsenSelected.value);
+              value:
+                  absenC.stsAbsenSelected.value.isEmpty
+                      ? null
+                      : absenC.stsAbsenSelected.value,
+              items:
+                  absenC.stsAbsen
+                      .map(
+                        (e) =>
+                            DropdownMenuItem<String>(value: e, child: Text(e)),
+                      )
+                      .toList(),
+              onChanged: (val) {
+                if (val != null) {
+                  absenC.stsAbsenSelected.value = val;
+                }
+              },
+            ),
+          ),
+        ),
+
+        const SizedBox(height: 5),
+
+        CsDropdownCabang(
+          hintText: data!.namaCabang,
+          dataUser: data,
+          value:
+              absenC.selectedCabang.value.isEmpty
+                  ? null
+                  : absenC.selectedCabang.value,
+        ),
+
+        const SizedBox(height: 5),
+
+        /// SHIFT KERJA (NO NETWORK TIME)
+        Obx(
+          () => Visibility(
+            visible: absenC.stsAbsenSelected.value != "Check Out",
+            child: CsDropdownShiftKerja(
+              page: 'absen',
+              value:
+                  absenC.selectedShift.value.isEmpty
+                      ? null
+                      : absenC.selectedShift.value,
+              onChanged: (val) async{
+                if (val == "5") {
+                  final DateTime? now = await getServerTimeLocal();
+                  final nowTime = FormatWaktu.formatJamMenit(
+                    jamMenit:
+                        "${now!.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}",
+                  );
+
+                  if (nowTime.isAfter(
+                        FormatWaktu.formatJamMenit(jamMenit: '08:59'),
+                      ) &&
+                      nowTime.isBefore(
+                        FormatWaktu.formatJamMenit(jamMenit: '15:00'),
+                      )) {
+                    absenC.selectedShift.value = "";
+                    dialogMsg(
+                      'INFO',
+                      'Cannot select this shift before\n15:00 local time.',
+                    );
+                    return;
+                  }
+
+                  absenC.selectedShift.value = val!;
+                } else {
+                  for (final s in absenC.shiftKerja) {
+                    if (s.id == val) {
+                      absenC.selectedShift.value = val!;
+                      absenC.jamMasuk.value = s.jamMasuk!;
+                      absenC.jamPulang.value = s.jamPulang!;
+                      break;
                     }
-                  },
-                ),
-              ),
-              const SizedBox(height: 5),
-              // Obx(
-              //   () => Visibility(
-              //     visible: absC.stsAbsenSelected.value != "Check Out",
-              //     child:
-              CsDropdownCabang(
-                hintText: data!.namaCabang,
-                dataUser: data,
-                value:
-                    absC.selectedCabang.value == ""
-                        ? null
-                        : absC.selectedCabang.value,
-              ),
-              //   ),
-              // ),
-              const SizedBox(height: 5),
-              Obx(
-                () => Visibility(
-                  visible: absC.stsAbsenSelected.value != "Check Out",
-                  child: CsDropdownShiftKerja(
-                    page: 'absen',
-                    value:
-                        absC.selectedShift.value == ""
-                            ? null
-                            : absC.selectedShift.value,
-                    onChanged: (val) async {
-                      if (val == "5") {
-                        loadingDialog(
-                          "retrieve time data from the network",
-                          '',
-                        );
-                        // await absC.timeNetwork(
-                        //   await FlutterNativeTimezone.getLocalTimezone(),
-                        // );
-                        await absC.fallbackTimeNetwork(
-                          await FlutterNativeTimezone.getLocalTimezone(),
-                          dotenv.env['API_KEY_WORLDTIME_API'],
-                        );
-                        Get.back();
-                        if (FormatWaktu.formatJamMenit(
-                              jamMenit:
-                                  absC.timeNow.isNotEmpty
-                                      ? absC.timeNow
-                                      : absC.timeNowOpt,
-                            ).isAfter(
-                              FormatWaktu.formatJamMenit(jamMenit: '08:59'),
-                            ) &&
-                            FormatWaktu.formatJamMenit(
-                              jamMenit:
-                                  absC.timeNow.isNotEmpty
-                                      ? absC.timeNow
-                                      : absC.timeNowOpt,
-                            ).isBefore(
-                              FormatWaktu.formatJamMenit(jamMenit: '15:00'),
-                            )) {
-                          absC.selectedShift.value = "";
-                          dialogMsg(
-                            'INFO',
-                            'Cannot select this shift before\n15:00 local time.\n\nPlease select another shift',
-                          );
-                        } else {
-                          absC.selectedShift.value = val!;
-                          // add duration 8 hour for shift 5 moved to check_in page, before submiting data presence (json) 
-                          // absC.jamMasuk.value =
-                          //     absC.timeNow.isNotEmpty
-                          //         ? absC.timeNow
-                          //         : absC.timeNowOpt;
-                          // absC.jamPulang.value = DateFormat("HH:mm").format(
-                          //   DateTime.parse(
-                          //     absC.dateNowServer,
-                          //   ).toLocal().add(const Duration(hours: 8)),
-                          // );
-                          // print(absC.dateNowServer);
-                          // print(absC.jamPulang.value);
-                          dialogMsg(
-                            'INFO',
-                            'Make sure the work shift selected is appropriate',
-                          );
-                        }
-                      } else {
-                        for (int i = 0; i < absC.shiftKerja.length; i++) {
-                          if (absC.shiftKerja[i].id == val) {
-                            absC.selectedShift.value = val!;
-                            absC.jamMasuk.value = absC.shiftKerja[i].jamMasuk!;
-                            absC.jamPulang.value =
-                                absC.shiftKerja[i].jamPulang!;
-                          }
-                        }
-                        dialogMsg(
-                          'INFO',
-                          'Make sure the work shift selected is appropriate',
-                        );
-                      }
-                    },
-                  ),
-                ),
-              ),
-            ],
-          );
-        }
-      } else {
-        // jika terjadi error pada future
-        return const Center(child: Text("There is an error"));
-      }
-    },
-  );
+                  }
+                }
+
+                dialogMsg(
+                  'INFO',
+                  'Make sure the work shift selected is appropriate',
+                );
+              },
+            ),
+          ),
+        ),
+      ],
+    );
+  });
 }

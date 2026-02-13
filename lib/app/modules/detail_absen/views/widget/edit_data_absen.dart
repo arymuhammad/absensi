@@ -19,7 +19,7 @@ class EditDataAbsen extends GetView<DetailAbsenController> {
   Widget build(BuildContext context) {
     return Container(
       height: 500,
-      decoration: const BoxDecoration(color: Colors.white),
+      decoration: BoxDecoration(color: Colors.grey[300]),
       child: SingleChildScrollView(
         scrollDirection: Axis.vertical,
         child: Padding(
@@ -54,7 +54,7 @@ class EditDataAbsen extends GetView<DetailAbsenController> {
                   ),
                 ],
               ),
-              const SizedBox(height: 5),
+              const SizedBox(height: 10),
               SizedBox(
                 // height: 52,
                 child: CsDropdownShiftKerja(
@@ -187,7 +187,7 @@ class EditDataAbsen extends GetView<DetailAbsenController> {
                   label: 'Reason for data change',
                 ),
               ),
-              const SizedBox(height: 20),
+              // const SizedBox(height: 5),
               Center(
                 child: CsElevatedButtonIcon(
                   icon: Transform.rotate(
@@ -197,7 +197,7 @@ class EditDataAbsen extends GetView<DetailAbsenController> {
                   fontSize: 18,
                   label: 'Request Approval',
                   onPressed: () {
-                    detailC.submitApproval(data['id_user'], data['nama']);
+                    detailC.submitApproval(data['id_user'], data['nama'], data['kode_cabang']);
                   },
                   backgroundColor: AppColors.itemsBackground,
                 ),

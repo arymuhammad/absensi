@@ -256,7 +256,7 @@ class ReqAppUpdate extends GetView {
                                         // const SizedBox(height: 5),
                                         Text(i.nama, style: titleTextStyle),
                                         Text(
-                                          i.idUser,
+                                          i.namaCabang,
                                           style: subtitleTextStyle,
                                         ),
                                         Row(

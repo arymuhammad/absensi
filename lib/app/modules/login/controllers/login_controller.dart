@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:absensi/app/data/helper/db_helper.dart';
 import 'package:absensi/app/data/helper/custom_dialog.dart';
 import 'package:absensi/app/data/model/login_offline_model.dart';
+import 'package:absensi/app/modules/pay_slip/controllers/pay_slip_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -221,6 +222,7 @@ class LoginController extends GetxController with GetTickerProviderStateMixin {
     //   ); // Opsional delay sebentar untuk proses reset
     // }
     Get.delete<AbsenController>(force: true); // Hapus instance controller lama
+    Get.delete<PaySlipController>(force: true);
     // Get.reset();
     Get.back();
 

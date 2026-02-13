@@ -1,5 +1,6 @@
 import 'package:absensi/app/data/helper/app_colors.dart';
 import 'package:absensi/app/data/helper/const.dart';
+import 'package:absensi/app/data/helper/greeting_helper.dart';
 import 'package:absensi/app/data/model/login_model.dart';
 import 'package:absensi/app/modules/home/views/summary_absen.dart';
 import 'package:absensi/app/modules/home/views/summary_absen_area.dart';
@@ -19,6 +20,8 @@ class HomeView extends GetView<HomeController> {
   final absenC = Get.put(AbsenController());
   final adjCtrl = Get.put(AdjustPresenceController());
   final leaveC = Get.put(LeaveController());
+  final greetingC = Get.put(HomeController());
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -27,13 +30,41 @@ class HomeView extends GetView<HomeController> {
         children: [
           // const CsBgImg(),
           Container(
-            height: 110,
-            decoration: const BoxDecoration(color: AppColors.itemsBackground),
+            height: 230,
+           decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color(0xFF1B2541), Color(0xFF3949AB)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
           ),
           Padding(
-            padding: const EdgeInsets.only(left: 15.0, top: 40.0, right: 15.0),
+            padding: const EdgeInsets.only(left: 15.0, top: 60.0, right: 15.0),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Obx(
+                      () => Text(
+                        '${greetingC.greeting.value}${listDataUser!.nama!.split(' ')[0]}',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          color: AppColors.contentColorWhite,
+                        ),
+                      ),
+                    ),
+                    // Obx(() => Image(image: greetingC.icon.value, width: 42)),
+                    // const Padding(
+                    //   padding: EdgeInsets.all(8.0),
+                    //   child: PingIndicator(host: '103.156.15.61'),
+                    // ),
+                  ],
+                ),
+                const SizedBox(height: 5,),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -46,58 +77,75 @@ class HomeView extends GetView<HomeController> {
                               () => ProfilView(listDataUser: listDataUser!),
                             );
                           },
-                          child: RoundedImage(
-                            height: 60,
+                          child: Container(
                             width: 60,
-                            foto: listDataUser!.foto!,
-                            name: listDataUser!.nama!,
-                            headerProfile: true,
+                            height: 60,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: Colors.lightBlue,
+                                width: 1,
+                              ), // border putih tebal 4
+                            ),
+                            child: RoundedImage(
+                              height: 60,
+                              width: 60,
+                              foto: listDataUser!.foto!,
+                              name: listDataUser!.nama!,
+                              headerProfile: true,
+                            ),
                           ),
                         ),
                         const SizedBox(width: 10),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              listDataUser!.nama!.substring(
-                                    0,
-                                    listDataUser!.nama!.length > 18
-                                        ? 18
-                                        : listDataUser!.nama!.length,
-                                  ) +
-                                  (listDataUser!.nama!.length > 18 ? '...' : '')
-                                      .toString()
-                                      .capitalize!,
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 1,
-                              softWrap: true,
-                              style: titleTextStyle.copyWith(
-                                fontSize: 18,
-                                color: AppColors.contentColorWhite,
-                                // fontWeight: FontWeight.w500,
-                              ),
-                            ),
+                            // Text(
+                            //   listDataUser!.nama!.substring(
+                            //         0,
+                            //         listDataUser!.nama!.length > 18
+                            //             ? 18
+                            //             : listDataUser!.nama!.length,
+                            //       ) +
+                            //       (listDataUser!.nama!.length > 18
+                            //               ? '...'
+                            //               : '')
+                            //           .toString()
+                            //           .capitalize!,
+                            //   overflow: TextOverflow.ellipsis,
+                            //   maxLines: 1,
+                            //   softWrap: true,
+                            //   style: titleTextStyle.copyWith(
+                            //     fontSize: 18,
+                            //     color: AppColors.contentColorWhite,
+                            //     // fontWeight: FontWeight.w500,
+                            //   ),
+                            // ),
                             Text(
                               listDataUser!.levelUser!.capitalize!,
                               style: subtitleTextStyle.copyWith(
-                                // color: Colors.grey,
-                                fontSize: 14,
+                                color: Colors.white,
+                                fontSize: 16,
                               ),
                             ),
                             Text(
                               listDataUser!.namaCabang!.capitalize!,
-                              // overflow: TextOverflow.ellipsis,
-                              // maxLines: 1,
+
                               softWrap: true,
-                              style: subtitleTextStyle.copyWith(fontSize: 14),
+                              style: const TextStyle(
+                                fontSize: 16,
+                                color: Colors.grey,
+                              ),
                             ),
                           ],
                         ),
                       ],
                     ),
+
+                    // ping widget
                   ],
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height:5),
                 // Row(
                 //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 //   children: [
@@ -165,6 +213,35 @@ class HomeView extends GetView<HomeController> {
                     ? SummaryAbsenArea(userData: listDataUser!)
                     : SummaryAbsen(userData: listDataUser!),
               ],
+            ),
+          ),
+          Positioned(
+            top: 40,
+            right: -10,
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final screenWidth = MediaQuery.of(context).size.width;
+
+                // ukuran responsif
+                final double iconSize = screenWidth * 0.28; // ±28% layar
+
+                return IgnorePointer(
+                  child: Opacity(
+                    opacity: 0.95,
+                    child: 
+                    // Image(
+                      // image:
+                       SizedBox(
+                        height:iconSize,
+                        width:iconSize,
+                        child: greetingC.icon.value),
+                    //   width: iconSize,
+                    //   height: iconSize,
+                    //   fit: BoxFit.contain,
+                    // ),
+                  ),
+                );
+              },
             ),
           ),
         ],

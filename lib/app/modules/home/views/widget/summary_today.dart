@@ -8,285 +8,436 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:intl/intl.dart';
-import 'package:marquee/marquee.dart';
 
 import '../../../../data/helper/app_colors.dart';
 import '../../../../data/helper/const.dart';
+import '../../../../data/helper/custom_dialog.dart';
 import '../../../../data/helper/format_waktu.dart';
 import '../../../../data/model/absen_model.dart';
 import '../../../../data/model/login_model.dart';
+import '../../../login/controllers/login_controller.dart';
 
 class SummaryToday extends StatelessWidget {
   SummaryToday({super.key, this.listDataUser});
   final Data? listDataUser;
   final homeC = Get.find<HomeController>();
   final absenC = Get.find<AbsenController>();
+  final logC = Get.find<LoginController>();
 
   @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        Container(
-          padding: const EdgeInsets.only(left: 10, top: 5, right: 10),
-          height: 180,
-          decoration: BoxDecoration(
-            color: AppColors.itemsBackground,
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Obx(
-                () => Text(
-                  FormatWaktu.formatIndo(tanggal: absenC.tglStream.value),
-                  style: const TextStyle(
-                    color: AppColors.contentColorWhite,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                  ),
-                ),
-              ),
-              Row(
-                children: [
-                  const Icon(
-                    Iconsax.clock_outline,
-                    size: 18,
-                    color: Colors.white,
-                  ),
-                  StreamBuilder(
-                    stream: homeC.getTime(),
-                    builder: (context, snapshot) {
-                      if (snapshot.hasData) {
-                        return Text(
-                          snapshot.data!,
-                          style: const TextStyle(
-                            color: AppColors.contentColorWhite,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14,
-                          ),
-                        );
-                      } else if (snapshot.hasError) {
-                        return Text('${snapshot.error}');
-                      }
-                      return const Center(child: CupertinoActivityIndicator());
-                    },
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
+        // Container(
+        //   padding: const EdgeInsets.only(left: 10, top: 5, right: 10),
+        //   height: 180,
+        //   decoration: BoxDecoration(
+        //     color: AppColors.itemsBackground,
+        //     borderRadius: BorderRadius.circular(10),
+        //   ),
+        //   child: Row(
+        //     crossAxisAlignment: CrossAxisAlignment.start,
+        //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        //     children: [
+        //       Obx(
+        //         () => Text(
+        //           FormatWaktu.formatIndo(tanggal: absenC.tglStream.value),
+        //           style: const TextStyle(
+        //             color: AppColors.contentColorWhite,
+        //             fontWeight: FontWeight.bold,
+        //             fontSize: 14,
+        //           ),
+        //         ),
+        //       ),
+        //       Row(
+        //         children: [
+        //           const Icon(
+        //             Iconsax.clock_outline,
+        //             size: 18,
+        //             color: Colors.white,
+        //           ),
+        //           StreamBuilder(
+        //             stream: homeC.getTime(),
+        //             builder: (context, snapshot) {
+        //               if (snapshot.hasData) {
+        //                 return Text(
+        //                   snapshot.data!,
+        //                   style: const TextStyle(
+        //                     color: AppColors.contentColorWhite,
+        //                     fontWeight: FontWeight.bold,
+        //                     fontSize: 14,
+        //                   ),
+        //                 );
+        //               } else if (snapshot.hasError) {
+        //                 return Text('${snapshot.error}');
+        //               }
+        //               return const Center(child: CupertinoActivityIndicator());
+        //             },
+        //           ),
+        //         ],
+        //       ),
+        //     ],
+        //   ),
+        // ),
         Padding(
-          padding: const EdgeInsets.fromLTRB(0, 30, 0, 0),
-          child: Container(
-            height: listDataUser!.visit == "1" ? 170 : 170,
-            decoration: BoxDecoration(
-              color: AppColors.contentColorWhite,
+          padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
+          child: Card(
+            shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
             ),
-            child: Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            elevation: 8,
+            child: Container(
+              height: listDataUser!.visit == "1" ? 170 : 168,
+              decoration: BoxDecoration(
+                color: AppColors.contentColorWhite,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Obx(
+                () => Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Obx(
-                      () => Expanded(
-                        flex: 1,
-                        child: _buildTimeCard(
-                          title: 'Check In',
-                          angle: -45,
-                          icon: Icons.arrow_circle_left,
-                          iconColor: AppColors.contentColorBlue,
-                          isLoading: absenC.isLoading.value,
-                          data: absenC.dataAbsen,
-                          dataVisit: absenC.dataVisit,
-                          isIn: true,
-                          visit: listDataUser!.visit!,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Obx(
-                      () => Expanded(
-                        flex: 1,
-                        child: _buildTimeCard(
-                          title: 'Check Out',
-                          angle: -70,
-                          icon: Icons.arrow_circle_right_rounded,
-                          iconColor: AppColors.contentColorRed,
-                          isLoading: absenC.isLoading.value,
-                          data: absenC.dataAbsen,
-                          dataVisit: absenC.dataVisit,
-                          isIn: false,
-                          visit: listDataUser!.visit!,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    children: [
-                      Visibility(
-                        visible: listDataUser!.visit == "1" ? true : false,
-                        child: Column(
+                    //
+                    absenC.dataAbsen.isNotEmpty || absenC.dataVisit.isNotEmpty
+                        ? Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Row(
-                              children: [
-                                const Icon(
-                                  HeroIcons.map_pin,
-                                  color: AppColors.contentColorBlue,
-                                  size: 20,
+                            // Obx(
+                            //   () =>
+                            Expanded(
+                              flex: 1,
+                              child: _buildTimeCard(
+                                title: 'Check In',
+                                angle: -45,
+                                icon: Icons.arrow_circle_left,
+                                iconColor: AppColors.contentColorBlue,
+                                isLoading: absenC.isLoading.value,
+                                data: absenC.dataAbsen,
+                                dataVisit: absenC.dataVisit,
+                                isIn: true,
+                                visit: listDataUser!.visit!,
+                              ),
+                            ),
+                            // ),
+                            const SizedBox(width: 10),
+                            // Obx(
+                            //   () =>
+                            Expanded(
+                              flex: 1,
+                              child: _buildTimeCard(
+                                title: 'Check Out',
+                                angle: -70,
+                                icon: Icons.arrow_circle_right_rounded,
+                                iconColor: AppColors.contentColorRed,
+                                isLoading: absenC.isLoading.value,
+                                data: absenC.dataAbsen,
+                                dataVisit: absenC.dataVisit,
+                                isIn: false,
+                                visit: listDataUser!.visit!,
+                              ),
+                            ),
+                            // ),
+                          ],
+                        )
+                        : Container(
+                          height: 130, // tambahin dikit biar napas
+                          width: Get.mediaQuery.size.width,
+                          margin: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Stack(
+                            children: [
+                              /// IMAGE KANAN
+                              Positioned(
+                                right: 0,
+                                top: 0,
+                                bottom: 40, // stop sebelum button
+                                child: Image.asset(
+                                  'assets/image/bg_sts_home.png',
+                                  width: 120,
+                                  fit: BoxFit.contain,
                                 ),
-                                const SizedBox(width: 5),
-                                Obx(
-                                  () => Text(
-                                    absenC.dataVisit.isNotEmpty &&
-                                            absenC.dataVisit[0].namaCabang! !=
-                                                ""
-                                        ? absenC.dataVisit[0].namaCabang!.capitalize!
-                                        : '-',
-                                    style: titleTextStyle.copyWith(
-                                      color: Colors.grey,
+                              ),
+
+                              /// TEXT
+                              Padding(
+                                padding: const EdgeInsets.fromLTRB(
+                                  12,
+                                  12,
+                                  12,
+                                  48,
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      "Today's status",
+                                      style: titleTextStyle.copyWith(
+                                        fontSize: 18,
+                                      ),
                                     ),
-                                    softWrap: true,
+                                    const SizedBox(height: 6),
+                                    Text(
+                                      "Haven't Checked In yet",
+                                      style: titleTextStyle.copyWith(
+                                        fontSize: 20,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+
+                              /// ✅ BUTTON FIX DI BOTTOM
+                              Align(
+                                alignment: Alignment.bottomCenter,
+                                child: Padding(
+                                  padding: const EdgeInsets.fromLTRB(
+                                    12,
+                                    0,
+                                    12,
+                                    0,
+                                  ),
+                                  child: GestureDetector(
+                                    onTap: () async {
+                                      logC.selectedMenu(2);
+                                      // 🔑 VALIDASI STATUS ABSEN TERKINI (DB / SERVER)
+                                      await absenC.refreshAbsen(listDataUser!);
+
+                                      // ⛔ Jika masih wajib checkout, jangan lanjut ambil lokasi
+                                      if (absenC.mustCheckoutYesterday.value) {
+                                        showToast(
+                                          'You must Check Out yesterday first',
+                                        );
+                                        return;
+                                      }
+
+                                      // 📍 BARU ambil lokasi
+                                      absenC.getLoc(listDataUser);
+                                    },
+                                    child: Container(
+                                      height: 40,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(10),
+                                        image: const DecorationImage(
+                                          image: AssetImage(
+                                            'assets/image/bg_btn_ci.png',
+                                          ),
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                      alignment: Alignment.center,
+                                      child: const Text(
+                                        'CHECK IN NOW',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                    ),
                                   ),
                                 ),
-                              ],
-                            ),
-                            Row(
-                              children: [
-                                const Icon(
-                                  Iconsax.clock_bold,
-                                  color: AppColors.contentColorBlue,
-                                  size: 20,
-                                ),
-                                const SizedBox(width: 2),
-                                Obx(() {
-                                  var diffHours = const Duration();
-                                  if (absenC.dataVisit.isNotEmpty &&
-                                      absenC.dataVisit[0].jamOut != "") {
-                                    diffHours = DateTime.parse(
-                                      '${absenC.dataVisit[0].tglVisit!} ${absenC.dataVisit[0].jamOut!}',
-                                    ).difference(
-                                      DateTime.parse(
-                                        '${absenC.dataVisit[0].tglVisit!} ${absenC.dataVisit[0].jamIn!}',
-                                      ),
-                                    );
-                                  } else {
-                                    diffHours = const Duration();
-                                  }
-                                  return absenC.isLoading.value
-                                      ? Platform.isAndroid
-                                          ? const SizedBox(
-                                            height: 17,
-                                            width: 17,
-                                            child: CircularProgressIndicator(),
-                                          )
-                                          : const SizedBox(
-                                            height: 17,
-                                            width: 17,
-                                            child: CupertinoActivityIndicator(),
-                                          )
-                                      : Text(
-                                        absenC.dataVisit.isNotEmpty &&
-                                                absenC.dataVisit[0].jamIn! != ""
-                                            ? ' Total hour ${absenC.dataVisit[0].jamOut != "" ? diffHours.inHours : '0'}j ${absenC.dataVisit[0].jamOut != "" ? diffHours.inMinutes % 60 : '0'}m'
-                                            : '-:-',
-                                        style: const TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.grey,
-                                          // color:
-                                          //     absenC.dataVisit.isNotEmpty &&
-                                          //             absenC
-                                          //                     .dataVisit[0]
-                                          //                     .jamIn! !=
-                                          //                 ""
-                                          //         ? green
-                                          //         : defaultColor,
-                                        ),
-                                      );
-                                }),
-                              ],
-                            ),
-                          ],
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
 
-                      Visibility(
-                        visible: listDataUser!.visit !="1",
-                        child: Obx(
-                          (() =>
-                              absenC.dataAbsen.isEmpty
-                                  ? Container()
-                                  : StreamBuilder<Duration>(
-                                    stream: absenC.countdownToCheckout(
-                                      DateFormat('HH:mm').parse(
-                                       absenC.dataAbsen[0].jamAbsenMasuk!
-                                           
-                                      ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Visibility(
+                            visible:
+                                listDataUser!.visit == "1" &&
+                                        absenC.dataVisit.isNotEmpty
+                                    ? true
+                                    : false,
+                            child: Column(
+                              children: [
+                                Row(
+                                  children: [
+                                    const Icon(
+                                      HeroIcons.map_pin,
+                                      color: AppColors.contentColorBlue,
+                                      size: 20,
                                     ),
-                                    builder: (context, snapshot) {
-                                      if (snapshot.hasData) {
-                                        final remaining = snapshot.data!;
-                                        if (remaining == Duration.zero) {
-                                          return const Row(
+                                    const SizedBox(width: 5),
+                                    // Obx(
+                                    //   () =>
+                                    Text(
+                                      absenC.dataVisit.isNotEmpty &&
+                                              absenC.dataVisit[0].namaCabang! !=
+                                                  ""
+                                          ? absenC
+                                              .dataVisit[0]
+                                              .namaCabang!
+                                              .capitalize!
+                                          : '-',
+                                      style: titleTextStyle.copyWith(
+                                        color: Colors.grey,
+                                      ),
+                                      softWrap: true,
+                                    ),
+                                    // ),
+                                  ],
+                                ),
+                                Row(
+                                  children: [
+                                    const Icon(
+                                      Iconsax.clock_bold,
+                                      color: AppColors.contentColorBlue,
+                                      size: 20,
+                                    ),
+                                    const SizedBox(width: 2),
+                                    Obx(() {
+                                      var diffHours = const Duration();
+                                      if (absenC.dataVisit.isNotEmpty &&
+                                          absenC.dataVisit[0].jamOut != "") {
+                                        diffHours = DateTime.parse(
+                                          '${absenC.dataVisit[0].tglVisit!} ${absenC.dataVisit[0].jamOut!}',
+                                        ).difference(
+                                          DateTime.parse(
+                                            '${absenC.dataVisit[0].tglVisit!} ${absenC.dataVisit[0].jamIn!}',
+                                          ),
+                                        );
+                                      } else {
+                                        diffHours = const Duration();
+                                      }
+                                      return absenC.isLoading.value
+                                          ? Platform.isAndroid
+                                              ? const SizedBox(
+                                                height: 17,
+                                                width: 17,
+                                                child:
+                                                    CircularProgressIndicator(),
+                                              )
+                                              : const SizedBox(
+                                                height: 17,
+                                                width: 17,
+                                                child:
+                                                    CupertinoActivityIndicator(),
+                                              )
+                                          : Text(
+                                            absenC.dataVisit.isNotEmpty &&
+                                                    absenC
+                                                            .dataVisit[0]
+                                                            .jamIn! !=
+                                                        ""
+                                                ? ' Total hour ${absenC.dataVisit[0].jamOut != "" ? diffHours.inHours : '0'}j ${absenC.dataVisit[0].jamOut != "" ? diffHours.inMinutes % 60 : '0'}m'
+                                                : '-:-',
+                                            style: const TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.grey,
+                                              // color:
+                                              //     absenC.dataVisit.isNotEmpty &&
+                                              //             absenC
+                                              //                     .dataVisit[0]
+                                              //                     .jamIn! !=
+                                              //                 ""
+                                              //         ? green
+                                              //         : defaultColor,
+                                            ),
+                                          );
+                                    }),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          Visibility(
+                            visible: listDataUser!.visit != "1",
+                            child:
+                                // Obx(
+                                //   () =>
+                                absenC.dataAbsen.isEmpty
+                                    ? Container()
+                                    : StreamBuilder<Duration>(
+                                      stream: absenC.countdownToCheckout(
+                                        DateFormat('HH:mm').parse(
+                                          absenC.dataAbsen[0].jamAbsenMasuk!,
+                                        ),
+                                      ),
+                                      builder: (context, snapshot) {
+                                        // ⛔ JIKA SUDAH CHECK OUT, JANGAN TAMPILKAN APA-APA
+                                        final jamPulang =
+                                            absenC.dataAbsen[0].jamAbsenPulang;
+                                        if (jamPulang != null &&
+                                            jamPulang.isNotEmpty) {
+                                          return const SizedBox(); // atau Text("Checked out")
+                                        }
+
+                                        if (snapshot.hasData) {
+                                          final remaining = snapshot.data!;
+
+                                          // ✅ WAKTU SUDAH HABIS & BELUM CHECKOUT
+                                          if (remaining == Duration.zero) {
+                                            return const Row(
+                                              children: [
+                                                Text(
+                                                  'It`s time to Check Out',
+                                                  style: TextStyle(
+                                                    fontSize: 15,
+                                                    color:
+                                                        AppColors
+                                                            .contentColorGreenAccent,
+                                                    fontWeight: FontWeight.bold,
+                                                    fontFamily: 'Nunito',
+                                                  ),
+                                                ),
+                                              ],
+                                            );
+                                          }
+
+                                          // ⏳ MASIH COUNTDOWN
+                                          return Row(
                                             children: [
-                                              Text(
-                                                'It`s time to Check Out',
-                                                style: TextStyle(
-                                                  fontSize: 15,
-                                                  color: AppColors.contentColorGreenAccent,
-                                                  fontWeight: FontWeight.bold,
-                                                  fontFamily: 'Nunito',
+                                              const Icon(
+                                                Icons.hourglass_bottom_rounded,
+                                                size: 20,
+                                                color: Colors.grey,
+                                              ),
+                                              const SizedBox(width: 2),
+                                              RichText(
+                                                text: TextSpan(
+                                                  children: [
+                                                    TextSpan(
+                                                      text: absenC
+                                                          .formatDuration(
+                                                            remaining,
+                                                          ),
+                                                      style: const TextStyle(
+                                                        fontSize: 14,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color:
+                                                            AppColors
+                                                                .contentColorRed,
+                                                      ),
+                                                    ),
+                                                    const TextSpan(
+                                                      text:
+                                                          ' until you Check Out',
+                                                      style: TextStyle(
+                                                        fontSize: 14,
+                                                        fontFamily: 'Nunito',
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: Colors.grey,
+                                                      ),
+                                                    ),
+                                                  ],
                                                 ),
                                               ),
                                             ],
                                           );
                                         }
-                                        return Row(
-                                          children: [
-                                            const Icon(
-                                              Icons.history_toggle_off,
-                                              size: 20,
-                                              color: Colors.grey,
-                                            ),
-                                            const SizedBox(width: 2),
-                                            RichText(
-                                              text: TextSpan(
-                                                text: '',
-                        
-                                                children: [
-                                                  TextSpan(
-                                                    text: absenC.formatDuration(
-                                                      remaining,
-                                                    ),
-                                                    style: const TextStyle(
-                                                      fontSize: 14,
-                                                      fontWeight: FontWeight.bold,
-                                                      color:
-                                                          AppColors
-                                                              .contentColorRed,
-                                                    ),
-                                                  ),
-                                                  const TextSpan(
-                                                    text: ' until you Check Out',
-                                                    style: TextStyle(
-                                                      fontSize: 14,
-                                                      fontFamily: 'Nunito',
-                                                      fontWeight: FontWeight.bold,
-                                                      color: Colors.grey,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ],
-                                        );
-                                      } else {
+
+                                        // ⏱️ LOADING STREAM
                                         return const Row(
                                           children: [
                                             Text(
@@ -299,62 +450,47 @@ class SummaryToday extends StatelessWidget {
                                             ),
                                           ],
                                         );
-                                      }
-                                    },
-                                  )),
-                        ),
-                      ),
-                      Visibility(
-                        visible: listDataUser!.visit == "1" ? false : true,
-                        child: Container(
-                          height: 20,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(5),
-                            color: AppColors.itemsBackground,
+                                      },
+                                    ),
+                            // ),
                           ),
-                          child: Row(
-                            children: [
-                              const SizedBox(width: 5),
-                              const Icon(
-                                Icons.campaign_rounded,
-                                size: 18.0,
-                                color: AppColors.contentColorWhite,
-                              ),
-                              const SizedBox(width: 5),
-                              SizedBox(
-                                height: 50,
-                                width: Get.mediaQuery.size.width / 1.5,
-                                child: Marquee(
-                                  text:
-                                      'Periksa selalu notifikasi untuk informasi pengajuan perubahan data absensi ',
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    color: AppColors.contentColorWhite,
+                          const SizedBox(height: 3,),
+                          Visibility(
+                            visible: absenC.dataAbsen.isNotEmpty,
+                            child: Row(
+                              children: [
+                                Icon(CupertinoIcons.clock, size: 19,),
+                                const SizedBox(width:3 ,),
+                                RichText(
+                                  text: TextSpan(
+                                    children: [
+                                      TextSpan(
+                                        text: 'Jam Kerja: ',
+                                        style: TextStyle(
+                                          color: AppColors.itemsBackground,
+                                          fontFamily: 'Nunito',
+                                        ),
+                                      ),
+                                      TextSpan(
+                                        text: '${absenC.dataAbsen.isNotEmpty?absenC.dataAbsen[0].jamMasuk:''} - ${absenC.dataAbsen.isNotEmpty?absenC.dataAbsen[0].jamPulang:''}',
+                                        style: TextStyle(
+                                          color: AppColors.itemsBackground,
+                                          fontWeight: FontWeight.bold,
+                                          fontFamily: 'Nunito',
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                  scrollAxis: Axis.horizontal,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  blankSpace: 20.0,
-                                  velocity: 50.0, // kecepatan scrolling
-                                  startPadding: 0.0,
-                                  accelerationDuration: const Duration(
-                                    seconds: 1,
-                                  ),
-                                  accelerationCurve: Curves.linear,
-                                  decelerationDuration: const Duration(
-                                    milliseconds: 500,
-                                  ),
-                                  decelerationCurve: Curves.easeOut,
-                                  pauseAfterRound: const Duration(seconds: 1),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
-                        ),
+                        ],
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
         ),

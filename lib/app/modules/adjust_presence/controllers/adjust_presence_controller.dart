@@ -265,6 +265,7 @@ class AdjustPresenceController extends GetxController
       "id_user": idUser,
       "tgl_masuk": tglMasuk,
     };
+    // print(data);
     await ServiceApi().updateAbsen(data);
     selectedShift.value = "";
     succesDialog(

@@ -11,9 +11,24 @@ Widget buildVisit({required Data? data}) {
   return Column(
     children: [
       DropdownButtonFormField<String>(
-        decoration: const InputDecoration(
-          border: OutlineInputBorder(),
-          label: Text('Select one'),
+        decoration: InputDecoration(
+           fillColor: Colors.white,
+                  filled: true,
+                  isDense: true, // 🔑 biar tinggi tetap rapih
+                  contentPadding: const EdgeInsets.all(5),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide.none,
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide.none,
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide.none,
+                  ),
+          label: const Text('Select one'),
         ),
         value:
             absC.stsAbsenSelected.isEmpty ? null : absC.stsAbsenSelected.value,
@@ -32,8 +47,23 @@ Widget buildVisit({required Data? data}) {
         () => Visibility(
           visible: absC.optVisitVisible.value ? true : false,
           child: DropdownButtonFormField(
-            decoration: const InputDecoration(
-              border: OutlineInputBorder(),
+            decoration: InputDecoration(
+               fillColor: Colors.white,
+                  filled: true,
+                  isDense: true, // 🔑 biar tinggi tetap rapih
+                  contentPadding: const EdgeInsets.all(5),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide.none,
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide.none,
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide.none,
+                  ),
               hintText: 'Select RND / Visit',
             ),
             items:
@@ -59,8 +89,23 @@ Widget buildVisit({required Data? data}) {
                   : false,
           child: TextField(
             controller: absC.rndLoc,
-            decoration: const InputDecoration(
-              border: OutlineInputBorder(),
+            decoration: InputDecoration(
+              fillColor: Colors.white,
+                  filled: true,
+                  isDense: true, // 🔑 biar tinggi tetap rapih
+                  contentPadding: const EdgeInsets.all(5),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide.none,
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide.none,
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide.none,
+                  ),
               labelText: 'Mall/City',
               hintText: 'Cth : AEON MALL - SENTUL',
             ),
@@ -93,7 +138,22 @@ Widget buildVisit({required Data? data}) {
 
                 return DropdownButtonFormField(
                   decoration: InputDecoration(
-                    border: const OutlineInputBorder(),
+                    fillColor: Colors.white,
+                  filled: true,
+                  isDense: true, // 🔑 biar tinggi tetap rapih
+                  contentPadding: const EdgeInsets.all(5),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide.none,
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide.none,
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide.none,
+                  ),
                     hintText: data!.namaCabang,
                   ),
                   value: dropdownValue,

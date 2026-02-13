@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 // import 'dart:developer';
 import 'dart:io';
-import 'package:absensi/app/data/add_controller.dart';
 import 'package:absensi/app/data/helper/db_helper.dart';
 import 'package:absensi/app/data/model/cek_visit_model.dart';
 import 'package:absensi/app/data/model/user_model.dart';
@@ -28,6 +27,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:xml/xml.dart' as xml;
+import '../../../data/helper/time_service.dart';
 import '../../../data/model/login_model.dart';
 import '../../../services/service_api.dart';
 import '../../../data/helper/custom_dialog.dart';
@@ -85,8 +85,8 @@ class AbsenController extends GetxController {
   var jamMasuk = "".obs;
   var jamPulang = "".obs;
   var timeNow = "";
-  var timeNowOpt = DateFormat('HH:mm').format(DateTime.now()).toString();
-  var dateNowServer = "";
+  // var timeNowOpt = DateFormat('HH:mm').format(DateTime.now()).toString();
+  // var dateNowServer = "";
   var tglStream = DateTime.now().obs;
   var dateAbsen = "";
   var downloadProgress = 0.0.obs;
@@ -111,7 +111,7 @@ class AbsenController extends GetxController {
   final Rx<RangeSelectionMode> rangeSelectionMode = Rx(
     RangeSelectionMode.toggledOff,
   );
-  var dateNow = DateFormat('yyyy-MM-dd').format(DateTime.now());
+
   var thisMonth =
       DateFormat('MMMM yyyy', 'id_ID').format(DateTime.now()).toString();
   var initDate1 =
@@ -145,6 +145,13 @@ class AbsenController extends GetxController {
   final isEnabled = true.obs;
   int maxRetries = 3;
 
+  final RxBool mustCheckoutYesterday = false.obs;
+  final RxBool isCheckingAbsen = false.obs;
+  final RxString searchKeyword = ''.obs;
+  DateTime? timeServer;
+  String? realDateServer;
+  String? realTimeServer;
+
   @override
   void onInit() async {
     super.onInit();
@@ -154,19 +161,30 @@ class AbsenController extends GetxController {
     userCab = TextEditingController();
     rndLoc = TextEditingController();
     selectedDate.value = null;
-
+    timeServer = await getServerTimeLocal();
+    realDateServer = DateFormat('yyyy-MM-dd').format(timeServer!);
+    realTimeServer = DateFormat('HH:mm').format(timeServer!);
     // timeNetwork(await FlutterNativeTimezone.getLocalTimezone());
-    fallbackTimeNetwork(
-      await FlutterNativeTimezone.getLocalTimezone(),
-      dotenv.env['API_KEY_WORLDTIME_API'],
-    );
-    Timer.periodic(const Duration(seconds: 1), (Timer t) async => timeNowOpt);
+    // fallbackTimeNetwork(
+    //   await FlutterNativeTimezone.getLocalTimezone(),
+    //   dotenv.env['API_KEY_WORLDTIME_API'],
+    // );
+
+    // TimeService.tryResyncIfFallback();
+
+    // if (await TimeService.isTimezoneChanged()) {
+    //   await TimeService.safeSyncAtStartup();
+    // }
+
+    // Timer.periodic(const Duration(seconds: 1), (Timer t) async => timeNowOpt);
 
     SharedPreferences pref = await SharedPreferences.getInstance();
     var dataUserLogin = Data.fromJson(
       jsonDecode(pref.getString('userDataLogin')!),
     );
     // var userID = Data.fromJson(jsonDecode(pref.getString('userDataLogin')!)).id!;
+
+    refreshAbsen(dataUserLogin);
     idUser.value = dataUserLogin.id!;
     var paramLimit = {
       "mode": "limit",
@@ -185,13 +203,13 @@ class AbsenController extends GetxController {
     var paramSingle = {
       "mode": "single",
       "id_user": dataUserLogin.id,
-      "tanggal_masuk": dateNow,
+      "tanggal_masuk": realDateServer,
     };
 
     var paramSingleVisit = {
       "mode": "single",
       "id_user": dataUserLogin.id,
-      "tgl_visit": dateNow,
+      "tgl_visit": realDateServer,
     };
 
     searchAbsen.value = dataAllAbsen;
@@ -261,6 +279,61 @@ class AbsenController extends GetxController {
     super.onClose();
   }
 
+  bool get isBeforeCheckoutLimitNow {
+    final now = timeServer;
+    return now!.isBefore(DateTime(now.year, now.month, now.day, 09, 1));
+  }
+
+  Future<void> refreshAbsen(Data data) async {
+    isCheckingAbsen.value = true;
+
+    try {
+      if (!isBeforeCheckoutLimitNow) {
+        mustCheckoutYesterday.value = false;
+        return;
+      }
+
+      final now = timeServer;
+      final previousDate = DateFormat(
+        'yyyy-MM-dd',
+      ).format(now!.subtract(const Duration(days: 1)));
+
+      await cekDataAbsen("pulang", data.id!, previousDate);
+
+      mustCheckoutYesterday.value =
+          cekAbsen.value.total == "1" && cekAbsen.value.idShift != "0";
+    } finally {
+      isCheckingAbsen.value = false;
+    }
+  }
+
+  /// 🔥 PANGGIL INI SETIAP DATA ABSEN BERUBAH
+  Future<void> invalidateAbsen(Data data) async {
+    await refreshAbsen(data);
+  }
+
+  Future<void> resetAbsenToday(Data data) async {
+    final today = realDateServer;
+
+    // Reset state penting
+    cekAbsen.value = CekAbsen();
+    stsAbsenSelected.value = "";
+    selectedShift.value = "";
+    mustCheckoutYesterday.value = false;
+    isCheckingAbsen.value = false;
+    // Reload data absen hari ini
+    await getAbsenToday({
+      "mode": "single",
+      "id_user": data.id,
+      "tanggal_masuk": today,
+    });
+  }
+
+  void resetFilter() {
+    searchKeyword.value = "";
+    searchDate.value = "";
+  }
+
   int compareVersion(String v1, String v2) {
     List<String> parts1 = v1.split('.');
     List<String> parts2 = v2.split('.');
@@ -311,15 +384,11 @@ class AbsenController extends GetxController {
       if (dataUserLogin.visit == "0") {
         // start cek absen
 
-        var tempDataAbs = await SQLHelper.instance.getAllAbsenToday(dateNow);
-
-        await cekDataAbsen(
-          "masuk",
-          idUser.value,
-          DateFormat('yyyy-MM-dd').format(
-            DateTime.parse(dateNowServer.isNotEmpty ? dateNowServer : dateNow),
-          ),
+        var tempDataAbs = await SQLHelper.instance.getAllAbsenToday(
+          realDateServer!,
         );
+
+        await cekDataAbsen("masuk", idUser.value, realDateServer!);
 
         if (cekAbsen.value.total == "0") {
           if (tempDataAbs.isNotEmpty) {
@@ -350,15 +419,7 @@ class AbsenController extends GetxController {
             _sub.cancel();
           }
         } else {
-          await cekDataAbsen(
-            "pulang",
-            idUser.value,
-            DateFormat('yyyy-MM-dd').format(
-              DateTime.parse(
-                dateNowServer.isNotEmpty ? dateNowServer : dateNow,
-              ),
-            ),
-          );
+          await cekDataAbsen("pulang", idUser.value, realDateServer!);
           if (cekAbsen.value.total == "1") {
             if (tempDataAbs.isNotEmpty &&
                 tempDataAbs.first.tanggalPulang != null) {
@@ -394,7 +455,7 @@ class AbsenController extends GetxController {
 
         var tempDataVisit = await SQLHelper.instance.getVisitToday(
           idUser.value,
-          dateNow,
+          realDateServer!,
           '',
           0,
         );
@@ -405,11 +466,7 @@ class AbsenController extends GetxController {
                 ? "masuk"
                 : "masukv2",
             idUser.value,
-            DateFormat('yyyy-MM-dd').format(
-              DateTime.parse(
-                dateNowServer.isNotEmpty ? dateNowServer : dateNow,
-              ),
-            ),
+            realDateServer!,
             tempDataVisit.isNotEmpty && tempDataVisit.length == 1
                 ? tempDataVisit.first.visitIn!
                 : '',
@@ -448,11 +505,7 @@ class AbsenController extends GetxController {
             await cekDataVisit(
               tempDataVisit.length == 1 ? "pulang" : "pulangv2",
               idUser.value,
-              DateFormat('yyyy-MM-dd').format(
-                DateTime.parse(
-                  dateNowServer.isNotEmpty ? dateNowServer : dateNow,
-                ),
-              ),
+              realDateServer!,
               tempDataVisit.length == 1 ? tempDataVisit.first.visitIn! : '',
             );
 
@@ -571,38 +624,39 @@ class AbsenController extends GetxController {
 
   // }
 
-  Future<void> fallbackTimeNetwork(String timeZone, String? apiKey) async {
-    try {
-      var url = 'https://world-time-api3.p.rapidapi.com/timezone/$timeZone';
-      var headers = <String, String>{};
-      if (apiKey != null) {
-        headers['x-rapidapi-key'] = apiKey;
-        headers['x-rapidapi-host'] = 'world-time-api3.p.rapidapi.com';
-      }
+  // Future<void> fallbackTimeNetwork(String timeZone, String? apiKey) async {
+  //   try {
+  //     var url =
+  //         'https://world-time-api3.p.rapidapi.com/timezone/${Uri.encodeComponent(timeZone)}';
+  //     var headers = <String, String>{};
+  //     if (apiKey != null) {
+  //       headers['x-rapidapi-key'] = apiKey;
+  //       headers['x-rapidapi-host'] = 'world-time-api3.p.rapidapi.com';
+  //     }
 
-      final response = await http
-          .get(Uri.parse(url), headers: headers)
-          .timeout(
-            const Duration(seconds: 20),
-            onTimeout: () => http.Response('Timeout', 408),
-          );
+  //     final response = await http
+  //         .get(Uri.parse(url), headers: headers)
+  //         .timeout(
+  //           const Duration(seconds: 20),
+  //           onTimeout: () => http.Response('Timeout', 408),
+  //         );
 
-      if (response.statusCode == 200) {
-        var result = jsonDecode(response.body);
-        // Format data tergantung response API tersebut
-        timeNow = DateFormat(
-          'HH:mm',
-        ).format(DateTime.parse(result['datetime']).toLocal());
-        dateNowServer = result['datetime'];
-      } else {
-        // Get.back();
-        showToast('Gagal mengambil data waktu dari API cadangan');
-      }
-    } catch (e) {
-      // Get.back();
-      showToast('Error saat mengambil data waktu: $e');
-    }
-  }
+  //     if (response.statusCode == 200) {
+  //       var result = jsonDecode(response.body);
+  //       // Format data tergantung response API tersebut
+  //       timeNow = DateFormat(
+  //         'HH:mm',
+  //       ).format(DateTime.parse(result['datetime']).toLocal());
+  //       dateNowServer = result['datetime'];
+  //     } else {
+  //       // Get.back();
+  //       showToast('Gagal mengambil data waktu dari API cadangan');
+  //     }
+  //   } catch (e) {
+  //     // Get.back();
+  //     showToast('Error saat mengambil data waktu: $e');
+  //   }
+  // }
 
   getLoc(Data? dataUser) async {
     Position position = await determinePosition();
@@ -679,9 +733,6 @@ class AbsenController extends GetxController {
 
     barcodeScanRes.value = "";
     isLoading.value = false;
-
-    // dialogAbsenView(dataUser!, position.latitude, position.longitude);
-    // }
   }
 
   Future<Position> determinePosition() async {
@@ -905,14 +956,14 @@ class AbsenController extends GetxController {
       "tanggal_masuk": tglAbsen,
       "tanggal_pulang": DateFormat('yyyy-MM-dd').format(tglStream.value),
     };
-
+    // print(data);
     final response = await ServiceApi().cekDataAbsen(data);
     cekAbsen.value = response;
 
     dateAbsen =
         cekAbsen.value.tanggalMasuk != null
             ? cekAbsen.value.tanggalMasuk!
-            : dateNow;
+            : realDateServer!;
     return cekAbsen.value;
   }
 
@@ -1163,7 +1214,7 @@ class AbsenController extends GetxController {
 
     var tempDataAbs = await SQLHelper.instance.getAbsenToday(
       idUser.value,
-      dateNow,
+      realDateServer!,
     );
     dataAbsen.value = tempDataAbs;
 
@@ -1247,44 +1298,32 @@ class AbsenController extends GetxController {
     };
     final response = await ServiceApi().getVisit(param);
     dataAllVisit.value = response;
+    searchVisit.value = response;
     isLoading.value = false;
     return dataAllVisit;
   }
 
-  filterDataAbsen(String data) {
-    List<Absen> result = [];
+  List<Absen> get filterDataAbsen {
+    final q = searchKeyword.value.toLowerCase();
 
-    if (data.isEmpty) {
-      result = dataAllAbsen;
-    } else {
-      result =
-          dataAllAbsen
-              .where(
-                (e) => e.tanggalMasuk.toString().toLowerCase().contains(
-                  data.toLowerCase(),
-                ),
-              )
-              .toList();
-    }
-    searchAbsen.value = result;
+    if (q.isEmpty) return dataAllAbsen;
+
+    return searchAbsen.where((e) {
+      return e.namaCabang!.toLowerCase().contains(q) ||
+          e.tanggalMasuk!.toLowerCase().contains(q) ||
+          e.jamAbsenMasuk!.contains(q) ||
+          e.jamAbsenPulang!.contains(q);
+    }).toList();
   }
 
-  filterDataVisit(String data) {
-    List<Visit> result = [];
+  List<Visit> get filterDataVisit {
+    final q = searchKeyword.value.toLowerCase();
 
-    if (data.isEmpty) {
-      result = dataAllVisit;
-    } else {
-      result =
-          dataAllVisit
-              .where(
-                (e) => e.namaCabang.toString().toLowerCase().contains(
-                  data.toLowerCase(),
-                ),
-              )
-              .toList();
-    }
-    searchVisit.value = result;
+    if (q.isEmpty) return dataAllVisit;
+    return searchVisit.where((e) {
+      return e.namaCabang!.toLowerCase().contains(q) ||
+          e.tglVisit!.toLowerCase().contains(q);
+    }).toList();
   }
 
   Future<List<Absen>> getFilteredAbsen(idUser, d1, d2) async {
@@ -1417,7 +1456,7 @@ class AbsenController extends GetxController {
     final response = await ServiceApi().getVisit(paramSingleVisit);
     var tempDataVisit = await SQLHelper.instance.getVisitToday(
       idUser.value,
-      dateNow,
+      realDateServer!,
       '',
       1,
     );
@@ -1443,7 +1482,7 @@ class AbsenController extends GetxController {
 
     var tempLimitVisit = await SQLHelper.instance.getVisitToday(
       idUser.value,
-      dateNow,
+      realDateServer!,
       '',
       0,
     );
@@ -1507,13 +1546,13 @@ class AbsenController extends GetxController {
     var paramSingle = {
       "mode": "single",
       "id_user": dataUserLogin.id,
-      "tanggal_masuk": dateNow,
+      "tanggal_masuk": realDateServer,
     };
 
     var paramSingleVisit = {
       "mode": "single",
       "id_user": dataUserLogin.id,
-      "tgl_visit": dateNow,
+      "tgl_visit": realDateServer,
     };
 
     return _startDateStream(
@@ -1559,92 +1598,92 @@ class AbsenController extends GetxController {
     await ServiceApi().sendDataToXmor(data);
   }
 
-  void resetData() {
-    isLoading.value = true;
-    ascending.value = true;
-    lokasi.value = "";
-    devInfo.value = "";
-    cekAbsen.value = CekAbsen();
-    cekVisit.value = CekVisit(
-      total: '',
-      tglVisit: '',
-      kodeStore: '',
-      namaStore: '',
-    );
-    optVisitSelected.value = "";
-    stsAbsenSelected.value = "";
-    optVisitVisible.value = true;
-    dataAbsen.clear();
-    dataVisit.clear();
-    dataLimitAbsen.clear();
-    dataLimitVisit.clear();
-    dataAllAbsen.clear();
-    dataAllVisit.clear();
-    shiftKerja.clear();
-    cabang.clear();
-    userCabang.clear();
-    idUser.value = "";
-    msg.value = "";
-    selectedShift.value = "";
-    selectedCabang.value = "";
-    selectedUserCabang.value = "";
-    userMonitor.value = "";
-    selectedCabangVisit.value = "";
-    distanceStore.value = 0.0;
-    locNote.value = "";
-    lat.value = "";
-    long.value = "";
-    latFromGps.value = 0.0;
-    longFromGps.value = 0.0;
-    jamMasuk.value = "";
-    jamPulang.value = "";
-    timeNow = "";
-    timeNowOpt = DateFormat('HH:mm').format(DateTime.now()).toString();
-    dateNowServer = "";
-    tglStream.value = DateTime.now();
-    dateAbsen = "";
-    downloadProgress.value = 0.0;
-    updateList.clear();
-    currVer = "";
-    latestVer = "";
-    supportedAbi = "";
-    statsCon.value = "";
-    searchAbsen.clear();
-    searchVisit.clear();
-    filterAbsen.clear();
-    filterVisit.clear();
-    image = null;
-    searchDate.value = "";
-    calendarFormat.value = CalendarFormat.month;
-    selectedDate.value = null;
-    rangeStart.value = null;
-    rangeEnd.value = null;
-    rangeSelectionMode.value = RangeSelectionMode.toggledOff;
-    dateNow = DateFormat('yyyy-MM-dd').format(DateTime.now());
-    thisMonth =
-        DateFormat('MMMM yyyy', 'id_ID').format(DateTime.now()).toString();
-    initDate1 =
-        DateFormat('yyyy-MM-dd')
-            .format(DateTime(DateTime.now().year, DateTime.now().month, 1))
-            .toString();
-    initDate2 =
-        DateFormat('yyyy-MM-dd')
-            .format(DateTime(DateTime.now().year, DateTime.now().month + 1, 0))
-            .toString();
-    lastTime = null;
-    remainingSec.value = 30;
-    timerStat.value = false;
-    capturedImage = null;
-    barcodeScanRes.value = '';
-    scannedLatLng.value = null;
-    isEnabled.value = true;
-    // reset TextEditingController jika perlu juga:
-    date1.clear();
-    date2.clear();
-    store.clear();
-    userCab.clear();
-    rndLoc.clear();
-  }
+  // void resetData() {
+  //   isLoading.value = true;
+  //   ascending.value = true;
+  //   lokasi.value = "";
+  //   devInfo.value = "";
+  //   cekAbsen.value = CekAbsen();
+  //   cekVisit.value = CekVisit(
+  //     total: '',
+  //     tglVisit: '',
+  //     kodeStore: '',
+  //     namaStore: '',
+  //   );
+  //   optVisitSelected.value = "";
+  //   stsAbsenSelected.value = "";
+  //   optVisitVisible.value = true;
+  //   dataAbsen.clear();
+  //   dataVisit.clear();
+  //   dataLimitAbsen.clear();
+  //   dataLimitVisit.clear();
+  //   dataAllAbsen.clear();
+  //   dataAllVisit.clear();
+  //   shiftKerja.clear();
+  //   cabang.clear();
+  //   userCabang.clear();
+  //   idUser.value = "";
+  //   msg.value = "";
+  //   selectedShift.value = "";
+  //   selectedCabang.value = "";
+  //   selectedUserCabang.value = "";
+  //   userMonitor.value = "";
+  //   selectedCabangVisit.value = "";
+  //   distanceStore.value = 0.0;
+  //   locNote.value = "";
+  //   lat.value = "";
+  //   long.value = "";
+  //   latFromGps.value = 0.0;
+  //   longFromGps.value = 0.0;
+  //   jamMasuk.value = "";
+  //   jamPulang.value = "";
+  //   timeNow = "";
+  //   timeNowOpt = DateFormat('HH:mm').format(DateTime.now()).toString();
+  //   dateNowServer = "";
+  //   tglStream.value = DateTime.now();
+  //   dateAbsen = "";
+  //   downloadProgress.value = 0.0;
+  //   updateList.clear();
+  //   currVer = "";
+  //   latestVer = "";
+  //   supportedAbi = "";
+  //   statsCon.value = "";
+  //   searchAbsen.clear();
+  //   searchVisit.clear();
+  //   filterAbsen.clear();
+  //   filterVisit.clear();
+  //   image = null;
+  //   searchDate.value = "";
+  //   calendarFormat.value = CalendarFormat.month;
+  //   selectedDate.value = null;
+  //   rangeStart.value = null;
+  //   rangeEnd.value = null;
+  //   rangeSelectionMode.value = RangeSelectionMode.toggledOff;
+  //   dateNow = DateFormat('yyyy-MM-dd').format(DateTime.now());
+  //   thisMonth =
+  //       DateFormat('MMMM yyyy', 'id_ID').format(DateTime.now()).toString();
+  //   initDate1 =
+  //       DateFormat('yyyy-MM-dd')
+  //           .format(DateTime(DateTime.now().year, DateTime.now().month, 1))
+  //           .toString();
+  //   initDate2 =
+  //       DateFormat('yyyy-MM-dd')
+  //           .format(DateTime(DateTime.now().year, DateTime.now().month + 1, 0))
+  //           .toString();
+  //   lastTime = null;
+  //   remainingSec.value = 30;
+  //   timerStat.value = false;
+  //   capturedImage = null;
+  //   barcodeScanRes.value = '';
+  //   scannedLatLng.value = null;
+  //   isEnabled.value = true;
+  //   // reset TextEditingController jika perlu juga:
+  //   date1.clear();
+  //   date2.clear();
+  //   store.clear();
+  //   userCab.clear();
+  //   rndLoc.clear();
+  // }
 
   Future<void> getLastUserData({required Data dataUser}) async {
     var newUser = await ServiceApi().fetchCurrentUser({

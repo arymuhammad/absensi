@@ -47,6 +47,7 @@ class MainMenu extends StatelessWidget {
                       idUser: userData!.id!,
                       level: userData!.level!,
                     );
+
                     if ((userData!.parentId == "3" &&
                             (userData!.level == "19" ||
                                 userData!.level == "26")) ||
@@ -115,300 +116,89 @@ class MainMenu extends StatelessWidget {
                             : false,
                     child: Row(
                       children: [
-                        Column(
-                          children: [
-                            InkWell(
-                              onTap: () {
-                                // var key = "";
-                                // if (userData!.level == "19" ||
-                                //     userData!.level == "26") {
-                                //   key = "kode_cabang";
-                                // }
-                                var param = {
-                                  "type": "get_pending_req_leave",
-                                  "kode_cabang": userData!.kodeCabang!,
-                                  "id_user": userData!.id!,
-                                  "level": userData!.level!,
-                                  "parent_id": userData!.parentId!,
-                                };
-                                // print(param);
-                                leaveC.isLoading.value = true;
-                                leaveC.getLeaveReq(param);
-                                Get.to(
-                                  () => RequestLeaveView(userData: userData!),
-                                  transition: Transition.cupertino,
-                                );
-                              },
-                              child: Container(
-                                height: 50,
-                                width: 50,
-                                padding: const EdgeInsets.all(5),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  color: Colors.white,
-                                ),
-                                child: Obx(
-                                  () => FutureBuilder<NotifModel>(
-                                    future: homeC.futurePendApp.value,
-                                    // (
-                                    //   idUser: userData!.id!,
-                                    //   kodeCabang: userData!.kodeCabang!,
-                                    //   level: userData!.level!,
-                                    //   parentId: userData!.parentId!,
-                                    // ),
-                                    builder: (context, snapshot) {
-                                      return Stack(
-                                        // alignment: Alignment.center,
-                                        clipBehavior: Clip.none,
-                                        children: [
-                                          Image.asset(
-                                            'assets/image/req-leave.png',
-                                            // width: 40,
-                                            // height: 40,
-                                          ),
-                                          if (snapshot.connectionState ==
-                                              ConnectionState.waiting)
-                                            const Positioned(
-                                              top: -2,
-                                              right: -2,
-                                              child: SizedBox(
-                                                width: 16,
-                                                height: 16,
-                                                child:
-                                                    CircularProgressIndicator(
-                                                      strokeWidth: 2,
-                                                    ),
-                                              ),
-                                            )
-                                          else if (snapshot.hasError)
-                                            const Positioned(
-                                              top: -2,
-                                              right: -2,
-                                              child: Icon(
-                                                Icons.error,
-                                                color: Colors.red,
-                                                size: 16,
-                                              ),
-                                            )
-                                          else if (snapshot.hasData &&
-                                              snapshot.data!.totalRequest! > 0)
-                                            Positioned(
-                                              top: -4,
-                                              right: -4,
-                                              child: Badge(
-                                                isLabelVisible: true,
-                                                label: Text(
-                                                  snapshot.data!.totalRequest!
-                                                      .toString(),
-                                                ),
-                                              ),
-                                            ),
-                                        ],
-                                      );
-                                    },
-                                  ),
-                                ),
-                              ),
-                            ),
-                            const Text(
-                              'Approval\n',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(fontSize: 15),
-                            ),
-                          ],
+                        MenuIconWithBadge(
+                          asset: 'assets/image/req-leave.png',
+                          label: 'Approval',
+                          future: homeC.futurePendApp.value,
+                          badgeCount: (data) => data.totalRequest ?? 0,
+                          onTap: () {
+                            var param = {
+                              "type": "get_pending_req_leave",
+                              "kode_cabang": userData!.kodeCabang!,
+                              "id_user": userData!.id!,
+                              "level": userData!.level!,
+                              "parent_id": userData!.parentId!,
+                            };
+                            leaveC.isLoading.value = true;
+                            leaveC.getLeaveReq(param);
+                            Get.to(
+                              () => RequestLeaveView(userData: userData!),
+                              transition: Transition.cupertino,
+                            );
+                          },
                         ),
-                        const SizedBox(width: 18),
+                        const SizedBox(width: 10),
                       ],
                     ),
                   ),
-                  Column(
-                    children: [
-                      InkWell(
-                        onTap: () {
-                          Get.to(() {
-                            leaveC.isLoading.value = true;
-                            leaveC.getLeaveReq({
-                              "type": "",
-                              "id_user": userData!.id!,
-                            });
-                            return LeaveView(userData: userData!);
-                          }, transition: Transition.cupertino);
-                        },
-                        child: Container(
-                          height: 50,
-                          width: 50,
-                          padding: const EdgeInsets.all(5),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color: Colors.white,
-                          ),
-                          child: Image.asset(
-                            'assets/image/leave.png',
-                            // height: 40,
-                            // width: 40,
-                          ),
-                        ),
-                      ),
-
-                      const Text(
-                        'Leave\n',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 15),
-                      ),
-                    ],
+                  MenuIconItem(
+                    asset: 'assets/image/leave.png',
+                    label: 'Leave',
+                    onTap: () {
+                      Get.to(() {
+                        leaveC.isLoading.value = true;
+                        leaveC.getLeaveReq({
+                          "type": "",
+                          "id_user": userData!.id!,
+                        });
+                        return LeaveView(userData: userData!);
+                      }, transition: Transition.cupertino);
+                    },
                   ),
-
-                  const SizedBox(width: 18),
+                  const SizedBox(width: 10),
                   Visibility(
                     visible:
-                        userData!.parentId == "3" || userData!.parentId == "4"
-                            ? true
-                            : false,
+                        userData!.parentId == "3" || userData!.parentId == "4",
                     child: Row(
                       children: [
-                        Column(
-                          children: [
-                            InkWell(
-                              onTap: () {
-                                Get.to(() {
-                                  adjCtrl.getReqAppUpt(
-                                    '',
-                                    '',
-                                    userData!.level,
-                                    userData!.id,
-                                    adjCtrl.initDate,
-                                    adjCtrl.lastDate,
-                                  );
-                                  return ReqAppUserView(userData: userData!);
-                                }, transition: Transition.cupertino);
-                              },
-                              child: Container(
-                                height: 50,
-                                width: 50,
-                                padding: const EdgeInsets.all(5),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  color: Colors.white,
-                                ),
-                                child: Obx(
-                                  () => FutureBuilder<NotifModel>(
-                                    future: homeC.futurePendAdj.value,
-                                    builder: (context, snapshot) {
-                                      return Stack(
-                                        // alignment: Alignment.center,
-                                        clipBehavior: Clip.none,
-                                        children: [
-                                          Image.asset(
-                                            'assets/image/notif.png',
-                                            // height: 40,
-                                            // width: 40,
-                                          ),
-                                          if (snapshot.connectionState ==
-                                              ConnectionState.waiting)
-                                            const Positioned(
-                                              top: -2,
-                                              right: -2,
-                                              child: SizedBox(
-                                                width: 16,
-                                                height: 16,
-                                                child:
-                                                    CircularProgressIndicator(
-                                                      strokeWidth: 2,
-                                                    ),
-                                              ),
-                                            )
-                                          else if (snapshot.hasError)
-                                            const Positioned(
-                                              top: -2,
-                                              right: -2,
-                                              child: Icon(
-                                                Icons.error,
-                                                color: Colors.red,
-                                                size: 16,
-                                              ),
-                                            )
-                                          else if (snapshot.hasData &&
-                                              snapshot.data!.totalNotif! > 0)
-                                            Positioned(
-                                              top: -4,
-                                              right: -4,
-                                              child: Badge(
-                                                isLabelVisible: true,
-                                                label: Text(
-                                                  snapshot.data!.totalNotif!
-                                                      .toString(),
-                                                ),
-                                              ),
-                                            ),
-                                        ],
-                                      );
-                                    },
-                                  ),
-                                ),
-                              ),
-                            ),
-
-                            const Text(
-                              'Notification\n',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(fontSize: 15),
-                            ),
-                          ],
+                        Obx(()=> MenuIconWithBadge(
+                            asset: 'assets/image/notif.png',
+                            label: 'Notification',
+                            future: homeC.futurePendAdj.value,
+                            badgeCount: (data) {
+                              // print(data.totalNotif);
+                              return data.totalNotif ?? 0;
+                            },
+                            onTap: () {
+                              Get.to(() {
+                                adjCtrl.getReqAppUpt(
+                                  '',
+                                  '',
+                                  userData!.level,
+                                  userData!.id,
+                                  adjCtrl.initDate,
+                                  adjCtrl.lastDate,
+                                );
+                                return ReqAppUserView(userData: userData!);
+                              }, transition: Transition.cupertino);
+                            },
+                          ),
                         ),
-                        const SizedBox(width: 18),
+                        const SizedBox(width: 10),
                       ],
                     ),
                   ),
-
-                  Visibility(
-                    // visible:
-                    //     userData!.parentId == "3" || userData!.parentId == "4"
-                    //         ? true
-                    //         : false,
-                    child: Row(
-                      children: [
-                        Column(
-                          children: [
-                            InkWell(
-                              onTap: () {
-                                Get.to(() {
-                                  // payC.getPaySlip(
-                                  //   empId: userData!.nik!,
-                                  //   branch: userData!.kodeCabang!,
-                                  //   date1: payC.initDate.value,
-                                  //   date2: payC.endDate.value,
-                                  // );
-                                  return PaySlipView(userData: userData!);
-                                }, transition: Transition.cupertino);
-                              },
-                              child: Container(
-                                height: 50,
-                                width: 50,
-                                padding: const EdgeInsets.all(5),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  color: Colors.white,
-                                ),
-                                child: Image.asset(
-                                  'assets/image/payslip.png',
-                                  // height: 40,
-                                  // width: 40,
-                                ),
-                              ),
-                            ),
-
-                            const Text(
-                              'PaySlip\n',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(fontSize: 15),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(width: 18),
-                      ],
-                    ),
+                  MenuIconItem(
+                    asset: 'assets/image/payslip.png',
+                    label: 'Payslip',
+                    onTap: () {
+                      Get.to(
+                        () => PaySlipView(userData: userData!),
+                        transition: Transition.cupertino,
+                      );
+                    },
                   ),
-
+                  const SizedBox(width: 10),
                   Visibility(
                     visible:
                         userData!.level == "1" || userData!.level == "26"
@@ -416,90 +206,185 @@ class MainMenu extends StatelessWidget {
                             : false,
                     child: Row(
                       children: [
-                        Column(
-                          children: [
-                            InkWell(
-                              onTap: () async {
-                                Get.to(
-                                  () =>
-                                      MonitoringAbsenView(userData: userData!),
-                                  transition: Transition.cupertino,
-                                );
-                                absC.searchAbsen.clear();
-                                absC.userMonitor.value = "";
-                              },
-                              child: Container(
-                                height: 50,
-                                width: 50,
-                                padding: const EdgeInsets.all(5),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  color: Colors.white,
-                                ),
-                                child: Image.asset(
-                                  'assets/image/monitoring.png',
-                                  // height: 40,
-                                  // width: 40,
-                                ),
-                              ),
-                            ),
-                            const Text(
-                              'Monitoring\n',
-                              style: TextStyle(fontSize: 15),
-                              textAlign: TextAlign.center,
-                            ),
-                          ],
-                        ),
-                        const SizedBox(width: 18),
-                      ],
-                    ),
-                  ),
-                  Visibility(
-                    visible: userData!.level == "1" ? true : false,
-                    child: Column(
-                      children: [
-                        InkWell(
-                          onTap: () async {
-                            adjCtrl.getReqAppUpt(
-                              '',
-                              '',
-                              userData!.level,
-                              userData!.id,
-                              adjCtrl.initDate,
-                              adjCtrl.lastDate,
-                            );
+                        MenuIconItem(
+                          asset: 'assets/image/monitoring.png',
+                          label: 'Monitoring',
+                          onTap: () {
                             Get.to(
-                              () => AdjustPresenceView(data: userData!),
+                              () => MonitoringAbsenView(userData: userData!),
                               transition: Transition.cupertino,
                             );
                             absC.searchAbsen.clear();
                             absC.userMonitor.value = "";
                           },
-                          child: Container(
-                            height: 50,
-                            width: 50,
-                            padding: const EdgeInsets.all(5),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              color: Colors.white,
-                            ),
-                            child: Image.asset(
-                              'assets/image/adjust.png',
-                              // width: 40,
-                              // height: 40,
-                            ),
-                          ),
                         ),
-                        const Text(
-                          'Adjust\n',
-                          style: TextStyle(fontSize: 15),
-                          textAlign: TextAlign.center,
-                        ),
+                        const SizedBox(width: 10),
                       ],
+                    ),
+                  ),
+
+                  Visibility(
+                    visible: userData!.level == "1" ? true : false,
+                    child: MenuIconItem(
+                      asset: 'assets/image/adjust.png',
+                      label: 'Adjust',
+                      onTap: () {
+                        adjCtrl.getReqAppUpt(
+                          '',
+                          '',
+                          userData!.level,
+                          userData!.id,
+                          adjCtrl.initDate,
+                          adjCtrl.lastDate,
+                        );
+                        Get.to(
+                          () => AdjustPresenceView(data: userData!),
+                          transition: Transition.cupertino,
+                        );
+                        absC.searchAbsen.clear();
+                        absC.userMonitor.value = "";
+                      },
                     ),
                   ),
                 ],
               ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class MenuIconItem extends StatelessWidget {
+  final String asset;
+  final String label;
+  final VoidCallback onTap;
+
+  const MenuIconItem({
+    super.key,
+    required this.asset,
+    required this.label,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        width: 72,
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SizedBox(height: 40, width: 40, child: Image.asset(asset)),
+
+            const SizedBox(height: 6),
+
+            Text(
+              label,
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class MenuIconWithBadge extends StatelessWidget {
+  final String asset;
+  final String label;
+  final VoidCallback onTap;
+  final Future<NotifModel> future;
+  final int Function(NotifModel data) badgeCount;
+
+  const MenuIconWithBadge({
+    super.key,
+    required this.asset,
+    required this.label,
+    required this.onTap,
+    required this.future,
+    required this.badgeCount,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        width: 72,
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SizedBox(
+              height: 40,
+              width: 40,
+              child: FutureBuilder<NotifModel>(
+                future: future,
+                builder: (context, snapshot) {
+                  return Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      Image.asset(asset),
+
+                      if (snapshot.connectionState == ConnectionState.waiting)
+                        const Positioned(
+                          top: -2,
+                          right: -2,
+                          child: SizedBox(
+                            width: 14,
+                            height: 14,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          ),
+                        )
+                      else if (snapshot.hasError)
+                        const Positioned(
+                          top: -2,
+                          right: -2,
+                          child: Icon(Icons.error, color: Colors.red, size: 14),
+                        )
+                      else if (snapshot.hasData &&
+                          badgeCount(snapshot.data!) > 0)
+                        Positioned(
+                          top: -4,
+                          right: -4,
+                          child: Badge(
+                            label: Text(
+                              badgeCount(snapshot.data!).toString(),
+                              style: const TextStyle(fontSize: 10),
+                            ),
+                          ),
+                        ),
+                    ],
+                  );
+                },
+              ),
+            ),
+
+            const SizedBox(height: 6),
+
+            Text(
+              label,
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
             ),
           ],
         ),

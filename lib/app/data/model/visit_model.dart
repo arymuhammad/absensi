@@ -17,24 +17,25 @@ class Visit {
   late String? deviceInfo2;
   late String? isRnd;
 
-  Visit(
-      {this.id,
-      this.nama,
-      this.namaCabang,
-      this.tglVisit,
-      this.visitIn,
-      this.jamIn,
-      this.visitOut,
-      this.jamOut,
-      this.fotoIn,
-      this.fotoOut,
-      this.latIn,
-      this.longIn,
-      this.latOut,
-      this.longOut,
-      this.deviceInfo,
-      this.deviceInfo2,
-      this.isRnd});
+  Visit({
+    this.id,
+    this.nama,
+    this.namaCabang,
+    this.tglVisit,
+    this.visitIn,
+    this.jamIn,
+    this.visitOut,
+    this.jamOut,
+    this.fotoIn,
+    this.fotoOut,
+    this.latIn,
+    this.longIn,
+    this.latOut,
+    this.longOut,
+    this.deviceInfo,
+    this.deviceInfo2,
+    this.isRnd,
+  });
 
   Visit.fromJson(Map<String, dynamic> json) {
     id = json['id_user'];
@@ -76,5 +77,25 @@ class Visit {
     data['device_info2'] = deviceInfo2;
     data['is_rnd'] = isRnd;
     return data;
+  }
+
+  Visit.fromMap(Map<String, dynamic> map) {
+    id = map['id_user'];
+    nama = map['nama'];
+    namaCabang = map['nama_cabang'] ?? map['visit_in'];
+    tglVisit = map['tgl_visit'];
+    visitIn = map['visit_in'];
+    jamIn = map['jam_in'];
+    visitOut = map['visit_out'];
+    jamOut = map['jam_out'];
+    fotoIn = map['foto_in'];
+    latIn = map['lat_in'];
+    longIn = map['long_in'];
+    fotoOut = map['foto_out'];
+    latOut = map['lat_out'];
+    longOut = map['long_out'];
+    deviceInfo = map['device_info'];
+    deviceInfo2 = map['device_info2'];
+    isRnd = map['is_rnd'];
   }
 }

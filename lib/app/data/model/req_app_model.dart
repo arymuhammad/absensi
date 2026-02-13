@@ -2,6 +2,7 @@ class ReqApp {
   late String id;
   late String idUser;
   late String nama;
+  late String namaCabang;
   late String tglMasuk;
   String? tglPulang;
   String? idShift;
@@ -25,6 +26,7 @@ class ReqApp {
     required this.id,
     required this.idUser,
     required this.nama,
+    required this.namaCabang,
     required this.tglMasuk,
     this.tglPulang,
     this.idShift,
@@ -49,6 +51,7 @@ class ReqApp {
     id = json['id'];
     idUser = json['id_user'];
     nama = json['nama']??'';
+    namaCabang = json['nama_cabang']??'';
     tglMasuk = json['tgl_masuk'];
     tglPulang = json['tgl_pulang']??'';
     idShift = json['id_shift']??'';

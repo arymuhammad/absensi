@@ -6,7 +6,9 @@ import 'package:absensi/app/services/service_api.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:lottie/lottie.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../../data/helper/greeting_helper.dart';
 import '../../../data/model/login_model.dart';
 
 class HomeController extends GetxController
@@ -35,8 +37,14 @@ class HomeController extends GetxController
       DateTime(DateTime.now().year, DateTime.now().month + 1, 0).toString(),
     ),
   );
+
+  final greeting = ''.obs;
+  final icon = Rx<Widget>(Lottie.asset('assets/animation/pagi.json'));
+  Timer? _timer;
+
   @override
   void onInit() async {
+    super.onInit();
     SharedPreferences pref = await SharedPreferences.getInstance();
     var dataUserLogin = Data.fromJson(
       jsonDecode(pref.getString('userDataLogin')!),
@@ -77,7 +85,18 @@ class HomeController extends GetxController
     futurePendAdj = Rx<Future<NotifModel>>(
       getPendingAdj(idUser: dataUserLogin.id!, level: dataUserLogin.level!),
     );
-    super.onInit();
+
+    _refresh();
+
+    // update tiap 30 detik (aman & smooth)
+    _timer = Timer.periodic(const Duration(seconds: 30), (_) {
+      _refresh();
+    });
+  }
+
+  void _refresh() async {
+    greeting.value = await GreetingHelper.getGreeting();
+    icon.value = await GreetingHelper.getIcon();
   }
 
   void changePage(int newPage) {
@@ -87,6 +106,7 @@ class HomeController extends GetxController
   @override
   void dispose() {
     tabController.dispose();
+    _timer?.cancel();
     super.dispose();
   }
 
@@ -158,6 +178,7 @@ class HomeController extends GetxController
       "date1": initDate,
       "date2": endDate,
     };
+    // print(data);
     return summPendApp.value = await ServiceApi().getNotif(data);
   }
 

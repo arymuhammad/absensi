@@ -12,8 +12,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:signature/signature.dart';
-
-import '../../../../data/add_controller.dart';
 import '../../../shared/date_picker.dart';
 import '../../../shared/elevated_button.dart';
 
@@ -21,7 +19,6 @@ class LeaveAdd extends StatelessWidget {
   LeaveAdd({super.key, this.userData});
   final Data? userData;
   final leaveC = Get.find<LeaveController>();
-  final adC = Get.put(AdController());
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -35,6 +32,13 @@ class LeaveAdd extends StatelessWidget {
         ),
         backgroundColor: AppColors.itemsBackground,
         centerTitle: true,
+        flexibleSpace: Container(decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color(0xFF1B2541), Color(0xFF3949AB)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),),
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -391,8 +395,6 @@ class LeaveAdd extends StatelessWidget {
                         levelUserPengganti: leaveC.selectedLevelUser.value,
                         parentId: userData!.parentId!,
                       );
-                      adC.loadInterstitialAd();
-                      adC.showInterstitialAd(() {});
                     }
                   },
                   child: const Text('Ajukan Cuti'),

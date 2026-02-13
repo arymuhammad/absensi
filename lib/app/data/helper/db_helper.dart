@@ -501,6 +501,23 @@ class SQLHelper {
     return res.map((e) => ServerApi.fromJson(e)).toList();
   }
 
+  Future<Visit?> getLastVisit(String id) async {
+  final db = await database;
+
+  final res = await db.query(
+    'tbl_visit_area',
+    where: 'id_user = ?',
+    whereArgs: [id],
+    orderBy: 'tgl_visit DESC, jam_in DESC',
+    limit: 1,
+  );
+
+  if (res.isEmpty) return null;
+
+  return Visit.fromMap(res.first);
+}
+
+
   // Future<void> updateFaceData(Map<String, dynamic> data, String id) async {
   //   try {
   //     Database db = await instance.database;

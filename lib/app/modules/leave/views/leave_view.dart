@@ -56,23 +56,20 @@ class LeaveView extends GetView<LeaveController> {
             icon: const Icon(Icons.format_list_bulleted_add),
           ),
         ],
+        flexibleSpace: Container(decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color(0xFF1B2541), Color(0xFF3949AB)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),),
       ),
       body: Stack(
         children: [
           Column(
             children: [
               const SizedBox(height: 5),
-              Obx(() {
-                // Tampilkan banner saat sudah di-load
-                if (leaveC.bannerAdStartApp.value != null) {
-                  return SizedBox(
-                    width: Get.mediaQuery.size.width,
-                    child: StartAppBanner(leaveC.bannerAdStartApp.value!),
-                  );
-                } else {
-                  return const Text('Loading Ads...');
-                }
-              }),
+         
               Expanded(
                 child: CustomMaterialIndicator(
                   onRefresh: () async {

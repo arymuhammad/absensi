@@ -1,3 +1,4 @@
+import 'package:absensi/app/data/helper/convert_time.dart';
 import 'package:absensi/app/data/model/login_model.dart';
 import 'package:absensi/app/modules/adjust_presence/controllers/adjust_presence_controller.dart';
 import 'package:absensi/app/modules/home/controllers/home_controller.dart';
@@ -20,6 +21,7 @@ class UptDataAbsen extends StatelessWidget {
   final homeC = Get.find<HomeController>();
   @override
   Widget build(BuildContext context) {
+   final levelId = dataUser!.level;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -93,7 +95,7 @@ class UptDataAbsen extends StatelessWidget {
         Text('Alasan Perubahan Data', style: titleTextStyle),
         Text(data.alasan!, style: subtitleTextStyle),
         Visibility(
-          visible: data.accept == "" && dataUser!.level == "1" ? true : false,
+          visible: data.accept == "" && (['1','26']).contains(levelId) ? true : false,
           child: SizedBox(
             height: 45,
             child: CsTextField(
@@ -115,7 +117,7 @@ class UptDataAbsen extends StatelessWidget {
         ),
         // const Divider(thickness: 2),
         Visibility(
-          visible: data.accept == "" && dataUser!.level == "1" ? true : false,
+          visible: data.accept == "" && (['1','26']).contains(levelId) ? true : false,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
@@ -139,18 +141,20 @@ class UptDataAbsen extends StatelessWidget {
                     "id_user": data.idUser,
                     "tgl_masuk": data.tglMasuk,
                     "tgl_pulang": data.tglPulang,
-                    "jam_absen_masuk": data.jamAbsenMasuk,
+                    "jam_absen_masuk": (data.jamAbsenMasuk).to24Hour(),
                     "foto_masuk": data.fotoMasuk,
-                    "jam_absen_pulang": data.jamAbsenPulang,
+                    "jam_absen_pulang": (data.jamAbsenPulang).to24Hour(),
                     "foto_pulang": data.fotoPulang,
                     "lat_out": data.latOut,
                     "long_out": data.longOut,
                     "device_info2": data.devInfo,
                   };
-                  adjCtrl.appAbs(dataUptApp, dataUptAbs);  homeC.reloadPendingAdj(
-                      idUser: dataUser!.id!,
-                      level: dataUser!.level!,
-                    );
+                  adjCtrl.appAbs(dataUptApp, dataUptAbs);
+                  homeC.reloadPendingAdj(
+                    idUser: dataUser!.id!,
+                    level: dataUser!.level!,
+                  );
+                  homeC.futurePendAdj.value;
                 },
               ),
               CsElevatedButton(
@@ -166,10 +170,12 @@ class UptDataAbsen extends StatelessWidget {
                     "tgl_masuk": data.tglMasuk,
                     "status": data.status,
                   };
-                  adjCtrl.appAbs(dataUptApp, {});  homeC.reloadPendingAdj(
-                      idUser: dataUser!.id!,
-                      level: dataUser!.level!,
-                    );
+                  adjCtrl.appAbs(dataUptApp, {});
+                  homeC.reloadPendingAdj(
+                    idUser: dataUser!.id!,
+                    level: dataUser!.level!,
+                  );
+                  homeC.futurePendAdj.value;
                 },
               ),
             ],

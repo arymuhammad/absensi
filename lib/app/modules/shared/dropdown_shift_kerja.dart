@@ -3,12 +3,16 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-
 class CsDropdownShiftKerja extends StatelessWidget {
   final String? value;
   final Function(String?)? onChanged;
   final String page;
-  CsDropdownShiftKerja({super.key, this.value, this.onChanged, required this.page});
+  CsDropdownShiftKerja({
+    super.key,
+    this.value,
+    this.onChanged,
+    required this.page,
+  });
 
   final absC = Get.find<AbsenController>();
   @override
@@ -19,9 +23,26 @@ class CsDropdownShiftKerja extends StatelessWidget {
         if (snapshot.hasData) {
           var dataShift = snapshot.data!;
           return DropdownButtonFormField(
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               // contentPadding: EdgeInsets.all(8),
-                border: OutlineInputBorder(), hintText: 'Select Shift Absence'),
+              fillColor: Colors.white,
+              filled: true,
+              isDense: true, // 🔑 biar tinggi tetap rapih
+              contentPadding: const EdgeInsets.all(5),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide.none,
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide.none,
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide.none,
+              ),
+              hintText: 'Select absence shift',
+            ),
             value: value,
             onChanged:
                 // (data) {
@@ -54,24 +75,33 @@ class CsDropdownShiftKerja extends StatelessWidget {
             //       'INFO', 'Pastikan Shift Kerja yang dipilih\nsudah sesuai');
             // }
             // },
-            items: dataShift
-                .where((val) => page == "edit_data_absen" ?  val.id != '5':  val.id != '0')
-                .map((e) => DropdownMenuItem(
-                    value: e.id,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          e.namaShift.toString(),
-                          style: const TextStyle(fontSize: 14),
+            items:
+                dataShift
+                    .where(
+                      (val) =>
+                          page == "edit_data_absen"
+                              ? val.id != '5'
+                              : val.id != '0',
+                    )
+                    .map(
+                      (e) => DropdownMenuItem(
+                        value: e.id,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              e.namaShift.toString(),
+                              style: const TextStyle(fontSize: 14),
+                            ),
+                            Text(
+                              ' (${e.jamMasuk!} - ${e.jamPulang!})',
+                              style: const TextStyle(fontSize: 15),
+                            ),
+                          ],
                         ),
-                        Text(
-                          ' (${e.jamMasuk!} - ${e.jamPulang!})',
-                          style: const TextStyle(fontSize: 15),
-                        ),
-                      ],
-                    )))
-                .toList(),
+                      ),
+                    )
+                    .toList(),
           );
         } else if (snapshot.hasError) {
           return Text('${snapshot.error}');

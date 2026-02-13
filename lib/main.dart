@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:absensi/app/data/helper/app_colors.dart';
+import 'package:absensi/app/data/helper/time_service.dart';
 import 'package:absensi/app/data/model/login_model.dart';
 import 'package:absensi/app/modules/login/controllers/login_controller.dart';
 
@@ -40,6 +41,9 @@ void main() async {
     auth.logUser.value =
         userDataLogin != "" ? Data.fromJson(jsonDecode(userDataLogin)) : Data();
   }
+  //run server time first
+  // await TimeService.safeSyncAtStartup();
+
 
   runApp(
     GetMaterialApp(

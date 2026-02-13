@@ -23,10 +23,24 @@ class CsTextField extends StatelessWidget {
       controller: controller,
       maxLines: maxLines,
       decoration: InputDecoration(
-        border: const OutlineInputBorder(),
+       fillColor: Colors.white,
+                  filled: true,
+                  isDense: true, // 🔑 biar tinggi tetap rapih
+                  contentPadding: const EdgeInsets.all(5),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide.none,
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide.none,
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide.none,
+                  ),
         labelText: label,
         suffixIcon: icon,
-        contentPadding: const EdgeInsets.all(8),
       ),
       onChanged: onChanged,
       keyboardType: keyboardType,

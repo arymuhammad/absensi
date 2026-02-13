@@ -35,6 +35,13 @@ class RequestLeaveView extends GetView<LeaveController> {
         ),
         backgroundColor: AppColors.itemsBackground,
         centerTitle: true,
+        flexibleSpace:Container(decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color(0xFF1B2541), Color(0xFF3949AB)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),)
       ),
       body: Stack(
         children: [

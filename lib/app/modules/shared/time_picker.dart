@@ -56,10 +56,23 @@ class CsTimePicker extends StatelessWidget {
               decoration: InputDecoration(
                   prefixIcon: const Icon(Icons.access_time_filled_rounded),
                   errorStyle: const TextStyle(color: Colors.red),
-                  border: const OutlineInputBorder(),
-                  fillColor: const Color(0xfff3f3f4),
-                  labelText: label,
-                  filled: true),
+                  fillColor: Colors.white,
+                  filled: true,
+                  isDense: true, // 🔑 biar tinggi tetap rapih
+                  contentPadding: const EdgeInsets.all(5),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide.none,
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide.none,
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide.none,
+                  ),
+                  labelText: label,),
             ),
           )
         ],

@@ -13,6 +13,7 @@ import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:lottie/lottie.dart';
 import 'package:month_year_picker/month_year_picker.dart';
 
 import '../../../data/helper/const.dart';
@@ -36,68 +37,86 @@ class PaySlipView extends GetView<PaySlipController> {
         title: Text('PaySlip', style: titleTextStyle.copyWith(fontSize: 18)),
         centerTitle: true,
         backgroundColor: AppColors.itemsBackground,
+        flexibleSpace: Container(decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color(0xFF1B2541), Color(0xFF3949AB)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),),
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
           children: [
-            DateTimeField(
-              controller: payC.datePeriode,
-              decoration: const InputDecoration(
-                contentPadding: EdgeInsets.symmetric(
-                  vertical: 8.0,
-                  horizontal: 12.0,
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: DateTimeField(
+                controller: payC.datePeriode,
+                decoration: InputDecoration(
+                  prefixIcon: const Icon(Icons.calendar_month_sharp),
+                  hintText: 'Pilih Periode',
+                  fillColor: Colors.white,
+                  filled: true,
+                  isDense: true,
+                  contentPadding: const EdgeInsets.all(5),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide.none,
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide.none,
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide.none,
+                  ),
                 ),
-                prefixIcon: Icon(Icons.calendar_month_sharp),
-                hintText: 'Pilih Periode',
-                border: OutlineInputBorder(),
-              ),
-              onChanged: (periode) {
-                if (periode == null) {
-                  payC.initDate.value = payC.initDate.value;
-                  payC.endDate.value = payC.endDate.value;
-                  payC.isLoading.value = true;
-                  // payC.getPaySlip(
-                  //   empId: userData!.nik!,
-                  //   date1: payC.initDate.value,
-                  //   date2: payC.endDate.value,
-                  //   branch: userData!.kodeCabang!,
-                  // );
-                } else {
-                  payC.initDate.value = DateFormat(
-                    'yyyy-MM-dd',
-                  ).format(periode);
-                  payC.endDate.value = DateFormat(
-                    'yyyy-MM-dd',
-                  ).format(DateTime(periode.year, periode.month + 1, 0));
-                  payC.isLoading.value = true;
 
-                  userData!.kodeCabang == "HO000"
-                      ? payC.getPaySlip(
-                        empId: userData!.nik!,
-                        date1: payC.initDate.value,
-                        date2: payC.endDate.value,
-                        branch: userData!.kodeCabang!,
-                      )
-                      : payC.getPaySlipStore(
-                        empId: userData!.nik!,
-                        date1: payC.initDate.value,
-                        date2: payC.endDate.value,
-                        branch: userData!.kodeCabang!,
-                      );
-                }
-              },
-              format: DateFormat("MMM yyyy"),
-              onShowPicker: (context, currentValue) {
-                return showMonthYearPicker(
-                  context: context,
-                  firstDate: DateTime(2000),
-                  initialDate: currentValue ?? DateTime.now(),
-                  lastDate: DateTime(2100),
-                );
-              },
+                /// ⛔ LOGIC TIDAK DIUBAH
+                onChanged: (periode) {
+                  if (periode == null) {
+                    payC.initDate.value = payC.initDate.value;
+                    payC.endDate.value = payC.endDate.value;
+                    payC.isLoading.value = true;
+                  } else {
+                    payC.initDate.value = DateFormat(
+                      'yyyy-MM-dd',
+                    ).format(periode);
+                    payC.endDate.value = DateFormat(
+                      'yyyy-MM-dd',
+                    ).format(DateTime(periode.year, periode.month + 1, 0));
+                    payC.isLoading.value = true;
+
+                    userData!.kodeCabang == "HO000"
+                        ? payC.getPaySlip(
+                          empId: userData!.nik!,
+                          date1: payC.initDate.value,
+                          date2: payC.endDate.value,
+                          branch: userData!.kodeCabang!,
+                        )
+                        : payC.getPaySlipStore(
+                          empId: userData!.nik!,
+                          date1: payC.initDate.value,
+                          date2: payC.endDate.value,
+                          branch: userData!.kodeCabang!,
+                        );
+                  }
+                },
+
+                format: DateFormat("MMM yyyy"),
+
+                /// 🔥 DIGANTI DI SINI SAJA
+                onShowPicker: (context, currentValue) async {
+                  return await payC.showCustomMonthYearPicker(
+                    context,
+                    initialDate: currentValue,
+                  );
+                },
+              ),
             ),
-            const SizedBox(height: 15),
+
             Expanded(
               child: Obx(
                 () => CustomMaterialIndicator(
@@ -142,16 +161,17 @@ class PaySlipView extends GetView<PaySlipController> {
                             ? payC.paySlipFuture.value
                             : payC.paySlipStoreFuture.value,
                     builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const Center(child: CircularProgressIndicator());
-                      } else if (snapshot.hasError) {
+                      // if (snapshot.connectionState == ConnectionState.waiting) {
+                      //   return const Center(child: CircularProgressIndicator());
+                      // } else
+                      if (snapshot.hasError) {
                         return Center(child: Text('Error: ${snapshot.error}'));
                       } else if (!snapshot.hasData || snapshot.data == null) {
                         return Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Image.asset('assets/image/payslip.png', scale: 2),
-                            const SizedBox(height: 10),
+                            Lottie.asset('assets/animation/ketawa.json',height: 100,),
+                            // const SizedBox(height: 2),
                             const Text('Tidak ada data slip gaji tersedia'),
                           ],
                         );
@@ -170,53 +190,55 @@ class PaySlipView extends GetView<PaySlipController> {
                                     : PaySlipStoreDesc(data: payslipstore!),
                               ],
                             ),
-                            Positioned(
-                              left: 0,
-                              right: 0,
-                              bottom: 0,
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: AppColors.itemsBackground,
-                                  borderRadius: BorderRadius.circular(10)
-                                ),
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 8,
-                                  horizontal: 10,
-                                ),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      'TOTAL DITERIMA',
-                                      style: titleTextStyle.copyWith(
-                                        fontSize: 16,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                    Text(
-                                      CurrencyFormat.convertToIdr(
-                                        int.parse(
-                                          userData!.kodeCabang! == "HO000"
-                                              ? payslip!
-                                                  .payslipModel!
-                                                  .totalReceivedByEmp!
-                                              : payslipstore!
-                                                  .payslipStoreModel!
-                                                  .netSalaryRoundTf!,
-                                        ),
-                                        0,
-                                      ),
-                                      style: const TextStyle(
-                                        fontSize: 16,
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
+                            // Positioned(
+                            //   left: 0,
+                            //   right: 0,
+                            //   bottom: 0,
+                            //   child: Container(
+                            //     margin: const EdgeInsets.only(top: 6),
+                            //     padding: const EdgeInsets.symmetric(
+                            //       horizontal: 16,
+                            //       vertical: 14,
+                            //     ),
+                            //     decoration: BoxDecoration(
+                            //       color: const Color(0xFF4E73A8),
+                            //       borderRadius: BorderRadius.circular(14),
+                            //     ),
+                            //     child: Row(
+                            //       mainAxisAlignment:
+                            //           MainAxisAlignment.spaceBetween,
+                            //       children: [
+                            //         const Text(
+                            //           'TOTAL DITERIMA',
+                            //           style: TextStyle(
+                            //             color: Colors.white,
+                            //             fontSize: 16,
+                            //             fontWeight: FontWeight.w600,
+                            //           ),
+                            //         ),
+                            //         Text(
+                            //           CurrencyFormat.convertToIdr(
+                            //             int.parse(
+                            //               userData!.kodeCabang! == "HO000"
+                            //                   ? payslip!
+                            //                       .payslipModel!
+                            //                       .totalReceivedByEmp!
+                            //                   : payslipstore!
+                            //                       .payslipStoreModel!
+                            //                       .netSalaryRoundTf!,
+                            //             ),
+                            //             0,
+                            //           ),
+                            //           style: const TextStyle(
+                            //             fontSize: 16,
+                            //             color: Colors.white,
+                            //             fontWeight: FontWeight.bold,
+                            //           ),
+                            //         ),
+                            //       ],
+                            //     ),
+                            //   ),
+                            // ),
                           ],
                         );
                       }

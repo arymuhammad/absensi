@@ -40,7 +40,13 @@ class BackupView extends GetView {
           // const CsBgImg(),
           Container(
             height: 250,
-            decoration: const BoxDecoration(color: AppColors.itemsBackground),
+           decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color(0xFF1B2541), Color(0xFF3949AB)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
           ),
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 100, 20, 20),

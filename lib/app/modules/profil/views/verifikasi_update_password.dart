@@ -5,6 +5,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../shared/input_decoration.dart';
+
 class VerifikasiUpdatePassword extends GetView {
   VerifikasiUpdatePassword({super.key});
   final pegawaiC = Get.put(AddPegawaiController());
@@ -28,7 +30,13 @@ class VerifikasiUpdatePassword extends GetView {
         children: [
           Container(
             height: 250,
-            decoration: const BoxDecoration(color: AppColors.itemsBackground),
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color(0xFF1B2541), Color(0xFF3949AB)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
           ),
           Padding(
             padding: const EdgeInsets.all(20.0),
@@ -50,14 +58,9 @@ class VerifikasiUpdatePassword extends GetView {
                 const SizedBox(height: 10),
                 TextField(
                   controller: pegawaiC.telp,
-                  decoration: InputDecoration(
-                    labelText: 'No Telp',
-                    prefixIcon: const Icon(Icons.phone_android),
-                    filled: true,
-                    fillColor: Colors.white,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
+                  decoration: inputDecoration(
+                    label: 'No Telp',
+                    prefixIcon: Icons.phone_android,
                   ),
                   keyboardType: TextInputType.phone,
                 ),
