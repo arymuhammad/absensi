@@ -120,10 +120,19 @@ class SettingsView extends GetView<SettingsController> {
                           // ),
                           ListTile(
                             onTap: () {
-                              Get.to(
-                                () => VerifikasiUpdatePassword(),
-                                transition: Transition.cupertino,
+                              // Get.to(
+                              //   () => VerifikasiUpdatePassword(),
+                              //   transition: Transition.cupertino,
+                              // );
+
+                              Navigator.push(context,
+                                MaterialPageRoute(
+                                  builder:
+                                      (_) =>
+                                         VerifikasiUpdatePassword(),
+                                ),
                               );
+                            
                             },
                             leading: Container(
                               height: 40,
@@ -132,7 +141,10 @@ class SettingsView extends GetView<SettingsController> {
                                 color: bgContainer,
                                 borderRadius: BorderRadius.circular(8),
                               ),
-                              child: const Icon(Iconsax.key_bulk, color: AppColors.itemsBackground),
+                              child: const Icon(
+                                Iconsax.key_bulk,
+                                color: AppColors.itemsBackground,
+                              ),
                             ),
                             title: Text(
                               'Security',
@@ -155,9 +167,17 @@ class SettingsView extends GetView<SettingsController> {
                           ),
                           ListTile(
                             onTap: () {
-                              Get.to(
-                                () => BackupView(userData: listDataUser!),
-                                transition: Transition.cupertino,
+                              // Get.to(
+                              //   () => BackupView(userData: listDataUser!),
+                              //   transition: Transition.cupertino,
+                              // );
+
+                              Navigator.push(context,
+                                MaterialPageRoute(
+                                  builder:
+                                      (_) =>
+                                          BackupView(userData: listDataUser!),
+                                ),
                               );
                             },
                             leading: Container(
@@ -257,9 +277,16 @@ class SettingsView extends GetView<SettingsController> {
                           ),
                           ListTile(
                             onTap: () {
-                              Get.to(
-                                () => AboutView(),
-                                transition: Transition.cupertino,
+                              // Get.to(
+                              //   () => AboutView(),
+                              //   transition: Transition.cupertino,
+                              // );
+                               Navigator.push(context,
+                                MaterialPageRoute(
+                                  builder:
+                                      (_) =>
+                                         AboutView(),
+                                ),
                               );
                             },
                             leading: Container(
@@ -347,8 +374,8 @@ class SettingsView extends GetView<SettingsController> {
             right: 20,
             bottom: 0,
             child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
                   children: [
@@ -370,7 +397,7 @@ class SettingsView extends GetView<SettingsController> {
                     ),
                   ],
                 ),
-              ]
+              ],
             ),
           ),
         ],

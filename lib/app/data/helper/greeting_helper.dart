@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:lottie/lottie.dart';
 import 'time_service.dart';
 
@@ -23,7 +22,10 @@ class GreetingHelper {
 
   static Future<Widget> getIcon() async {
     final serverTime = await getServerTimeLocal();
-    final hour = serverTime!.hour;
+     if (serverTime == null) return Lottie.asset('assets/animation/pagi.json');
+
+    final hour = serverTime.hour;
+
     if (hour >= 5 && hour < 11) {
       return Lottie.asset('assets/animation/pagi.json');
     } else if (hour >= 11 && hour < 15) {

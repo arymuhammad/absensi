@@ -69,7 +69,7 @@ class DetailVisitView extends GetView {
       body: Stack(
         children: [
           ListView(
-            padding: const EdgeInsets.fromLTRB(20, 80, 20, 10),
+            padding: const EdgeInsets.fromLTRB(20, 100, 20, 10),
             children: [
               buildCard(
                 context: context,
@@ -77,7 +77,7 @@ class DetailVisitView extends GetView {
                 marker: markersMasuk,
                 isIn: true,
               ),
-              const SizedBox(height: 10),
+              // const SizedBox(height: 10),
               Visibility(
                 visible: detailData['jam_out'] == "" ? true : false,
                 child: const Center(

@@ -20,6 +20,7 @@ import '../../../data/helper/duration_count.dart';
 import '../../../data/helper/format_waktu.dart';
 import '../../detail_absen/views/detail_absen_view.dart';
 import '../../shared/history_card.dart';
+import '../../shared/history_card_shimmer.dart';
 
 class SemuaAbsenView extends GetView {
   SemuaAbsenView({super.key, this.data});
@@ -54,15 +55,16 @@ class SemuaAbsenView extends GetView {
                   initialDateRange: DateTimeRange(
                     start: pickedMonth.value,
                     end: pickedMonth.value,
-                  ),   builder: (context, child) {
+                  ),
+                  builder: (context, child) {
                     return Theme(
                       data: Theme.of(context).copyWith(
                         colorScheme: const ColorScheme.light(
                           primary: AppColors.itemsBackground,
                           onPrimary: AppColors.contentColorWhite,
                           surface: AppColors.contentColorWhite,
-                          onSurface:  AppColors.contentColorBlack,
-                        ), 
+                          onSurface: AppColors.contentColorBlack,
+                        ),
                       ),
                       child: child!,
                     );
@@ -88,13 +90,15 @@ class SemuaAbsenView extends GetView {
         ),
         backgroundColor: AppColors.itemsBackground,
         elevation: 0.0,
-        flexibleSpace: Container(decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Color(0xFF1B2541), Color(0xFF3949AB)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-            ),),
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFF1B2541), Color(0xFF3949AB)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
         // iconTheme: const IconThemeData(color: Colors.black,),
       ),
       body: CustomMaterialIndicator(
@@ -102,6 +106,7 @@ class SemuaAbsenView extends GetView {
           absenC.resetFilter();
           pickedRange.value = null;
           // selectedTab.value = 0;
+          absenC.isLoading.value = true;
           await absenC.getAllAbsen(
             data!.id!,
             absenC.initDate1,
@@ -129,7 +134,6 @@ class SemuaAbsenView extends GetView {
           controller: scrollC,
           physics: const AlwaysScrollableScrollPhysics(),
           slivers: [
-          
             /// 🔥 STICKY TAB
             SliverPersistentHeader(
               pinned: true,
@@ -192,8 +196,11 @@ class SemuaAbsenView extends GetView {
                     }).toList();
 
                 if (absenC.isLoading.value) {
-                  return const SliverFillRemaining(
-                    child: Center(child: CircularProgressIndicator()),
+                  return SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) => const HistoryCardShimmer(),
+                      childCount: 5, // jumlah shimmer tampil
+                    ),
                   );
                 }
 
@@ -253,7 +260,7 @@ class SemuaAbsenView extends GetView {
                                     jamMenit: item.jamPulang!,
                                   ),
                                 )
-                            ? "Early"
+                            ? 'Minus Time'
                             : FormatWaktu.formatJamMenit(
                               jamMenit: item.jamAbsenPulang!,
                             ).isAtSameMomentAs(
@@ -262,46 +269,64 @@ class SemuaAbsenView extends GetView {
                               ),
                             )
                             ? 'On Time'
-                            : "Over Time";
+                            : FormatWaktu.formatJamMenit(
+                              jamMenit: item.jamAbsenPulang!,
+                            ).isAfter(
+                              FormatWaktu.formatJamMenit(
+                                jamMenit: item.jamPulang!,
+                              ).add(const Duration(hours: 1)),
+                            )
+                            ? 'Overtime'
+                            : 'Extra Time';
                     return AnimatedHistoryCard(
                       index: index,
                       child: InkWell(
-                        onTap:
-                            () => Get.to(() {
-                              var detailData = {
-                                "foto_profil":
-                                    data!.foto != "" ? data!.foto : data!.nama,
-                                "nama": item.nama!,
-                                "id_shift": item.idShift!,
-                                "nama_shift": item.namaShift!,
-                                "id_user": item.idUser!,
-                                "kode_cabang": item.kodeCabang!,
-                                "tanggal_masuk": item.tanggalMasuk!,
-                                "tanggal_pulang":
-                                    item.tanggalPulang != null
-                                        ? item.tanggalPulang!
-                                        : "",
-                                "jam_masuk": stsMasuk,
-                                "jam_pulang": stsPulang,
-                                "jam_absen_masuk": item.jamAbsenMasuk!,
-                                "jam_absen_pulang": item.jamAbsenPulang!,
-                                "foto_masuk": item.fotoMasuk!,
-                                "foto_pulang": item.fotoPulang!,
-                                "lat_masuk": item.latMasuk!,
-                                "long_masuk": item.longMasuk!,
-                                "lat_pulang": item.latPulang!,
-                                "long_pulang": item.longPulang!,
-                                "device_info": item.devInfo!,
-                                "device_info2": item.devInfo2!,
-                              };
+                        onTap: () {
+                          var detailData = {
+                            "foto_profil":
+                                data!.foto != "" ? data!.foto : data!.nama,
+                            "nama": item.nama!,
+                            "id_shift": item.idShift!,
+                            "nama_shift": item.namaShift!,
+                            "id_user": item.idUser!,
+                            "kode_cabang": item.kodeCabang!,
+                            "tanggal_masuk": item.tanggalMasuk!,
+                            "tanggal_pulang":
+                                item.tanggalPulang != null
+                                    ? item.tanggalPulang!
+                                    : "",
+                            "sts_masuk": stsMasuk,
+                            "sts_pulang": stsPulang,
+                            "jam_masuk": item.jamMasuk,
+                            "jam_pulang": item.jamPulang,
+                            "jam_absen_masuk": item.jamAbsenMasuk!,
+                            "jam_absen_pulang": item.jamAbsenPulang!,
+                            "foto_masuk": item.fotoMasuk!,
+                            "foto_pulang": item.fotoPulang!,
+                            "lat_masuk": item.latMasuk!,
+                            "long_masuk": item.longMasuk!,
+                            "lat_pulang": item.latPulang!,
+                            "long_pulang": item.longPulang!,
+                            "device_info": item.devInfo!,
+                            "device_info2": item.devInfo2!,
+                          };
+                          // Get.to(() {
 
-                              return DetailAbsenView(detailData);
-                            }, transition: Transition.cupertino),
+                          //   return DetailAbsenView(detailData);
+                          // }, transition: Transition.cupertino);
+
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => DetailAbsenView(detailData),
+                            ),
+                          );
+                        },
                         child: HistoryCard(
                           date: DateTime.parse(item.tanggalMasuk!),
                           checkIn: item.jamAbsenMasuk!,
                           checkOut: item.jamAbsenPulang!,
-                          duration: hitungDurasi(
+                          duration: hitungDurasiFull(
                             tglMasuk: item.tanggalMasuk,
                             jamMasuk: item.jamAbsenMasuk,
                             tglPulang: item.tanggalPulang,

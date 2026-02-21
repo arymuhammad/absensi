@@ -1,4 +1,5 @@
 import 'package:absensi/app/data/helper/const.dart';
+import 'package:absensi/app/modules/shared/container_main_color.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -49,42 +50,47 @@ class PaySlipDesc extends StatelessWidget {
                   Column(
                     children: [
                       /// ================= HEADER =================
-                      Container(
-                        padding: const EdgeInsets.fromLTRB(16, 20, 16, 10),
-                        color: blue.withOpacity(.95),
-                        child: Row(
-                          children: [
-                            const Icon(
-                              Icons.calendar_month,
-                              color: Colors.white,
-                            ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: Text(
-                                '${model.periode!.capitalize} ${DateFormat.y().format(DateTime.parse(model.createdAt!))}',
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 17,
-                                  fontWeight: FontWeight.w600,
-                                  letterSpacing: .5,
+                      ContainerMainColor(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        radius: 0,
+                        child: Container(
+                          padding: const EdgeInsets.fromLTRB(16, 20, 16, 10),
+                          // color: blue.withOpacity(.95),
+                          child: Row(
+                            children: [
+                              const Icon(
+                                Icons.calendar_month,
+                                color: Colors.white,
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: Text(
+                                  '${model.periode!.capitalize} ${DateFormat.y().format(DateTime.parse(model.createdAt!))}',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 17,
+                                    fontWeight: FontWeight.w600,
+                                    letterSpacing: .5,
+                                  ),
                                 ),
                               ),
-                            ),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 6,
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 6,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(.25),
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: Text(
+                                  '${model.totalWorkDay} Hari',
+                                  style: const TextStyle(color: Colors.white),
+                                ),
                               ),
-                              decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(.25),
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: Text(
-                                '${model.totalWorkDay} Hari',
-                                style: const TextStyle(color: Colors.white),
-                              ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
 

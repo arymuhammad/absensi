@@ -67,22 +67,40 @@ class VerifikasiUpdatePassword extends GetView {
                 const SizedBox(height: 20),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 60),
-                  child: ElevatedButton(
-                    onPressed: () {
-                      pegawaiC.cekUser(context);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.itemsBackground,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(50),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFF1B2541), Color(0xFF3949AB)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
                       ),
-                      minimumSize: Size(Get.size.width / 2, 50),
+                      borderRadius: BorderRadius.circular(30),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.blueAccent.withOpacity(0.4),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
                     ),
-                    child: const Text(
-                      'VALIDATION',
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: AppColors.contentColorWhite,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        pegawaiC.cekUser(context);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.transparent,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(50),
+                        ),
+                        minimumSize: Size(Get.size.width / 2, 50),
+                      ),
+                      child: const Text(
+                        'VALIDATION',
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: AppColors.contentColorWhite,
+                        ),
                       ),
                     ),
                   ),

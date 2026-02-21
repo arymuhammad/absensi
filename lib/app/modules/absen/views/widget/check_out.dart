@@ -3,7 +3,6 @@ import 'package:absensi/app/data/helper/time_service.dart';
 import 'package:absensi/app/data/model/login_model.dart';
 import 'package:absensi/app/modules/absen/controllers/absen_controller.dart';
 import 'package:absensi/app/modules/home/controllers/home_controller.dart';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import '../../../../data/helper/custom_dialog.dart';
@@ -19,38 +18,6 @@ Future<void> checkOut(Data dataUser, double latitude, double longitude) async {
   try {
     // =======================
     // 🔐 VALIDASI WAKTU
-    // =======================
-
-    // ⛔ BLOCK jika jam device tidak trusted
-    // if (TimeService.isUntrustedTime(maxFallbackMinutes: 10)) {
-    //   Get.back();
-    //   showToast('Unable to verify server time');
-    //   return;
-    // }
-
-    // // ⛔ manipulasi waktu / timezone
-    // if (!await AbsensiGuard.validateTime()) return;
-
-//     if (TimeService.isClockMovedBack()) {
-//       Get.back();
-//       showToast("Device time manipulation detected");
-//       return;
-//     }
-
-//     if (TimeService.isTimezoneSpoofed()) {
-//       Get.back();
-//       showToast("Timezone manipulation detected");
-//       return;
-//     }
-
-//    if (await TimeService.isDeviceRebooted()) {
-//   Get.back();
-//   showToast("Device restarted, syncing time...");
-//   await TimeService.syncServerTime();
-//   return;
-// }
-
-
     // =======================
     // ⏱️ WAKTU SERVER
     // =======================
@@ -80,6 +47,7 @@ Future<void> checkOut(Data dataUser, double latitude, double longitude) async {
         "Warning",
         "Check in data not found\nPlease check in first",
       );
+      //  absC.getLoc(dataUser);
       return;
     }
 

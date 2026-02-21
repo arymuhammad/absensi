@@ -1,23 +1,23 @@
-import 'dart:io';
+// import 'dart:io';
 
-import 'package:absensi/app/modules/absen/controllers/absen_controller.dart';
-import 'package:absensi/app/data/helper/db_helper.dart';
-import 'package:absensi/app/data/helper/custom_dialog.dart';
+// import 'package:absensi/app/modules/absen/controllers/absen_controller.dart';
+// import 'package:absensi/app/data/helper/db_helper.dart';
+// import 'package:absensi/app/data/helper/custom_dialog.dart';
 
-import 'package:absensi/app/modules/absen/views/form_absen.dart';
-import 'package:absensi/app/modules/absen/views/visit.dart';
-import 'package:absensi/app/modules/shared/dropdown_cabang.dart';
-import 'package:absensi/app/services/service_api.dart';
-import 'package:awesome_dialog/awesome_dialog.dart';
-import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:get/get.dart';
-import 'package:intl/intl.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+// import 'package:absensi/app/modules/absen/views/form_absen.dart';
+// import 'package:absensi/app/modules/absen/views/visit.dart';
+// import 'package:absensi/app/modules/shared/dropdown_cabang.dart';
+// import 'package:absensi/app/services/service_api.dart';
+// import 'package:awesome_dialog/awesome_dialog.dart';
+// import 'package:flutter/material.dart';
+// import 'package:geolocator/geolocator.dart';
+// import 'package:get/get.dart';
+// import 'package:intl/intl.dart';
+// import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../../data/model/login_model.dart';
+// import '../../../data/model/login_model.dart';
 
-final absC = Get.put(AbsenController());
+// final absC = Get.put(AbsenController());
 
 // dialogAbsenView(Data dataUser, latitude, longitude) async {
 //   if (dataUser.visit == "1") {

@@ -1,17 +1,17 @@
 import 'package:absensi/app/data/helper/app_colors.dart';
 import 'package:absensi/app/data/helper/const.dart';
-import 'package:absensi/app/data/helper/greeting_helper.dart';
 import 'package:absensi/app/data/model/login_model.dart';
 import 'package:absensi/app/modules/home/views/summary_absen.dart';
 import 'package:absensi/app/modules/home/views/summary_absen_area.dart';
 import 'package:absensi/app/modules/leave/controllers/leave_controller.dart';
-import 'package:absensi/app/modules/profil/views/profil_view.dart';
+import 'package:absensi/app/modules/shared/container_main_color.dart';
 import 'package:absensi/app/modules/shared/rounded_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../absen/controllers/absen_controller.dart';
 import '../../adjust_presence/controllers/adjust_presence_controller.dart';
+import '../../login/controllers/login_controller.dart';
 import '../controllers/home_controller.dart';
 
 class HomeView extends GetView<HomeController> {
@@ -28,19 +28,14 @@ class HomeView extends GetView<HomeController> {
       resizeToAvoidBottomInset: false,
       body: Stack(
         children: [
-          // const CsBgImg(),
-          Container(
-            height: 230,
-           decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Color(0xFF1B2541), Color(0xFF3949AB)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-            ),
+          ContainerMainColor(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            radius: 0,
+            child: Container(height: 230),
           ),
           Padding(
-            padding: const EdgeInsets.only(left: 15.0, top: 60.0, right: 15.0),
+            padding: const EdgeInsets.only(left: 15.0, top: 45.0, right: 15.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -48,13 +43,22 @@ class HomeView extends GetView<HomeController> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Obx(
-                      () => Text(
-                        '${greetingC.greeting.value}${listDataUser!.nama!.split(' ')[0]}',
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                          color: AppColors.contentColorWhite,
-                        ),
+                      () => Row(
+                        children: [
+                          Text(
+                            '${greetingC.greeting.value}${listDataUser!.nama!.split(' ')[0]}',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                              color: AppColors.contentColorWhite,
+                            ),
+                          ),
+                          const SizedBox(width: 5),
+                          const Icon(
+                            Icons.waving_hand_rounded,
+                            color: Colors.orange,
+                          ),
+                        ],
                       ),
                     ),
                     // Obx(() => Image(image: greetingC.icon.value, width: 42)),
@@ -64,7 +68,7 @@ class HomeView extends GetView<HomeController> {
                     // ),
                   ],
                 ),
-                const SizedBox(height: 5,),
+                const SizedBox(height: 8),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -73,9 +77,11 @@ class HomeView extends GetView<HomeController> {
                       children: [
                         InkWell(
                           onTap: () {
-                            Get.to(
-                              () => ProfilView(listDataUser: listDataUser!),
-                            );
+                            // Get.to(
+                            //   () => ProfilView(listDataUser: listDataUser!),
+                            // );
+                            final loginC = Get.find<LoginController>();
+                            loginC.selected.value = 4;
                           },
                           child: Container(
                             width: 60,
@@ -96,31 +102,10 @@ class HomeView extends GetView<HomeController> {
                             ),
                           ),
                         ),
-                        const SizedBox(width: 10),
+                        const SizedBox(width: 8),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            // Text(
-                            //   listDataUser!.nama!.substring(
-                            //         0,
-                            //         listDataUser!.nama!.length > 18
-                            //             ? 18
-                            //             : listDataUser!.nama!.length,
-                            //       ) +
-                            //       (listDataUser!.nama!.length > 18
-                            //               ? '...'
-                            //               : '')
-                            //           .toString()
-                            //           .capitalize!,
-                            //   overflow: TextOverflow.ellipsis,
-                            //   maxLines: 1,
-                            //   softWrap: true,
-                            //   style: titleTextStyle.copyWith(
-                            //     fontSize: 18,
-                            //     color: AppColors.contentColorWhite,
-                            //     // fontWeight: FontWeight.w500,
-                            //   ),
-                            // ),
                             Text(
                               listDataUser!.levelUser!.capitalize!,
                               style: subtitleTextStyle.copyWith(
@@ -145,7 +130,7 @@ class HomeView extends GetView<HomeController> {
                     // ping widget
                   ],
                 ),
-                const SizedBox(height:5),
+                const SizedBox(height: 5),
                 // Row(
                 //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 //   children: [
@@ -216,25 +201,25 @@ class HomeView extends GetView<HomeController> {
             ),
           ),
           Positioned(
-            top: 40,
-            right: -10,
+            top: 45,
+            right: -5,
             child: LayoutBuilder(
               builder: (context, constraints) {
                 final screenWidth = MediaQuery.of(context).size.width;
 
                 // ukuran responsif
-                final double iconSize = screenWidth * 0.28; // ±28% layar
+                final double iconSize = screenWidth * 0.20; // ±28% layar
 
                 return IgnorePointer(
                   child: Opacity(
                     opacity: 0.95,
-                    child: 
-                    // Image(
-                      // image:
-                       SizedBox(
-                        height:iconSize,
-                        width:iconSize,
-                        child: greetingC.icon.value),
+                    child: Obx(
+                      () => SizedBox(
+                        height: iconSize,
+                        width: iconSize,
+                        child: greetingC.icon.value,
+                      ),
+                    ),
                     //   width: iconSize,
                     //   height: iconSize,
                     //   fit: BoxFit.contain,

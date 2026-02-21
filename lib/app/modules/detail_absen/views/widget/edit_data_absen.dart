@@ -1,8 +1,10 @@
 import 'dart:io';
 import 'dart:math';
 import 'package:absensi/app/data/helper/app_colors.dart';
+import 'package:absensi/app/data/helper/const.dart';
 import 'package:absensi/app/data/helper/custom_dialog.dart';
 import 'package:absensi/app/modules/detail_absen/controllers/detail_absen_controller.dart';
+import 'package:absensi/app/modules/shared/container_main_color.dart';
 import 'package:absensi/app/modules/shared/date_picker.dart';
 import 'package:absensi/app/modules/shared/text_field.dart';
 import 'package:absensi/app/modules/shared/time_picker.dart';
@@ -27,9 +29,48 @@ class EditDataAbsen extends GetView<DetailAbsenController> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Edit Data Absen',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Edit Data Absen',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+
+                  InkWell(
+                    onTap: () {
+                      detailC.jamAbsenMasuk.clear();
+                      detailC.jamAbsenPulang.clear();
+                      detailC.image = null;
+                      detailC.image2 = null;
+                      detailC.tglPulang.clear();
+                      detailC.selectedShift.value = "";
+                      detailC.alasan.clear();
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: Colors.red,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.clear_rounded,
+                            size: 15,
+                            color: Colors.white,
+                          ),
+                          Text(
+                            'Clear',
+                            style: titleTextStyle.copyWith(
+                              color: AppColors.contentColorWhite,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
               const Divider(),
               Row(
@@ -189,17 +230,26 @@ class EditDataAbsen extends GetView<DetailAbsenController> {
               ),
               // const SizedBox(height: 5),
               Center(
-                child: CsElevatedButtonIcon(
-                  icon: Transform.rotate(
-                    angle: 180 * pi / 100,
-                    child: const Icon(Icons.send_outlined),
+                child: ContainerMainColor(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  radius: 30,
+                  child: CsElevatedButtonIcon(
+                    icon: Transform.rotate(
+                      angle: 180 * pi / 100,
+                      child: const Icon(Icons.send_outlined),
+                    ),
+                    fontSize: 18,
+                    label: 'Request Approval',
+                    onPressed: () {
+                      detailC.submitApproval(
+                        data['id_user'],
+                        data['nama'],
+                        data['kode_cabang'],
+                      );
+                    },
+                    backgroundColor: Colors.transparent,
                   ),
-                  fontSize: 18,
-                  label: 'Request Approval',
-                  onPressed: () {
-                    detailC.submitApproval(data['id_user'], data['nama'], data['kode_cabang']);
-                  },
-                  backgroundColor: AppColors.itemsBackground,
                 ),
               ),
             ],

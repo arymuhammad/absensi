@@ -5,7 +5,10 @@ import 'package:absensi/app/data/model/payslip_result_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/utils.dart';
 import 'package:intl/intl.dart';
-import '../../../../data/helper/app_colors.dart';
+import '../../../shared/container_main_color.dart';
+import 'dash_divider.dart';
+import 'receipt_clipper.dart';
+import 'watermark_slip.dart';
 
 class PaySlipStoreDesc extends StatelessWidget {
   const PaySlipStoreDesc({super.key, required this.data});
@@ -13,619 +16,363 @@ class PaySlipStoreDesc extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        return Column(
-          children: [
-            Container(
-              // padding: EdgeInsets.all(5),
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey),
-                borderRadius: BorderRadius.circular(10),
-                color: Colors.white,
-              ),
-              child: Column(
-                spacing: 2,
-                crossAxisAlignment: CrossAxisAlignment.start,
+    final model = data.payslipStoreModel!;
+    const blue = Color(0xFF4E73A8);
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
+        child: Material(
+          elevation: 16,
+          shadowColor: Colors.black.withOpacity(.3),
+          color: Colors.transparent,
+          child: ClipPath(
+            clipper: ReceiptClipper(),
+            child: Container(
+              color: const Color(0xFFFFFDF7),
+              child: Stack(
                 children: [
-                  const SizedBox(height: 5),
-                  Center(
-                    child: Text(
-                      'SLIP GAJI KARYAWAN',
-                      style: titleTextStyle.copyWith(fontSize: 16),
+                  /// 🔹 WATERMARK
+                  const Positioned.fill(
+                    child: Padding(
+                      padding: EdgeInsets.all(20),
+                      child: RepeatedWatermark(
+                        text: 'URBAN&CO',
+                        // alternatif:
+                        // text: model.empName!.toUpperCase(),
+                        // text: 'SLIP GAJI',
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 10),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 8.0, right: 8),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          // mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            SizedBox(
-                              width: constraints.maxWidth / 2,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Periode',
-                                    style: subtitleTextStyle.copyWith(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.normal,
-                                    ),
-                                  ),
-                                  Text(
-                                    '  ${data.payslipStoreModel!.periode!.capitalize} ${DateFormat.y('id').format(DateTime.parse(data.payslipStoreModel!.createdAt!))}',
-                                    style: titleTextStyle.copyWith(
-                                      fontSize: 17,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
+
+                  /// 🔹 KONTEN UTAMA
+                  Column(
+                    children: [
+                      /// ================= HEADER =================
+                      ContainerMainColor(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        radius: 0,
+                        child: Container(
+                          padding: const EdgeInsets.fromLTRB(16, 20, 16, 10),
+                          // color: blue.withOpacity(.95),
+                          child: Row(
+                            children: [
+                              const Icon(
+                                Icons.calendar_month,
+                                color: Colors.white,
                               ),
-                            ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Jabatan',
-                                  style: subtitleTextStyle.copyWith(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.normal,
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: Text(
+                                  '${model.periode!.capitalize} ${DateFormat.y().format(DateTime.parse(model.createdAt!))}',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 17,
+                                    fontWeight: FontWeight.w600,
+                                    letterSpacing: .5,
                                   ),
                                 ),
-                                Text(
-                                  data.payslipStoreModel!.position!,
-                                  style: titleTextStyle.copyWith(
-                                    fontSize: 17,
-                                    fontWeight: FontWeight.bold,
+                              ),
+                              // Container(
+                              //   padding: const EdgeInsets.symmetric(
+                              //     horizontal: 12,
+                              //     vertical: 6,
+                              //   ),
+                              //   decoration: BoxDecoration(
+                              //     color: Colors.white.withOpacity(.25),
+                              //     borderRadius: BorderRadius.circular(20),
+                              //   ),
+                              //   child: Text(
+                              //     '${model.tk} Hari',
+                              //     style: const TextStyle(color: Colors.white),
+                              //   ),
+                              // ),
+                            ],
+                          ),
+                        ),
+                      ),
+
+                      /// ================= BODY =================
+                      Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            /// --- INFO ---
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Expanded(
+                                  child: _info('Nama Karyawan', model.empName!),
+                                ),
+                                const SizedBox(width: 24),
+                                Expanded(
+                                  child: _info(
+                                    'Tanggal Gabung',
+                                    FormatWaktu.formatShortEng(
+                                      tanggal: DateTime.parse(model.joinDate!),
+                                    ),
                                   ),
                                 ),
                               ],
                             ),
-                          ],
-                        ),
-                        const SizedBox(height: 6),
-                        Row(
-                          // mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            SizedBox(
-                              width: constraints.maxWidth / 2,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Nama Karyawan',
-                                    style: subtitleTextStyle.copyWith(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.normal,
-                                    ),
-                                  ),
-                                  Text(
-                                    data.payslipStoreModel!.empName!,
-                                    style: titleTextStyle.copyWith(
-                                      fontSize: 17,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Column(
+                            const SizedBox(height: 8),
+                            Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  'Tanggal Gabung',
-                                  style: subtitleTextStyle.copyWith(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.normal,
+                                Expanded(
+                                  child: _info(
+                                    'Jabatan',
+                                    model.position!.capitalize!,
                                   ),
                                 ),
-
-                                Text(
-                                  '${FormatWaktu.formatShortEng(tanggal: (DateTime.parse(data.payslipStoreModel!.joinDate!)))}',
-                                  style: titleTextStyle.copyWith(
-                                    fontSize: 17,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
+                                const SizedBox(width: 24),
+                                // Expanded(
+                                //   child: _info(
+                                //     'Status Karyawan',
+                                //     model.empStat ?? '',
+                                //   ),
+                                // ),
                               ],
                             ),
+
+                            const SizedBox(height: 16),
+                            const DashedDivider(),
+
+                            /// ================= PENERIMAAN =================
+                            const SizedBox(height: 14),
+                            _sectionTitle('Penerimaan'),
+                            _rowIcon(
+                              Icons.payments,
+                              Colors.green,
+                              'Gaji Pokok',
+                              model.basicSalary!,
+                            ),
+                            _rowIcon(
+                              Icons.add_circle,
+                              Colors.orange,
+                              'Tj Jabatan',
+                              model.allowance!,
+                            ),
+
+                            _rowIcon(
+                              Icons.calendar_month
+                              ,
+                              Colors.lightBlue,
+                              'Tj Kehadiran',
+                              model.presenceAllowance!,
+                            ),
+                            _rowIcon(
+                              Icons.transfer_within_a_station_outlined,
+                              Colors.red,
+                              'Tj Kejauhan',
+                              model.rangeSubsidy!,
+                            ),
+                            _rowIcon(
+                              Icons.home,
+                              Colors.purpleAccent,
+                              'Tj Kost',
+                              model.boardingAllowance!,
+                            ),
+                            _rowIcon(
+                              Icons.attach_money_rounded,
+                              Colors.yellow,
+                              'Bonus',
+                              model.bonus!,
+                            ),
+                            _rowIcon(
+                              Icons.sync,
+                              Colors.blue,
+                              'Refund',
+                              model.refund!,
+                            ),
+                            const SizedBox(height: 12),
+                            _totalBar(
+                              'Total Penerimaan',
+                              model.totalIncome!,
+                              green!,
+                            ),
+
+                            const SizedBox(height: 16),
+                            const DashedDivider(),
+
+                            /// ================= POTONGAN =================
+                            const SizedBox(height: 14),
+                            _sectionTitle('Potongan'),
+                            _rowCount(
+                              Icons.person_off,
+                              Colors.deepOrange,
+                              'A / I / S',
+                              // model.totalLate!,
+                              model.ais!,
+                            ),
+                            _rowCount(
+                              Icons.schedule,
+                             Colors.redAccent,
+                              'Telat',
+                              // model.totalLate!,
+                              model.late!,
+                            ),
+                            _rowCount(
+                              Icons.badge,
+                              Colors.indigo,
+                              'Seragam / ID',
+                              // model.totalLate!,
+                              model.uniform!,
+                            ),
+                            _rowCount(
+                              Icons.fact_check,
+                              Colors.teal,
+                              'SO',
+                              // model.totalLate!,
+                              model.so!,
+                            ),
+                            _rowCount(
+                              Icons.wallet,
+                              Colors.green,
+                              'Deposit',
+                              // model.totalLate!,
+                              model.deposit!,
+                            ),
+                            const SizedBox(height: 8),
+                            _totalBar('Total Potongan', model.totalCut!, red!),
+                            // const SizedBox(height: 50),
+                           
                           ],
                         ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 8.0, right: 8),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'PENERIMAAN',
-                          style: titleTextStyle.copyWith(fontSize: 16),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 8.0, right: 8),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Gaji Pokok',
-                          style: subtitleTextStyle.copyWith(
-                            fontSize: 15,
-                            fontWeight: FontWeight.normal,
-                          ),
-                        ),
-                        Text(
-                          CurrencyFormat.convertToIdr(
-                            int.parse(data.payslipStoreModel!.basicSalary!),
-                            0,
-                          ),
-                          style: const TextStyle(fontSize: 15),
-                        ),
-                      ],
-                    ),
-                  ),
-                  // const SizedBox(height: 2),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 8.0, right: 8),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Tj Jabatan',
-                          style: subtitleTextStyle.copyWith(
-                            fontSize: 15,
-                            fontWeight: FontWeight.normal,
-                          ),
-                        ),
-                        Text(
-                          CurrencyFormat.convertToIdr(
-                            int.parse(data.payslipStoreModel!.allowance!),
-                            0,
-                          ),
-                          style: const TextStyle(fontSize: 15),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 8.0, right: 8),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Tj Kehadiran',
-                          style: subtitleTextStyle.copyWith(
-                            fontSize: 15,
-                            fontWeight: FontWeight.normal,
-                          ),
-                        ),
-                        Text(
-                          CurrencyFormat.convertToIdr(
-                            int.parse(
-                              data.payslipStoreModel!.presenceAllowance!,
+                      ), const DashedDivider(),
+                            const SizedBox(height: 12),
+
+                            /// ================= TOTAL DITERIMA =================
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+                              child: _totalBar(
+                                'Total Diterima',
+                                model.netSalaryRoundTf!,
+                                blue,
+                                big: true,
+                              ),
                             ),
-                            0,
-                          ),
-                          style: const TextStyle(fontSize: 15),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 8.0, right: 8),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Tj Kejauhan',
-                          style: subtitleTextStyle.copyWith(
-                            fontSize: 15,
-                            fontWeight: FontWeight.normal,
-                          ),
-                        ),
-                        Text(
-                          CurrencyFormat.convertToIdr(
-                            int.parse(data.payslipStoreModel!.rangeSubsidy!),
-                            0,
-                          ),
-                          style: const TextStyle(fontSize: 15),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 8.0, right: 8),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Tj Kost',
-                          style: subtitleTextStyle.copyWith(
-                            fontSize: 15,
-                            fontWeight: FontWeight.normal,
-                          ),
-                        ),
-                        Text(
-                          CurrencyFormat.convertToIdr(
-                            int.parse(
-                              data.payslipStoreModel!.boardingAllowance!,
-                            ),
-                            0,
-                          ),
-                          style: const TextStyle(fontSize: 15),
-                        ),
-                      ],
-                    ),
-                  ),
-                  // const SizedBox(height: 5),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 8.0, right: 8),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Bonus',
-                          style: subtitleTextStyle.copyWith(
-                            fontSize: 15,
-                            fontWeight: FontWeight.normal,
-                          ),
-                        ),
-                        Text(
-                          CurrencyFormat.convertToIdr(
-                            int.parse(data.payslipStoreModel!.bonus!),
-                            0,
-                          ),
-                          style: const TextStyle(fontSize: 15),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 8.0, right: 8),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Refund',
-                          style: subtitleTextStyle.copyWith(
-                            fontSize: 15,
-                            fontWeight: FontWeight.normal,
-                          ),
-                        ),
-                        Text(
-                          CurrencyFormat.convertToIdr(
-                            int.parse(data.payslipStoreModel!.refund!),
-                            0,
-                          ),
-                          style: const TextStyle(fontSize: 15),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 8.0, right: 8),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Lembur',
-                          style: subtitleTextStyle.copyWith(
-                            fontSize: 15,
-                            fontWeight: FontWeight.normal,
-                          ),
-                        ),
-                        Text(
-                          CurrencyFormat.convertToIdr(
-                            int.parse(data.payslipStoreModel!.overtime!),
-                            0,
-                          ),
-                          style: const TextStyle(fontSize: 15),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 5),
-                  Container(
-                    width: double.infinity, // agar lebarnya penuh
-                    decoration: const BoxDecoration(
-                      color:
-                          AppColors
-                              .itemsBackground, // warna background abu dengan penuh
-                      borderRadius: BorderRadius.only(
-                        bottomLeft: Radius.circular(10),
-                        bottomRight: Radius.circular(10),
-                      ),
-                    ),
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 8,
-                      horizontal: 10,
-                    ), // beri padding supaya text tidak mepet
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'TOTAL PENERIMAAN',
-                          style: titleTextStyle.copyWith(
-                            fontSize: 16,
-                            color: Colors.white,
-                          ),
-                        ),
-                        Text(
-                          CurrencyFormat.convertToIdr(
-                            int.parse(data.payslipStoreModel!.totalIncome!),
-                            0,
-                          ),
-                          style: const TextStyle(
-                            fontSize: 16,
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
+
+                            const SizedBox(height: 12),
+                    ],
                   ),
                 ],
               ),
             ),
+          ),
+        ),
+      ),
+    );
+  }
 
-            const SizedBox(height: 15),
-            Container(
-              // padding: EdgeInsets.all(5),
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey),
-                borderRadius: BorderRadius.circular(10),
-                color: Colors.white,
-              ),
-              child: Column(
-                spacing: 2,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Center(child: Text('SLIP GAJI KARYAWAN'),)
-                  Padding(
-                    padding: const EdgeInsets.only(left: 8.0, right: 8, top: 8),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'POTONGAN',
-                          style: titleTextStyle.copyWith(fontSize: 16),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 10),
+  /// ================= COMPONENTS =================
 
-                  // const SizedBox(height: 5),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 8.0, right: 8),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'A / I / S',
-                          style: subtitleTextStyle.copyWith(
-                            fontSize: 15,
-                            fontWeight: FontWeight.normal,
-                          ),
-                        ),
-                        SizedBox(
-                          width: 100,
-                          child: Text(
-                            CurrencyFormat.convertToIdr(
-                              int.parse(data.payslipStoreModel!.ais!),
-                              0,
-                            ),
-                            style: const TextStyle(fontSize: 15),
-                            textAlign: TextAlign.right,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 8.0, right: 8),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Telat',
-                          style: subtitleTextStyle.copyWith(
-                            fontSize: 15,
-                            fontWeight: FontWeight.normal,
-                          ),
-                        ),
+  Widget _info(String title, String value) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(title, style: const TextStyle(color: Colors.grey, fontSize: 13)),
+        const SizedBox(height: 2),
+        Text(
+          value,
+          style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+        ),
+      ],
+    );
+  }
 
-                        SizedBox(
-                          width: 100,
-                          child: Text(
-                            CurrencyFormat.convertToIdr(
-                              int.parse(data.payslipStoreModel!.late!),
-                              0,
-                            ),
-                            style: const TextStyle(fontSize: 15),
-                            textAlign: TextAlign.right,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 8.0, right: 8),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Seragam / ID',
-                          style: subtitleTextStyle.copyWith(
-                            fontSize: 15,
-                            fontWeight: FontWeight.normal,
-                          ),
-                        ),
+  Widget _sectionTitle(String text) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Text(
+        text,
+        style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+      ),
+    );
+  }
 
-                        SizedBox(
-                          width: 100,
-                          child: Text(
-                            CurrencyFormat.convertToIdr(
-                              int.parse(data.payslipStoreModel!.uniform!),
-                              0,
-                            ),
-                            style: const TextStyle(fontSize: 15),
-                            textAlign: TextAlign.right,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 8.0, right: 8),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'SO',
-                          style: subtitleTextStyle.copyWith(
-                            fontSize: 15,
-                            fontWeight: FontWeight.normal,
-                          ),
-                        ),
+  Widget _rowIcon(IconData icon, Color color, String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2),
+      child: Row(
+        children: [
+          CircleAvatar(
+            radius: 14,
+            backgroundColor: color.withOpacity(.15),
+            child: Icon(icon, size: 16, color: color),
+          ),
+          const SizedBox(width: 10),
+          Expanded(child: Text(label)),
+          Text(
+            CurrencyFormat.convertToIdr(int.parse(value), 0),
+            style: const TextStyle(fontWeight: FontWeight.w600),
+          ),
+        ],
+      ),
+    );
+  }
 
-                        SizedBox(
-                          width: 100,
-                          child: Text(
-                            CurrencyFormat.convertToIdr(
-                              int.parse(data.payslipStoreModel!.so!),
-                              0,
-                            ),
-                            style: const TextStyle(fontSize: 15),
-                            textAlign: TextAlign.right,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 8.0, right: 8),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Deposit',
-                          style: subtitleTextStyle.copyWith(
-                            fontSize: 15,
-                            fontWeight: FontWeight.normal,
-                          ),
-                        ),
+  Widget _rowCount(
+    IconData icon,
+    Color color,
+    String label,
+    // String count,
+    String value,
+  ) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2),
+      child: Row(
+        children: [
+          CircleAvatar(
+            radius: 14,
+            backgroundColor: color.withOpacity(.15),
+            child: Icon(icon, size: 16, color: color),
+          ),
+          const SizedBox(width: 10),
+          Expanded(child: Text(label)),
+          // Text('x $count'),
+          // const SizedBox(width: 12),
+          Text(
+            CurrencyFormat.convertToIdr(int.parse(value), 0),
+            style: const TextStyle(fontWeight: FontWeight.w600),
+          ),
+        ],
+      ),
+    );
+  }
 
-                        SizedBox(
-                          width: 100,
-                          child: Text(
-                            CurrencyFormat.convertToIdr(
-                              int.parse(data.payslipStoreModel!.deposit!),
-                              0,
-                            ),
-                            style: const TextStyle(fontSize: 15),
-                            textAlign: TextAlign.right,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 15),
-                  Container(
-                    width: double.infinity, // agar lebarnya penuh
-                    decoration: const BoxDecoration(
-                      color:
-                          AppColors
-                              .itemsBackground, // warna background abu dengan penuh
-                      borderRadius: BorderRadius.only(
-                        bottomLeft: Radius.circular(10),
-                        bottomRight: Radius.circular(10),
-                      ),
-                    ),
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 8,
-                      horizontal: 10,
-                    ), // beri padding supaya text tidak mepet
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'TOTAL POTONGAN',
-                          style: titleTextStyle.copyWith(
-                            fontSize: 16,
-                            color: Colors.white,
-                          ),
-                        ),
-                        Text(
-                          CurrencyFormat.convertToIdr(
-                            int.parse(data.payslipStoreModel!.totalCut!),
-                            0,
-                          ),
-                          style: const TextStyle(
-                            fontSize: 16,
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
+  Widget _totalBar(
+    String title,
+    String value,
+    Color color, {
+    bool big = false,
+  }) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 7),
+      // color: color,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            title,
+            style: const TextStyle(
+              // color: Colors.white,
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
             ),
-            const SizedBox(height: 50),
-            // Container(
-            //   width: double.infinity, // agar lebarnya penuh
-            //   decoration: const BoxDecoration(
-            //     color:
-            //         AppColors
-            //             .itemsBackground, // warna background abu dengan penuh
-            //     // borderRadius: BorderRadius.only(
-            //     //   bottomLeft: Radius.circular(10),
-            //     //   bottomRight: Radius.circular(10),
-            //     // ),
-            //   ),
-            //   padding: const EdgeInsets.symmetric(
-            //     vertical: 8,
-            //     horizontal: 10,
-            //   ), // beri padding supaya text tidak mepet
-            //   child: Row(
-            //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            //     children: [
-            //       Text(
-            //         'TOTAL DITERIMA',
-            //         style: titleTextStyle.copyWith(
-            //           fontSize: 16,
-            //           color: Colors.white,
-            //         ),
-            //       ),
-            //       Text(
-            //         CurrencyFormat.convertToIdr(
-            //           int.parse(data.payslipStoreModel!.netSalaryRoundTf!),
-            //           0,
-            //         ),
-            //         style: const TextStyle(
-            //           fontSize: 16,
-            //           color: Colors.white,
-            //           fontWeight: FontWeight.bold,
-            //         ),
-            //       ),
-            //     ],
-            //   ),
-            // ),
-          ],
-        );
-      },
+          ),
+          Text(
+            CurrencyFormat.convertToIdr(int.parse(value), 0),
+            style: TextStyle(
+              color: color,
+              fontSize: big ? 25 : 15,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

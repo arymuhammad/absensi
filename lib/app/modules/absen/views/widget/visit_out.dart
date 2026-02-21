@@ -1,8 +1,6 @@
 import 'dart:io';
 
 import 'package:absensi/app/data/model/login_model.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:flutter_native_timezone_updated_gradle/flutter_native_timezone.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import '../../../../data/helper/custom_dialog.dart';

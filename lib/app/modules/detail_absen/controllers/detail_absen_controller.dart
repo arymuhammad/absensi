@@ -269,7 +269,7 @@ class DetailAbsenController extends GetxController {
       failedDialog(
         Get.context!,
         "Kesalahan",
-        "Harap isi bagian yang ingi diperbarui",
+        "Harap isi bagian yang ingin diperbarui",
       );
     }
   }

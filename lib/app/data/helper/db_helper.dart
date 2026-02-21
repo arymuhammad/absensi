@@ -64,7 +64,8 @@ class SQLHelper {
         aktif INTEGER,
         jenis_store TEXT,
         jenis_cabang TEXT,
-        area_coverage INTEGER
+        area_coverage INTEGER,
+        area_coverage_qr INTEGER
       )
       """);
     await db.execute("""CREATE TABLE IF NOT EXISTS shift_kerja(
@@ -500,22 +501,6 @@ class SQLHelper {
     var res = await db.query('server');
     return res.map((e) => ServerApi.fromJson(e)).toList();
   }
-
-  Future<Visit?> getLastVisit(String id) async {
-  final db = await database;
-
-  final res = await db.query(
-    'tbl_visit_area',
-    where: 'id_user = ?',
-    whereArgs: [id],
-    orderBy: 'tgl_visit DESC, jam_in DESC',
-    limit: 1,
-  );
-
-  if (res.isEmpty) return null;
-
-  return Visit.fromMap(res.first);
-}
 
 
   // Future<void> updateFaceData(Map<String, dynamic> data, String id) async {

@@ -15,41 +15,7 @@ final absC = Get.find<AbsenController>();
 final homeC = Get.find<HomeController>();
 
 checkIn(Data dataUser, double latitude, double longitude) async {
-  // ===============================
-  // 1️⃣ VALIDASI WAKTU (PALING AWAL)
-  // ===============================
-  // paksa resync jika fallback
-  // await TimeService.tryResyncIfFallback();
-
-  // if (TimeService.isUntrustedTime(maxFallbackMinutes: 1)) {
-  //   Get.back();
-  //   showToast('Unable to verify server time');
-  //   return;
-  // }
-
-  // if (!await AbsensiGuard.validateTime()) return;
-
-//  if (TimeService.isClockMovedBack()) {
-//     Get.back();
-//     showToast("Device time manipulation detected");
-//     return;
-//   }
-
-//   if (TimeService.isTimezoneSpoofed()) {
-//     Get.back();
-//     showToast("Timezone manipulation detected");
-//     return;
-//   }
-
-//   if (await TimeService.isDeviceRebooted()) {
-//   Get.back();
-//   showToast("Device restarted, syncing time...");
-//   await TimeService.syncServerTime();
-//   return;
-// }
-
-
-  // ===============================
+   // ===============================
   // 2️⃣ SNAPSHOT WAKTU SERVER
   // ===============================
   final DateTime? nowLocal = await getServerTimeLocal();

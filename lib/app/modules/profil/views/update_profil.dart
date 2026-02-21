@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:absensi/app/data/helper/app_colors.dart';
 import 'package:absensi/app/data/model/login_model.dart';
 import 'package:absensi/app/modules/add_pegawai/controllers/add_pegawai_controller.dart';
+import 'package:absensi/app/modules/shared/container_main_color.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -410,51 +411,57 @@ class UpdateProfil extends GetView {
                           const SizedBox(height: 10),
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 30),
-                            child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: AppColors.itemsBackground,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(50),
+                            child: ContainerMainColor(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              radius: 30,
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  elevation: 0,
+                                  backgroundColor: Colors.transparent,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(50),
+                                  ),
+                                  minimumSize: Size(Get.size.width / 2, 50),
                                 ),
-                                minimumSize: Size(Get.size.width / 2, 50),
-                              ),
-                              onPressed: () {
-                                // loadingDialog("updating data", "");
-                                ctr.isLoading.value = true;
-                                ctr.addUpdatePegawai(
-                                  context,
-                                  "update",
-                                  userData!,
-                                );
-                              },
-                              child: Obx(
-                                () =>
-                                    ctr.isLoading.value
-                                        ? Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            const Text('LOADING...   '),
-                                            SizedBox(
-                                              height: 20,
-                                              width: 20,
-                                              child:
-                                                  Platform.isAndroid
-                                                      ? const CircularProgressIndicator(
-                                                        color:
-                                                            AppColors
-                                                                .contentColorWhite,
-                                                      )
-                                                      : const CupertinoActivityIndicator(),
+                                onPressed: () {
+                                  // loadingDialog("updating data", "");
+                                  ctr.isLoading.value = true;
+                                  ctr.addUpdatePegawai(
+                                    context,
+                                    "update",
+                                    userData!,
+                                  );
+                                },
+                                child: Obx(
+                                  () =>
+                                      ctr.isLoading.value
+                                          ? Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              const Text('LOADING...   '),
+                                              SizedBox(
+                                                height: 20,
+                                                width: 20,
+                                                child:
+                                                    Platform.isAndroid
+                                                        ? const CircularProgressIndicator(
+                                                          color:
+                                                              AppColors
+                                                                  .contentColorWhite,
+                                                        )
+                                                        : const CupertinoActivityIndicator(),
+                                              ),
+                                            ],
+                                          )
+                                          : const Text(
+                                            'UPDATE',
+                                            style: TextStyle(
+                                              color: AppColors.mainTextColor1,
                                             ),
-                                          ],
-                                        )
-                                        : const Text(
-                                          'UPDATE',
-                                          style: TextStyle(
-                                            color: AppColors.mainTextColor1,
                                           ),
-                                        ),
+                                ),
                               ),
                             ),
                           ),

@@ -99,27 +99,47 @@ class UpdatePassword extends GetView {
                 const SizedBox(height: 20),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 80),
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      await pegawaiC.updatePassword(
-                        context,
-                        Get.arguments["id_user"],
-                        Get.arguments["username"],
-                      );
-                      //  Restart.restartApp();
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.itemsBackground,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(50),
+                  child: Container(decoration: BoxDecoration(
+    gradient: const LinearGradient(
+      colors: [
+        Color(0xFF1B2541),
+        Color(0xFF3949AB),
+      ],
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+    ),
+    borderRadius: BorderRadius.circular(30),
+    boxShadow: [
+      BoxShadow(
+        color: Colors.blueAccent.withOpacity(0.4),
+        blurRadius: 8,
+        offset: const Offset(0, 4),
+      ),
+    ],
+  ),
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        await pegawaiC.updatePassword(
+                          context,
+                          Get.arguments["id_user"],
+                          Get.arguments["username"],
+                        );
+                        //  Restart.restartApp();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.transparent,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(50),
+                        ),
+                        minimumSize: Size(Get.size.width / 2, 50),
                       ),
-                      minimumSize: Size(Get.size.width / 2, 50),
-                    ),
-                    child: const Text(
-                      'UPDATE',
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: AppColors.mainTextColor1,
+                      child: const Text(
+                        'UPDATE',
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: AppColors.mainTextColor1,
+                        ),
                       ),
                     ),
                   ),

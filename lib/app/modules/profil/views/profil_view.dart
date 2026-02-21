@@ -14,6 +14,7 @@ import 'package:photo_view/photo_view.dart';
 import '../../../data/helper/app_colors.dart';
 import '../../../data/helper/custom_dialog.dart';
 import '../../add_pegawai/controllers/add_pegawai_controller.dart';
+import '../../shared/elevated_button.dart';
 import '../controllers/profil_controller.dart';
 import 'update_profil.dart';
 
@@ -42,24 +43,24 @@ class ProfilView extends GetView<ProfilController> {
           ),
 
           /// GLOW EFFECT
-          Positioned(
-            top: 80,
-            left: -40,
-            right: -40,
-            child: Container(
-              height: 200,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(200),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.blueAccent.withOpacity(.35),
-                    blurRadius: 120,
-                    spreadRadius: 20,
-                  ),
-                ],
-              ),
-            ),
-          ),
+          // Positioned(
+          //   top: 80,
+          //   left: -40,
+          //   right: -40,
+          //   child: Container(
+          //     height: 200,
+          //     decoration: BoxDecoration(
+          //       borderRadius: BorderRadius.circular(200),
+          //       boxShadow: [
+          //         BoxShadow(
+          //           color: Colors.blueAccent.withOpacity(.35),
+          //           blurRadius: 120,
+          //           spreadRadius: 20,
+          //         ),
+          //       ],
+          //     ),
+          //   ),
+          // ),
 
           /// BACKGROUND CARD BESAR
           Positioned(
@@ -77,7 +78,7 @@ class ProfilView extends GetView<ProfilController> {
 
           /// CONTENT AREA
           Padding(
-            padding: const EdgeInsets.only(top: 100, left: 32, right: 32),
+            padding: const EdgeInsets.only(top: 100, left: 22, right: 22),
             child: Column(
               children: [
                 /// AVATAR FLOATING
@@ -133,7 +134,7 @@ class ProfilView extends GetView<ProfilController> {
                   ),
                 ),
 
-                const SizedBox(height: 13),
+                const SizedBox(height: 6),
 
                 /// NAME
                 Text(
@@ -144,7 +145,7 @@ class ProfilView extends GetView<ProfilController> {
                   ),
                 ),
 
-                const SizedBox(height: 6),
+                // const SizedBox(height: 5),
 
                 /// USER INFO
                 Row(
@@ -222,6 +223,41 @@ class ProfilView extends GetView<ProfilController> {
                                           ),
                                         ),
                                         child: const Icon(
+                                          Icons.account_circle,
+                                          size: 15,
+                                          color: Colors.lightBlue,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 2),
+                                      Text(
+                                        'Username',
+                                        style: subtitleTextStyle,
+                                      ),
+                                    ],
+                                  ),
+                                  trailing: Text(
+                                    listDataUser!.username!,
+                                    style: titleTextStyle,
+                                  ),
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                  ),
+                                  dense: true,
+                                ),
+                                const Divider(height: 0),
+                                ListTile(
+                                  title: Row(
+                                    children: [
+                                      Container(
+                                        width: 20,
+                                        height: 20,
+                                        decoration: BoxDecoration(
+                                          color: Colors.blue[50],
+                                          borderRadius: BorderRadius.circular(
+                                            5,
+                                          ),
+                                        ),
+                                        child: const Icon(
                                           Icons.work,
                                           size: 15,
                                           color: Colors.lightBlue,
@@ -234,10 +270,25 @@ class ProfilView extends GetView<ProfilController> {
                                       ),
                                     ],
                                   ),
-                                  trailing: Text(
-                                    listDataUser!.nik!,
-                                    style: titleTextStyle,
-                                  ),
+                                  trailing:
+                                      listDataUser!.nik!.isEmpty
+                                          ? CsElevatedButton(
+                                            color: AppColors.itemsBackground,
+                                            fontsize: 12,
+                                            label: 'Generate ID',
+                                            onPressed:
+                                                listDataUser!.createdAt! == ""
+                                                    ? null
+                                                    : () {
+                                                      ctr.generateEmpId(
+                                                        listDataUser!,
+                                                      );
+                                                    },
+                                          )
+                                          : Text(
+                                            listDataUser!.nik!,
+                                            style: titleTextStyle,
+                                          ),
                                   contentPadding: const EdgeInsets.symmetric(
                                     horizontal: 16,
                                   ),
@@ -359,41 +410,6 @@ class ProfilView extends GetView<ProfilController> {
                                   ),
                                   dense: true,
                                 ),
-                                const Divider(height: 0),
-                                ListTile(
-                                  title: Row(
-                                    children: [
-                                      Container(
-                                        width: 20,
-                                        height: 20,
-                                        decoration: BoxDecoration(
-                                          color: Colors.blue[50],
-                                          borderRadius: BorderRadius.circular(
-                                            5,
-                                          ),
-                                        ),
-                                        child: const Icon(
-                                          Icons.account_circle,
-                                          size: 15,
-                                          color: Colors.lightBlue,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 2),
-                                      Text(
-                                        'Username',
-                                        style: subtitleTextStyle,
-                                      ),
-                                    ],
-                                  ),
-                                  trailing: Text(
-                                    listDataUser!.username!,
-                                    style: titleTextStyle,
-                                  ),
-                                  contentPadding: const EdgeInsets.symmetric(
-                                    horizontal: 16,
-                                  ),
-                                  dense: true,
-                                ),
                               ],
                             ),
                           ),
@@ -409,13 +425,38 @@ class ProfilView extends GetView<ProfilController> {
                           ),
                           child: ListTile(
                             onTap: () {
-                              Get.to(
-                                () => UpdateProfil(userData: listDataUser!),
+                              // Get.to(
+                              //   () => UpdateProfil(userData: listDataUser!),
+                              // );
+                               Navigator.push(context,
+                                MaterialPageRoute(
+                                  builder:
+                                      (_) =>
+                                      UpdateProfil(userData: listDataUser!),
+                                ),
                               );
                             },
-                            title: const Text(
-                              'Edit Profile',
-                              style: TextStyle(fontWeight: FontWeight.bold),
+                            title: Row(
+                              children: [
+                                Container(
+                                  width: 20,
+                                  height: 20,
+                                  decoration: BoxDecoration(
+                                    color: Colors.blue[50],
+                                    borderRadius: BorderRadius.circular(5),
+                                  ),
+                                  child: const Icon(
+                                    Icons.edit,
+                                    size: 15,
+                                    color: Colors.lightBlue,
+                                  ),
+                                ),
+                                const SizedBox(width: 2),
+                                const Text(
+                                  'Edit Profile',
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                              ],
                             ),
                             trailing: const Icon(
                               Icons.keyboard_arrow_right_rounded,
@@ -440,12 +481,30 @@ class ProfilView extends GetView<ProfilController> {
                                 btnOkOnPress: () => auth.logout(),
                               );
                             },
-                            title: const Text(
-                              'Logout',
-                              style: TextStyle(
-                                color: Colors.red,
-                                fontWeight: FontWeight.bold,
-                              ),
+                            title: Row(
+                              children: [
+                                Container(
+                                  width: 20,
+                                  height: 20,
+                                  decoration: BoxDecoration(
+                                    color: Colors.blue[50],
+                                    borderRadius: BorderRadius.circular(5),
+                                  ),
+                                  child: const Icon(
+                                    Icons.logout,
+                                    size: 15,
+                                    color: Colors.red,
+                                  ),
+                                ),
+                                const SizedBox(width: 2),
+                                const Text(
+                                  'Logout',
+                                  style: TextStyle(
+                                    color: Colors.red,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
                             ),
                             trailing: const Icon(
                               Icons.keyboard_arrow_right_rounded,

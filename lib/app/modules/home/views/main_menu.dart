@@ -29,7 +29,7 @@ class MainMenu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.fromLTRB(8.0,8,8.0,0),
       child: SizedBox(
         width: Get.mediaQuery.size.width,
         // decoration: BoxDecoration(
@@ -170,7 +170,7 @@ class MainMenu extends StatelessWidget {
                               return data.totalNotif ?? 0;
                             },
                             onTap: () {
-                              Get.to(() {
+                              // Get.to(() {
                                 adjCtrl.getReqAppUpt(
                                   '',
                                   '',
@@ -179,8 +179,15 @@ class MainMenu extends StatelessWidget {
                                   adjCtrl.initDate,
                                   adjCtrl.lastDate,
                                 );
-                                return ReqAppUserView(userData: userData!);
-                              }, transition: Transition.cupertino);
+                              //   return ReqAppUserView(userData: userData!);
+                              // }, transition: Transition.cupertino);
+                              Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder:
+                                  (_) => ReqAppUserView(userData: userData!)
+                            ),
+                          );
                             },
                           ),
                         ),
@@ -192,10 +199,17 @@ class MainMenu extends StatelessWidget {
                     asset: 'assets/image/payslip.png',
                     label: 'Payslip',
                     onTap: () {
-                      Get.to(
-                        () => PaySlipView(userData: userData!),
-                        transition: Transition.cupertino,
-                      );
+                      // Get.to(
+                      //   () => PaySlipView(userData: userData!),
+                      //   transition: Transition.cupertino,
+                      // );
+                      Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder:
+                                  (_) => PaySlipView(userData: userData!)
+                            ),
+                          );
                     },
                   ),
                   const SizedBox(width: 10),

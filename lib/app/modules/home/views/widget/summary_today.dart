@@ -13,6 +13,7 @@ import '../../../../data/helper/app_colors.dart';
 import '../../../../data/helper/const.dart';
 import '../../../../data/helper/custom_dialog.dart';
 import '../../../../data/helper/format_waktu.dart';
+import '../../../../data/helper/shift_name_helper.dart';
 import '../../../../data/model/absen_model.dart';
 import '../../../../data/model/login_model.dart';
 import '../../../login/controllers/login_controller.dart';
@@ -80,7 +81,7 @@ class SummaryToday extends StatelessWidget {
         //   ),
         // ),
         Padding(
-          padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
+          padding: const EdgeInsets.fromLTRB(0, 8, 0, 0),
           child: Card(
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
@@ -214,7 +215,12 @@ class SummaryToday extends StatelessWidget {
                                       }
 
                                       // 📍 BARU ambil lokasi
-                                      absenC.getLoc(listDataUser);
+                                      // loadingDialog(
+                                      //   'Finding your location',
+                                      //   '',
+                                      // );
+                                      await absenC.getLoc(listDataUser);
+                                      // Get.back();
                                     },
                                     child: Container(
                                       height: 40,
@@ -454,26 +460,36 @@ class SummaryToday extends StatelessWidget {
                                     ),
                             // ),
                           ),
-                          const SizedBox(height: 3,),
+                          const SizedBox(height: 3),
                           Visibility(
                             visible: absenC.dataAbsen.isNotEmpty,
                             child: Row(
                               children: [
-                                Icon(CupertinoIcons.clock, size: 19,),
-                                const SizedBox(width:3 ,),
+                                const Icon(CupertinoIcons.clock, size: 19),
+                                const SizedBox(width: 3),
                                 RichText(
                                   text: TextSpan(
                                     children: [
-                                      TextSpan(
-                                        text: 'Jam Kerja: ',
+                                      const TextSpan(
+                                        text: 'working hours: ',
                                         style: TextStyle(
                                           color: AppColors.itemsBackground,
                                           fontFamily: 'Nunito',
                                         ),
                                       ),
                                       TextSpan(
-                                        text: '${absenC.dataAbsen.isNotEmpty?absenC.dataAbsen[0].jamMasuk:''} - ${absenC.dataAbsen.isNotEmpty?absenC.dataAbsen[0].jamPulang:''}',
-                                        style: TextStyle(
+                                        text:
+                                            '${absenC.dataAbsen.isNotEmpty ? absenC.dataAbsen[0].jamMasuk : ''} - ${absenC.dataAbsen.isNotEmpty ? absenC.dataAbsen[0].jamPulang : ''}',
+                                        style: const TextStyle(
+                                          color: AppColors.itemsBackground,
+                                          fontWeight: FontWeight.bold,
+                                          fontFamily: 'Nunito',
+                                        ),
+                                      ),
+                                      TextSpan(
+                                        text:
+                                            ' ${absenC.dataAbsen.isNotEmpty ? shiftName(jamMasuk: absenC.dataAbsen[0].jamMasuk!) : ''}',
+                                        style: const TextStyle(
                                           color: AppColors.itemsBackground,
                                           fontWeight: FontWeight.bold,
                                           fontFamily: 'Nunito',
@@ -481,6 +497,7 @@ class SummaryToday extends StatelessWidget {
                                       ),
                                     ],
                                   ),
+                                  overflow: TextOverflow.ellipsis,
                                 ),
                               ],
                             ),
@@ -654,7 +671,7 @@ Widget _buildTimeCard({
               ),
             ],
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 15),
           isLoading
               ? (Platform.isAndroid
                   ? const SizedBox(

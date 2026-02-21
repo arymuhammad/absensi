@@ -41,37 +41,46 @@ class CsDropdownCabang extends StatelessWidget {
             child: DropdownButtonFormField(
               decoration: InputDecoration(
                 fillColor: Colors.white,
-                  filled: true,
-                  isDense: true, // 🔑 biar tinggi tetap rapih
-                  contentPadding: const EdgeInsets.all(5),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide.none,
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide.none,
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide.none,
-                  ),
+                filled: true,
+                isDense: true, // 🔑 biar tinggi tetap rapih
+                contentPadding: const EdgeInsets.all(5),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide.none,
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide.none,
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide.none,
+                ),
                 hintText: hintText,
               ),
               value: dropdownValue,
-              onChanged: (data) {
+              onChanged: (data) async {
                 if (data == null) return;
-                absC.selectedCabang.value = data;
-            
-                for (int i = 0; i < uniqueCabang.length; i++) {
-                  if (uniqueCabang[i].kodeCabang == data) {
-                    absC.lat.value = uniqueCabang[i].lat!;
-                    absC.long.value = uniqueCabang[i].long!;
-                    break;
-                  }
-                }
-                absC.isLoading.value = true;
-                absC.getLoc(dataUser!);
+                // if (dataUser!.visit == "1") {
+                //   absC.selectedCabangVisit.value = data;
+                // } else {
+                //   absC.selectedCabang.value = data;
+                // }
+                final cabang = uniqueCabang.firstWhere(
+                  (e) => e.kodeCabang == data,
+                );
+
+                absC.changeCabang(cabang, dataUser!);
+                // for (int i = 0; i < uniqueCabang.length; i++) {
+                //   if (uniqueCabang[i].kodeCabang == data) {
+                //     absC.lat.value = uniqueCabang[i].lat!;
+                //     absC.long.value = uniqueCabang[i].long!;
+                //     break;
+                //   }
+                // }
+                // absC.lastZoomMode = ""; // reset supaya zoom pasti trigger
+                // absC.isLoading.value = true;
+                // await absC.getLoc(dataUser!);
               },
               items:
                   uniqueCabang

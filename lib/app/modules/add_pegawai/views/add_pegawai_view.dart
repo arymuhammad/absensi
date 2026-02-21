@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:absensi/app/data/helper/app_colors.dart';
 import 'package:absensi/app/data/helper/const.dart';
 import 'package:absensi/app/data/model/login_model.dart';
+import 'package:absensi/app/modules/shared/container_main_color.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -20,9 +21,14 @@ class AddPegawaiView extends GetView<AddPegawaiController> {
     return Scaffold(
       body: Stack(
         children: [
-          Container(
-            height: 250,
-            color: AppColors.itemsBackground,
+          ContainerMainColor(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            radius: 0,
+            child: Container(
+              height: 250,
+              
+            ),
           ),
           ListView(
             scrollDirection: Axis.vertical,
@@ -350,25 +356,31 @@ class AddPegawaiView extends GetView<AddPegawaiController> {
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 105),
-                child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.itemsBackground,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(50)),
-                        minimumSize: const Size(70, 50)),
-                    onPressed: () {
-                      controller.addUpdatePegawai(context, "add", Data());
-                    },
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'REGISTER',
-                          style: titleTextStyle,
-                        ),
-                        const Icon(Iconsax.arrow_right_bold)
-                      ],
-                    )),
+                child: ContainerMainColor(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  radius: 30,
+                  child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.transparent,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(50)),
+                          minimumSize: const Size(70, 50)),
+                      onPressed: () {
+                        controller.addUpdatePegawai(context, "add", Data());
+                      },
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'REGISTER',
+                            style: titleTextStyle,
+                          ),
+                          const Icon(Iconsax.arrow_right_bold)
+                        ],
+                      )),
+                ),
               )
             ],
           ),

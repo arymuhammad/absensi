@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../../data/helper/const.dart';
+import 'present_shimmer.dart';
 
 class SummaryPerMonth extends StatelessWidget {
   SummaryPerMonth({super.key, this.userData});
@@ -74,7 +75,13 @@ _buildAbsen(Data userData, HomeController absenC) {
       future: absenC.futureSummary.value,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const CircularProgressIndicator();
+          return Row(
+            children: [
+              presentShimmer(),
+              presentShimmer(),
+              presentShimmer(),
+            ],
+          );
         } else if (snapshot.hasError) {
           return const Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -218,7 +225,7 @@ _buildAbsen(Data userData, HomeController absenC) {
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              Icon(Icons.warning, size: 28, color: red),
+                              Icon(Icons.warning_rounded, size: 28, color: red),
                               const SizedBox(width: 5),
                               Text(
                                 'Late',

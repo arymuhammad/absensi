@@ -1,20 +1,20 @@
-import 'dart:io';
+// import 'dart:io';
 
-import 'package:absensi/app/modules/absen/controllers/absen_controller.dart';
-import 'package:absensi/app/services/service_api.dart';
-import 'package:awesome_dialog/awesome_dialog.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:get/get.dart';
-import 'package:intl/intl.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../../../data/helper/db_helper.dart';
-import '../../../data/helper/custom_dialog.dart';
-import '../../../data/model/login_model.dart';
-import '../../../data/model/visit_model.dart';
+// import 'package:absensi/app/modules/absen/controllers/absen_controller.dart';
+// import 'package:absensi/app/services/service_api.dart';
+// import 'package:awesome_dialog/awesome_dialog.dart';
+// import 'package:flutter/cupertino.dart';
+// import 'package:flutter/material.dart';
+// import 'package:geolocator/geolocator.dart';
+// import 'package:get/get.dart';
+// import 'package:intl/intl.dart';
+// import 'package:shared_preferences/shared_preferences.dart';
+// import '../../../data/helper/db_helper.dart';
+// import '../../../data/helper/custom_dialog.dart';
+// import '../../../data/model/login_model.dart';
+// import '../../../data/model/visit_model.dart';
 
-final absC = Get.put(AbsenController());
+// final absC = Get.put(AbsenController());
 // visit(Data dataUser, latitude, longitude) async {
 //   var paramVisitToday = {
 //     "mode": "single",

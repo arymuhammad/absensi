@@ -47,9 +47,14 @@ class HistoryCard extends StatelessWidget {
           // ================= DATE BOX =================
           Container(
             width: boxWidth,
-            padding: const EdgeInsets.symmetric(vertical: 13),
+            padding: const EdgeInsets.symmetric(vertical: 14),
             decoration: const BoxDecoration(
-              color: Color(0xFF1E293B),
+              // color: Color(0xFF1E293B),
+              gradient: LinearGradient(
+                colors: [Color(0xFF1B2541), Color(0xFF3949AB)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
               borderRadius: BorderRadius.horizontal(left: Radius.circular(14)),
             ),
             child: Column(
@@ -108,9 +113,9 @@ class HistoryCard extends StatelessWidget {
                       _timeColumn(
                         checkOut,
                         'Check Out',
-                        stsP == "Early" || stsP == "Absent"
+                        stsP == "Minus Time" || stsP == "Absent"
                             ? red!
-                            : stsP == "Over Time"
+                            : stsP == "Overtime"
                             ? blue!
                             : green!,
                       ),

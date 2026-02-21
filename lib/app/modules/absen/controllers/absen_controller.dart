@@ -11,8 +11,8 @@ import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:device_marketing_names/device_marketing_names.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_map/flutter_map.dart';
 // import 'package:flutter_face_api/flutter_face_api.dart';
-import 'package:flutter_native_timezone_updated_gradle/flutter_native_timezone.dart';
 // import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:http/http.dart' as http;
 import 'package:absensi/app/data/model/shift_kerja_model.dart';
@@ -27,6 +27,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:xml/xml.dart' as xml;
+import '../../../data/helper/loading_progress.dart';
 import '../../../data/helper/time_service.dart';
 import '../../../data/model/login_model.dart';
 import '../../../services/service_api.dart';
@@ -37,13 +38,13 @@ import '../../../data/model/cek_absen_model.dart';
 import 'package:pdf/pdf.dart';
 import 'package:printing/printing.dart';
 import 'package:pdf/widgets.dart' as pw;
-import 'package:device_info_null_safety/device_info_null_safety.dart';
+// import 'package:device_info_null_safety/device_info_null_safety.dart';
 
 import '../../login/controllers/login_controller.dart';
 import '../views/widget/custom_qr_page.dart';
 // import 'package:flutter_face_api/flutter_face_api.dart' as regula;
 
-class AbsenController extends GetxController {
+class AbsenController extends GetxController with GetTickerProviderStateMixin {
   var isLoading = true.obs;
   var ascending = true.obs;
   var lokasi = "".obs;
@@ -80,6 +81,8 @@ class AbsenController extends GetxController {
   var long = "".obs; // tampung koordinat long dari store yang dipilih
   var latFromGps = 0.0.obs; // tampung koordinat lat dari gps device
   var longFromGps = 0.0.obs; // tampung koordinat long dari gps device
+  Rx<LatLng?> validatedQrLatLng = Rx<LatLng?>(null);
+
   // var userPostLat = 0.0.obs;
   // var userPostLong = 0.0.obs;
   var jamMasuk = "".obs;
@@ -93,7 +96,7 @@ class AbsenController extends GetxController {
   var updateList = [];
   var currVer = "";
   var latestVer = "";
-  var supportedAbi = "";
+  // var supportedAbi = "";
   var statsCon = "".obs;
   RxList<Absen> searchAbsen = RxList<Absen>([]);
   RxList<Visit> searchVisit = RxList<Visit>([]);
@@ -151,6 +154,22 @@ class AbsenController extends GetxController {
   DateTime? timeServer;
   String? realDateServer;
   String? realTimeServer;
+  late AnimationController animController;
+
+  var progress = 1.0.obs;
+  final durationSeconds = 20.obs;
+  var secondsLeft = 20.obs;
+  var progressColor = Colors.green.obs;
+
+  final mapController = MapController();
+  RxDouble currentZoom = 17.0.obs;
+  RxBool isInsideRadius = false.obs;
+  String lastZoomMode = "";
+  Rxn<LatLng> storeLatLng = Rxn<LatLng>();
+
+  final lineProgress = 0.0.obs;
+
+  var isMapReady = false.obs;
 
   @override
   void onInit() async {
@@ -164,17 +183,6 @@ class AbsenController extends GetxController {
     timeServer = await getServerTimeLocal();
     realDateServer = DateFormat('yyyy-MM-dd').format(timeServer!);
     realTimeServer = DateFormat('HH:mm').format(timeServer!);
-    // timeNetwork(await FlutterNativeTimezone.getLocalTimezone());
-    // fallbackTimeNetwork(
-    //   await FlutterNativeTimezone.getLocalTimezone(),
-    //   dotenv.env['API_KEY_WORLDTIME_API'],
-    // );
-
-    // TimeService.tryResyncIfFallback();
-
-    // if (await TimeService.isTimezoneChanged()) {
-    //   await TimeService.safeSyncAtStartup();
-    // }
 
     // Timer.periodic(const Duration(seconds: 1), (Timer t) async => timeNowOpt);
 
@@ -184,6 +192,10 @@ class AbsenController extends GetxController {
     );
     // var userID = Data.fromJson(jsonDecode(pref.getString('userDataLogin')!)).id!;
 
+    storeLatLng.value = LatLng(
+      double.parse(dataUserLogin.lat!),
+      double.parse(dataUserLogin.long!),
+    );
     refreshAbsen(dataUserLogin);
     idUser.value = dataUserLogin.id!;
     var paramLimit = {
@@ -230,7 +242,7 @@ class AbsenController extends GetxController {
     // print('VERSI SEKARANG $currVer');
 
     final readDoc = await http.get(
-      Uri.parse('http://103.156.15.61/update apk/updateLog.xml'),
+      Uri.parse('http://103.156.15.61/update_apk/updateLog.xml'),
     );
 
     if (readDoc.statusCode == 200) {
@@ -240,11 +252,11 @@ class AbsenController extends GetxController {
       latestVer = cLog.findElements('versi').first.innerText;
       if (compareVersion(latestVer, currVer) > 0) {
         if (Platform.isAndroid) {
-          final DeviceInfoNullSafety deviceInfoNullSafety =
-              DeviceInfoNullSafety();
-          Map<String, dynamic> abiInfo = await deviceInfoNullSafety.abiInfo;
-          var abi = abiInfo.entries.toList();
-          supportedAbi = abi[1].value;
+          // final DeviceInfoNullSafety deviceInfoNullSafety =
+          //     DeviceInfoNullSafety();
+          // Map<String, dynamic> abiInfo = await deviceInfoNullSafety.abiInfo;
+          // var abi = abiInfo.entries.toList();
+          // supportedAbi = abi[1].value;
           checkForUpdates("onInit");
         }
         // disable redirect to appstore for ios when update is available
@@ -265,6 +277,35 @@ class AbsenController extends GetxController {
       paramLimitVisit,
       dataUserLogin,
     );
+
+    animController = AnimationController(
+      vsync: this,
+      duration: Duration(seconds: durationSeconds.value),
+    );
+    animController.addListener(() {
+      progress.value = 1 - animController.value;
+      final total = durationSeconds.value;
+
+      secondsLeft.value = (total - (total * animController.value)).ceil();
+
+      double p = progress.value;
+
+      if (p > 0.5) {
+        progressColor.value = Colors.green;
+      } else if (p > 0.2) {
+        progressColor.value = Colors.orange;
+      } else {
+        progressColor.value = Colors.red;
+      }
+    });
+
+    everAll([lat, long, scannedLatLng, latFromGps, longFromGps], (_) {
+      if (!isMapReady.value) return;
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _triggerSmartZoom(dataUserLogin);
+      });
+    });
   }
 
   @override
@@ -276,7 +317,30 @@ class AbsenController extends GetxController {
     rndLoc.dispose();
     filterVisit.dispose();
     _dateStream.close();
+    animController.dispose();
     super.onClose();
+  }
+
+  void startLoading({
+    int seconds = 20,
+    String title = "Finding your location",
+  }) {
+    durationSeconds.value = seconds;
+    secondsLeft.value = seconds;
+
+    animController.duration = Duration(seconds: seconds);
+    animController.forward(from: 0);
+
+    showLoadingDialog(title);
+  }
+
+  void stopLoading() {
+    animController.stop();
+    if (Get.isDialogOpen ?? false) Get.back();
+  }
+
+  void showLoadingDialog(String title) {
+    Get.dialog(LoadingDialog(title: title), barrierDismissible: false);
   }
 
   bool get isBeforeCheckoutLimitNow {
@@ -576,89 +640,8 @@ class AbsenController extends GetxController {
     return userCabang.value = response;
   }
 
-  // Future<void> timeNetwork(String timeZone) async {
-  //   // int attempts = 0;
-  //   // while (attempts < maxRetries) {
-  //   try {
-  //     final response = await http
-  //         .get(
-  //           Uri.parse(
-  //             // 'https://script.google.com/macros/s/AKfycbyd5AcbAnWi2Yn0xhFRbyzS4qMq1VucMVgVvhul5XqS9HkAyJY/exec?tz=$timeZone',
-  //             'https://timeapi.io/api/time/current/zone?timeZone=$timeZone',
-  //           ),
-  //         )
-  //         .timeout(
-  //           const Duration(seconds: 10),
-  //           onTimeout: () => http.Response('Timeout', 408),
-  //         );
-  //     // print('https://timeapi.io/api/time/current/zone?timeZone=$timeZone');
-
-  //     // DateFormat inputFormat = DateFormat("EEE, dd MMM yyyy HH:mm:ss Z");
-  //     if (response.statusCode == 200) {
-  //       var result = jsonDecode(response.body);
-  //       // DateTime dateTime = inputFormat.parse(result['fulldate']);
-  //       // timeNow = DateFormat('HH:mm').format(dateTime);
-  //       timeNow = result['time'];
-  //       // dateNowServer = DateFormat('yyyy-MM-dd').format(dateTime);
-  //       dateNowServer = result['dateTime'];
-  //       // break;
-  //       // } else {
-  //       //   attempts++;
-  //       //   await Future.delayed(const Duration(seconds: 3));
-  //       // }
-  //     } else {
-  //       // Jika gagal, coba ambil dari URL alternatif
-
-  //       await fallbackTimeNetwork(
-  //         timeZone,
-  //         dotenv.env['API_KEY_WORLDTIME_API'],
-  //       );
-  //     }
-  //   } catch (e) {
-  //     // Get.back();
-  //     showToast(e.toString());
-  //     fallbackTimeNetwork(timeZone, dotenv.env['API_KEY_WORLDTIME_API']);
-  //     // attempts++;
-  //     // await Future.delayed(const Duration(seconds: 3));
-  //   }
-
-  // }
-
-  // Future<void> fallbackTimeNetwork(String timeZone, String? apiKey) async {
-  //   try {
-  //     var url =
-  //         'https://world-time-api3.p.rapidapi.com/timezone/${Uri.encodeComponent(timeZone)}';
-  //     var headers = <String, String>{};
-  //     if (apiKey != null) {
-  //       headers['x-rapidapi-key'] = apiKey;
-  //       headers['x-rapidapi-host'] = 'world-time-api3.p.rapidapi.com';
-  //     }
-
-  //     final response = await http
-  //         .get(Uri.parse(url), headers: headers)
-  //         .timeout(
-  //           const Duration(seconds: 20),
-  //           onTimeout: () => http.Response('Timeout', 408),
-  //         );
-
-  //     if (response.statusCode == 200) {
-  //       var result = jsonDecode(response.body);
-  //       // Format data tergantung response API tersebut
-  //       timeNow = DateFormat(
-  //         'HH:mm',
-  //       ).format(DateTime.parse(result['datetime']).toLocal());
-  //       dateNowServer = result['datetime'];
-  //     } else {
-  //       // Get.back();
-  //       showToast('Gagal mengambil data waktu dari API cadangan');
-  //     }
-  //   } catch (e) {
-  //     // Get.back();
-  //     showToast('Error saat mengambil data waktu: $e');
-  //   }
-  // }
-
   getLoc(Data? dataUser) async {
+    startLoading(seconds: 20);
     Position position = await determinePosition();
     try {
       final deviceNames = DeviceMarketingNames();
@@ -682,25 +665,25 @@ class AbsenController extends GetxController {
     //     'You have been detected using\nfake location\nPlease turn off fake location',
     //   );
     // } else {
-    try {
-      List<Placemark> placemarks = await placemarkFromCoordinates(
-        position.latitude,
-        position.longitude,
-      ).timeout(const Duration(seconds: 15));
+    // try {
+    //   List<Placemark> placemarks = await placemarkFromCoordinates(
+    //     position.latitude,
+    //     position.longitude,
+    //   ).timeout(const Duration(seconds: 15));
 
-      lokasi.value =
-          '${placemarks[0].street!}, ${placemarks[0].subLocality!}\n${placemarks[0].subAdministrativeArea!}, ${placemarks[0].administrativeArea!}';
-      // print(lokasi.value);
-    } on TimeoutException {
-      isLoading.value = false;
-      showToast("Failed to get location, please try again.");
-      return Future.error('Timeout while getting location');
-    } catch (e) {
-      isLoading.value = false;
-      isEnabled.value = false;
-      showToast("There is an error: $e");
-      return Future.error(e.toString());
-    }
+    //   lokasi.value =
+    //       '${placemarks[0].street!}, ${placemarks[0].subLocality!}\n${placemarks[0].subAdministrativeArea!}, ${placemarks[0].administrativeArea!}';
+    //   // print(lokasi.value);
+    // } on TimeoutException {
+    //   isLoading.value = false;
+    //   showToast("Failed to get location, please try again.");
+    //   return Future.error('Timeout while getting location');
+    // } catch (e) {
+    //   isLoading.value = false;
+    //   isEnabled.value = false;
+    //   showToast("There is an error: $e");
+    //   return Future.error(e.toString());
+    // }
     // timeNetwork(await FlutterNativeTimezone.getLocalTimezone());
     latFromGps.value = position.latitude;
     longFromGps.value = position.longitude;
@@ -747,6 +730,8 @@ class AbsenController extends GetxController {
         // accessing the position and request users of the
         // App to enable the location services.
         showToast("Lokasi belum diaktifkan");
+        // Get.back();
+        stopLoading();
         // lokasi.value = "Lokasi Anda tidak diketahui";
         return Future.error('Location services are disabled.');
       }
@@ -765,6 +750,8 @@ class AbsenController extends GetxController {
           isLoading.value = false;
           isEnabled.value = false;
           showToast("Izin Lokasi ditolak");
+          // Get.back();
+          stopLoading();
           return Future.error('Location permissions are denied');
         }
         // await Future.delayed(const Duration(milliseconds: 400));
@@ -780,6 +767,7 @@ class AbsenController extends GetxController {
           "Izin Lokasi ditolak.\nHarap berikan akses pada perizinan lokasi",
         );
         // Get.back();
+        stopLoading();
         return Future.error(
           'Location permissions are permanently denied, we cannot request permissions.',
         );
@@ -796,10 +784,12 @@ class AbsenController extends GetxController {
 
       Position loc = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
-        timeLimit: const Duration(seconds: 15),
+        timeLimit: const Duration(seconds: 20),
         // forceAndroidLocationManager: true
         //
       );
+      // print(loc.latitude);
+      // print(loc.longitude);
       if (loc.isMocked) {
         isLoading.value = false;
         isEnabled.value = false;
@@ -808,19 +798,24 @@ class AbsenController extends GetxController {
           'Warning',
           'You have been detected using\nfake location',
         );
+        // Get.back();
       }
+      stopLoading();
       return loc;
     } on TimeoutException {
       isLoading.value = false;
       isEnabled.value = false;
       // Get.back(); // Tutup loading
       showToast("Failed to get location, please try again.");
+      // Get.back();
+      stopLoading();
       return Future.error('Timeout while getting location');
     } catch (e) {
-      // Get.back();
+      Get.back();
       isLoading.value = false;
       isEnabled.value = false;
       showToast("There is an error: $e");
+      stopLoading();
       return Future.error(e.toString());
     }
   }
@@ -863,42 +858,55 @@ class AbsenController extends GetxController {
       Get.back();
 
       if (barcodeScanRes.isNotEmpty &&
-              barcodeScanRes.value.split(' ').length > 2 &&
-              barcodeScanRes.value.split(' ')[2] != "URBAN&CO" ||
-          barcodeScanRes.isNotEmpty &&
-              barcodeScanRes.value.split(' ').length < 2) {
+          ((barcodeScanRes.value.split(' ').length > 2 &&
+                  barcodeScanRes.value.split(' ')[2] != "URBAN&CO") ||
+              barcodeScanRes.isNotEmpty &&
+                  barcodeScanRes.value.split(' ').length < 3)) {
         selectedCabang.value = "";
+        selectedCabangVisit.value = "";
         isLoading.value = false;
         isEnabled.value = false;
         distanceStore.value = 0.0;
+        barcodeScanRes.value = "";
         lokasi.value = "Unknown, please try again";
         locNote.value = "";
         showToast("Unrecognized QR Code");
+        if (lat.isNotEmpty && long.isNotEmpty) {
+          storeLatLng.value = LatLng(
+            double.parse(lat.value),
+            double.parse(long.value),
+          );
+        }
       } else {
-        // print(barcodeScanRes.value.split(' ')[0]);
-        List<Placemark> placemarks = await placemarkFromCoordinates(
-          double.parse(barcodeScanRes.value.split(' ')[0]),
-          double.parse(barcodeScanRes.value.split(' ')[1]),
-        );
-        lokasi.value =
-            '${placemarks[0].street!}, ${placemarks[0].subLocality!}\n${placemarks[0].subAdministrativeArea!}, ${placemarks[0].administrativeArea!}';
+       
+        // List<Placemark> placemarks = await placemarkFromCoordinates(
+        //   double.parse(barcodeScanRes.value.split(' ')[0]),
+        //   double.parse(barcodeScanRes.value.split(' ')[1]),
+        // );
+        // lokasi.value =
+        //     '${placemarks[0].street!}, ${placemarks[0].subLocality!}\n${placemarks[0].subAdministrativeArea!}, ${placemarks[0].administrativeArea!}';
 
         scannedLatLng.value = LatLng(
           double.parse(barcodeScanRes.value.split(' ')[0]),
           double.parse(barcodeScanRes.value.split(' ')[1]),
         );
+        // 🔥 Paksa circle tetap tampil
+        storeLatLng.value = scannedLatLng.value;
 
         // Step 2: Dapatkan posisi user
-        loadingDialog('Validating your QR code', '');
+        startLoading(seconds: 15, title: 'Validating your QR code');
+        // loadingDialog(, '');
         Position userPosition;
         try {
           userPosition = await Geolocator.getCurrentPosition(
             desiredAccuracy: LocationAccuracy.high,
             timeLimit: const Duration(seconds: 15),
           );
-          Get.back();
+          // Get.back();
+          stopLoading();
         } catch (e) {
-          Get.back();
+          // Get.back();
+          stopLoading();
           showToast('Failed to get location! Make sure GPS is active.');
           // ScaffoldMessenger.of(Get.context!).showSnackBar(
           //   const SnackBar(
@@ -916,10 +924,34 @@ class AbsenController extends GetxController {
         );
 
         // Step 4: Validasi
-        if (distanceMeter <= 100) {
-          selectedCabang.value = barcodeScanRes.value.split(' ')[3];
-          latFromGps.value = userPosition.latitude;
-          longFromGps.value = userPosition.longitude;
+
+        // getCoveredQR(kodeCabang: barcodeScanRes.value.split(' ')[3]);
+
+        // print(distanceMeter);
+        // print(num.parse(dataUser!.areaCoverQR!));
+        final allowedRadius = await getCoveredQR(
+          kodeCabang: barcodeScanRes.value.split(' ')[3],
+        );
+
+        if (distanceMeter <= allowedRadius) {
+          // dataUser!.visit == "1"
+          // ?
+          if (dataUser!.visit == "1") {
+            selectedCabangVisit.value = barcodeScanRes.value.split(' ')[3];
+          } else {
+            selectedCabang.value = barcodeScanRes.value.split(' ')[3];
+          }
+
+          // print(selectedCabangVisit.value);
+          // print(selectedCabang.value);
+          // print(barcodeScanRes.value.split(' ')[3]);
+          // kode lama
+          // latFromGps.value = userPosition.latitude;
+          // longFromGps.value = userPosition.longitude;
+          validatedQrLatLng.value = LatLng(
+            userPosition.latitude,
+            userPosition.longitude,
+          );
           isLoading.value = false;
           isEnabled.value = true;
           locNote.value = "You are in the radius area";
@@ -927,21 +959,57 @@ class AbsenController extends GetxController {
             'Location validation successful. You are within the QR code area.',
           );
 
+         
+          updateCircleFromQr(barcodeScanRes.value);
+
+          refreshZoom(dataUser);
+
           // Lanjutkan proses absensi/kehadiran
         } else {
           selectedCabang.value = "";
+          selectedCabangVisit.value = "";
+          barcodeScanRes.value = "";
           isLoading.value = false;
           isEnabled.value = false;
           locNote.value =
               "You are outside the QR area (${(distanceMeter / 1000).toStringAsFixed(2)} Km)";
           distanceStore.value = distanceMeter;
           showToast('Validation failed!');
+          
+          updateCircleFromQr(barcodeScanRes.value);
+
+          refreshZoom(dataUser!);
 
           // Tolak absensi/scan, bisa kasih opsi retry
         }
       }
     } on PlatformException {
       barcodeScanRes.value = 'Failed to get platform version.';
+    }
+  }
+
+  Future<num> getCoveredQR({required String kodeCabang}) async {
+    try {
+      final response = await http.get(
+        Uri.parse(
+          '${ServiceApi().baseUrl}get_covered_qr?kode_cabang=$kodeCabang',
+        ),
+      );
+
+      if (response.statusCode != 200) {
+        throw Exception("Server error ${response.statusCode}");
+      }
+
+      final result = jsonDecode(response.body);
+
+      if (result['success'] != true || result['data'] == null) {
+        throw Exception("Invalid response");
+      }
+
+      return num.parse(result['data']['area_coverage_qr']);
+    } catch (e) {
+      showToast("Failed to get QR radius");
+      return 0; // fallback aman
     }
   }
 
@@ -1222,7 +1290,9 @@ class AbsenController extends GetxController {
       if (response.isNotEmpty && response[0].jamAbsenPulang != "") {
         dataAbsen.value = response;
       } else if (response.isNotEmpty &&
-          response[0].jamAbsenMasuk != tempDataAbs[0].jamAbsenMasuk!) {
+              response[0].jamAbsenMasuk != tempDataAbs[0].jamAbsenMasuk! ||
+          response.isNotEmpty &&
+              response[0].idShift != tempDataAbs[0].idShift!) {
         dataAbsen.value = response;
       } else {
         dataAbsen.value = tempDataAbs;
@@ -1238,7 +1308,7 @@ class AbsenController extends GetxController {
   Future<List<Absen>> getLimitAbsen(paramLimitAbsen) async {
     final response = await ServiceApi().getAbsen(paramLimitAbsen);
     dataLimitAbsen.clear();
-    isLoading.value = true;
+    // isLoading.value = true;
     var tempSingleAbs = await SQLHelper.instance.getLimitDataAbsen(
       idUser.value,
       initDate1,
@@ -1374,14 +1444,15 @@ class AbsenController extends GetxController {
 
     try {
       final readDoc = await http
-          .get(Uri.parse('http://103.156.15.61/update apk/updateLog.xml'))
+          .get(Uri.parse('http://103.156.15.61/update_apk/updateLog.xml'))
           .timeout(const Duration(seconds: 20));
       final response = await http
           .head(
             Uri.parse(
-              supportedAbi == 'arm64-v8a'
-                  ? 'http://103.156.15.61/update apk/absensiApp.arm64v8a.apk'
-                  : 'http://103.156.15.61/update apk/absensiApp.apk',
+              // supportedAbi == 'arm64-v8a'
+              //     ? 'http://103.156.15.61/update apk/absensiApp.arm64v8a.apk'
+                  // :
+                   'http://103.156.15.61/update_apk/absensiApp.apk',
             ),
           )
           .timeout(const Duration(seconds: 20));
@@ -1598,93 +1669,6 @@ class AbsenController extends GetxController {
     await ServiceApi().sendDataToXmor(data);
   }
 
-  // void resetData() {
-  //   isLoading.value = true;
-  //   ascending.value = true;
-  //   lokasi.value = "";
-  //   devInfo.value = "";
-  //   cekAbsen.value = CekAbsen();
-  //   cekVisit.value = CekVisit(
-  //     total: '',
-  //     tglVisit: '',
-  //     kodeStore: '',
-  //     namaStore: '',
-  //   );
-  //   optVisitSelected.value = "";
-  //   stsAbsenSelected.value = "";
-  //   optVisitVisible.value = true;
-  //   dataAbsen.clear();
-  //   dataVisit.clear();
-  //   dataLimitAbsen.clear();
-  //   dataLimitVisit.clear();
-  //   dataAllAbsen.clear();
-  //   dataAllVisit.clear();
-  //   shiftKerja.clear();
-  //   cabang.clear();
-  //   userCabang.clear();
-  //   idUser.value = "";
-  //   msg.value = "";
-  //   selectedShift.value = "";
-  //   selectedCabang.value = "";
-  //   selectedUserCabang.value = "";
-  //   userMonitor.value = "";
-  //   selectedCabangVisit.value = "";
-  //   distanceStore.value = 0.0;
-  //   locNote.value = "";
-  //   lat.value = "";
-  //   long.value = "";
-  //   latFromGps.value = 0.0;
-  //   longFromGps.value = 0.0;
-  //   jamMasuk.value = "";
-  //   jamPulang.value = "";
-  //   timeNow = "";
-  //   timeNowOpt = DateFormat('HH:mm').format(DateTime.now()).toString();
-  //   dateNowServer = "";
-  //   tglStream.value = DateTime.now();
-  //   dateAbsen = "";
-  //   downloadProgress.value = 0.0;
-  //   updateList.clear();
-  //   currVer = "";
-  //   latestVer = "";
-  //   supportedAbi = "";
-  //   statsCon.value = "";
-  //   searchAbsen.clear();
-  //   searchVisit.clear();
-  //   filterAbsen.clear();
-  //   filterVisit.clear();
-  //   image = null;
-  //   searchDate.value = "";
-  //   calendarFormat.value = CalendarFormat.month;
-  //   selectedDate.value = null;
-  //   rangeStart.value = null;
-  //   rangeEnd.value = null;
-  //   rangeSelectionMode.value = RangeSelectionMode.toggledOff;
-  //   dateNow = DateFormat('yyyy-MM-dd').format(DateTime.now());
-  //   thisMonth =
-  //       DateFormat('MMMM yyyy', 'id_ID').format(DateTime.now()).toString();
-  //   initDate1 =
-  //       DateFormat('yyyy-MM-dd')
-  //           .format(DateTime(DateTime.now().year, DateTime.now().month, 1))
-  //           .toString();
-  //   initDate2 =
-  //       DateFormat('yyyy-MM-dd')
-  //           .format(DateTime(DateTime.now().year, DateTime.now().month + 1, 0))
-  //           .toString();
-  //   lastTime = null;
-  //   remainingSec.value = 30;
-  //   timerStat.value = false;
-  //   capturedImage = null;
-  //   barcodeScanRes.value = '';
-  //   scannedLatLng.value = null;
-  //   isEnabled.value = true;
-  //   // reset TextEditingController jika perlu juga:
-  //   date1.clear();
-  //   date2.clear();
-  //   store.clear();
-  //   userCab.clear();
-  //   rndLoc.clear();
-  // }
-
   Future<void> getLastUserData({required Data dataUser}) async {
     var newUser = await ServiceApi().fetchCurrentUser({
       "username": dataUser.username!,
@@ -1733,5 +1717,148 @@ class AbsenController extends GetxController {
     final minutes = (duration.inMinutes % 60).toString().padLeft(2, '0');
     final seconds = (duration.inSeconds % 60).toString().padLeft(2, '0');
     return '$hours:$minutes:$seconds';
+  }
+
+  // double get dynamicRadius {
+  //   // Zoom 5 – 18
+  //   // Semakin zoom in → semakin besar
+  //   return (currentZoom.value * 8).clamp(40, 160);
+  // }
+
+  void autoSmartZoom({
+    required LatLng userLatLng,
+    required LatLng storeLatLng,
+    required double allowedRadius,
+    bool force = false,
+  }) {
+    final distance = const Distance().as(
+      LengthUnit.Meter,
+      userLatLng,
+      storeLatLng,
+    );
+
+    final inside = distance <= allowedRadius;
+
+    isInsideRadius.value = inside;
+
+    // 🔥 Kalau force true, reset mode
+    if (force) {
+      lastZoomMode = "";
+    }
+
+    if (inside && lastZoomMode != "inside") {
+      lastZoomMode = "inside";
+
+      mapController.moveAndRotate(userLatLng, 15.5, 0);
+    } else if (!inside && lastZoomMode != "outside") {
+      lastZoomMode = "outside";
+
+      final bounds = LatLngBounds.fromPoints([userLatLng, storeLatLng]);
+
+      mapController.fitCamera(
+        CameraFit.bounds(bounds: bounds, padding: const EdgeInsets.all(80)),
+      );
+    }
+    // print(userLatLng);
+    // print(storeLatLng);
+    // print(lastZoomMode);
+    // print(distance);
+    // print(allowedRadius);
+    // print(barcodeScanRes.value);
+  }
+
+  void _triggerSmartZoom(Data? data) {
+    final userLatLng =
+        scannedLatLng.value ?? LatLng(latFromGps.value, longFromGps.value);
+
+    final storeLatLng = LatLng(
+      double.parse(lat.isNotEmpty ? lat.value : data!.lat!),
+      double.parse(long.isNotEmpty ? long.value : data!.long!),
+    );
+
+    autoSmartZoom(
+      userLatLng: userLatLng,
+      storeLatLng: storeLatLng,
+      allowedRadius: double.parse(data!.areaCover!),
+    );
+  }
+
+  // void updateStore(LatLng newStore) {
+  //   lat.value = newStore.latitude.toString();
+  //   long.value = newStore.longitude.toString();
+
+  //   lastZoomMode = ""; // reset supaya zoom trigger ulang
+  // }
+
+  void changeCabang(Cabang cabang, Data dataUser) async {
+    if (dataUser.visit == "1") {
+      selectedCabangVisit.value = cabang.kodeCabang!;
+    } else {
+      selectedCabang.value = cabang.kodeCabang!;
+    }
+
+    lat.value = cabang.lat!;
+    long.value = cabang.long!;
+
+    storeLatLng.value = LatLng(
+      double.parse(cabang.lat!),
+      double.parse(cabang.long!),
+    );
+    // print('storeLatLong Cabang: ${storeLatLng.value}');
+
+    // print(storeLatLng.value);
+    // print(dynamicRadius);
+    barcodeScanRes.value = "";
+    // 🔥 Hitung ulang posisi user
+    // final userLatLng =
+    //     scannedLatLng.value ?? LatLng(latFromGps.value, longFromGps.value);
+
+    // final storeLatLng = LatLng(
+    //   double.parse(cabang.lat!),
+    //   double.parse(cabang.long!),
+    // );
+
+    await getLoc(dataUser);
+    refreshZoom(dataUser);
+    // isLoading.value = true;
+  }
+
+  void updateCircleFromQr(String qrValue) {
+    final parts = qrValue.split(' ');
+    if (parts.length >= 2) {
+      final latQr = double.parse(parts[0]);
+      final longQr = double.parse(parts[1]);
+
+      final newLatLng = LatLng(latQr, longQr);
+
+      scannedLatLng.value = newLatLng;
+      storeLatLng.value = newLatLng; // 🔥 ini kuncinya
+    }
+  }
+
+  double get distanceKm {
+    if (storeLatLng.value == null) return 0;
+
+    final meter = const Distance().as(
+      LengthUnit.Meter,
+      LatLng(latFromGps.value, longFromGps.value),
+      storeLatLng.value!,
+    );
+
+    return meter / 1000;
+  }
+
+  void refreshZoom(Data dataUser) {
+    if (storeLatLng.value == null) return;
+
+    final userLatLng =
+        validatedQrLatLng.value ?? LatLng(latFromGps.value, longFromGps.value);
+
+    autoSmartZoom(
+      userLatLng: userLatLng,
+      storeLatLng: storeLatLng.value!,
+      allowedRadius: double.parse(dataUser.areaCover!),
+      force: true,
+    );
   }
 }

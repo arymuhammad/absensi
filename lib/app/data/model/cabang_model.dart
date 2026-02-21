@@ -5,8 +5,17 @@ class Cabang {
   String? lat;
   String? long;
   String? cvrArea;
+  String? cvrAreaQR;
 
-  Cabang({this.kodeCabang, this.namaCabang, this.brandCabang, this.lat, this.long, this.cvrArea});
+  Cabang({
+    this.kodeCabang,
+    this.namaCabang,
+    this.brandCabang,
+    this.lat,
+    this.long,
+    this.cvrArea,
+    this.cvrAreaQR,
+  });
 
   Cabang.fromJson(Map<String, dynamic> json) {
     kodeCabang = json['kode_cabang'];
@@ -15,6 +24,7 @@ class Cabang {
     lat = json['lat'];
     long = json['long'];
     cvrArea = json['area_coverage'];
+    cvrAreaQR = json['area_coverage_qr'];
   }
 
   Map<String, dynamic> toJson() {
@@ -25,6 +35,7 @@ class Cabang {
     data['lat'] = lat;
     data['long'] = long;
     data['area_coverage'] = cvrArea;
+    data['area_coverage_qr'] = cvrAreaQR;
     return data;
   }
 }

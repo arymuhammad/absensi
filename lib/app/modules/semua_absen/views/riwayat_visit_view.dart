@@ -15,6 +15,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../data/helper/duration_count.dart';
 import '../../shared/history_card.dart';
+import '../../shared/history_card_shimmer.dart';
 
 class RiwayatVisitView extends GetView {
   RiwayatVisitView({super.key, this.userData});
@@ -58,8 +59,8 @@ class RiwayatVisitView extends GetView {
                           primary: AppColors.itemsBackground,
                           onPrimary: AppColors.contentColorWhite,
                           surface: AppColors.contentColorWhite,
-                          onSurface:  AppColors.contentColorBlack,
-                        ), 
+                          onSurface: AppColors.contentColorBlack,
+                        ),
                       ),
                       child: child!,
                     );
@@ -81,17 +82,20 @@ class RiwayatVisitView extends GetView {
         ),
         backgroundColor: AppColors.itemsBackground,
         elevation: 0.0,
-       flexibleSpace:Container(decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Color(0xFF1B2541), Color(0xFF3949AB)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-            ),)
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFF1B2541), Color(0xFF3949AB)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
       ),
       // resizeToAvoidBottomInset: false,
       body: CustomMaterialIndicator(
         onRefresh: () async {
+          visitC.isLoading.value = true;
           visitC.resetFilter();
           pickedRange.value = null;
           // selectedTab.value = 0;
@@ -174,8 +178,11 @@ class RiwayatVisitView extends GetView {
                     }).toList();
 
                 if (visitC.isLoading.value) {
-                  return const SliverFillRemaining(
-                    child: Center(child: CircularProgressIndicator()),
+                  return SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) => const HistoryCardShimmer(),
+                      childCount: 5, // jumlah shimmer tampil
+                    ),
                   );
                 }
 
@@ -194,43 +201,45 @@ class RiwayatVisitView extends GetView {
                     return AnimatedHistoryCard(
                       index: index,
                       child: InkWell(
-                        onTap:
-                            () => Get.to(() {
-                              var detailData = {
-                                "foto_profil":
-                                    userData!.foto != ""
-                                        ? userData!.foto
-                                        : userData!.nama,
-                                "nama": item.nama!,
-                                "id_user": item.id!,
-                                "store": item.namaCabang!,
-                                "tgl_visit": item.tglVisit!,
-                                "jam_in": item.jamIn!,
-                                "foto_in": item.fotoIn!,
-                                "jam_out":
-                                    item.jamOut != "" ? item.jamOut! : "",
-                                "foto_out":
-                                    item.fotoOut != "" ? item.fotoOut! : "",
-                                "lat_in": item.latIn!,
-                                "long_in": item.longIn!,
-                                "lat_out":
-                                    item.latOut != "" ? item.latOut! : "",
-                                "long_out":
-                                    item.longOut != "" ? item.longOut! : "",
-                                "device_info": item.deviceInfo!,
-                                "device_info2":
-                                    item.deviceInfo2 != ""
-                                        ? item.deviceInfo2
-                                        : "",
-                              };
+                        onTap: () {
+                          var detailData = {
+                            "foto_profil":
+                                userData!.foto != ""
+                                    ? userData!.foto
+                                    : userData!.nama,
+                            "nama": item.nama!,
+                            "id_user": item.id!,
+                            "store": item.namaCabang!,
+                            "tgl_visit": item.tglVisit!,
+                            "jam_in": item.jamIn!,
+                            "foto_in": item.fotoIn!,
+                            "jam_out": item.jamOut != "" ? item.jamOut! : "",
+                            "foto_out": item.fotoOut != "" ? item.fotoOut! : "",
+                            "lat_in": item.latIn!,
+                            "long_in": item.longIn!,
+                            "lat_out": item.latOut != "" ? item.latOut! : "",
+                            "long_out": item.longOut != "" ? item.longOut! : "",
+                            "device_info": item.deviceInfo!,
+                            "device_info2":
+                                item.deviceInfo2 != "" ? item.deviceInfo2 : "",
+                          };
+                          //   Get.to(() {
 
-                              return DetailVisitView(detailData);
-                            }, transition: Transition.cupertino),
+                          //   return DetailVisitView(detailData);
+                          // }, transition: Transition.cupertino);
+
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => DetailVisitView(detailData),
+                            ),
+                          );
+                        },
                         child: HistoryCard(
                           date: DateTime.parse(item.tglVisit!),
                           checkIn: safe(item.jamIn),
                           checkOut: safe(item.jamOut),
-                          duration: hitungDurasi(
+                          duration: hitungDurasiFull(
                             tglMasuk: item.tglVisit,
                             jamMasuk: item.jamIn,
                             tglPulang: item.tglVisit,

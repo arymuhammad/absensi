@@ -14,12 +14,11 @@ import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:icons_plus/icons_plus.dart';
 import 'package:intl/intl.dart';
-import 'package:shimmer/shimmer.dart';
 
 import '../../../data/helper/duration_count.dart';
 import '../../shared/history_card.dart';
+import '../../shared/history_card_shimmer.dart';
 import 'main_menu.dart';
 import 'widget/summary_per_month.dart';
 
@@ -35,7 +34,7 @@ class SummaryAbsen extends GetView {
       child: Column(
         children: [
           SummaryToday(listDataUser: userData!),
-          const SizedBox(height: 15),
+          const SizedBox(height: 10),
           Expanded(
             child: CustomMaterialIndicator(
               onRefresh: () async {
@@ -91,7 +90,7 @@ class SummaryAbsen extends GetView {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Padding(
-                        padding: const EdgeInsets.only(left: 10.0, top: 5),
+                        padding: const EdgeInsets.only(left: 10.0, top: 15),
                         child: Text(
                           'Attendance History',
                           style: titleTextStyle.copyWith(fontSize: 15),
@@ -99,7 +98,7 @@ class SummaryAbsen extends GetView {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 5),
+                  // const SizedBox(height: 5),
                   Obx(
                     () =>
                         absenC.isLoading.value
@@ -109,124 +108,7 @@ class SummaryAbsen extends GetView {
                               physics: const NeverScrollableScrollPhysics(),
                               itemCount: 3,
                               itemBuilder: (context, index) {
-                                return Container(
-                                  margin: const EdgeInsets.only(bottom: 20),
-                                  padding: const EdgeInsets.all(10),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Shimmer.fromColors(
-                                            baseColor: Colors.grey,
-                                            highlightColor:
-                                                const Color.fromARGB(
-                                                  255,
-                                                  238,
-                                                  238,
-                                                  238,
-                                                ),
-                                            child: Container(
-                                              width: 60,
-                                              height: 15,
-                                              decoration: BoxDecoration(
-                                                color: Colors.white,
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
-                                              ),
-                                            ),
-                                          ),
-                                          Shimmer.fromColors(
-                                            baseColor: Colors.grey,
-                                            highlightColor:
-                                                const Color.fromARGB(
-                                                  255,
-                                                  238,
-                                                  238,
-                                                  238,
-                                                ),
-                                            child: Container(
-                                              width: 130,
-                                              height: 15,
-                                              decoration: BoxDecoration(
-                                                color: Colors.white,
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      const SizedBox(height: 8),
-                                      Shimmer.fromColors(
-                                        baseColor: Colors.grey,
-                                        highlightColor: const Color.fromARGB(
-                                          255,
-                                          238,
-                                          238,
-                                          238,
-                                        ),
-                                        child: Container(
-                                          width: 70,
-                                          height: 15,
-                                          decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            borderRadius: BorderRadius.circular(
-                                              10,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(height: 8),
-                                      Shimmer.fromColors(
-                                        baseColor: Colors.grey,
-                                        highlightColor: const Color.fromARGB(
-                                          255,
-                                          238,
-                                          238,
-                                          238,
-                                        ),
-                                        child: Container(
-                                          width: 60,
-                                          height: 15,
-                                          decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            borderRadius: BorderRadius.circular(
-                                              10,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(height: 8),
-                                      Shimmer.fromColors(
-                                        baseColor: Colors.grey,
-                                        highlightColor: const Color.fromARGB(
-                                          255,
-                                          238,
-                                          238,
-                                          238,
-                                        ),
-                                        child: Container(
-                                          width: 70,
-                                          height: 15,
-                                          decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            borderRadius: BorderRadius.circular(
-                                              10,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                );
+                                return const HistoryCardShimmer();
                               },
                             )
                             : absenC.dataLimitAbsen.isEmpty
@@ -292,7 +174,7 @@ class SummaryAbsen extends GetView {
                                                 jamMenit: d.jamPulang!,
                                               ),
                                             )
-                                        ? "Early"
+                                        ? "Minus Time"
                                         : FormatWaktu.formatJamMenit(
                                           jamMenit: d.jamAbsenPulang!,
                                         ).isAtSameMomentAs(
@@ -301,47 +183,66 @@ class SummaryAbsen extends GetView {
                                           ),
                                         )
                                         ? 'On Time'
-                                        : "Over Time";
+                                        : FormatWaktu.formatJamMenit(
+                                          jamMenit: d.jamAbsenPulang!,
+                                        ).isAfter(
+                                          FormatWaktu.formatJamMenit(
+                                            jamMenit: d.jamPulang!,
+                                          ).add(const Duration(hours: 1)),
+                                        )
+                                        ? 'Overtime'
+                                        : 'Extra Time';
                                 //
                                 return InkWell(
-                                  onTap:
-                                      () => Get.to(() {
-                                        var detailData = {
-                                          "foto_profil":
-                                              userData!.foto != ""
-                                                  ? userData!.foto
-                                                  : userData!.nama,
-                                          "nama": d.nama!,
-                                          "id_shift": d.idShift!,
-                                          "nama_shift": d.namaShift!,
-                                          "id_user": d.idUser!,
-                                          "kode_cabang":d.kodeCabang,
-                                          "tanggal_masuk": d.tanggalMasuk!,
-                                          "tanggal_pulang":
-                                              d.tanggalPulang != null
-                                                  ? d.tanggalPulang!
-                                                  : "",
-                                          "jam_masuk": stsMasuk,
-                                          "jam_pulang": stsPulang,
-                                          "jam_absen_masuk": d.jamAbsenMasuk!,
-                                          "jam_absen_pulang": d.jamAbsenPulang!,
-                                          "foto_masuk": d.fotoMasuk!,
-                                          "foto_pulang": d.fotoPulang!,
-                                          "lat_masuk": d.latMasuk!,
-                                          "long_masuk": d.longMasuk!,
-                                          "lat_pulang": d.latPulang!,
-                                          "long_pulang": d.longPulang!,
-                                          "device_info": d.devInfo!,
-                                          "device_info2": d.devInfo2!,
-                                        };
+                                  onTap: () {
+                                    var detailData = {
+                                      "foto_profil":
+                                          userData!.foto != ""
+                                              ? userData!.foto
+                                              : userData!.nama,
+                                      "nama": d.nama!,
+                                      "id_shift": d.idShift!,
+                                      "nama_shift": d.namaShift!,
+                                      "id_user": d.idUser!,
+                                      "kode_cabang": d.kodeCabang,
+                                      "tanggal_masuk": d.tanggalMasuk!,
+                                      "tanggal_pulang":
+                                          d.tanggalPulang != null
+                                              ? d.tanggalPulang!
+                                              : "",
+                                      "sts_masuk": stsMasuk,
+                                      "sts_pulang": stsPulang,
+                                      "jam_masuk": d.jamMasuk,
+                                      "jam_pulang": d.jamPulang,
+                                      "jam_absen_masuk": d.jamAbsenMasuk!,
+                                      "jam_absen_pulang": d.jamAbsenPulang!,
+                                      "foto_masuk": d.fotoMasuk!,
+                                      "foto_pulang": d.fotoPulang!,
+                                      "lat_masuk": d.latMasuk!,
+                                      "long_masuk": d.longMasuk!,
+                                      "lat_pulang": d.latPulang!,
+                                      "long_pulang": d.longPulang!,
+                                      "device_info": d.devInfo!,
+                                      "device_info2": d.devInfo2!,
+                                    };
+                                    //   Get.to(() {
 
-                                        return DetailAbsenView(detailData);
-                                      }, transition: Transition.cupertino),
+                                    //   return DetailAbsenView(detailData);
+                                    // }, transition: Transition.cupertino);
+
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder:
+                                            (_) => DetailAbsenView(detailData),
+                                      ),
+                                    );
+                                  },
                                   child: HistoryCard(
                                     date: DateTime.parse(d.tanggalMasuk!),
                                     checkIn: safe(d.jamAbsenMasuk),
                                     checkOut: safe(d.jamAbsenPulang),
-                                    duration: hitungDurasi(
+                                    duration: hitungDurasiFull(
                                       tglMasuk: d.tanggalMasuk,
                                       jamMasuk: d.jamAbsenMasuk,
                                       tglPulang: d.tanggalPulang,

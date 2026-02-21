@@ -1,9 +1,11 @@
 import 'package:absensi/app/data/helper/app_colors.dart';
 import 'package:absensi/app/data/helper/const.dart';
 import 'package:absensi/app/data/helper/custom_dialog.dart';
+import 'package:absensi/app/data/helper/duration_count.dart';
 import 'package:absensi/app/data/helper/format_waktu.dart';
 import 'package:absensi/app/modules/detail_absen/views/widget/edit_data_absen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 
 import 'package:get/get.dart';
 import 'package:icons_plus/icons_plus.dart';
@@ -59,13 +61,15 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
           ),
         ),
         backgroundColor: AppColors.itemsBackground,
-        flexibleSpace:Container(decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Color(0xFF1B2541), Color(0xFF3949AB)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-            ),)
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFF1B2541), Color(0xFF3949AB)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
         // centerTitle: true,
       ),
       resizeToAvoidBottomInset: false,
@@ -85,7 +89,7 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
                 marker: markersMasuk,
                 isIn: true,
               ),
-              const SizedBox(height: 5),
+              // const SizedBox(height: 5),
               Visibility(
                 visible: detailData['tanggal_pulang'] == "" ? true : false,
                 child: const Center(
@@ -111,19 +115,37 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        backgroundColor: AppColors.itemsBackground,
-        onPressed: () {
-          detailData['id_shift'] == "5"
-              ? failedDialog(
-                context,
-                'ERROR',
-                'data absen dengan Shift WEEKDAY-KUSTOM tidak dapat di edit!',
-              )
-              : Get.bottomSheet(EditDataAbsen(data: detailData));
-        },
-        label: const Text('Edit Data'),
-        icon: const Icon(Icons.edit),
+      floatingActionButton: Container(
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Color(0xFF1B2541), Color(0xFF3949AB)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(30),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.blueAccent.withOpacity(0.4),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: FloatingActionButton.extended(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          onPressed: () {
+            detailData['id_shift'] == "5"
+                ? failedDialog(
+                  context,
+                  'ERROR',
+                  'data absen dengan Shift WEEKDAY-KUSTOM tidak dapat di edit!',
+                )
+                : Get.bottomSheet(EditDataAbsen(data: detailData));
+          },
+          label: const Text('Edit Data'),
+          icon: const Icon(Icons.edit),
+        ),
       ),
     );
   }
@@ -141,14 +163,14 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
 
     final headerColor =
         isIn
-            ? data!['jam_masuk'] == "Late"
-                ? Colors.redAccent[700]
-                : Colors.greenAccent[700]
-            : data!['jam_pulang'] == "Over Time"
-            ? Colors.blueAccent[700]
-            : data['jam_pulang'] == "Early"
-            ? Colors.redAccent[700]
-            : Colors.greenAccent[700];
+            ? data!['sts_masuk'] == "Late"
+                ? const Color(0xFFC44747) // merah check out
+                : const Color(0xFF3E7C59) // hijau check in
+            : data!['sts_pulang'] == "Overtime"
+            ? Colors.blue
+            : data['sts_pulang'] == "Minus Time"
+            ? const Color(0xFFC44747) // merah check out;
+            : const Color(0xFF3E7C59); // hijau check in
 
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 10),
@@ -244,11 +266,30 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
                       children: [
                         TileLayer(
                           urlTemplate:
-                              'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                          userAgentPackageName:
-                              'dev.fleaflet.flutter_map.example',
+                          'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                      subdomains: const ['a', 'b', 'c', 'd'],
+                      userAgentPackageName: 'com.absensi.urbanco', tileSize: 256,
+                      retinaMode: true,
                         ),
-                        MarkerLayer(markers: isIn ? marker! : markerPulang!),
+                        MarkerLayer(markers: isIn ? marker! : markerPulang!),CurrentLocationLayer(
+                      alignDirectionOnUpdate: AlignOnUpdate.never,
+                      style: const LocationMarkerStyle(
+                        showAccuracyCircle: false,
+                        marker: Icon(
+                          Icons.location_on,
+                          color: Color(0xFFEA4335),
+                          size: 42,
+                          shadows: [
+                            Shadow(
+                              color: Colors.black38,
+                              blurRadius: 6,
+                              offset: Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        markerSize: Size(42, 42),
+                      ),
+                    ),
                       ],
                     ),
                   ),
@@ -314,7 +355,7 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
                                 Row(
                                   children: [
                                     Text(
-                                      data['nama_shift'].toString().capitalize!,
+                                     shiftName(shift: data['nama_shift']),
                                       style: const TextStyle(fontSize: 13),
                                     ),
                                     const SizedBox(width: 5),
@@ -335,20 +376,28 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
                                         //   child:
                                         Icon(
                                           isIn
-                                              ? data['jam_masuk'] == "Late"
+                                              ? data['sts_masuk'] == "Late"
                                                   ? Icons.cancel
                                                   : Icons.check_circle
-                                              : data['jam_pulang'] == "Early"
+                                              : data['sts_pulang'] == "Minus Time"
                                               ? Icons.cancel
                                               : Icons.check_circle,
                                           color: headerColor,
+                                          size:15
                                         ),
                                         const SizedBox(width: 5),
-                                        Text(
-                                          isIn
-                                              ? data['jam_masuk']
-                                              : data['jam_pulang'],
-                                          style: TextStyle(color: headerColor),
+                                        Row(
+                                          children: [
+                                            Text(
+                                              isIn
+                                                  ? data['sts_masuk']
+                                                  : data['sts_pulang'],
+                                              style: TextStyle(color: headerColor),
+                                            ),
+                                        const SizedBox(width: 2),
+                                        Text( isIn
+                                                  ? hitungIn(jamMasuk: data['jam_masuk'], jamAbsenMasuk: data['jam_absen_masuk']):hitungOut(tglMasuk: data['tanggal_masuk'], jamMasuk: data['jam_absen_masuk'], tglPulang: data['tanggal_pulang'], jamPulang:  data['jam_absen_pulang']), style: TextStyle(color: headerColor),)
+                                          ],
                                         ),
 
                                         //  const Text(
@@ -391,5 +440,22 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
         ],
       ),
     );
+  }
+}
+
+String shiftName({required String shift}){
+  switch(shift){
+    case'WEEKDAY-PAGI':
+    return 'Pagi';
+    case'WEEKDAY-MIDLE':
+    return 'Middle';
+    case'WEEKDAY-SIANG/LATE':
+    return 'Siang/Late';
+    case'WEEKDAY-LATE DELIVERY':
+    return 'Late Delivery';
+    case'WEEKDAY-MIDLE II':
+    return 'Middle II';
+default:
+return 'Custom';
   }
 }
