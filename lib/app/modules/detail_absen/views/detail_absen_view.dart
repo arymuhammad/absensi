@@ -151,57 +151,61 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
   }
 
   Widget buildCard({
-    BuildContext? context,
-    Map<String, dynamic>? data,
-    List<Marker>? marker,
-    List<Marker>? markerPulang,
-    required bool isIn,
-  }) {
-    String getGoogleMapsUrl(double lat, double lng) {
-      return 'https://www.google.com/maps/search/?api=1&query=$lat,$lng';
-    }
+  required BuildContext context,
+  required Map<String, dynamic> data,
+  List<Marker>? marker,
+  List<Marker>? markerPulang,
+  required bool isIn,
+}) {
+  final width = MediaQuery.of(context).size.width;
+  final isSmall = width < 370;
 
-    final headerColor =
-        isIn
-            ? data!['sts_masuk'] == "Late"
-                ? const Color(0xFFC44747) // merah check out
-                : const Color(0xFF3E7C59) // hijau check in
-            : data!['sts_pulang'] == "Overtime"
-            ? Colors.blue
-            : data['sts_pulang'] == "Minus Time"
-            ? const Color(0xFFC44747) // merah check out;
-            : const Color(0xFF3E7C59); // hijau check in
+  String getGoogleMapsUrl(double lat, double lng) {
+    return 'https://www.google.com/maps/search/?api=1&query=$lat,$lng';
+  }
 
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 10),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(22),
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            blurRadius: 25,
-            offset: const Offset(0, 16),
-            color: Colors.black.withOpacity(.18),
+  final headerColor =
+      isIn
+          ? data['sts_masuk'] == "Late"
+              ? const Color(0xFFC44747)
+              : const Color(0xFF3E7C59)
+          : data['sts_pulang'] == "Overtime"
+              ? Colors.blue
+              : data['sts_pulang'] == "Minus Time"
+                  ? const Color(0xFFC44747)
+                  : const Color(0xFF3E7C59);
+
+  return Container(
+    margin: const EdgeInsets.symmetric(vertical: 12),
+    decoration: BoxDecoration(
+      borderRadius: BorderRadius.circular(24),
+      color: Colors.white,
+      boxShadow: [
+        BoxShadow(
+          blurRadius: 30,
+          offset: const Offset(0, 18),
+          color: Colors.black.withOpacity(.12),
+        ),
+      ],
+    ),
+    child: Column(
+      children: [
+
+        /// ================= HEADER =================
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+          decoration: BoxDecoration(
+            color: headerColor,
+            borderRadius:
+                const BorderRadius.vertical(top: Radius.circular(24)),
           ),
-        ],
-      ),
-      child: Column(
-        children: [
-          /// ================= HEADER =================
-          Container(
-            height: 52,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            decoration: BoxDecoration(
-              color: headerColor,
-              borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(22),
-              ),
-            ),
-            child: Row(
-              children: [
-                const Icon(Icons.access_time, color: Colors.white),
-                const SizedBox(width: 10),
-                Text(
+          child: Row(
+            children: [
+              const Icon(Icons.access_time, color: Colors.white),
+              const SizedBox(width: 10),
+
+              Expanded(
+                child: Text(
                   isIn ? 'CHECK IN' : 'CHECK OUT',
                   style: const TextStyle(
                     color: Colors.white,
@@ -209,253 +213,247 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
                     letterSpacing: 1,
                   ),
                 ),
-                const Spacer(),
-                Text(
-                  isIn ? data['jam_absen_masuk'] : data['jam_absen_pulang'],
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
+              ),
+
+              Text(
+                isIn
+                    ? data['jam_absen_masuk']
+                    : data['jam_absen_pulang'],
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: isSmall ? 14 : 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        /// ================= BODY =================
+        Padding(
+          padding: const EdgeInsets.all(14),
+          child: Column(
+            children: [
+
+              /// ================= MAP =================
+              ClipRRect(
+                borderRadius: BorderRadius.circular(20),
+                child: SizedBox(
+                  height: 220,
+                  child: FlutterMap(
+                    options: MapOptions(
+                      initialCenter: isIn
+                          ? LatLng(
+                              double.parse(data["lat_masuk"]),
+                              double.parse(data["long_masuk"]),
+                            )
+                          : LatLng(
+                              double.parse(
+                                  data["lat_pulang"] != ""
+                                      ? data["lat_pulang"]
+                                      : '0.0'),
+                              double.parse(
+                                  data["long_pulang"] != ""
+                                      ? data["long_pulang"]
+                                      : '0.0'),
+                            ),
+                      initialZoom: 17,
+                      onTap: (_, point) {
+                        launchUrl(
+                          Uri.parse(
+                              getGoogleMapsUrl(point.latitude, point.longitude)),
+                        );
+                      },
+                    ),
+                    children: [
+                      TileLayer(
+                        urlTemplate:
+                            'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                        userAgentPackageName: 'com.absensi.urbanco',
+                      ),
+                      MarkerLayer(
+                          markers: isIn ? marker! : markerPulang!),
+                    ],
                   ),
                 ),
-                const SizedBox(width: 6),
-                const Icon(Icons.chevron_right, color: Colors.white),
-              ],
-            ),
-          ),
+              ),
 
-          /// ================= BODY =================
-          Padding(
-            padding: const EdgeInsets.all(14),
-            child: SizedBox(
-              height: 300,
-              child: Stack(
+              const SizedBox(height: 14),
+
+              /// ================= INFO SECTION =================
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  /// ================= MAP =================
+
+                  /// PHOTO
                   ClipRRect(
-                    borderRadius: BorderRadius.circular(18),
-                    child: FlutterMap(
-                      options: MapOptions(
-                        onTap: (tapPosition, point) {
-                          launchUrl(
-                            Uri.parse(
-                              getGoogleMapsUrl(point.latitude, point.longitude),
-                            ),
-                          );
-                        },
-                        initialCenter:
-                            isIn
-                                ? LatLng(
-                                  double.parse(data["lat_masuk"]),
-                                  double.parse(data["long_masuk"]),
-                                )
-                                : LatLng(
-                                  double.parse(
-                                    data["lat_pulang"] != ""
-                                        ? data["lat_pulang"]
-                                        : '0.0',
-                                  ),
-                                  double.parse(
-                                    data["long_pulang"] != ""
-                                        ? data["long_pulang"]
-                                        : '0.0',
-                                  ),
-                                ),
-                        initialZoom: 17,
-                      ),
+                    borderRadius: BorderRadius.circular(14),
+                    child: Image.network(
+                      "${ServiceApi().baseUrl}${isIn ? data['foto_masuk'] : data['foto_pulang']}",
+                      width: isSmall ? 60 : 70,
+                      height: isSmall ? 60 : 70,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) =>
+                          Image.asset('assets/image/selfie.png',
+                              width: 70, height: 70),
+                    ),
+                  ),
+
+                  const SizedBox(width: 12),
+
+                  /// TEXT AREA
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        TileLayer(
-                          urlTemplate:
-                          'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                      subdomains: const ['a', 'b', 'c', 'd'],
-                      userAgentPackageName: 'com.absensi.urbanco', tileSize: 256,
-                      retinaMode: true,
+
+                        /// NAME
+                        Text(
+                          data["nama"].toString().capitalize!,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontWeight: FontWeight.w700,
+                            fontSize: isSmall ? 14 : 16,
+                          ),
                         ),
-                        MarkerLayer(markers: isIn ? marker! : markerPulang!),CurrentLocationLayer(
-                      alignDirectionOnUpdate: AlignOnUpdate.never,
-                      style: const LocationMarkerStyle(
-                        showAccuracyCircle: false,
-                        marker: Icon(
-                          Icons.location_on,
-                          color: Color(0xFFEA4335),
-                          size: 42,
-                          shadows: [
-                            Shadow(
-                              color: Colors.black38,
-                              blurRadius: 6,
-                              offset: Offset(0, 2),
+
+                        const SizedBox(height: 4),
+
+                        /// DATE
+                        Text(
+                          isIn
+                              ? FormatWaktu.formatIndo(
+                                  tanggal:
+                                      DateTime.parse(data['tanggal_masuk']),
+                                )
+                              : data['tanggal_pulang'] != ""
+                                  ? FormatWaktu.formatIndo(
+                                      tanggal: DateTime.parse(
+                                          data['tanggal_pulang']),
+                                    )
+                                  : '',
+                          style: TextStyle(
+                              fontSize: isSmall ? 12 : 13,
+                              color: Colors.grey[700]),
+                        ),
+
+                        const SizedBox(height: 6),
+
+                        /// SHIFT + STATUS (WRAP AUTO RESPONSIVE)
+                        Wrap(
+                          spacing: 6,
+                          runSpacing: 4,
+                          crossAxisAlignment:
+                              WrapCrossAlignment.center,
+                          children: [
+
+                            Text(
+                              shiftName(shift: data['nama_shift']),
+                              style: TextStyle(
+                                fontSize: isSmall ? 11 : 13,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+
+                            Icon(
+                              isIn
+                                  ? data['sts_masuk'] == "Late"
+                                      ? Icons.cancel
+                                      : Icons.check_circle
+                                  : data['sts_pulang'] == "Minus Time"
+                                      ? Icons.cancel
+                                      : Icons.check_circle,
+                              color: headerColor,
+                              size: 16,
+                            ),
+
+                            Text(
+                              isIn
+                                  ? data['sts_masuk']
+                                  : data['sts_pulang'],
+                              style: TextStyle(
+                                color: headerColor,
+                                fontSize: isSmall ? 11 : 13,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+
+                            Text(
+                              isIn
+                                  ? hitungIn(
+                                      jamMasuk: data['jam_masuk'],
+                                      jamAbsenMasuk:
+                                          data['jam_absen_masuk'],
+                                    )
+                                  : hitungOut(
+                                      tglMasuk:
+                                          data['tanggal_masuk'],
+                                      jamMasuk:
+                                          data['jam_absen_masuk'],
+                                      tglPulang:
+                                          data['tanggal_pulang'],
+                                      jamPulang:
+                                          data['jam_absen_pulang'],
+                                    ),
+                              style: TextStyle(
+                                color: headerColor,
+                                fontSize: isSmall ? 11 : 13,
+                              ),
                             ),
                           ],
                         ),
-                        markerSize: Size(42, 42),
-                      ),
-                    ),
-                      ],
-                    ),
-                  ),
 
-                  /// ================= INFO CARD =================
-                  Positioned(
-                    left: 8,
-                    right: 8,
-                    bottom: 8,
-                    child: Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Row(
-                        children: [
-                          SizedBox(
-                            height: 70,
-                            width: 70,
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(10),
-                              child: Image.network(
-                                "${ServiceApi().baseUrl}${isIn ? data['foto_masuk'] : data['foto_pulang']}",
-                                fit: BoxFit.cover,
-                                errorBuilder:
-                                    (_, __, ___) =>
-                                        Image.asset('assets/image/selfie.png'),
+                        const SizedBox(height: 6),
+
+                        /// DEVICE INFO
+                        Row(
+                          children: [
+                            const Icon(Icons.smartphone,
+                                size: 14),
+                            const SizedBox(width: 4),
+                            Expanded(
+                              child: Text(
+                                isIn
+                                    ? data['device_info']
+                                    : data['device_info2'],
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: isSmall ? 11 : 12,
+                                  color: Colors.grey[600],
+                                ),
                               ),
                             ),
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  data["nama"].toString().capitalize!,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.w700,
-                                    fontSize: 15,
-                                  ),
-                                ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  isIn
-                                      ? FormatWaktu.formatIndo(
-                                        tanggal: DateTime.parse(
-                                          data['tanggal_masuk'],
-                                        ),
-                                      )
-                                      : data['tanggal_pulang'] != ""
-                                      ? FormatWaktu.formatIndo(
-                                        tanggal: DateTime.parse(
-                                          data['tanggal_pulang'],
-                                        ),
-                                      )
-                                      : '',
-                                ),
-                                const SizedBox(height: 2),
-                                Row(
-                                  children: [
-                                    Text(
-                                     shiftName(shift: data['nama_shift']),
-                                      style: const TextStyle(fontSize: 13),
-                                    ),
-                                    const SizedBox(width: 5),
-                                    Row(
-                                      children: [
-                                        // Container(
-                                        //   padding: const EdgeInsets.symmetric(
-                                        //     horizontal: 8,
-                                        //     vertical: 4,
-                                        //   ),
-                                        //   decoration: BoxDecoration(
-                                        //     borderRadius: BorderRadius.circular(6),
-                                        //     color:
-                                        //         data['jam_masuk'] == "Late"
-                                        //             ? Colors.redAccent[700]
-                                        //             : Colors.greenAccent[700],
-                                        //   ),
-                                        //   child:
-                                        Icon(
-                                          isIn
-                                              ? data['sts_masuk'] == "Late"
-                                                  ? Icons.cancel
-                                                  : Icons.check_circle
-                                              : data['sts_pulang'] == "Minus Time"
-                                              ? Icons.cancel
-                                              : Icons.check_circle,
-                                          color: headerColor,
-                                          size:15
-                                        ),
-                                        const SizedBox(width: 5),
-                                        Row(
-                                          children: [
-                                            Text(
-                                              isIn
-                                                  ? data['sts_masuk']
-                                                  : data['sts_pulang'],
-                                              style: TextStyle(color: headerColor),
-                                            ),
-                                        const SizedBox(width: 2),
-                                        Text( isIn
-                                                  ? hitungIn(jamMasuk: data['jam_masuk'], jamAbsenMasuk: data['jam_absen_masuk']):hitungOut(tglMasuk: data['tanggal_masuk'], jamMasuk: data['jam_absen_masuk'], tglPulang: data['tanggal_pulang'], jamPulang:  data['jam_absen_pulang']), style: TextStyle(color: headerColor),)
-                                          ],
-                                        ),
-
-                                        //  const Text(
-                                        //   color: Colors.white,
-                                        //   fontSize: 12,
-                                        //   fontWeight: FontWeight.w600,
-                                        // ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 4),
-                                Row(
-                                  children: [
-                                    const Icon(Icons.smartphone, size: 14),
-                                    const SizedBox(width: 4),
-                                    Expanded(
-                                      child: Text(
-                                        isIn
-                                            ? data['device_info']
-                                            : data['device_info2'],
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: const TextStyle(fontSize: 12),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
+                          ],
+                        ),
+                      ],
                     ),
                   ),
                 ],
               ),
-            ),
+            ],
           ),
-        ],
-      ),
-    );
-  }
+        ),
+      ],
+    ),
+  );
+}
 }
 
-String shiftName({required String shift}){
-  switch(shift){
-    case'WEEKDAY-PAGI':
-    return 'Pagi';
-    case'WEEKDAY-MIDLE':
-    return 'Middle';
-    case'WEEKDAY-SIANG/LATE':
-    return 'Siang/Late';
-    case'WEEKDAY-LATE DELIVERY':
-    return 'Late Delivery';
-    case'WEEKDAY-MIDLE II':
-    return 'Middle II';
-default:
-return 'Custom';
+String shiftName({required String shift}) {
+  switch (shift) {
+    case 'WEEKDAY-PAGI':
+      return 'Pagi';
+    case 'WEEKDAY-MIDLE':
+      return 'Middle';
+    case 'WEEKDAY-SIANG/LATE':
+      return 'Siang/Late';
+    case 'WEEKDAY-LATE DELIVERY':
+      return 'Late Delivery';
+    case 'WEEKDAY-MIDLE II':
+      return 'Middle II';
+    default:
+      return 'Custom';
   }
 }
