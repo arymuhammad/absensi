@@ -384,9 +384,11 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
-				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
+				CURRENT_PROJECT_VERSION = 40;
 				DEVELOPMENT_TEAM = 4PYK8X6245;
 				ENABLE_BITCODE = NO;
+				FLUTTER_BUILD_NAME = 2.3.46;
+				FLUTTER_BUILD_NUMBER = 40;
 				INFOPLIST_FILE = Runner/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "URBAN&CO SPOT";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
@@ -395,7 +397,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.3.42;
+				MARKETING_VERSION = 2.3.46;
 				PRODUCT_BUNDLE_IDENTIFIER = com.urbanco.spot;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -524,10 +526,12 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
-				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
+				CURRENT_PROJECT_VERSION = 40;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = 4PYK8X6245;
 				ENABLE_BITCODE = NO;
+				FLUTTER_BUILD_NAME = 2.3.46;
+				FLUTTER_BUILD_NUMBER = 40;
 				INFOPLIST_FILE = Runner/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "URBAN&CO SPOT";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
@@ -536,7 +540,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.3.42;
+				MARKETING_VERSION = 2.3.46;
 				PRODUCT_BUNDLE_IDENTIFIER = com.urbanco.spot;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -557,9 +561,11 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
-				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
+				CURRENT_PROJECT_VERSION = 40;
 				DEVELOPMENT_TEAM = 4PYK8X6245;
 				ENABLE_BITCODE = NO;
+				FLUTTER_BUILD_NAME = 2.3.46;
+				FLUTTER_BUILD_NUMBER = 40;
 				INFOPLIST_FILE = Runner/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "URBAN&CO SPOT";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
@@ -568,7 +574,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.3.42;
+				MARKETING_VERSION = 2.3.46;
 				PRODUCT_BUNDLE_IDENTIFIER = com.urbanco.spot;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";

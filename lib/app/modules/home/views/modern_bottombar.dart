@@ -26,7 +26,7 @@ class ModernBottomBar extends StatelessWidget {
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
             child: Container(
-               height: 60 + bottomSafe, // ✅ dinamis
+               height: 55 + bottomSafe, // ✅ dinamis
             padding: EdgeInsets.only(bottom: bottomSafe), // ✅ kasih ruang home indicator
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
@@ -55,7 +55,7 @@ class ModernBottomBar extends StatelessWidget {
 
         // ===== FLOATING CENTER BUTTON =====
         Positioned(
-        bottom: 20 + bottomSafe / 2, // ✅ ikut naik sedikit
+        bottom: 30 + bottomSafe / 2, // ✅ ikut naik sedikit
           child: GestureDetector(
             onTap: () => onTap(2),
             child: Container(
