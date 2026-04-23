@@ -1,4 +1,3 @@
-import 'package:absensi/app/data/model/login_model.dart';
 import 'package:absensi/app/data/model/req_app_model.dart';
 import 'package:absensi/app/modules/adjust_presence/controllers/adjust_presence_controller.dart';
 import 'package:absensi/app/modules/home/controllers/home_controller.dart';
@@ -13,17 +12,20 @@ import 'package:widget_zoom/widget_zoom.dart';
 import '../../../../data/helper/const.dart';
 import '../../../../data/helper/convert_time.dart';
 import '../../../../services/service_api.dart';
+import '../../../login/controllers/login_controller.dart';
 import '../../../shared/elevated_button.dart';
 
 class UptMasukPulang extends StatelessWidget {
-  UptMasukPulang({super.key, required this.data, this.dataUser});
+  UptMasukPulang({super.key, required this.data});
   final ReqApp data;
-  final Data? dataUser;
+  final auth = Get.find<LoginController>();
   final adjCtrl = Get.put(AdjustPresenceController());
   final homeC = Get.find<HomeController>();
   @override
   Widget build(BuildContext context) {
-    final levelId = dataUser!.level;
+    final dataUser = auth.logUser.value;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final levelId = dataUser.level;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -43,7 +45,8 @@ class UptMasukPulang extends StatelessWidget {
                     const Icon(Iconsax.clock_outline),
                     const SizedBox(width: 5),
                     Text(
-                      data.status == "update_masuk"
+                      data.status == "update_masuk" ||
+                              data.status == "update_masuk_cst"
                           ? data.jamAbsenMasuk!
                           : data.jamAbsenPulang!,
                       style: titleTextStyle,
@@ -51,7 +54,11 @@ class UptMasukPulang extends StatelessWidget {
                   ],
                 ),
                 Visibility(
-                  visible: data.status == "update_masuk" ? false : true,
+                  visible:
+                      data.status == "update_masuk" ||
+                              data.status == "update_masuk_cst"
+                          ? false
+                          : true,
                   child: Row(
                     children: [
                       const Icon(Iconsax.calendar_2_outline),
@@ -67,9 +74,12 @@ class UptMasukPulang extends StatelessWidget {
               width: 70,
               child: WidgetZoom(
                 heroAnimationTag:
-                    data.status == "update_masuk" ? 'fotoMasuk' : 'fotoPulang',
+                    data.status == "update_masuk" ||
+                            data.status == "update_masuk_cst"
+                        ? 'fotoMasuk'
+                        : 'fotoPulang',
                 zoomWidget: Image.network(
-                  '${ServiceApi().baseUrl}${data.status == "update_masuk" ? data.fotoMasuk : data.fotoPulang}',
+                  '${ServiceApi().baseUrl}${data.status == "update_masuk" || data.status == "update_masuk_cst" ? data.fotoMasuk : data.fotoPulang}',
                 ),
               ),
             ),
@@ -89,6 +99,7 @@ class UptMasukPulang extends StatelessWidget {
             child: CsTextField(
               controller: adjCtrl.keteranganApp,
               label: 'Keterangan',
+              isDark: isDark,
             ),
           ),
         ),
@@ -130,7 +141,8 @@ class UptMasukPulang extends StatelessWidget {
                   /////////
                   var keyJamAbsen = "";
                   var keyFotoAbsen = "";
-                  if (data.status == "update_masuk") {
+                  if (data.status == "update_masuk" ||
+                      data.status == "update_masuk_cst") {
                     keyJamAbsen = "jam_absen_masuk";
                     keyFotoAbsen = "foto_masuk";
                   } else {
@@ -143,25 +155,33 @@ class UptMasukPulang extends StatelessWidget {
                     "id_user": data.idUser,
                     "tgl_masuk": data.tglMasuk,
                     keyJamAbsen:
-                        (data.status == "update_masuk"
+                        (data.status == "update_masuk" ||
+                                    data.status == "update_masuk_cst"
                                 ? data.jamAbsenMasuk
                                 : data.jamAbsenPulang)
                             .to24Hour(),
                     keyFotoAbsen:
-                        data.status == "update_masuk"
+                        data.status == "update_masuk" ||
+                                data.status == "update_masuk_cst"
                             ? data.fotoMasuk
                             : data.fotoPulang,
                     "tgl_pulang": data.tglPulang,
                     "lat_out": data.latOut,
                     "long_out": data.longOut,
                     "device_info2": data.devInfo,
+                    // 🔥 tambahan khusus
+                    if (data.status == "update_masuk_cst") ...{
+                      "jam_masuk": data.jamMasuk,
+                      "jam_pulang": data.jamPulang,
+                    },
                   };
                   adjCtrl.appAbs(dataUptApp, dataUptAbs);
                   homeC.reloadPendingAdj(
-                    idUser: dataUser!.id!,
-                    level: dataUser!.level!,
+                    idUser: dataUser.id!,
+                    level: dataUser.level!,
                   );
                   homeC.futurePendAdj.value;
+                  // ignore: invalid_use_of_protected_member
                   homeC.refresh();
                 },
               ),
@@ -180,10 +200,11 @@ class UptMasukPulang extends StatelessWidget {
                   };
                   adjCtrl.appAbs(dataUptApp, {});
                   homeC.reloadPendingAdj(
-                    idUser: dataUser!.id!,
-                    level: dataUser!.level!,
+                    idUser: dataUser.id!,
+                    level: dataUser.level!,
                   );
                   homeC.futurePendAdj.value;
+                  // ignore: invalid_use_of_protected_member
                   homeC.refresh();
                 },
               ),

@@ -1,4 +1,3 @@
-import 'package:absensi/app/data/model/login_model.dart';
 import 'package:absensi/app/data/model/req_app_model.dart';
 import 'package:absensi/app/modules/adjust_presence/controllers/adjust_presence_controller.dart';
 import 'package:absensi/app/modules/home/controllers/home_controller.dart';
@@ -6,18 +5,21 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icons_plus/icons_plus.dart';
 import '../../../../data/helper/const.dart';
+import '../../../login/controllers/login_controller.dart';
 import '../../../shared/elevated_button.dart';
 import '../../../shared/text_field.dart';
 
 class UptShift extends StatelessWidget {
-  UptShift({super.key, required this.data, this.dataUser});
+  UptShift({super.key, required this.data});
   final ReqApp data;
-  final Data? dataUser;
+  final auth = Get.find<LoginController>();
   final adjCtrl = Get.put(AdjustPresenceController());
   final homeC = Get.find<HomeController>();
   @override
   Widget build(BuildContext context) {
-    final levelId = dataUser!.level;
+    final dataUser = auth.logUser.value;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final levelId = dataUser.level;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -57,6 +59,7 @@ class UptShift extends StatelessWidget {
             child: CsTextField(
               controller: adjCtrl.keteranganApp,
               label: 'Keterangan',
+              isDark: isDark,
             ),
           ),
         ),
@@ -103,8 +106,8 @@ class UptShift extends StatelessWidget {
                   };
                   adjCtrl.appAbs(dataUptApp, dataUptAbs);
                   homeC.reloadPendingAdj(
-                    idUser: dataUser!.id!,
-                    level: dataUser!.level!,
+                    idUser: dataUser.id!,
+                    level: dataUser.level!,
                   );
                   homeC.futurePendAdj.value;
                 },
@@ -124,8 +127,8 @@ class UptShift extends StatelessWidget {
                   };
                   adjCtrl.appAbs(dataUptApp, {});
                   homeC.reloadPendingAdj(
-                    idUser: dataUser!.id!,
-                    level: dataUser!.level!,
+                    idUser: dataUser.id!,
+                    level: dataUser.level!,
                   );
                   homeC.futurePendAdj.value;
                 },

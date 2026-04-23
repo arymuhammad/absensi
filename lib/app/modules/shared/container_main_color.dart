@@ -1,3 +1,4 @@
+import 'package:absensi/app/data/helper/app_colors.dart';
 import 'package:flutter/material.dart';
 
 class ContainerMainColor extends StatelessWidget {
@@ -12,11 +13,7 @@ class ContainerMainColor extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        gradient:  LinearGradient(
-          colors: const [Color(0xFF1B2541), Color(0xFF3949AB)],
-          begin: begin,
-          end: end,
-        ),
+        gradient:  AppColors.mainGradient(context: context, begin: begin, end: end),
         borderRadius: BorderRadius.circular(radius),
         boxShadow: [
           BoxShadow(

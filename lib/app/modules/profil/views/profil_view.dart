@@ -3,7 +3,7 @@ import 'dart:math' as math;
 
 import 'package:absensi/app/data/helper/const.dart';
 import 'package:absensi/app/data/helper/format_waktu.dart';
-import 'package:absensi/app/data/model/login_model.dart';
+import 'package:absensi/app/modules/absen/controllers/absen_controller.dart';
 import 'package:absensi/app/modules/login/controllers/login_controller.dart';
 import 'package:absensi/app/services/service_api.dart';
 import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
@@ -19,23 +19,26 @@ import '../controllers/profil_controller.dart';
 import 'update_profil.dart';
 
 class ProfilView extends GetView<ProfilController> {
-  ProfilView({super.key, this.listDataUser});
+  ProfilView({super.key});
+
   final auth = Get.find<LoginController>();
   final ctr = Get.find<AddPegawaiController>();
-  final Data? listDataUser;
+  final absC = Get.find<AbsenController>();
 
   @override
   Widget build(BuildContext context) {
-    final imgUrl = '${ServiceApi().baseUrl}${listDataUser!.foto!}';
+    final listDataUser = auth.logUser.value;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final imgUrl = '${ServiceApi().baseUrl}${listDataUser.foto!}';
     return Scaffold(
       body: Stack(
         children: [
           /// HEADER GRADIENT + GLOW
           Container(
             height: 260,
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Color(0xFF1B2541), Color(0xFF3949AB)],
+            decoration: BoxDecoration(
+              gradient: AppColors.mainGradient(
+                context: context,
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
@@ -69,9 +72,14 @@ class ProfilView extends GetView<ProfilController> {
             right: 16,
             bottom: 0,
             child: Container(
-              decoration: const BoxDecoration(
-                color: Color(0xFFF2F4F8),
-                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+              decoration: BoxDecoration(
+                color:
+                    isDark
+                        ? const Color(0xFF121212) // dark surface
+                        : const Color(0xFFF2F4F8),
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(20),
+                ),
               ),
             ),
           ),
@@ -87,7 +95,10 @@ class ProfilView extends GetView<ProfilController> {
                   width: 160,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white, width: 6),
+                    border: Border.all(
+                      color: isDark ? Colors.grey.shade800 : Colors.white,
+                      width: 6,
+                    ),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withOpacity(.25),
@@ -100,35 +111,46 @@ class ProfilView extends GetView<ProfilController> {
                     child: SizedBox(
                       height: 150,
                       width: 150,
-                      child: InkWell(
-                        onTap: () {
-                          showDialog(
-                            context: context,
-                            builder: (context) {
-                              return Dialog(
-                                backgroundColor: Colors.black,
-                                insetPadding: const EdgeInsets.all(0),
-                                child: GestureDetector(
-                                  onTap: () => Navigator.of(context).pop(),
-                                  child: PhotoView(
-                                    imageProvider: NetworkImage(
-                                      '${ServiceApi().baseUrl}${listDataUser!.foto!}',
-                                    ),
-                                    backgroundDecoration: const BoxDecoration(
-                                      color: Colors.black,
-                                    ),
+                      child: Obx(
+                        () =>
+                            absC.isOffline.value
+                                ? Container(
+                                  color: Colors.white,
+                                  child: Image.asset('assets/image/selfie.png'),
+                                )
+                                : InkWell(
+                                  onTap: () {
+                                    showDialog(
+                                      context: context,
+                                      builder: (context) {
+                                        return Dialog(
+                                          backgroundColor: Colors.black,
+                                          insetPadding: const EdgeInsets.all(0),
+                                          child: GestureDetector(
+                                            onTap:
+                                                () =>
+                                                    Navigator.of(context).pop(),
+                                            child: PhotoView(
+                                              imageProvider: NetworkImage(
+                                                '${ServiceApi().baseUrl}${listDataUser.foto!}',
+                                              ),
+                                              backgroundDecoration:
+                                                  const BoxDecoration(
+                                                    color: Colors.black,
+                                                  ),
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    );
+                                  },
+                                  child: Image.network(
+                                    listDataUser.foto != ""
+                                        ? imgUrl
+                                        : "https://ui-avatars.com/api/?name=${listDataUser.nama!}",
+                                    fit: BoxFit.cover,
                                   ),
                                 ),
-                              );
-                            },
-                          );
-                        },
-                        child: Image.network(
-                          listDataUser!.foto != ""
-                              ? imgUrl
-                              : "https://ui-avatars.com/api/?name=${listDataUser!.nama!}",
-                          fit: BoxFit.cover,
-                        ),
                       ),
                     ),
                   ),
@@ -138,7 +160,7 @@ class ProfilView extends GetView<ProfilController> {
 
                 /// NAME
                 Text(
-                  listDataUser!.nama!,
+                  listDataUser.nama!,
                   style: titleTextStyle.copyWith(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
@@ -151,16 +173,16 @@ class ProfilView extends GetView<ProfilController> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(listDataUser!.id!, style: subtitleTextStyle),
+                    Text(listDataUser.id!, style: subtitleTextStyle),
                     Text(' - ', style: subtitleTextStyle),
-                    Text(listDataUser!.levelUser!, style: subtitleTextStyle),
+                    Text(listDataUser.levelUser!, style: subtitleTextStyle),
                     Visibility(
-                      visible: listDataUser!.idRegion! != "",
+                      visible: listDataUser.idRegion! != "",
                       child: Row(
                         children: [
                           Text(' - ', style: subtitleTextStyle),
                           Text(
-                            listDataUser!.idRegion!,
+                            listDataUser.idRegion!,
                             style: subtitleTextStyle,
                           ),
                         ],
@@ -175,10 +197,15 @@ class ProfilView extends GetView<ProfilController> {
                 Expanded(
                   child: CustomMaterialIndicator(
                     onRefresh: () async {
-                      await ctr.getLastUserData(dataUser: listDataUser!);
-                      showToast('Page Refreshed');
+                      final online = await absC.isOnline();
+                      if (online) {
+                        await ctr.getLastUserData(dataUser: listDataUser);
+                        showToast('Page Refreshed');
+                      } else {
+                        showToast('No Internet Connection, try again later ');
+                      }
                     },
-                    backgroundColor: Colors.white,
+                    backgroundColor: isDark ? Colors.black : Colors.white,
                     indicatorBuilder: (context, controller) {
                       return Padding(
                         padding: const EdgeInsets.all(6.0),
@@ -201,8 +228,14 @@ class ProfilView extends GetView<ProfilController> {
                         SizedBox(
                           height: 250,
                           child: Card(
+                            color:
+                                isDark
+                                    ? Theme.of(context)
+                                        .cardColor // dark surface
+                                    : const Color(0xFFF2F4F8),
                             elevation: 8,
-                            shadowColor: Colors.black12,
+                            shadowColor:
+                                isDark ? Colors.black54 : Colors.black12,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(20),
                             ),
@@ -217,7 +250,12 @@ class ProfilView extends GetView<ProfilController> {
                                         width: 20,
                                         height: 20,
                                         decoration: BoxDecoration(
-                                          color: Colors.blue[50],
+                                          color:
+                                              isDark
+                                                  ? Colors.blue.withOpacity(
+                                                    0.15,
+                                                  )
+                                                  : Colors.blue[50],
                                           borderRadius: BorderRadius.circular(
                                             5,
                                           ),
@@ -228,7 +266,7 @@ class ProfilView extends GetView<ProfilController> {
                                           color: Colors.lightBlue,
                                         ),
                                       ),
-                                      const SizedBox(width: 2),
+                                      const SizedBox(width: 5),
                                       Text(
                                         'Username',
                                         style: subtitleTextStyle,
@@ -236,7 +274,7 @@ class ProfilView extends GetView<ProfilController> {
                                     ],
                                   ),
                                   trailing: Text(
-                                    listDataUser!.username!,
+                                    listDataUser.username!,
                                     style: titleTextStyle,
                                   ),
                                   contentPadding: const EdgeInsets.symmetric(
@@ -252,7 +290,12 @@ class ProfilView extends GetView<ProfilController> {
                                         width: 20,
                                         height: 20,
                                         decoration: BoxDecoration(
-                                          color: Colors.blue[50],
+                                          color:
+                                              isDark
+                                                  ? Colors.blue.withOpacity(
+                                                    0.15,
+                                                  )
+                                                  : Colors.blue[50],
                                           borderRadius: BorderRadius.circular(
                                             5,
                                           ),
@@ -263,7 +306,7 @@ class ProfilView extends GetView<ProfilController> {
                                           color: Colors.lightBlue,
                                         ),
                                       ),
-                                      const SizedBox(width: 2),
+                                      const SizedBox(width: 5),
                                       Text(
                                         'Employee ID',
                                         style: subtitleTextStyle,
@@ -271,22 +314,22 @@ class ProfilView extends GetView<ProfilController> {
                                     ],
                                   ),
                                   trailing:
-                                      listDataUser!.nik!.isEmpty
+                                      listDataUser.nik!.isEmpty
                                           ? CsElevatedButton(
                                             color: AppColors.itemsBackground,
                                             fontsize: 12,
                                             label: 'Generate ID',
                                             onPressed:
-                                                listDataUser!.createdAt! == ""
+                                                listDataUser.createdAt! == ""
                                                     ? null
                                                     : () {
                                                       ctr.generateEmpId(
-                                                        listDataUser!,
+                                                        listDataUser,
                                                       );
                                                     },
                                           )
                                           : Text(
-                                            listDataUser!.nik!,
+                                            listDataUser.nik!,
                                             style: titleTextStyle,
                                           ),
                                   contentPadding: const EdgeInsets.symmetric(
@@ -302,7 +345,12 @@ class ProfilView extends GetView<ProfilController> {
                                         width: 20,
                                         height: 20,
                                         decoration: BoxDecoration(
-                                          color: Colors.blue[50],
+                                          color:
+                                              isDark
+                                                  ? Colors.blue.withOpacity(
+                                                    0.15,
+                                                  )
+                                                  : Colors.blue[50],
                                           borderRadius: BorderRadius.circular(
                                             5,
                                           ),
@@ -313,7 +361,7 @@ class ProfilView extends GetView<ProfilController> {
                                           color: Colors.lightBlue,
                                         ),
                                       ),
-                                      const SizedBox(width: 2),
+                                      const SizedBox(width: 5),
                                       Text(
                                         'Phone No.',
                                         style: subtitleTextStyle,
@@ -321,7 +369,7 @@ class ProfilView extends GetView<ProfilController> {
                                     ],
                                   ),
                                   trailing: Text(
-                                    listDataUser!.noTelp!,
+                                    listDataUser.noTelp!,
                                     style: titleTextStyle,
                                   ),
                                   contentPadding: const EdgeInsets.symmetric(
@@ -337,7 +385,12 @@ class ProfilView extends GetView<ProfilController> {
                                         width: 20,
                                         height: 20,
                                         decoration: BoxDecoration(
-                                          color: Colors.blue[50],
+                                          color:
+                                              isDark
+                                                  ? Colors.blue.withOpacity(
+                                                    0.15,
+                                                  )
+                                                  : Colors.blue[50],
                                           borderRadius: BorderRadius.circular(
                                             5,
                                           ),
@@ -348,7 +401,7 @@ class ProfilView extends GetView<ProfilController> {
                                           color: Colors.lightBlue,
                                         ),
                                       ),
-                                      const SizedBox(width: 2),
+                                      const SizedBox(width: 5),
                                       Text(
                                         'Registered In',
                                         style: subtitleTextStyle,
@@ -356,10 +409,10 @@ class ProfilView extends GetView<ProfilController> {
                                     ],
                                   ),
                                   trailing: Text(
-                                    listDataUser!.namaCabang!.capitalize!,
+                                    listDataUser.namaCabang!.capitalize!,
                                     style: titleTextStyle.copyWith(
                                       fontSize:
-                                          listDataUser!.namaCabang!.length > 21
+                                          listDataUser.namaCabang!.length > 21
                                               ? 11
                                               : 15,
                                     ),
@@ -377,7 +430,12 @@ class ProfilView extends GetView<ProfilController> {
                                         width: 20,
                                         height: 20,
                                         decoration: BoxDecoration(
-                                          color: Colors.blue[50],
+                                          color:
+                                              isDark
+                                                  ? Colors.blue.withOpacity(
+                                                    0.15,
+                                                  )
+                                                  : Colors.blue[50],
                                           borderRadius: BorderRadius.circular(
                                             5,
                                           ),
@@ -388,7 +446,7 @@ class ProfilView extends GetView<ProfilController> {
                                           color: Colors.lightBlue,
                                         ),
                                       ),
-                                      const SizedBox(width: 2),
+                                      const SizedBox(width: 5),
                                       Text(
                                         'Registered At',
                                         style: subtitleTextStyle,
@@ -396,10 +454,10 @@ class ProfilView extends GetView<ProfilController> {
                                     ],
                                   ),
                                   trailing: Text(
-                                    listDataUser!.createdAt != ""
+                                    listDataUser.createdAt != ""
                                         ? FormatWaktu.formatShortEng(
                                           tanggal: DateTime.parse(
-                                            listDataUser!.createdAt!,
+                                            listDataUser.createdAt!,
                                           ),
                                         )
                                         : '-',
@@ -428,11 +486,12 @@ class ProfilView extends GetView<ProfilController> {
                               // Get.to(
                               //   () => UpdateProfil(userData: listDataUser!),
                               // );
-                               Navigator.push(context,
+                              Navigator.push(
+                                context,
                                 MaterialPageRoute(
                                   builder:
                                       (_) =>
-                                      UpdateProfil(userData: listDataUser!),
+                                          UpdateProfil(userData: listDataUser),
                                 ),
                               );
                             },
@@ -442,7 +501,10 @@ class ProfilView extends GetView<ProfilController> {
                                   width: 20,
                                   height: 20,
                                   decoration: BoxDecoration(
-                                    color: Colors.blue[50],
+                                    color:
+                                        isDark
+                                            ? Colors.blue.withOpacity(0.15)
+                                            : Colors.blue[50],
                                     borderRadius: BorderRadius.circular(5),
                                   ),
                                   child: const Icon(
@@ -451,7 +513,7 @@ class ProfilView extends GetView<ProfilController> {
                                     color: Colors.lightBlue,
                                   ),
                                 ),
-                                const SizedBox(width: 2),
+                                const SizedBox(width: 5),
                                 const Text(
                                   'Edit Profile',
                                   style: TextStyle(fontWeight: FontWeight.bold),
@@ -487,7 +549,10 @@ class ProfilView extends GetView<ProfilController> {
                                   width: 20,
                                   height: 20,
                                   decoration: BoxDecoration(
-                                    color: Colors.blue[50],
+                                    color:
+                                        isDark
+                                            ? Colors.blue.withOpacity(0.15)
+                                            : Colors.blue[50],
                                     borderRadius: BorderRadius.circular(5),
                                   ),
                                   child: const Icon(
@@ -496,7 +561,7 @@ class ProfilView extends GetView<ProfilController> {
                                     color: Colors.red,
                                   ),
                                 ),
-                                const SizedBox(width: 2),
+                                const SizedBox(width: 5),
                                 const Text(
                                   'Logout',
                                   style: TextStyle(

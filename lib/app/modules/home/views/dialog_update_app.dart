@@ -170,7 +170,7 @@ dialogUpdateApp() {
               // absC.supportedAbi == 'arm64-v8a'
               //     ? 'http://103.156.15.61/update apk/absensiApp.arm64v8a.apk'
                   // : 
-                  'http://103.156.15.61/update_apk/absensiApp.apk',
+                  'http://103.156.15.61/update_apk/latest.apk',
               // OPTIONAL
               // destinationFilename: '/',
               // OPTIONAL, ANDROID ONLY - ABILITY TO VALIDATE CHECKSUM OF FILE:

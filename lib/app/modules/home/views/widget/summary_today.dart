@@ -27,6 +27,7 @@ class SummaryToday extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Stack(
       children: [
         // Container(
@@ -44,7 +45,7 @@ class SummaryToday extends StatelessWidget {
         //         () => Text(
         //           FormatWaktu.formatIndo(tanggal: absenC.tglStream.value),
         //           style: const TextStyle(
-        //             color: AppColors.contentColorWhite,
+        //             color: Theme.of(context).cardColor,
         //             fontWeight: FontWeight.bold,
         //             fontSize: 14,
         //           ),
@@ -64,7 +65,7 @@ class SummaryToday extends StatelessWidget {
         //                 return Text(
         //                   snapshot.data!,
         //                   style: const TextStyle(
-        //                     color: AppColors.contentColorWhite,
+        //                     color: Theme.of(context).cardColor,
         //                     fontWeight: FontWeight.bold,
         //                     fontSize: 14,
         //                   ),
@@ -81,7 +82,7 @@ class SummaryToday extends StatelessWidget {
         //   ),
         // ),
         Padding(
-          padding: const EdgeInsets.fromLTRB(0, 8, 0, 0),
+          padding: const EdgeInsets.fromLTRB(0, 1, 0, 0),
           child: Card(
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
@@ -90,7 +91,7 @@ class SummaryToday extends StatelessWidget {
             child: Container(
               height: listDataUser!.visit == "1" ? 170 : 168,
               decoration: BoxDecoration(
-                color: AppColors.contentColorWhite,
+                color: Theme.of(context).cardColor,
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Obx(
@@ -107,6 +108,7 @@ class SummaryToday extends StatelessWidget {
                             Expanded(
                               flex: 1,
                               child: _buildTimeCard(
+                                context: context,
                                 title: 'Check In',
                                 angle: -45,
                                 icon: Icons.arrow_circle_left,
@@ -116,6 +118,7 @@ class SummaryToday extends StatelessWidget {
                                 dataVisit: absenC.dataVisit,
                                 isIn: true,
                                 visit: listDataUser!.visit!,
+                                isDark: isDark
                               ),
                             ),
                             // ),
@@ -125,6 +128,7 @@ class SummaryToday extends StatelessWidget {
                             Expanded(
                               flex: 1,
                               child: _buildTimeCard(
+                                context: context,
                                 title: 'Check Out',
                                 angle: -70,
                                 icon: Icons.arrow_circle_right_rounded,
@@ -134,6 +138,7 @@ class SummaryToday extends StatelessWidget {
                                 dataVisit: absenC.dataVisit,
                                 isIn: false,
                                 visit: listDataUser!.visit!,
+                                isDark: isDark
                               ),
                             ),
                             // ),
@@ -144,19 +149,19 @@ class SummaryToday extends StatelessWidget {
                           width: Get.mediaQuery.size.width,
                           margin: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: Theme.of(context).cardColor,
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Stack(
                             children: [
                               /// IMAGE KANAN
                               Positioned(
-                                right: 0,
+                                right: 5,
                                 top: 0,
                                 bottom: 40, // stop sebelum button
                                 child: Image.asset(
                                   'assets/image/bg_sts_home.png',
-                                  width: 120,
+                                  width: 85,
                                   fit: BoxFit.contain,
                                 ),
                               ),
@@ -427,7 +432,7 @@ class SummaryToday extends StatelessWidget {
                                                     ),
                                                     const TextSpan(
                                                       text:
-                                                          ' until you Check Out',
+                                                          ' until you check out',
                                                       style: TextStyle(
                                                         fontSize: 14,
                                                         fontFamily: 'Nunito',
@@ -470,18 +475,24 @@ class SummaryToday extends StatelessWidget {
                                 RichText(
                                   text: TextSpan(
                                     children: [
-                                      const TextSpan(
+                                      TextSpan(
                                         text: 'working hours: ',
                                         style: TextStyle(
-                                          color: AppColors.itemsBackground,
+                                          color:
+                                              isDark
+                                                  ? Colors.grey
+                                                  : AppColors.itemsBackground,
                                           fontFamily: 'Nunito',
                                         ),
                                       ),
                                       TextSpan(
                                         text:
                                             '${absenC.dataAbsen.isNotEmpty ? absenC.dataAbsen[0].jamMasuk : ''} - ${absenC.dataAbsen.isNotEmpty ? absenC.dataAbsen[0].jamPulang : ''}',
-                                        style: const TextStyle(
-                                          color: AppColors.itemsBackground,
+                                        style: TextStyle(
+                                          color:
+                                              isDark
+                                                  ? Colors.grey
+                                                  : AppColors.itemsBackground,
                                           fontWeight: FontWeight.bold,
                                           fontFamily: 'Nunito',
                                         ),
@@ -489,8 +500,11 @@ class SummaryToday extends StatelessWidget {
                                       TextSpan(
                                         text:
                                             ' ${absenC.dataAbsen.isNotEmpty ? shiftName(jamMasuk: absenC.dataAbsen[0].jamMasuk!) : ''}',
-                                        style: const TextStyle(
-                                          color: AppColors.itemsBackground,
+                                        style: TextStyle(
+                                          color:
+                                              isDark
+                                                  ? Colors.grey
+                                                  : AppColors.itemsBackground,
                                           fontWeight: FontWeight.bold,
                                           fontFamily: 'Nunito',
                                         ),
@@ -517,6 +531,7 @@ class SummaryToday extends StatelessWidget {
 }
 
 Widget _buildTimeCard({
+  required BuildContext context,
   required String title,
   required double angle,
   required IconData icon,
@@ -526,6 +541,7 @@ Widget _buildTimeCard({
   List<Visit>? dataVisit,
   required bool isIn,
   required String visit,
+  required bool isDark
 }) {
   // Pilih list yang dipakai: jika data kosong atau null, pakai dataVisit
   // Tentukan data yang akan dipakai berdasarkan nilai visit
@@ -596,7 +612,9 @@ Widget _buildTimeCard({
                                       )
                                       ? green
                                       : red)
-                                  : AppColors.mainTextColor1)
+                                  : isDark
+                                  ? Theme.of(context).cardColor
+                                  : Colors.white)
                               : (effectiveData != null &&
                                       effectiveData[0].jamAbsenPulang! != ""
                                   ? (FormatWaktu.formatJamMenit(
@@ -618,7 +636,9 @@ Widget _buildTimeCard({
                                       )
                                       ? green
                                       : yellow)
-                                  : AppColors.mainTextColor1),
+                                  :isDark
+                                  ? Theme.of(context).cardColor
+                                  : Colors.white),
                     ),
                     child: Text(
                       isIn
@@ -662,9 +682,7 @@ Widget _buildTimeCard({
                                   ? 'On Time'
                                   : 'Overtime')
                               : ''),
-                      style: const TextStyle(
-                        color: AppColors.contentColorWhite,
-                      ),
+                      style: const TextStyle(color: Colors.white),
                     ),
                   ),
                 ],

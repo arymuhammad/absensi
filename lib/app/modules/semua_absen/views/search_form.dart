@@ -12,16 +12,19 @@ import 'package:get/get.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:intl/intl.dart';
 
-final absC = Get.find<AbsenController>();
-
-searchForm(Data? userData) {
+searchForm(
+  BuildContext context,
+  Data? userData,
+  bool isDark,
+  AbsenController absC,
+) {
   return Get.bottomSheet(
     isScrollControlled: true,
     Container(
       height: 400,
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.only(
+      decoration: BoxDecoration(
+        color: isDark ? Theme.of(context).cardColor : Colors.white,
+        borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(10),
           topRight: Radius.circular(10),
         ),
@@ -55,16 +58,22 @@ searchForm(Data? userData) {
                     children: [
                       SizedBox(
                         width: Get.mediaQuery.size.width / 2.1,
+                        height: 40,
                         child: DateTimeField(
                           controller: absC.date1,
                           style: const TextStyle(fontSize: 16),
-                          decoration: const InputDecoration(
-                            contentPadding: EdgeInsets.all(0.5),
-                            prefixIcon: Icon(Iconsax.calendar_edit_outline),
+                          decoration: InputDecoration(
+                            contentPadding: const EdgeInsets.all(0.5),
+                            prefixIcon: const Icon(
+                              Iconsax.calendar_edit_outline,
+                            ),
                             hintText: 'Tanggal Awal',
                             filled: true,
-                            fillColor: Colors.white,
-                            border: OutlineInputBorder(),
+                            fillColor:
+                                isDark
+                                    ? Theme.of(context).canvasColor
+                                    : Colors.white,
+                            border: const OutlineInputBorder(),
                           ),
                           format: DateFormat("yyyy-MM-dd"),
                           onShowPicker: (context, currentValue) {
@@ -79,16 +88,22 @@ searchForm(Data? userData) {
                       ),
                       SizedBox(
                         width: Get.mediaQuery.size.width / 2.1,
+                        height: 40,
                         child: DateTimeField(
                           controller: absC.date2,
                           style: const TextStyle(fontSize: 16),
-                          decoration: const InputDecoration(
-                            contentPadding: EdgeInsets.all(0.5),
-                            prefixIcon: Icon(Iconsax.calendar_edit_outline),
+                          decoration: InputDecoration(
+                            contentPadding: const EdgeInsets.all(0.5),
+                            prefixIcon: const Icon(
+                              Iconsax.calendar_edit_outline,
+                            ),
                             hintText: 'Tanggal Akhir',
                             filled: true,
-                            fillColor: Colors.white,
-                            border: OutlineInputBorder(),
+                            fillColor:
+                                isDark
+                                    ? Theme.of(context).canvasColor
+                                    : Colors.white,
+                            border: const OutlineInputBorder(),
                           ),
                           format: DateFormat("yyyy-MM-dd"),
                           onShowPicker: (context, currentValue) {
@@ -114,40 +129,60 @@ searchForm(Data? userData) {
                           allStore.add(data.namaCabang!);
                         }).toList();
 
-                        return TypeAheadFormField<String>(
-                          textFieldConfiguration: TextFieldConfiguration(
-                            style: const TextStyle(fontSize: 16),
-                            controller: absC.store,
-                            decoration: const InputDecoration(
-                              labelText: 'Cabang',
-                              hintText: "AEON BSD",
-                              border: OutlineInputBorder(),
-                              filled: true,
-                              fillColor: Colors.white,
-                            ),
-                          ),
-                          suggestionsCallback: (pattern) {
-                            return allStore.where(
-                              (option) => option.toLowerCase().contains(
-                                pattern.toLowerCase(),
+                        return SizedBox(
+                          height: 40,
+                          child: TypeAheadFormField<String>(
+                            textFieldConfiguration: TextFieldConfiguration(
+                              style: const TextStyle(fontSize: 16),
+                              controller: absC.store,
+                              decoration: InputDecoration(
+                                contentPadding: const EdgeInsets.all(8),
+                                labelText: 'Cabang',
+                                hintText: "AEON BSD",
+                                suffixIcon: IconButton(
+                                  onPressed: () {
+                                    absC.store.clear();
+                                    absC.userCab.clear();
+                                    absC.selectedUserCabang.value = "";
+                                  },
+                                  icon: const Icon(Icons.cancel),
+                                ),
+                                border: const OutlineInputBorder(),
+                                filled: true,
+                                fillColor:
+                                    isDark
+                                        ? Theme.of(context).canvasColor
+                                        : Colors.white,
                               ),
-                            );
-                          },
-                          itemBuilder: (context, suggestion) {
-                            return ListTile(
-                              tileColor: Colors.white,
-                              title: Text(suggestion),
-                            );
-                          },
-                          onSuggestionSelected: (suggestion) {
-                            absC.store.text = suggestion;
-                            for (int i = 0; i < dataCabang.length; i++) {
-                              if (dataCabang[i].namaCabang == suggestion) {
-                                absC.selectedCabang.value =
-                                    dataCabang[i].kodeCabang!;
+                            ),
+                            suggestionsCallback: (pattern) {
+                              return allStore.where(
+                                (option) => option.toLowerCase().contains(
+                                  pattern.toLowerCase(),
+                                ),
+                              );
+                            },
+                            itemBuilder: (context, suggestion) {
+                              return ListTile(
+                                tileColor:
+                                    isDark
+                                        ? Theme.of(context).canvasColor
+                                        : Colors.white,
+                                title: Text(suggestion),
+                              );
+                            },
+                            onSuggestionSelected: (suggestion) {
+                              absC.userCab.clear();
+                              absC.selectedUserCabang.value = "";
+                              absC.store.text = suggestion;
+                              for (int i = 0; i < dataCabang.length; i++) {
+                                if (dataCabang[i].namaCabang == suggestion) {
+                                  absC.selectedCabang.value =
+                                      dataCabang[i].kodeCabang!;
+                                }
                               }
-                            }
-                          },
+                            },
+                          ),
                         );
                       } else if (snapshot.hasError) {
                         return Text(snapshot.error.toString());
@@ -181,40 +216,58 @@ searchForm(Data? userData) {
                             userCab.add(data.nama!);
                           }).toList();
 
-                          return TypeAheadFormField<String>(
-                            textFieldConfiguration: TextFieldConfiguration(
-                              style: const TextStyle(fontSize: 16),
-                              controller: absC.userCab,
-                              decoration: const InputDecoration(
-                                labelText: 'User',
-                                border: OutlineInputBorder(),
-                                filled: true,
-                                fillColor: Colors.white,
-                              ),
-                            ),
-                            suggestionsCallback: (pattern) {
-                              return userCab.where(
-                                (option) => option.toLowerCase().contains(
-                                  pattern.toLowerCase(),
+                          return SizedBox(
+                            height: 40,
+                            child: TypeAheadFormField<String>(
+                              textFieldConfiguration: TextFieldConfiguration(
+                                style: const TextStyle(fontSize: 16),
+                                controller: absC.userCab,
+                                decoration: InputDecoration(
+                                  contentPadding: const EdgeInsets.all(8),
+                                  labelText: 'User',
+                                  suffixIcon: IconButton(
+                                    onPressed: () => absC.userCab.clear(),
+                                    icon: const Icon(Icons.cancel),
+                                  ),
+                                  border: const OutlineInputBorder(),
+                                  filled: true,
+                                  fillColor:
+                                      isDark
+                                          ? Theme.of(context).canvasColor
+                                          : Colors.white,
                                 ),
-                              );
-                            },
-                            itemBuilder: (context, suggestion) {
-                              return ListTile(
-                                tileColor: Colors.white,
-                                title: Text(suggestion),
-                              );
-                            },
-                            onSuggestionSelected: (suggestion) {
-                              absC.userCab.text = suggestion;
-                              absC.userMonitor.value = suggestion;
-                              for (int i = 0; i < dataUserCabang.length; i++) {
-                                if (dataUserCabang[i].nama == suggestion) {
-                                  absC.selectedUserCabang.value =
-                                      dataUserCabang[i].id!;
+                              ),
+                              suggestionsCallback: (pattern) {
+                                return userCab.where(
+                                  (option) => option.toLowerCase().contains(
+                                    pattern.toLowerCase(),
+                                  ),
+                                );
+                              },
+                              itemBuilder: (context, suggestion) {
+                                return ListTile(
+                                  tileColor:
+                                      isDark
+                                          ? Theme.of(context).canvasColor
+                                          : Colors.white,
+                                  title: Text(suggestion),
+                                );
+                              },
+                              onSuggestionSelected: (suggestion) {
+                                absC.userCab.text = suggestion;
+                                absC.userMonitor.value = suggestion;
+                                for (
+                                  int i = 0;
+                                  i < dataUserCabang.length;
+                                  i++
+                                ) {
+                                  if (dataUserCabang[i].nama == suggestion) {
+                                    absC.selectedUserCabang.value =
+                                        dataUserCabang[i].id!;
+                                  }
                                 }
-                              }
-                            },
+                              },
+                            ),
                           );
                         } else if (snapshot.hasError) {
                           return Text(snapshot.error.toString());

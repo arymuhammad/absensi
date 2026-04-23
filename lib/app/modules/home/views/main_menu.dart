@@ -4,6 +4,7 @@ import 'package:absensi/app/modules/adjust_presence/controllers/adjust_presence_
 import 'package:absensi/app/modules/home/controllers/home_controller.dart';
 import 'package:absensi/app/modules/leave/views/leave_view.dart';
 import 'package:absensi/app/modules/leave/views/request_leave_view.dart';
+import 'package:absensi/app/modules/overtime/views/overtime_view.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../data/helper/app_colors.dart';
@@ -29,7 +30,7 @@ class MainMenu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(8.0,8,8.0,0),
+      padding: const EdgeInsets.fromLTRB(8.0, 8, 8.0, 0),
       child: SizedBox(
         width: Get.mediaQuery.size.width,
         // decoration: BoxDecoration(
@@ -131,9 +132,11 @@ class MainMenu extends StatelessWidget {
                             };
                             leaveC.isLoading.value = true;
                             leaveC.getLeaveReq(param);
-                            Get.to(
-                              () => RequestLeaveView(userData: userData!),
-                              transition: Transition.cupertino,
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => RequestLeaveView(),
+                              ),
                             );
                           },
                         ),
@@ -145,14 +148,35 @@ class MainMenu extends StatelessWidget {
                     asset: 'assets/image/leave.png',
                     label: 'Leave',
                     onTap: () {
-                      Get.to(() {
-                        leaveC.isLoading.value = true;
-                        leaveC.getLeaveReq({
-                          "type": "",
-                          "id_user": userData!.id!,
-                        });
-                        return LeaveView(userData: userData!);
-                      }, transition: Transition.cupertino);
+                      leaveC.isLoading.value = true;
+                      leaveC.getLeaveReq({
+                        "type": "",
+                        "id_user": userData!.id!,
+                      });
+                      //  loadingDialog('Mengecek sisa saldo cuti kamu', '');
+                      // leaveC.leaveBalanceCheck(userData!);
+                      // Get.back();
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => LeaveView()),
+                      );
+                    },
+                  ),
+                  const SizedBox(width: 10),
+                  MenuIconItem(
+                    asset: 'assets/image/izin.png',
+                    label: 'Overtime',
+                    onTap: () {
+                      // Get.to(
+                      //   () => PaySlipView(userData: userData!),
+                      //   transition: Transition.cupertino,
+                      // );
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => OvertimeView(),
+                        ),
+                      );
                     },
                   ),
                   const SizedBox(width: 10),
@@ -161,9 +185,10 @@ class MainMenu extends StatelessWidget {
                         userData!.parentId == "3" || userData!.parentId == "4",
                     child: Row(
                       children: [
-                        Obx(()=> MenuIconWithBadge(
+                        Obx(
+                          () => MenuIconWithBadge(
                             asset: 'assets/image/notif.png',
-                            label: 'Notification',
+                            label: 'Inbox',
                             future: homeC.futurePendAdj.value,
                             badgeCount: (data) {
                               // print(data.totalNotif);
@@ -171,23 +196,22 @@ class MainMenu extends StatelessWidget {
                             },
                             onTap: () {
                               // Get.to(() {
-                                adjCtrl.getReqAppUpt(
-                                  '',
-                                  '',
-                                  userData!.level,
-                                  userData!.id,
-                                  adjCtrl.initDate,
-                                  adjCtrl.lastDate,
-                                );
+                              adjCtrl.getReqAppUpt(
+                                '',
+                                '',
+                                userData!.level,
+                                userData!.id,
+                                adjCtrl.initDate,
+                                adjCtrl.lastDate,
+                              );
                               //   return ReqAppUserView(userData: userData!);
                               // }, transition: Transition.cupertino);
                               Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder:
-                                  (_) => ReqAppUserView(userData: userData!)
-                            ),
-                          );
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => ReqAppUserView(),
+                                ),
+                              );
                             },
                           ),
                         ),
@@ -204,12 +228,11 @@ class MainMenu extends StatelessWidget {
                       //   transition: Transition.cupertino,
                       // );
                       Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder:
-                                  (_) => PaySlipView(userData: userData!)
-                            ),
-                          );
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => PaySlipView(),
+                        ),
+                      );
                     },
                   ),
                   const SizedBox(width: 10),
@@ -224,9 +247,11 @@ class MainMenu extends StatelessWidget {
                           asset: 'assets/image/monitoring.png',
                           label: 'Monitoring',
                           onTap: () {
-                            Get.to(
-                              () => MonitoringAbsenView(userData: userData!),
-                              transition: Transition.cupertino,
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => MonitoringAbsenView(),
+                              ),
                             );
                             absC.searchAbsen.clear();
                             absC.userMonitor.value = "";
@@ -251,9 +276,11 @@ class MainMenu extends StatelessWidget {
                           adjCtrl.initDate,
                           adjCtrl.lastDate,
                         );
-                        Get.to(
-                          () => AdjustPresenceView(data: userData!),
-                          transition: Transition.cupertino,
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => AdjustPresenceView(),
+                          ),
                         );
                         absC.searchAbsen.clear();
                         absC.userMonitor.value = "";
@@ -288,23 +315,23 @@ class MenuIconItem extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(12),
       child: Container(
-        width: 72,
+        width: 60,
         padding: const EdgeInsets.symmetric(vertical: 8),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            SizedBox(height: 40, width: 40, child: Image.asset(asset)),
+            SizedBox(height: 30, width: 30, child: Image.asset(asset)),
 
             const SizedBox(height: 6),
 
             Text(
               label,
               textAlign: TextAlign.center,
-              maxLines: 2,
+              maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
             ),
@@ -337,18 +364,18 @@ class MenuIconWithBadge extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(12),
       child: Container(
-        width: 72,
+        width: 60,
         padding: const EdgeInsets.symmetric(vertical: 8),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             SizedBox(
-              height: 40,
-              width: 40,
+              height: 30,
+              width: 30,
               child: FutureBuilder<NotifModel>(
                 future: future,
                 builder: (context, snapshot) {
@@ -381,7 +408,11 @@ class MenuIconWithBadge extends StatelessWidget {
                           child: Badge(
                             label: Text(
                               badgeCount(snapshot.data!).toString(),
-                              style: const TextStyle(fontSize: 10),
+                              style: const TextStyle(
+                                fontSize: 10,
+                                color: Colors.white,
+                              ),
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
                         ),

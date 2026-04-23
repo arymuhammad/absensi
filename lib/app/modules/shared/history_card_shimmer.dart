@@ -12,7 +12,7 @@ class HistoryCardShimmer extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).canvasColor,
         borderRadius: BorderRadius.circular(14),
         boxShadow: [
           BoxShadow(
@@ -24,7 +24,7 @@ class HistoryCardShimmer extends StatelessWidget {
       ),
       child: Shimmer.fromColors(
         baseColor: Colors.grey.shade300,
-        highlightColor: Colors.grey.shade100,
+        highlightColor: Colors.grey.shade400,
         child: Row(
           children: [
             /// DATE BOX

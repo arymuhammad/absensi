@@ -12,6 +12,7 @@ class VerifikasiUpdatePassword extends GetView {
   final pegawaiC = Get.put(AddPegawaiController());
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
@@ -30,9 +31,9 @@ class VerifikasiUpdatePassword extends GetView {
         children: [
           Container(
             height: 250,
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Color(0xFF1B2541), Color(0xFF3949AB)],
+            decoration: BoxDecoration(
+              gradient: AppColors.mainGradient(
+                context: context,
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
@@ -61,6 +62,8 @@ class VerifikasiUpdatePassword extends GetView {
                   decoration: inputDecoration(
                     label: 'No Telp',
                     prefixIcon: Icons.phone_android,
+                    isDark: isDark,
+                    context: context,
                   ),
                   keyboardType: TextInputType.phone,
                 ),

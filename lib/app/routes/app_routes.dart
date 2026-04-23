@@ -20,6 +20,7 @@ abstract class Routes {
   static const LEAVE = _Paths.LEAVE;
   static const PAY_SLIP = _Paths.PAY_SLIP;
   static const PING = _Paths.PING;
+  static const OVERTIME = _Paths.OVERTIME;
 }
 
 abstract class _Paths {
@@ -41,4 +42,5 @@ abstract class _Paths {
   static const LEAVE = '/leave';
   static const PAY_SLIP = '/pay-slip';
   static const PING = '/ping';
+  static const OVERTIME = '/overtime';
 }

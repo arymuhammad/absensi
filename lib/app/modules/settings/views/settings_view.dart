@@ -1,24 +1,31 @@
 import 'package:absensi/app/data/helper/app_colors.dart';
 import 'package:absensi/app/data/helper/const.dart';
-import 'package:absensi/app/data/model/login_model.dart';
 import 'package:absensi/app/modules/add_pegawai/controllers/add_pegawai_controller.dart';
+import 'package:absensi/app/modules/add_pegawai/views/add_pegawai_view.dart';
 import 'package:absensi/app/modules/settings/views/about_view.dart';
 import 'package:absensi/app/modules/settings/views/backup_view.dart';
 import 'package:absensi/app/modules/profil/views/verifikasi_update_password.dart';
-import 'package:absensi/app/routes/app_pages.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icons_plus/icons_plus.dart';
 // import '../../alarm/views/alarm_view.dart';
+import '../../../data/theme_controller.dart';
+import '../../../data/theme_switcher.dart';
+import '../../login/controllers/login_controller.dart';
 import '../controllers/settings_controller.dart';
+import 'faq_view.dart';
 
 class SettingsView extends GetView<SettingsController> {
-  SettingsView({super.key, this.listDataUser});
-  final Data? listDataUser;
+  SettingsView({super.key});
+
+  final auth = Get.find<LoginController>();
   final ctrl = Get.put(AddPegawaiController());
+  final themeC = Get.find<ThemeController>();
   @override
   Widget build(BuildContext context) {
+    final listDataUser = auth.logUser.value;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       body: Stack(
         children: [
@@ -26,9 +33,9 @@ class SettingsView extends GetView<SettingsController> {
           // ),
           Container(
             height: 250,
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Color(0xFF1B2541), Color(0xFF3949AB)],
+            decoration: BoxDecoration(
+              gradient: AppColors.mainGradient(
+                context: context,
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
@@ -48,7 +55,11 @@ class SettingsView extends GetView<SettingsController> {
                   children: [
                     Expanded(
                       child: ListView(
-                        padding: const EdgeInsets.all(10),
+                        padding: const EdgeInsets.only(
+                          left: 10,
+                          top: 10,
+                          right: 10,
+                        ),
                         children: [
                           // ListTile(
                           //   title: Text(
@@ -125,31 +136,35 @@ class SettingsView extends GetView<SettingsController> {
                               //   transition: Transition.cupertino,
                               // );
 
-                              Navigator.push(context,
+                              Navigator.push(
+                                context,
                                 MaterialPageRoute(
-                                  builder:
-                                      (_) =>
-                                         VerifikasiUpdatePassword(),
+                                  builder: (_) => VerifikasiUpdatePassword(),
                                 ),
                               );
-                            
                             },
                             leading: Container(
                               height: 40,
                               width: 40,
                               decoration: BoxDecoration(
-                                color: bgContainer,
+                                color:
+                                    isDark
+                                        ? Colors.blue.withOpacity(0.15)
+                                        : bgContainer,
                                 borderRadius: BorderRadius.circular(8),
                               ),
-                              child: const Icon(
+                              child: Icon(
                                 Iconsax.key_bulk,
-                                color: AppColors.itemsBackground,
+                                color:
+                                    isDark
+                                        ? Colors.blue
+                                        : AppColors.itemsBackground,
                               ),
                             ),
-                            title: Text(
+                            title: const Text(
                               'Security',
                               style: TextStyle(
-                                color: titleColor,
+                                // color: titleColor,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -172,11 +187,12 @@ class SettingsView extends GetView<SettingsController> {
                               //   transition: Transition.cupertino,
                               // );
 
-                              Navigator.push(context,
+                              Navigator.push(
+                                context,
                                 MaterialPageRoute(
                                   builder:
                                       (_) =>
-                                          BackupView(userData: listDataUser!),
+                                          BackupView(),
                                 ),
                               );
                             },
@@ -184,18 +200,24 @@ class SettingsView extends GetView<SettingsController> {
                               height: 40,
                               width: 40,
                               decoration: BoxDecoration(
-                                color: bgContainer,
+                                color:
+                                    isDark
+                                        ? Colors.blue.withOpacity(0.15)
+                                        : bgContainer,
                                 borderRadius: BorderRadius.circular(8),
                               ),
-                              child: const Icon(
+                              child: Icon(
                                 Bootstrap.database_fill_exclamation,
-                                color: AppColors.itemsBackground,
+                                color:
+                                    isDark
+                                        ? Colors.blue
+                                        : AppColors.itemsBackground,
                               ),
                             ),
-                            title: Text(
+                            title: const Text(
                               'Backup & Restore',
                               style: TextStyle(
-                                color: titleColor,
+                                // color: titleColor,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -238,27 +260,38 @@ class SettingsView extends GetView<SettingsController> {
                           //       color: subTitleColor),
                           // ),
                           Visibility(
-                            visible: listDataUser!.level == "1" ? true : false,
+                            visible: listDataUser.level == "1" ? true : false,
                             child: ListTile(
                               onTap: () {
-                                Get.toNamed(Routes.ADD_PEGAWAI);
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => const AddPegawaiView(),
+                                  ),
+                                );
                               },
                               leading: Container(
                                 height: 40,
                                 width: 40,
                                 decoration: BoxDecoration(
-                                  color: bgContainer,
+                                  color:
+                                      isDark
+                                          ? Colors.blue.withOpacity(0.15)
+                                          : bgContainer,
                                   borderRadius: BorderRadius.circular(8),
                                 ),
-                                child: const Icon(
+                                child: Icon(
                                   Iconsax.user_add_bold,
-                                  color: AppColors.itemsBackground,
+                                  color:
+                                      isDark
+                                          ? Colors.blue
+                                          : AppColors.itemsBackground,
                                 ),
                               ),
-                              title: Text(
+                              title: const Text(
                                 'Manage User',
                                 style: TextStyle(
-                                  color: titleColor,
+                                  // color: titleColor,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
@@ -281,11 +314,10 @@ class SettingsView extends GetView<SettingsController> {
                               //   () => AboutView(),
                               //   transition: Transition.cupertino,
                               // );
-                               Navigator.push(context,
+                              Navigator.push(
+                                context,
                                 MaterialPageRoute(
-                                  builder:
-                                      (_) =>
-                                         AboutView(),
+                                  builder: (_) => const FaqView(),
                                 ),
                               );
                             },
@@ -293,18 +325,73 @@ class SettingsView extends GetView<SettingsController> {
                               height: 40,
                               width: 40,
                               decoration: BoxDecoration(
-                                color: bgContainer,
+                                color:
+                                    isDark
+                                        ? Colors.blue.withOpacity(0.15)
+                                        : bgContainer,
                                 borderRadius: BorderRadius.circular(8),
                               ),
-                              child: const Icon(
-                                Iconsax.info_circle_bold,
-                                color: AppColors.itemsBackground,
+                              child: Icon(
+                                Iconsax.message_question_bold,
+                                color:
+                                    isDark
+                                        ? Colors.blue
+                                        : AppColors.itemsBackground,
                               ),
                             ),
-                            title: Text(
+                            title: const Text(
+                              'FAQ',
+                              style: TextStyle(
+                                // color: titleColor,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            subtitle: Text(
+                              '(Frequently Asked Questions)',
+                              style: TextStyle(
+                                color: subTitleColor,
+                                fontSize: 13,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            trailing: Icon(
+                              Icons.keyboard_arrow_right_rounded,
+                              color: subTitleColor,
+                            ),
+                          ),
+                          ListTile(
+                            onTap: () {
+                              // Get.to(
+                              //   () => AboutView(),
+                              //   transition: Transition.cupertino,
+                              // );
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (_) => AboutView()),
+                              );
+                            },
+                            leading: Container(
+                              height: 40,
+                              width: 40,
+                              decoration: BoxDecoration(
+                                color:
+                                    isDark
+                                        ? Colors.blue.withOpacity(0.15)
+                                        : bgContainer,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Icon(
+                                Iconsax.info_circle_bold,
+                                color:
+                                    isDark
+                                        ? Colors.blue
+                                        : AppColors.itemsBackground,
+                              ),
+                            ),
+                            title: const Text(
                               'Info',
                               style: TextStyle(
-                                color: titleColor,
+                                // color: titleColor,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -320,6 +407,70 @@ class SettingsView extends GetView<SettingsController> {
                               color: subTitleColor,
                             ),
                           ),
+                          // ListTile(
+                          //   onTap: () async {
+                          //     // Get.to(
+                          //     //   () => AboutView(),
+                          //     //   transition: Transition.cupertino,
+                          //     // );
+                          //     // Navigator.push(
+                          //     //   context,
+                          //     //   MaterialPageRoute(builder: (_) => AboutView()),
+                          //     // );
+
+                          //     const nomor =
+                          //         '6285124034523'; // format tanpa 0, pakai kode negara
+                          //     final pesan = Uri.encodeComponent(
+                          //       'Halo, ini pesan dari Flutter',
+                          //     );
+
+                          //     final url = Uri.parse(
+                          //       'https://api.whatsapp.com/send?phone=$nomor&text=$pesan',
+                          //     );
+
+                          //     // if (await canLaunchUrl(url)) {
+                          //     await launchUrl(url);
+                          //     // } else {
+                          //     // throw 'Tidak bisa buka WhatsApp';
+                          //     // }
+                          //   },
+                          //   leading: Container(
+                          //     height: 40,
+                          //     width: 40,
+                          //     decoration: BoxDecoration(
+                          //       color:
+                          //           isDark
+                          //               ? Colors.blue.withOpacity(0.15)
+                          //               : bgContainer,
+                          //       borderRadius: BorderRadius.circular(8),
+                          //     ),
+                          //     child: Icon(
+                          //       Iconsax.info_circle_bold,
+                          //       color:
+                          //           isDark
+                          //               ? Colors.blue
+                          //               : AppColors.itemsBackground,
+                          //     ),
+                          //   ),
+                          //   title: const Text(
+                          //     'Kirim WA',
+                          //     style: TextStyle(
+                          //       // color: titleColor,
+                          //       fontWeight: FontWeight.bold,
+                          //     ),
+                          //   ),
+                          //   subtitle: Text(
+                          //     'Send chat',
+                          //     style: TextStyle(
+                          //       color: subTitleColor,
+                          //       fontSize: 13,
+                          //     ),
+                          //   ),
+                          //   trailing: Icon(
+                          //     Icons.keyboard_arrow_right_rounded,
+                          //     color: subTitleColor,
+                          //   ),
+                          // ),
                           // ListTile(
                           //   onTap: () {
                           //     promptDialog(
@@ -397,6 +548,7 @@ class SettingsView extends GetView<SettingsController> {
                     ),
                   ],
                 ),
+                const ThemeSwitcher(),
               ],
             ),
           ),

@@ -16,6 +16,7 @@ class Visit {
   late String? deviceInfo;
   late String? deviceInfo2;
   late String? isRnd;
+  String? statusSync;
 
   Visit({
     this.id,
@@ -35,6 +36,7 @@ class Visit {
     this.deviceInfo,
     this.deviceInfo2,
     this.isRnd,
+    this.statusSync,
   });
 
   Visit.fromJson(Map<String, dynamic> json) {
@@ -97,5 +99,6 @@ class Visit {
     deviceInfo = map['device_info'];
     deviceInfo2 = map['device_info2'];
     isRnd = map['is_rnd'];
+    statusSync = map['status_sync'];
   }
 }

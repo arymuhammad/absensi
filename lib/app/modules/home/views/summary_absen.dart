@@ -6,7 +6,6 @@ import 'package:absensi/app/modules/absen/controllers/absen_controller.dart';
 import 'package:absensi/app/data/helper/const.dart';
 import 'package:absensi/app/data/helper/format_waktu.dart';
 import 'package:absensi/app/data/helper/custom_dialog.dart';
-import 'package:absensi/app/data/model/login_model.dart';
 import 'package:absensi/app/modules/detail_absen/views/detail_absen_view.dart';
 import 'package:absensi/app/modules/home/controllers/home_controller.dart';
 import 'package:absensi/app/modules/home/views/widget/summary_today.dart';
@@ -17,46 +16,56 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
 import '../../../data/helper/duration_count.dart';
+import '../../login/controllers/login_controller.dart';
 import '../../shared/history_card.dart';
 import '../../shared/history_card_shimmer.dart';
 import 'main_menu.dart';
 import 'widget/summary_per_month.dart';
 
 class SummaryAbsen extends GetView {
-  SummaryAbsen({super.key, this.userData});
-  final Data? userData;
+  SummaryAbsen({super.key});
+  final auth = Get.find<LoginController>();
   final absenC = Get.find<AbsenController>();
   final homeC = Get.find<HomeController>();
 
   @override
   Widget build(BuildContext context) {
+    final userData = auth.logUser.value;
     return Expanded(
       child: Column(
         children: [
-          SummaryToday(listDataUser: userData!),
-          const SizedBox(height: 10),
+          SummaryToday(listDataUser: userData),
+          const SizedBox(height: 5),
           Expanded(
             child: CustomMaterialIndicator(
               onRefresh: () async {
+                final online = await absenC.isOnline();
+                if (online) {
+                  homeC.reloadPendingAdj(
+                    idUser: userData.id!,
+                    level: userData.level!,
+                  );
+                  homeC.reloadSummary(userData.id!);
+                  await absenC.getLastUserData(dataUser: userData);
+                }
                 var paramLimit = {
                   "mode": "limit",
-                  "id_user": userData!.id,
+                  "id_user": userData.id,
                   "tanggal1": absenC.initDate1,
                   "tanggal2": absenC.initDate2,
                 };
 
                 var paramSingle = {
                   "mode": "single",
-                  "id_user": userData!.id,
+                  "id_user": userData.id,
                   "tanggal_masuk": DateFormat(
                     'yyyy-MM-dd',
                   ).format(absenC.tglStream.value),
                 };
 
-                absenC.isLoading.value = true;
-                homeC.reloadSummary(userData!.id!);
-                await absenC.getLastUserData(dataUser: userData!);
-                showToast('Page Refreshed');
+                // absenC.isLoading.value = true;
+
+                // showToast('Page Refreshed');
                 await absenC.getAbsenToday(paramSingle);
                 await absenC.getLimitAbsen(paramLimit);
 
@@ -83,9 +92,9 @@ class SummaryAbsen extends GetView {
               child: ListView(
                 padding: EdgeInsets.zero,
                 children: [
-                  SummaryPerMonth(userData: userData!),
-                  const SizedBox(height: 5),
-                  MainMenu(userData: userData!),
+                  SummaryPerMonth(userData: userData),
+                  // const SizedBox(height: 5),
+                  MainMenu(userData: userData),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -101,7 +110,7 @@ class SummaryAbsen extends GetView {
                   // const SizedBox(height: 5),
                   Obx(
                     () =>
-                        absenC.isLoading.value
+                        absenC.isLoading.value && absenC.dataLimitAbsen.isEmpty
                             ? ListView.builder(
                               padding: const EdgeInsets.only(bottom: 8),
                               shrinkWrap: true,
@@ -115,7 +124,9 @@ class SummaryAbsen extends GetView {
                             ? SizedBox(
                               height: Get.size.height / 3,
                               child: const Center(
-                                child: Text('Belum ada riwayat absen'),
+                                child: Text(
+                                  'There is no attendance history yet',
+                                ),
                               ),
                             )
                             : ListView.separated(
@@ -197,14 +208,14 @@ class SummaryAbsen extends GetView {
                                   onTap: () {
                                     var detailData = {
                                       "foto_profil":
-                                          userData!.foto != ""
-                                              ? userData!.foto
-                                              : userData!.nama,
+                                          userData.foto != ""
+                                              ? userData.foto
+                                              : userData.nama,
                                       "nama": d.nama!,
                                       "id_shift": d.idShift!,
                                       "nama_shift": d.namaShift!,
                                       "id_user": d.idUser!,
-                                      "kode_cabang": d.kodeCabang,
+                                      "kode_cabang": d.kodeCabang!,
                                       "tanggal_masuk": d.tanggalMasuk!,
                                       "tanggal_pulang":
                                           d.tanggalPulang != null

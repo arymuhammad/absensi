@@ -26,6 +26,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:xml/xml.dart' as xml;
 import '../../../data/helper/loading_progress.dart';
 import '../../../data/helper/time_service.dart';
@@ -38,13 +39,14 @@ import '../../../data/model/cek_absen_model.dart';
 import 'package:pdf/pdf.dart';
 import 'package:printing/printing.dart';
 import 'package:pdf/widgets.dart' as pw;
+import 'package:connectivity_plus/connectivity_plus.dart';
 // import 'package:device_info_null_safety/device_info_null_safety.dart';
 
 import '../../login/controllers/login_controller.dart';
 import '../views/widget/custom_qr_page.dart';
-// import 'package:flutter_face_api/flutter_face_api.dart' as regula;
 
-class AbsenController extends GetxController with GetTickerProviderStateMixin {
+class AbsenController extends GetxController
+    with GetTickerProviderStateMixin, WidgetsBindingObserver {
   var isLoading = true.obs;
   var ascending = true.obs;
   var lokasi = "".obs;
@@ -146,7 +148,7 @@ class AbsenController extends GetxController with GetTickerProviderStateMixin {
   var barcodeScanRes = ''.obs;
   var scannedLatLng = Rx<LatLng?>(null);
   final isEnabled = true.obs;
-  int maxRetries = 3;
+  // int maxRetries = 3;
 
   final RxBool mustCheckoutYesterday = false.obs;
   final RxBool isCheckingAbsen = false.obs;
@@ -170,142 +172,416 @@ class AbsenController extends GetxController with GetTickerProviderStateMixin {
   final lineProgress = 0.0.obs;
 
   var isMapReady = false.obs;
+  var isSyncing = false.obs;
+  var syncTotal = 0.obs;
+  var syncCurrent = 0.obs;
+  Timer? timer;
+  var isOffline = false.obs;
+  StreamSubscription? connectivitySub;
+  final isTimeUntrusted = false.obs;
+  bool isSyncingTime = false;
+  final isAppLocked = false.obs;
+  var visit = "".obs;
+  bool _hasTriggeredInitialSync = false;
 
   @override
-  void onInit() async {
+  void onInit() {
     super.onInit();
-    date1 = TextEditingController();
-    date2 = TextEditingController();
-    store = TextEditingController();
-    userCab = TextEditingController();
-    rndLoc = TextEditingController();
-    selectedDate.value = null;
-    timeServer = await getServerTimeLocal();
-    realDateServer = DateFormat('yyyy-MM-dd').format(timeServer!);
-    realTimeServer = DateFormat('HH:mm').format(timeServer!);
+    _init();
+    // WidgetsBinding.instance.addObserver(this);
+    // try {
+    //   getShift();
+    //   SharedPreferences pref = await SharedPreferences.getInstance();
+    //   var dataUserLogin = Data.fromJson(
+    //     jsonDecode(pref.getString('userDataLogin')!),
+    //   );
 
-    // Timer.periodic(const Duration(seconds: 1), (Timer t) async => timeNowOpt);
+    //   idUser.value = dataUserLogin.id!;
+    //   visit.value = dataUserLogin.visit!;
 
-    SharedPreferences pref = await SharedPreferences.getInstance();
-    var dataUserLogin = Data.fromJson(
-      jsonDecode(pref.getString('userDataLogin')!),
-    );
-    // var userID = Data.fromJson(jsonDecode(pref.getString('userDataLogin')!)).id!;
+    //   /// =========================
+    //   /// 🔥 INIT ONLINE STATE
+    //   /// =========================
+    //   isOffline.value = !(await isReallyOnline());
+    //   await initTime();
 
-    storeLatLng.value = LatLng(
-      double.parse(dataUserLogin.lat!),
-      double.parse(dataUserLogin.long!),
-    );
-    refreshAbsen(dataUserLogin);
-    idUser.value = dataUserLogin.id!;
-    var paramLimit = {
-      "mode": "limit",
-      "id_user": dataUserLogin.id!,
-      "tanggal1": initDate1,
-      "tanggal2": initDate2,
-    };
+    //   // /// =========================
+    //   // /// 🔥 LISTENER NETWORK
+    //   // /// =========================
+    //   // ever(isOffline, (val) async {
+    //   //   await initTime(); // 🔥 refresh time tiap perubahan network
+    //   // });
 
-    var paramLimitVisit = {
-      "mode": "limit",
-      "id_user": dataUserLogin.id!,
-      "tanggal1": initDate1,
-      "tanggal2": initDate2,
-    };
+    //   /// =========================
+    //   /// 🔥 SYNC DATA
+    //   /// =========================
+    //   final isVisit = dataUserLogin.visit == "1";
+    //   // 🔥 1. COBA SYNC SEKALI DULU
+    //   final isDone = isVisit ? await syncVisit() : await syncAbsen();
 
-    var paramSingle = {
-      "mode": "single",
-      "id_user": dataUserLogin.id,
-      "tanggal_masuk": realDateServer,
-    };
+    //   // 🔥 2. KALAU MASIH ADA YANG BELUM → BARU AUTO SYNC
+    //   if (!isDone) {
+    //     startAutoSync(isVisit: isVisit);
+    //   }
 
-    var paramSingleVisit = {
-      "mode": "single",
-      "id_user": dataUserLogin.id,
-      "tgl_visit": realDateServer,
-    };
+    //   /// =========================
+    //   /// 🔥 CONNECTIVITY LISTENER
+    //   /// =========================
+    //   connectivitySub = Connectivity().onConnectivityChanged.listen((_) async {
+    //     final nowOnline = await isReallyOnline();
+    //     final nowOffline = !nowOnline;
+    //     // 🔥 DETEKSI RECONNECT (offline → online)
+    //     if (isOffline.value == true && nowOffline == false) {
+    //       showToast("Reconnection, syncing data...");
+    //       if (isVisit) {
+    //         await syncVisit();
+    //       } else {
+    //         await syncAbsen();
+    //       }
+    //     }
+    //     // 🔄 UPDATE STATE
+    //     if (nowOffline != isOffline.value) {
+    //       isOffline.value = nowOffline;
+    //       if (!nowOffline) {
+    //         // 🔥 cuma refresh time saat balik online
+    //         await initTime();
+    //       }
+    //     }
+    //   });
 
-    searchAbsen.value = dataAllAbsen;
-    searchVisit.value = dataAllVisit;
+    //   /// =========================
+    //   /// 🔥 INIT CONTROLLER UI
+    //   /// =========================
+    //   date1 = TextEditingController();
+    //   date2 = TextEditingController();
+    //   store = TextEditingController();
+    //   userCab = TextEditingController();
+    //   rndLoc = TextEditingController();
+    //   selectedDate.value = null;
 
-    if (dataUserLogin.visit == "0") {
-      getAbsenToday(paramSingle);
-      getLimitAbsen(paramLimit);
-    } else {
-      getVisitToday(paramSingleVisit);
-      getLimitVisit(paramLimitVisit);
-    }
-    getCabang();
+    //   storeLatLng.value = LatLng(
+    //     double.parse(dataUserLogin.lat!),
+    //     double.parse(dataUserLogin.long!),
+    //   );
+    //   refreshAbsen(dataUserLogin);
 
-    PackageInfo packageInfo = await PackageInfo.fromPlatform();
-    currVer = packageInfo.version;
+    //   searchAbsen.value = dataAllAbsen;
+    //   searchVisit.value = dataAllVisit;
 
-    // print('VERSI SEKARANG $currVer');
+    //   /// =========================
+    //   /// 🔥 FETCH DATA
+    //   /// =========================
+    //   var paramLimit = {
+    //     "mode": "limit",
+    //     "id_user": dataUserLogin.id!,
+    //     "tanggal1": initDate1,
+    //     "tanggal2": initDate2,
+    //   };
 
-    final readDoc = await http.get(
-      Uri.parse('http://103.156.15.61/update_apk/updateLog.xml'),
-    );
+    //   var paramSingle = {
+    //     "mode": "single",
+    //     "id_user": dataUserLogin.id,
+    //     "tanggal_masuk": realDateServer,
+    //   };
 
-    if (readDoc.statusCode == 200) {
-      //parsing readDoc
-      final document = xml.XmlDocument.parse(readDoc.body);
-      final cLog = document.findElements('items').first;
-      latestVer = cLog.findElements('versi').first.innerText;
-      if (compareVersion(latestVer, currVer) > 0) {
-        if (Platform.isAndroid) {
-          // final DeviceInfoNullSafety deviceInfoNullSafety =
-          //     DeviceInfoNullSafety();
-          // Map<String, dynamic> abiInfo = await deviceInfoNullSafety.abiInfo;
-          // var abi = abiInfo.entries.toList();
-          // supportedAbi = abi[1].value;
-          checkForUpdates("onInit");
+    //   var paramSingleVisit = {
+    //     "mode": "single",
+    //     "id_user": dataUserLogin.id,
+    //     "tgl_visit": realDateServer,
+    //   };
+
+    //   if (dataUserLogin.visit == "0") {
+    //     await getAbsenToday(paramSingle);
+    //     await getLimitAbsen(paramLimit);
+    //   } else {
+    //     await getVisitToday(paramSingleVisit);
+    //     await getLimitVisit(paramLimit);
+    //   }
+
+    //   getCabang();
+    //   animController = AnimationController(
+    //     vsync: this,
+    //     duration: Duration(seconds: durationSeconds.value),
+    //   );
+    //   animController.addListener(() {
+    //     progress.value = 1 - animController.value;
+    //     final total = durationSeconds.value;
+
+    //     secondsLeft.value = (total - (total * animController.value)).ceil();
+
+    //     double p = progress.value;
+
+    //     if (p > 0.5) {
+    //       progressColor.value = Colors.green;
+    //     } else if (p > 0.2) {
+    //       progressColor.value = Colors.orange;
+    //     } else {
+    //       progressColor.value = Colors.red;
+    //     }
+    //   });
+
+    //   everAll([lat, long, scannedLatLng, latFromGps, longFromGps], (_) {
+    //     if (!isMapReady.value) return;
+
+    //     WidgetsBinding.instance.addPostFrameCallback((_) {
+    //       _triggerSmartZoom(dataUserLogin);
+    //     });
+    //   });
+
+    //   ever(isOffline, (offline) {
+    //     if (!offline) {
+    //       storeLatLng.value = LatLng(
+    //         double.parse(dataUserLogin.lat!),
+    //         double.parse(dataUserLogin.long!),
+    //       );
+    //     }
+    //   });
+
+    //   PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    //   currVer = packageInfo.version;
+
+    //   // print('VERSI SEKARANG $currVer');
+    //   final online = await absC.isOnline();
+    //   if (online) {
+    //     final readDoc = await http.get(
+    //       Uri.parse('http://103.156.15.61/update_apk/updateLog.xml'),
+    //     );
+
+    //     if (readDoc.statusCode == 200) {
+    //       //parsing readDoc
+    //       final document = xml.XmlDocument.parse(readDoc.body);
+    //       final cLog = document.findElements('items').first;
+    //       latestVer = cLog.findElements('versi').first.innerText;
+    //       if (compareVersion(latestVer, currVer) > 0) {
+    //         if (Platform.isAndroid) {
+    //           // final DeviceInfoNullSafety deviceInfoNullSafety =
+    //           //     DeviceInfoNullSafety();
+    //           // Map<String, dynamic> abiInfo = await deviceInfoNullSafety.abiInfo;
+    //           // var abi = abiInfo.entries.toList();
+    //           // supportedAbi = abi[1].value;
+    //           checkForUpdates("onInit");
+    //         } else {
+    //           launchUrl(
+    //             Uri.parse(
+    //               'https://apps.apple.com/us/app/urbanco-spot/id6476486235',
+    //             ),
+    //           );
+    //         }
+    //       }
+    //     }
+    //   }
+    // } catch (e) {
+    //   print("ERROR onInit: $e");
+    // }
+  }
+
+  Future<void> _init() async {
+    WidgetsBinding.instance.addObserver(this);
+    try {
+      await getShift();
+      SharedPreferences pref = await SharedPreferences.getInstance();
+      var dataUserLogin = Data.fromJson(
+        jsonDecode(pref.getString('userDataLogin')!),
+      );
+
+      idUser.value = dataUserLogin.id!;
+      visit.value = dataUserLogin.visit!;
+
+      /// =========================
+      /// 🔥 INIT ONLINE STATE
+      /// =========================
+      isOffline.value = !(await isReallyOnline());
+      await initTime();
+
+      // /// =========================
+      // /// 🔥 LISTENER NETWORK
+      // /// =========================
+      // ever(isOffline, (val) async {
+      //   await initTime(); // 🔥 refresh time tiap perubahan network
+      // });
+
+      /// =========================
+      /// 🔥 SYNC DATA
+      /// =========================
+      final isVisit = dataUserLogin.visit == "1";
+      // 🔥 1. COBA SYNC SEKALI DULU
+      final isDone = isVisit ? await syncVisit() : await syncAbsen();
+
+      // 🔥 2. KALAU MASIH ADA YANG BELUM → BARU AUTO SYNC
+      if (!isDone) {
+        startAutoSync(isVisit: isVisit);
+      }
+
+      /// =========================
+      /// 🔥 CONNECTIVITY LISTENER
+      /// =========================
+      connectivitySub = Connectivity().onConnectivityChanged.listen((_) async {
+        final nowOnline = await isReallyOnline();
+        final nowOffline = !nowOnline;
+        // 🔥 DETEKSI RECONNECT (offline → online)
+        if (isOffline.value == true && nowOffline == false) {
+          if (!isSyncing.value) {
+            showToast("Reconnection, syncing data...");
+            await triggerSync(isVisit: isVisit);
+          }
+          // if (isVisit) {
+          //   await syncVisit();
+          // } else {
+          //   await syncAbsen();
+          // }
         }
-        // disable redirect to appstore for ios when update is available
-        // else {
-        //   launchUrl(
-        //     Uri.parse(
-        //       'https://apps.apple.com/us/app/urbanco-spot/id6476486235',
-        //     ),
-        //   );
-        // }
-      }
-    }
-
-    _startDateStream(
-      paramSingle,
-      paramLimit,
-      paramSingleVisit,
-      paramLimitVisit,
-      dataUserLogin,
-    );
-
-    animController = AnimationController(
-      vsync: this,
-      duration: Duration(seconds: durationSeconds.value),
-    );
-    animController.addListener(() {
-      progress.value = 1 - animController.value;
-      final total = durationSeconds.value;
-
-      secondsLeft.value = (total - (total * animController.value)).ceil();
-
-      double p = progress.value;
-
-      if (p > 0.5) {
-        progressColor.value = Colors.green;
-      } else if (p > 0.2) {
-        progressColor.value = Colors.orange;
-      } else {
-        progressColor.value = Colors.red;
-      }
-    });
-
-    everAll([lat, long, scannedLatLng, latFromGps, longFromGps], (_) {
-      if (!isMapReady.value) return;
-
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _triggerSmartZoom(dataUserLogin);
+        // 🔄 UPDATE STATE
+        if (nowOffline != isOffline.value) {
+          isOffline.value = nowOffline;
+          if (!nowOffline) {
+            // 🔥 cuma refresh time saat balik online
+            await initTime();
+          }
+        }
       });
-    });
+
+      /// =========================
+      /// 🔥 INIT CONTROLLER UI
+      /// =========================
+      date1 = TextEditingController();
+      date2 = TextEditingController();
+      store = TextEditingController();
+      userCab = TextEditingController();
+      rndLoc = TextEditingController();
+      selectedDate.value = null;
+
+      storeLatLng.value = LatLng(
+        double.parse(dataUserLogin.lat!),
+        double.parse(dataUserLogin.long!),
+      );
+      refreshAbsen(dataUserLogin);
+
+      searchAbsen.value = dataAllAbsen;
+      searchVisit.value = dataAllVisit;
+
+      /// =========================
+      /// 🔥 FETCH DATA
+      /// =========================
+      var paramLimit = {
+        "mode": "limit",
+        "id_user": dataUserLogin.id!,
+        "tanggal1": initDate1,
+        "tanggal2": initDate2,
+      };
+
+      var paramSingle = {
+        "mode": "single",
+        "id_user": dataUserLogin.id,
+        "tanggal_masuk": realDateServer,
+      };
+
+      var paramSingleVisit = {
+        "mode": "single",
+        "id_user": dataUserLogin.id,
+        "tgl_visit": realDateServer,
+      };
+
+      if (dataUserLogin.visit == "0") {
+        await getAbsenToday(paramSingle);
+        await getLimitAbsen(paramLimit);
+      } else {
+        await getVisitToday(paramSingleVisit);
+        await getLimitVisit(paramLimit);
+      }
+
+      getCabang();
+      animController = AnimationController(
+        vsync: this,
+        duration: Duration(seconds: durationSeconds.value),
+      );
+      animController.addListener(() {
+        progress.value = 1 - animController.value;
+        final total = durationSeconds.value;
+
+        secondsLeft.value = (total - (total * animController.value)).ceil();
+
+        double p = progress.value;
+
+        if (p > 0.5) {
+          progressColor.value = Colors.green;
+        } else if (p > 0.2) {
+          progressColor.value = Colors.orange;
+        } else {
+          progressColor.value = Colors.red;
+        }
+      });
+
+      everAll([lat, long, scannedLatLng, latFromGps, longFromGps], (_) {
+        if (!isMapReady.value) return;
+
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _triggerSmartZoom(dataUserLogin);
+        });
+      });
+
+      ever(isOffline, (offline) {
+        if (!offline) {
+          storeLatLng.value = LatLng(
+            double.parse(dataUserLogin.lat!),
+            double.parse(dataUserLogin.long!),
+          );
+        }
+      });
+
+      PackageInfo packageInfo = await PackageInfo.fromPlatform();
+      currVer = packageInfo.version;
+
+      // print('VERSI SEKARANG $currVer');
+      final online = await absC.isOnline();
+      if (online) {
+        final readDoc = await http.get(
+          Uri.parse('http://103.156.15.61/update_apk/updateLog.xml'),
+        );
+
+        if (readDoc.statusCode == 200) {
+          //parsing readDoc
+          final document = xml.XmlDocument.parse(readDoc.body);
+          final cLog = document.findElements('items').first;
+          latestVer = cLog.findElements('versi').first.innerText;
+          if (compareVersion(latestVer, currVer) > 0) {
+            if (Platform.isAndroid) {
+              // final DeviceInfoNullSafety deviceInfoNullSafety =
+              //     DeviceInfoNullSafety();
+              // Map<String, dynamic> abiInfo = await deviceInfoNullSafety.abiInfo;
+              // var abi = abiInfo.entries.toList();
+              // supportedAbi = abi[1].value;
+              checkForUpdates("onInit");
+            } else {
+              launchUrl(
+                Uri.parse(
+                  'https://apps.apple.com/us/app/urbanco-spot/id6476486235',
+                ),
+              );
+            }
+          }
+        }
+      }
+    } catch (e) {
+      print("ERROR onInit: $e");
+    }
+  }
+
+  @override
+  void onReady() {
+    if (!_hasTriggeredInitialSync) {
+      _hasTriggeredInitialSync = true;
+
+      Future.microtask(() {
+        triggerSync(isVisit: visit.value == "1");
+      });
+    }
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      initTime(); // 🔥 app balik dari background
+    }
   }
 
   @override
@@ -318,7 +594,63 @@ class AbsenController extends GetxController with GetTickerProviderStateMixin {
     filterVisit.dispose();
     _dateStream.close();
     animController.dispose();
+    stopAutoSync();
+    WidgetsBinding.instance.removeObserver(this);
+    connectivitySub?.cancel();
+    filterAbsen.dispose();
     super.onClose();
+  }
+
+  Future<void> initTime() async {
+    if (isSyncingTime) return;
+    isSyncingTime = true;
+
+    try {
+      final t = await getSecureTime();
+
+      // ✅ VALID TIME (ONLINE / CACHE VALID)
+      isTimeUntrusted.value = false;
+      isAppLocked.value = false;
+
+      timeServer = t;
+      realDateServer = DateFormat('yyyy-MM-dd').format(t);
+      realTimeServer = DateFormat('HH:mm').format(t);
+    } catch (e) {
+      // 🔥 CEK: apakah ini karena offline?
+      final offline = !(await isReallyOnline());
+
+      if (offline) {
+        final prefs = await SharedPreferences.getInstance();
+        final isLocked = prefs.getBool("is_time_locked") ?? false;
+
+        if (isLocked) {
+          isTimeUntrusted.value = true;
+          isAppLocked.value = true;
+        } else {
+          final offline = !(await isReallyOnline());
+
+          if (offline) {
+            isTimeUntrusted.value = false;
+            isAppLocked.value = false;
+          } else {
+            isTimeUntrusted.value = true;
+            isAppLocked.value = true;
+          }
+        }
+      } else {
+        // ❌ ONLINE TAPI ERROR = MANIPULASI / INVALID
+        isTimeUntrusted.value = true;
+        isAppLocked.value = true;
+      }
+
+      // fallback
+      final now = DateTime.now();
+      timeServer = now;
+      realDateServer = DateFormat('yyyy-MM-dd').format(now);
+      realTimeServer = DateFormat('HH:mm').format(now);
+    } finally {
+      isSyncingTime = false;
+    }
   }
 
   void startLoading({
@@ -345,7 +677,7 @@ class AbsenController extends GetxController with GetTickerProviderStateMixin {
 
   bool get isBeforeCheckoutLimitNow {
     final now = timeServer;
-    return now!.isBefore(DateTime(now.year, now.month, now.day, 09, 1));
+    return now!.isBefore(DateTime(now.year, now.month, now.day, 9, 1));
   }
 
   Future<void> refreshAbsen(Data data) async {
@@ -432,7 +764,6 @@ class AbsenController extends GetxController with GetTickerProviderStateMixin {
     paramSingle,
     paramLimit,
     paramSingleVisit,
-    paramLimitVisit,
     Data dataUserLogin,
   ) {
     // Buat Stream yang mengeluarkan tanggal setiap detik
@@ -558,7 +889,7 @@ class AbsenController extends GetxController with GetTickerProviderStateMixin {
                 await ServiceApi().submitVisit(data, true);
               }
               getVisitToday(paramSingleVisit);
-              getLimitVisit(paramLimitVisit);
+              getLimitVisit(paramLimit);
               _sub.cancel();
             } else {
               // timerStat.value = false;
@@ -595,7 +926,7 @@ class AbsenController extends GetxController with GetTickerProviderStateMixin {
                   await ServiceApi().submitVisit(data, true);
                 }
                 getVisitToday(paramSingleVisit);
-                getLimitVisit(paramLimitVisit);
+                getLimitVisit(paramLimit);
                 _sub.cancel();
               } else {
                 _sub.cancel();
@@ -642,8 +973,9 @@ class AbsenController extends GetxController with GetTickerProviderStateMixin {
 
   getLoc(Data? dataUser) async {
     startLoading(seconds: 20);
-    Position position = await determinePosition();
+    Position position;
     try {
+      position = await determinePosition();
       final deviceNames = DeviceMarketingNames();
       // DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
       // if (Platform.isAndroid) {
@@ -655,39 +987,14 @@ class AbsenController extends GetxController with GetTickerProviderStateMixin {
       //   devInfo.value = '${iosInfo.name} ${iosInfo.model}';
       // }
       // ignore: empty_catches
-    } on PlatformException {}
-    // print(position.isMocked);
-    // if (position.isMocked == true) {
-    //   isLoading.value = false;
-    //   failedDialog(
-    //     Get.context,
-    //     'Warning',
-    //     'You have been detected using\nfake location\nPlease turn off fake location',
-    //   );
-    // } else {
-    // try {
-    //   List<Placemark> placemarks = await placemarkFromCoordinates(
-    //     position.latitude,
-    //     position.longitude,
-    //   ).timeout(const Duration(seconds: 15));
+    } catch (e) {
+      stopLoading();
+      return;
+    }
 
-    //   lokasi.value =
-    //       '${placemarks[0].street!}, ${placemarks[0].subLocality!}\n${placemarks[0].subAdministrativeArea!}, ${placemarks[0].administrativeArea!}';
-    //   // print(lokasi.value);
-    // } on TimeoutException {
-    //   isLoading.value = false;
-    //   showToast("Failed to get location, please try again.");
-    //   return Future.error('Timeout while getting location');
-    // } catch (e) {
-    //   isLoading.value = false;
-    //   isEnabled.value = false;
-    //   showToast("There is an error: $e");
-    //   return Future.error(e.toString());
-    // }
-    // timeNetwork(await FlutterNativeTimezone.getLocalTimezone());
     latFromGps.value = position.latitude;
     longFromGps.value = position.longitude;
-
+    // print(latFromGps.value);
     //cek user visit atau bukan
     if (optVisitSelected.isNotEmpty &&
         optVisitSelected.value == "Research and Development") {
@@ -706,16 +1013,41 @@ class AbsenController extends GetxController with GetTickerProviderStateMixin {
         isLoading.value = false;
         isEnabled.value = false;
         locNote.value =
-            "Your position is far from the permitted area (${(distanceStore.value / 1000).toStringAsFixed(2)} Km)";
+            "your distance from the store (${(distanceStore.value / 1000).toStringAsFixed(2)} Km)";
       } else {
         isLoading.value = false;
         isEnabled.value = true;
-        locNote.value = "You are in the radius area";
+        locNote.value = "Inside area";
       }
     }
 
     barcodeScanRes.value = "";
     isLoading.value = false;
+
+    stopLoading();
+  }
+
+  Future<bool> isOnline() async {
+    final online = await isReallyOnline();
+    isOffline.value = !online;
+    return online;
+  }
+
+  Future<bool> isReallyOnline() async {
+    final connectivityResult = await Connectivity().checkConnectivity();
+
+    final hasNetwork = connectivityResult.any(
+      (e) => e != ConnectivityResult.none,
+    );
+
+    if (!hasNetwork) return false;
+
+    try {
+      final result = await InternetAddress.lookup('google.com');
+      return result.isNotEmpty && result[0].rawAddress.isNotEmpty;
+    } catch (_) {
+      return false;
+    }
   }
 
   Future<Position> determinePosition() async {
@@ -726,36 +1058,22 @@ class AbsenController extends GetxController with GetTickerProviderStateMixin {
       // Test if location services are enabled.
       serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
-        // Location services are not enabled don't continue
-        // accessing the position and request users of the
-        // App to enable the location services.
         showToast("Lokasi belum diaktifkan");
-        // Get.back();
         stopLoading();
-        // lokasi.value = "Lokasi Anda tidak diketahui";
-        return Future.error('Location services are disabled.');
+        return Future.error('Location disabled.');
       }
 
-      // loadingDialog("Memindai posisi Anda...", "");
       permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
-        // loadingDialog("Memindai posisi Anda...", "");
         permission = await Geolocator.requestPermission();
         if (permission == LocationPermission.denied) {
-          // Permissions are denied, next time you could try
-          // requesting permissions again (this is also where
-          // Android's shouldShowRequestPermissionRationale
-          // returned true. According to Android guidelines
-          // your App should show an explanatory UI now.
           isLoading.value = false;
           isEnabled.value = false;
-          showToast("Izin Lokasi ditolak");
+          showToast("Permission denied");
           // Get.back();
           stopLoading();
-          return Future.error('Location permissions are denied');
+          return Future.error('Permission denied');
         }
-        // await Future.delayed(const Duration(milliseconds: 400));
-        // Get.back();
       }
       // await Future.delayed(const Duration(milliseconds: 400));
 
@@ -763,14 +1081,10 @@ class AbsenController extends GetxController with GetTickerProviderStateMixin {
         // Permissions are denied forever, handle appropriately.
         isLoading.value = false;
         isEnabled.value = false;
-        showToast(
-          "Izin Lokasi ditolak.\nHarap berikan akses pada perizinan lokasi",
-        );
+        showToast("Permission denied forever");
         // Get.back();
         stopLoading();
-        return Future.error(
-          'Location permissions are permanently denied, we cannot request permissions.',
-        );
+        return Future.error('Permission denied forever');
       }
 
       // When we reach here, permissions are granted and we can
@@ -782,26 +1096,52 @@ class AbsenController extends GetxController with GetTickerProviderStateMixin {
       //       "Posisi sementara: (${lastKnown.latitude}, ${lastKnown.longitude})";
       // }
 
-      Position loc = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
-        timeLimit: const Duration(seconds: 20),
-        // forceAndroidLocationManager: true
-        //
-      );
-      // print(loc.latitude);
-      // print(loc.longitude);
-      if (loc.isMocked) {
-        isLoading.value = false;
-        isEnabled.value = false;
-        failedDialog(
-          Get.context,
-          'Warning',
-          'You have been detected using\nfake location',
+      /// 🔥 1. coba ambil last known dulu (CEPAT)
+      Position? lastKnown = await Geolocator.getLastKnownPosition();
+
+      /// 🔥 2. coba ambil GPS real (TAPI ADA LIMIT)
+      try {
+        final fresh = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high,
+          timeLimit: const Duration(seconds: 20),
         );
-        // Get.back();
+
+        if (fresh.isMocked) {
+          isLoading.value = false;
+          isEnabled.value = false;
+          failedDialog(Get.context, 'Warning', 'Fake GPS detected');
+          throw Exception("Fake GPS detected");
+        }
+        stopLoading();
+        return fresh;
+      } catch (_) {
+        /// 🔥 fallback ke last known
+        if (lastKnown != null) {
+          return lastKnown;
+        }
+        rethrow;
       }
-      stopLoading();
-      return loc;
+
+      // Position loc = await Geolocator.getCurrentPosition(
+      //   desiredAccuracy: LocationAccuracy.high,
+      //   timeLimit: const Duration(seconds: 20),
+      //   // forceAndroidLocationManager: true
+      //   //
+      // );
+      // // print(loc.latitude);
+      // // print(loc.longitude);
+      // if (loc.isMocked) {
+      //   isLoading.value = false;
+      //   isEnabled.value = false;
+      //   failedDialog(
+      //     Get.context,
+      //     'Warning',
+      //     'You have been detected using\nfake location',
+      //   );
+      //   // Get.back();
+      // }
+      // stopLoading();
+      // return loc;
     } on TimeoutException {
       isLoading.value = false;
       isEnabled.value = false;
@@ -811,12 +1151,9 @@ class AbsenController extends GetxController with GetTickerProviderStateMixin {
       stopLoading();
       return Future.error('Timeout while getting location');
     } catch (e) {
-      Get.back();
-      isLoading.value = false;
-      isEnabled.value = false;
-      showToast("There is an error: $e");
+      showToast("Failed to get location");
       stopLoading();
-      return Future.error(e.toString());
+      return Future.error(e);
     }
   }
 
@@ -878,7 +1215,6 @@ class AbsenController extends GetxController with GetTickerProviderStateMixin {
           );
         }
       } else {
-       
         // List<Placemark> placemarks = await placemarkFromCoordinates(
         //   double.parse(barcodeScanRes.value.split(' ')[0]),
         //   double.parse(barcodeScanRes.value.split(' ')[1]),
@@ -959,7 +1295,6 @@ class AbsenController extends GetxController with GetTickerProviderStateMixin {
             'Location validation successful. You are within the QR code area.',
           );
 
-         
           updateCircleFromQr(barcodeScanRes.value);
 
           refreshZoom(dataUser);
@@ -975,7 +1310,7 @@ class AbsenController extends GetxController with GetTickerProviderStateMixin {
               "You are outside the QR area (${(distanceMeter / 1000).toStringAsFixed(2)} Km)";
           distanceStore.value = distanceMeter;
           showToast('Validation failed!');
-          
+
           updateCircleFromQr(barcodeScanRes.value);
 
           refreshZoom(dataUser!);
@@ -1255,44 +1590,323 @@ class AbsenController extends GetxController with GetTickerProviderStateMixin {
 
   Future<List<ShiftKerja>> getShift() async {
     var tempShift = await SQLHelper.instance.getShift();
+
     if (tempShift.isNotEmpty) {
-      return shiftKerja.value = tempShift;
+      shiftKerja.value =
+          tempShift.where((e) => e.id != "0" && e.id != null).toList();
+      return shiftKerja;
     } else {
       final response = await ServiceApi().getShift();
-      shiftKerja.value = response;
-      shiftKerja
-          .map(
-            (e) async => await SQLHelper.instance.insertShift(
-              ShiftKerja(
-                id: e.id,
-                namaShift: e.namaShift,
-                jamMasuk: e.jamMasuk,
-                jamPulang: e.jamPulang,
-              ),
-            ),
-          )
-          .toList();
+
+      shiftKerja.value =
+          response.where((e) => e.id != "0" && e.id != null).toList();
+
+      for (final e in shiftKerja) {
+        await SQLHelper.instance.insertShift(
+          ShiftKerja(
+            id: e.id,
+            namaShift: e.namaShift,
+            jamMasuk: e.jamMasuk,
+            jamPulang: e.jamPulang,
+          ),
+        );
+      }
 
       return shiftKerja;
     }
   }
 
+  Future<bool> syncAbsen() async {
+    if (isSyncing.value) return false;
+    isSyncing.value = true;
+
+    if (!await isOnline()) {
+      isSyncing.value = false;
+      return false;
+    }
+
+    showToast('collecting data');
+    final pendingData = await SQLHelper.instance.getPendingAbsen();
+
+    if (pendingData.isEmpty) {
+      stopAutoSync();
+      isSyncing.value = false;
+      showToast('no data found');
+      return true;
+    }
+    syncTotal.value = pendingData.length;
+    syncCurrent.value = 0;
+    showToast('sync started');
+
+    for (var item in pendingData) {
+      try {
+        Map<String, dynamic> data;
+        // =========================
+        // 🔥 CEK JENIS (MASUK / PULANG)
+        // =========================
+        if (item.jamAbsenPulang == null || item.jamAbsenPulang == '') {
+          // =========================
+          // ✅ INSERT (CHECK-IN)
+          // =========================
+          data = {
+            "status": "add",
+            "id": item.idUser,
+            "tanggal_masuk": item.tanggalMasuk,
+            "kode_cabang": item.kodeCabang,
+            "nama": item.nama,
+            "id_shift": item.idShift,
+            "jam_masuk": item.jamMasuk,
+            "jam_pulang": item.jamPulang,
+            "jam_absen_masuk": item.jamAbsenMasuk,
+            "foto_masuk": File(item.fotoMasuk!),
+            "lat_masuk": item.latMasuk,
+            "long_masuk": item.longMasuk,
+            "device_info": item.devInfo,
+          };
+        } else {
+          // =========================
+          // 🔄 UPDATE (CHECK-OUT)
+          // =========================
+          data = {
+            "status": "update",
+            "id": item.idUser,
+            "tanggal_masuk": item.tanggalMasuk,
+            "tanggal_pulang": item.tanggalPulang, // atau field khusus kalau ada
+            "nama": item.nama,
+            "jam_absen_pulang": item.jamAbsenPulang,
+            "foto_pulang": File(item.fotoPulang!),
+            "lat_pulang": item.latPulang,
+            "long_pulang": item.longPulang,
+            "device_info2": item.devInfo2,
+          };
+        }
+        await ServiceApi().submitAbsen(data, true);
+
+        await SQLHelper.instance.updateStatusAbsen(
+          item.idUser!,
+          item.tanggalMasuk!,
+          "SUCCESS",
+        );
+        // stopAutoSync();
+      } catch (e) {
+        await SQLHelper.instance.updateStatusAbsen(
+          item.idUser!,
+          item.tanggalMasuk!,
+          "FAILED",
+        );
+      }
+      // 🔥 update progress tiap item
+      syncCurrent.value++;
+    }
+    // 🔥 cek ulang setelah loop
+    final remaining = await SQLHelper.instance.getPendingAbsen();
+    if (remaining.isEmpty) {
+      showToast('sync process is complete');
+      stopAutoSync();
+      var paramLimit = {
+        "mode": "limit",
+        "id_user": idUser.value,
+        "tanggal1": initDate1,
+        "tanggal2": initDate2,
+      };
+
+      var paramSingle = {
+        "mode": "single",
+        "id_user": idUser.value,
+        "tanggal_masuk": realDateServer,
+      };
+      getAbsenToday(paramSingle);
+      getLimitAbsen(paramLimit);
+      isSyncing.value = false;
+      syncTotal.value = 0;
+      syncCurrent.value = 0;
+      return true;
+    } else {
+      showToast('some data failed, retrying...');
+      return false;
+    }
+  }
+
+  Future<bool> syncVisit() async {
+    if (isSyncing.value) return false;
+    isSyncing.value = true;
+
+    if (!await isOnline()) {
+      isSyncing.value = false;
+      return false;
+    }
+
+    showToast('collecting data');
+    final pendingData = await SQLHelper.instance.getPendingVisit();
+
+    if (pendingData.isEmpty) {
+      stopAutoSync();
+      isSyncing.value = false;
+      showToast('no data found');
+      return true;
+    }
+    syncTotal.value = pendingData.length;
+    syncCurrent.value = 0;
+    showToast('sync started');
+
+    for (var item in pendingData) {
+      try {
+        Map<String, dynamic> data;
+        // =========================
+        // 🔥 CEK JENIS (MASUK / PULANG)
+        // =========================
+        if (item.jamOut == null || item.jamOut == '') {
+          // =========================
+          // ✅ INSERT (VISIT-IN)
+          // =========================
+          data = {
+            "status": "add",
+            "id": item.id,
+            "nama": item.nama,
+            "tgl_visit": item.tglVisit,
+            "visit_in": item.visitIn,
+            "jam_in": item.jamIn,
+            "foto_in": File(item.fotoIn!),
+            "foto_out": "",
+            "lat_in": item.latIn,
+            "long_in": item.longIn,
+            "device_info": item.deviceInfo,
+            "is_rnd": item.isRnd,
+          };
+        } else {
+          // =========================
+          // 🔄 UPDATE (VISIT-OUT)
+          // =========================
+          data = {
+            "status": "update",
+            "id": item.id,
+            "nama": item.nama,
+            "tgl_visit": item.tglVisit,
+            "visit_out": item.visitOut,
+            "visit_in": item.visitOut,
+            "jam_out": item.jamOut,
+            "foto_out": File(item.fotoOut!),
+            "lat_out": item.latOut,
+            "long_out": item.longOut,
+            "device_info2": item.deviceInfo2,
+          };
+        }
+        await ServiceApi().submitVisit(data, true);
+
+        await SQLHelper.instance.updateStatusVisit(
+          item.id!,
+          item.tglVisit!,
+          item.visitIn!,
+          "SUCCESS",
+        );
+        // stopAutoSync();
+      } catch (e) {
+        await SQLHelper.instance.updateStatusVisit(
+          item.id!,
+          item.tglVisit!,
+          item.visitIn!,
+          "FAILED",
+        );
+      }
+      // 🔥 update progress tiap item
+      syncCurrent.value++;
+    }
+    // 🔥 cek ulang setelah loop
+    final remaining = await SQLHelper.instance.getPendingVisit();
+    if (remaining.isEmpty) {
+      showToast('sync process is complete');
+      stopAutoSync();
+      var paramLimit = {
+        "mode": "limit",
+        "id_user": idUser.value,
+        "tanggal1": initDate1,
+        "tanggal2": initDate2,
+      };
+
+      var paramSingle = {
+        "mode": "single",
+        "id_user": idUser.value,
+        "tgl_visit": realDateServer,
+      };
+      getVisitToday(paramSingle);
+      getLimitVisit(paramLimit);
+      isSyncing.value = false;
+      syncTotal.value = 0;
+      syncCurrent.value = 0;
+      return true;
+    } else {
+      showToast('some data failed, retrying...');
+      return false;
+    }
+  }
+
+  Future<void> triggerSync({required bool isVisit}) async {
+    if (isSyncing.value) return;
+    bool isDone;
+
+    if (isVisit) {
+      isDone = await syncVisit();
+    } else {
+      isDone = await syncAbsen();
+    }
+    // final isDone = await syncAbsen();
+
+    if (!isDone) {
+      startAutoSync(isVisit: isVisit); // masih ada pending
+    }
+  }
+
+  void startAutoSync({required bool isVisit}) {
+    timer?.cancel();
+    timer = Timer.periodic(const Duration(seconds: 20), (timer) async {
+      if (isVisit) {
+        await syncVisit();
+      } else {
+        await syncAbsen();
+      }
+    });
+  }
+
+  void stopAutoSync() {
+    timer?.cancel();
+  }
+
   getAbsenToday(paramAbsen) async {
+    final online = await isOnline();
+
+    // ===============================
+    // ⚠️ OFFLINE → LANGSUNG LOCAL
+    // ===============================
+    final dateNow =
+        realDateServer ?? DateFormat('yyyy-MM-dd').format(DateTime.now());
+    if (!online) {
+      var tempDataAbs = await SQLHelper.instance.getAbsenToday(
+        idUser.value,
+        dateNow,
+      );
+
+      dataAbsen.value = tempDataAbs;
+      return dataAbsen;
+    }
+
+    // ===============================
+    // ✅ ONLINE → API + LOCAL
+    // ===============================
     final response = await ServiceApi().getAbsen(paramAbsen);
 
     var tempDataAbs = await SQLHelper.instance.getAbsenToday(
       idUser.value,
-      realDateServer!,
+      dateNow,
     );
+
     dataAbsen.value = tempDataAbs;
 
     if (tempDataAbs.isNotEmpty) {
       if (response.isNotEmpty && response[0].jamAbsenPulang != "") {
         dataAbsen.value = response;
       } else if (response.isNotEmpty &&
-              response[0].jamAbsenMasuk != tempDataAbs[0].jamAbsenMasuk! ||
-          response.isNotEmpty &&
-              response[0].idShift != tempDataAbs[0].idShift!) {
+          (response[0].jamAbsenMasuk != tempDataAbs[0].jamAbsenMasuk! ||
+              response[0].idShift != tempDataAbs[0].idShift!)) {
         dataAbsen.value = response;
       } else {
         dataAbsen.value = tempDataAbs;
@@ -1306,69 +1920,218 @@ class AbsenController extends GetxController with GetTickerProviderStateMixin {
   }
 
   Future<List<Absen>> getLimitAbsen(paramLimitAbsen) async {
-    final response = await ServiceApi().getAbsen(paramLimitAbsen);
-    dataLimitAbsen.clear();
-    // isLoading.value = true;
-    var tempSingleAbs = await SQLHelper.instance.getLimitDataAbsen(
-      idUser.value,
-      initDate1,
-      initDate2,
-    );
+    isLoading.value = true;
 
-    if (tempSingleAbs.isNotEmpty) {
-      if (response.isEmpty ||
-          response.isNotEmpty &&
-              DateTime.parse(
-                response.first.tanggalMasuk!,
-              ).isBefore(DateTime.parse(tempSingleAbs.first.tanggalMasuk!)) ||
-          response.isNotEmpty &&
-              DateTime.parse(response.first.tanggalMasuk!).isAtSameMomentAs(
-                DateTime.parse(tempSingleAbs.first.tanggalMasuk!),
-              ) &&
-              response.first.jamAbsenPulang! == "" &&
-              tempSingleAbs.first.jamAbsenPulang! != "") {
-        isLoading.value = false;
-        dataLimitAbsen.value = tempSingleAbs;
-        statsCon.value =
-            'Wait for a stable internet connection\nThis data saved on local storage';
-        dataLimitAbsen.addAll(response);
-      } else {
-        isLoading.value = false;
-        statsCon.value = "";
-        dataLimitAbsen.value = response;
+    try {
+      /// 🔥 ambil data lokal dulu (fallback / cache)
+      final localData = await SQLHelper.instance.getLimitDataAbsen(
+        idUser.value,
+        initDate1,
+        initDate2,
+      );
+
+      final online = await isOnline();
+
+      /// =========================
+      /// 🔴 OFFLINE MODE
+      /// =========================
+      if (!online) {
+        if (localData.isNotEmpty) {
+          dataLimitAbsen.value = localData;
+          statsCon.value = 'Offline mode\nData loaded from local storage';
+        } else {
+          dataLimitAbsen.clear();
+          statsCon.value = 'Offline & no local data';
+        }
+        return dataLimitAbsen;
       }
-    } else {
+
+      /// =========================
+      /// 🟢 ONLINE MODE
+      /// =========================
+      final response = await ServiceApi()
+          .getAbsen(paramLimitAbsen)
+          .timeout(const Duration(seconds: 10));
+
+      /// =========================
+      /// 🔥 LOGIC SYNC (LOCAL vs SERVER)
+      /// =========================
+      if (localData.isNotEmpty) {
+        final localDate = DateTime.parse(localData.first.tanggalMasuk!);
+        final serverDate =
+            response.isNotEmpty
+                ? DateTime.parse(response.first.tanggalMasuk!)
+                : null;
+
+        final useLocal =
+            response.isEmpty ||
+            (serverDate != null && serverDate.isBefore(localDate)) ||
+            (serverDate != null &&
+                serverDate.isAtSameMomentAs(localDate) &&
+                response.first.jamAbsenPulang == "" &&
+                localData.first.jamAbsenPulang != "");
+
+        if (useLocal) {
+          dataLimitAbsen.value = localData;
+          statsCon.value =
+              'Wait for a stable internet connection\nThis data saved on local storage';
+
+          /// optional: merge data server
+          if (response.isNotEmpty) {
+            dataLimitAbsen.addAll(response);
+          }
+        } else {
+          dataLimitAbsen.value = response;
+          statsCon.value = "";
+        }
+      } else {
+        /// tidak ada data lokal
+        dataLimitAbsen.value = response;
+        statsCon.value = "";
+      }
+
+      return dataLimitAbsen;
+    } catch (e) {
+      /// 🔥 fallback kalau error / timeout
+      final localData = await SQLHelper.instance.getLimitDataAbsen(
+        idUser.value,
+        initDate1,
+        initDate2,
+      );
+
+      if (localData.isNotEmpty) {
+        dataLimitAbsen.value = localData;
+        statsCon.value = 'Connection unstable\nLoad data from local storage';
+      } else {
+        dataLimitAbsen.clear();
+        statsCon.value = 'Failed to load data';
+      }
+
+      return dataLimitAbsen;
+    } finally {
+      /// 🔥 hanya 1x di sini
       isLoading.value = false;
-      statsCon.value = "";
-      dataLimitAbsen.value = response;
     }
-    return dataLimitAbsen;
   }
 
   Future<List<Absen>> getAllAbsen(String id, String? d1, String? d2) async {
+    isLoading.value = true;
+
     var param = {
       "mode": "",
       "id_user": id,
       "tanggal1": d1!.isNotEmpty ? d1 : initDate1,
       "tanggal2": d2!.isNotEmpty ? d2 : initDate2,
     };
-    final response = await ServiceApi().getAbsen(param);
+
+    /// 🔥 ambil data lokal dulu (fallback)
+    var localData = await SQLHelper.instance.getAllDataAbsen(
+      id,
+      d1.isNotEmpty ? d1 : initDate1,
+      d2.isNotEmpty ? d2 : initDate2,
+    );
+
+    final online = await isOnline();
+
+    /// =========================
+    /// 🔴 OFFLINE MODE
+    /// =========================
+    if (!online) {
+      dataAllAbsen.value = localData;
+      searchAbsen.value = localData;
+
+      statsCon.value = 'Offline mode\nLoad data from local storage';
+
+      isLoading.value = false;
+      return dataAllAbsen;
+    }
+
+    /// =========================
+    /// 🟢 ONLINE MODE
+    /// =========================
+    List<Absen> response = [];
+
+    try {
+      response = await ServiceApi().getAbsen(param);
+    } catch (e) {
+      /// 🔥 fallback kalau error API
+      dataAllAbsen.value = localData;
+      searchAbsen.value = localData;
+
+      statsCon.value = 'Connection unstable\nLoad data from local storage';
+
+      isLoading.value = false;
+      return dataAllAbsen;
+    }
+
+    /// =========================
+    /// 🔥 LOGIC ASLI (TIDAK DIUBAH)
+    /// =========================
     dataAllAbsen.value = response;
     searchAbsen.value = response;
+    statsCon.value = "";
+
     isLoading.value = false;
     return dataAllAbsen;
   }
 
-  Future<List<Visit>> getAllVisited(String id) async {
+  Future<List<Visit>> getAllVisited(String id, String? d1, String? d2) async {
+    isLoading.value = true;
+
     var param = {
       "mode": "",
       "id_user": id,
-      "tanggal1": initDate1,
-      "tanggal2": initDate2,
+      "tanggal1": d1!.isNotEmpty ? d1 : initDate1,
+      "tanggal2": d2!.isNotEmpty ? d2 : initDate2,
     };
-    final response = await ServiceApi().getVisit(param);
+
+    /// 🔥 ambil data lokal dulu (fallback)
+    var localData = await SQLHelper.instance.getAllDataVisit(
+      id,
+      d1.isNotEmpty ? d1 : initDate1,
+      d2.isNotEmpty ? d2 : initDate2,
+    );
+
+    final online = await isOnline();
+
+    /// =========================
+    /// 🔴 OFFLINE MODE
+    /// =========================
+    if (!online) {
+      dataAllVisit.value = localData;
+      searchVisit.value = localData;
+
+      statsCon.value = 'Offline mode\nLoad data from local storage';
+
+      isLoading.value = false;
+      return dataAllVisit;
+    }
+
+    /// =========================
+    /// 🟢 ONLINE MODE
+    /// =========================
+    List<Visit> response = [];
+
+    try {
+      response = await ServiceApi().getVisit(param);
+    } catch (e) {
+      /// 🔥 fallback kalau error API
+      dataAllVisit.value = localData;
+      searchVisit.value = localData;
+
+      statsCon.value = 'Connection unstable\nLoad data from local storage';
+
+      isLoading.value = false;
+      return dataAllVisit;
+    }
+
+    /// =========================
+    /// 🔥 LOGIC ASLI (TETAP)
+    /// =========================
     dataAllVisit.value = response;
     searchVisit.value = response;
+    statsCon.value = "";
+
     isLoading.value = false;
     return dataAllVisit;
   }
@@ -1451,8 +2214,8 @@ class AbsenController extends GetxController with GetTickerProviderStateMixin {
             Uri.parse(
               // supportedAbi == 'arm64-v8a'
               //     ? 'http://103.156.15.61/update apk/absensiApp.arm64v8a.apk'
-                  // :
-                   'http://103.156.15.61/update_apk/absensiApp.apk',
+              // :
+              'http://103.156.15.61/update_apk/latest.apk',
             ),
           )
           .timeout(const Duration(seconds: 20));
@@ -1483,6 +2246,9 @@ class AbsenController extends GetxController with GetTickerProviderStateMixin {
         if (compareVersion(latestVer, currVer) > 0) {
           dialogUpdateApp();
         } else {
+          // print(compareVersion(latestVer, currVer) > 0);
+          // print(latestVer);
+          // print(currVer);
           if (status != "onInit") {
             Get.back(closeOverlays: true);
             succesDialog(
@@ -1496,14 +2262,15 @@ class AbsenController extends GetxController with GetTickerProviderStateMixin {
           }
         }
       } else {
-        succesDialog(
-          context: Get.context!,
-          pageAbsen: "N",
-          desc: "No system updates",
-          type: DialogType.info,
-          title: 'INFO',
-          btnOkOnPress: () => Get.back(),
-        );
+        showToast("No update available");
+        // succesDialog(
+        //   context: Get.context!,
+        //   pageAbsen: "N",
+        //   desc: "No system updates",
+        //   type: DialogType.info,
+        //   title: 'INFO',
+        //   btnOkOnPress: () => Get.back(),
+        // );
       }
     } on SocketException catch (e) {
       Get.back(closeOverlays: true);
@@ -1523,8 +2290,32 @@ class AbsenController extends GetxController with GetTickerProviderStateMixin {
     }
   }
 
-  getVisitToday(Map<String, dynamic> paramSingleVisit) async {
+  Future<List<Visit>> getVisitToday(
+    Map<String, dynamic> paramSingleVisit,
+  ) async {
+    final online = await isOnline();
+
+    // ===============================
+    // ⚠️ OFFLINE → LANGSUNG LOCAL
+    // ===============================
+    if (!online) {
+      var tempDataVisit = await SQLHelper.instance.getVisitToday(
+        idUser.value,
+        realDateServer!,
+        '',
+        1,
+      );
+
+      dataVisit.value = tempDataVisit;
+      isLoading.value = false;
+      return dataVisit;
+    }
+
+    // ===============================
+    // ✅ ONLINE → API + LOCAL
+    // ===============================
     final response = await ServiceApi().getVisit(paramSingleVisit);
+
     var tempDataVisit = await SQLHelper.instance.getVisitToday(
       idUser.value,
       realDateServer!,
@@ -1535,7 +2326,7 @@ class AbsenController extends GetxController with GetTickerProviderStateMixin {
     if (tempDataVisit.isNotEmpty) {
       if (response.isNotEmpty &&
           response.first.jamOut != "" &&
-          response.first.visitIn! == tempDataVisit.first.visitIn!) {
+          response.first.visitIn == tempDataVisit.first.visitIn) {
         dataVisit.value = response;
       } else {
         dataVisit.value = tempDataVisit;
@@ -1543,54 +2334,82 @@ class AbsenController extends GetxController with GetTickerProviderStateMixin {
     } else {
       dataVisit.value = response;
     }
+
     isLoading.value = false;
     return dataVisit;
   }
 
   getLimitVisit(Map<String, dynamic> paramLimitVisit) async {
-    final response = await ServiceApi().getLimitVisit(paramLimitVisit);
-    dataLimitVisit.clear();
+    isLoading.value = true;
 
+    /// 🔥 ambil data lokal dulu (biar selalu ada fallback)
     var tempLimitVisit = await SQLHelper.instance.getVisitToday(
       idUser.value,
       realDateServer!,
       '',
       0,
     );
+    try {
+      // 🔥 CEK REAL CONNECTION (bukan state)
+      final online = await isReallyOnline();
 
-    if (tempLimitVisit.isNotEmpty) {
-      if (response.isEmpty ||
-          response.isNotEmpty &&
-              DateTime.parse(
-                response.first.tglVisit!,
-              ).isBefore(DateTime.parse(tempLimitVisit.first.tglVisit!)) ||
-          response.isNotEmpty &&
-              DateTime.parse(response.first.tglVisit!).isAtSameMomentAs(
-                DateTime.parse(tempLimitVisit.first.tglVisit!),
-              ) &&
-              response.first.jamOut! == "" &&
-              tempLimitVisit.first.jamOut! != "" ||
-          response.isNotEmpty &&
-              DateTime.parse(response.first.tglVisit!).isAtSameMomentAs(
-                DateTime.parse(tempLimitVisit.first.tglVisit!),
-              ) &&
-              response.first.visitIn != tempLimitVisit.first.visitIn) {
-        isLoading.value = false;
+      /// =========================
+      /// 🔴 OFFLINE MODE
+      /// =========================
+      if (!online) {
         dataLimitVisit.value = tempLimitVisit;
-        statsCon.value =
-            'Wait for a stable internet connection\nThis data saved on local storage';
-        dataLimitVisit.addAll(response);
-      } else {
+        statsCon.value = 'Offline mode\nLoad data from local storage';
         isLoading.value = false;
+        return dataLimitVisit;
+      }
+
+      /// =========================
+      /// 🟢 ONLINE MODE
+      /// =========================
+      final response = await ServiceApi().getLimitVisit(paramLimitVisit);
+      dataLimitVisit.clear();
+
+      // =========================
+      /// 🔥 LOGIC ASLI (TIDAK DIUBAH)
+      /// =========================
+      if (tempLimitVisit.isNotEmpty) {
+        if (response.isEmpty ||
+            response.isNotEmpty &&
+                DateTime.parse(
+                  response.first.tglVisit!,
+                ).isBefore(DateTime.parse(tempLimitVisit.first.tglVisit!)) ||
+            response.isNotEmpty &&
+                DateTime.parse(response.first.tglVisit!).isAtSameMomentAs(
+                  DateTime.parse(tempLimitVisit.first.tglVisit!),
+                ) &&
+                response.first.jamOut! == "" &&
+                tempLimitVisit.first.jamOut! != "" ||
+            response.isNotEmpty &&
+                DateTime.parse(response.first.tglVisit!).isAtSameMomentAs(
+                  DateTime.parse(tempLimitVisit.first.tglVisit!),
+                ) &&
+                response.first.visitIn != tempLimitVisit.first.visitIn) {
+          dataLimitVisit.value = tempLimitVisit;
+          statsCon.value =
+              'Wait for a stable internet connection\nThis data saved on local storage';
+          dataLimitVisit.addAll(response);
+        } else {
+          statsCon.value = "";
+          dataLimitVisit.value = response;
+        }
+      } else {
         statsCon.value = "";
         dataLimitVisit.value = response;
       }
-    } else {
+      return dataLimitVisit;
+    } catch (e) {
+      /// 🔥 kalau error API → fallback ke lokal
+      dataLimitVisit.value = tempLimitVisit;
+      statsCon.value = 'Connection unstable\nLoad data from local storage';
+      return dataLimitVisit;
+    } finally {
       isLoading.value = false;
-      statsCon.value = "";
-      dataLimitVisit.value = response;
     }
-    return dataLimitVisit;
   }
 
   resend() async {
@@ -1607,12 +2426,12 @@ class AbsenController extends GetxController with GetTickerProviderStateMixin {
       "tanggal2": initDate2,
     };
 
-    var paramLimitVisit = {
-      "mode": "limit",
-      "id_user": dataUserLogin.id!,
-      "tanggal1": initDate1,
-      "tanggal2": initDate2,
-    };
+    // var paramLimitVisit = {
+    //   "mode": "limit",
+    //   "id_user": dataUserLogin.id!,
+    //   "tanggal1": initDate1,
+    //   "tanggal2": initDate2,
+    // };
 
     var paramSingle = {
       "mode": "single",
@@ -1630,7 +2449,6 @@ class AbsenController extends GetxController with GetTickerProviderStateMixin {
       paramSingle,
       paramLimit,
       paramSingleVisit,
-      paramLimitVisit,
       dataUserLogin,
     );
   }

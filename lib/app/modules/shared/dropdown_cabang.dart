@@ -7,10 +7,19 @@ import '../../data/model/cabang_model.dart';
 import '../absen/controllers/absen_controller.dart';
 
 class CsDropdownCabang extends StatelessWidget {
+  final BuildContext context;
+  final bool isDark;
   final String? hintText;
   final String? value;
   final Data? dataUser;
-  CsDropdownCabang({super.key, this.hintText, this.value, this.dataUser});
+  CsDropdownCabang({
+    super.key,
+    required this.context,
+    required this.isDark,
+    this.hintText,
+    this.value,
+    this.dataUser,
+  });
 
   final absC = Get.find<AbsenController>();
   @override
@@ -40,21 +49,35 @@ class CsDropdownCabang extends StatelessWidget {
             height: 40,
             child: DropdownButtonFormField(
               decoration: InputDecoration(
-                fillColor: Colors.white,
+                fillColor:
+                    isDark ? Theme.of(context).canvasColor : Colors.white,
                 filled: true,
-                isDense: true, // 🔑 biar tinggi tetap rapih
+                // isDense: true, // 🔑 biar tinggi tetap rapih
                 contentPadding: const EdgeInsets.all(5),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide.none,
+                  borderSide:
+                      isDark
+                          ? BorderSide(color: Colors.white.withOpacity(0.15))
+                          : BorderSide.none,
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide.none,
+                  borderSide:
+                      isDark
+                          ? BorderSide(color: Colors.white.withOpacity(0.15))
+                          : BorderSide.none,
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide.none,
+                  borderSide:
+                      isDark
+                          ? const BorderSide(
+                            color:
+                                Colors.blueAccent, // 🔥 biar ada feedback focus
+                            width: 1.2,
+                          )
+                          : BorderSide.none,
                 ),
                 hintText: hintText,
               ),

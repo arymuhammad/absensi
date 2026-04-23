@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:absensi/app/data/helper/custom_dialog.dart';
 import 'package:absensi/app/data/model/leave_model.dart';
 import 'package:absensi/app/data/model/login_model.dart';
@@ -8,9 +9,9 @@ import 'package:absensi/app/services/service_api.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:signature/signature.dart';
-import 'package:startapp_sdk/startapp.dart';
 import 'package:step_progress/step_progress.dart';
 import 'package:uuid/uuid.dart';
 
@@ -43,8 +44,8 @@ class LeaveController extends GetxController {
   late StepProgressController stepProgressController;
   int retryCount = 0;
   final int maxRetry = 3;
-  final StartAppSdk startAppSdk = StartAppSdk();
-  Rx<StartAppBannerAd?> bannerAdStartApp = Rx<StartAppBannerAd?>(null);
+  XFile? image;
+  final ImagePicker picker = ImagePicker();
 
   @override
   void onInit() async {
@@ -53,24 +54,25 @@ class LeaveController extends GetxController {
     var dataUser = Data.fromJson(jsonDecode(pref.getString('userDataLogin')!));
     idUser = dataUser.id!;
 
+    leaveBalanceCheck(dataUser);
+
     stepProgressController = StepProgressController(
       initialStep: currentStep,
       totalSteps: 3,
     );
     // print('username : ${dataUser.username!}');
-    var newUsr = await ServiceApi().fetchCurrentUser({
-      "username": dataUser.username!,
-      "password": dataUser.password!,
-    });
-    
-      final logC = Get.find<LoginController>();
-      logC.logUser.update((val) {
-        val!.leaveBalance = newUsr.leaveBalance!;
-      });
-      logC.refresh();
-  
-  }
 
+    // var newUsr = await ServiceApi().fetchCurrentUser({
+    //   "username": dataUser.username!,
+    //   "password": dataUser.password!,
+    // });
+
+    // final logC = Get.find<LoginController>();
+    // logC.logUser.update((val) {
+    //   val!.leaveBalance = newUsr.leaveBalance!;
+    // });
+    // logC.refresh();
+  }
 
   @override
   void onClose() {
@@ -143,8 +145,9 @@ class LeaveController extends GetxController {
       "level_user_pengganti": levelUserPengganti,
       "parent_id": parentId,
       "signature": base64SignImage,
+      "attach_file": File(image!.path.toString()),
     };
-    await ServiceApi().leave(data);
+    await ServiceApi().leaveAdd(data);
     datePick1.clear();
     datePick2.clear();
     selectedLeave.value = "";
@@ -158,6 +161,7 @@ class LeaveController extends GetxController {
     selectedLevelUser.value = "";
     selectednamaLevel.value = "";
     ctrSign.clear();
+    image = null;
     Get.back();
     Get.back();
     isLoading.value = true;
@@ -211,6 +215,19 @@ class LeaveController extends GetxController {
         val!.leaveBalance = newUser.leaveBalance!;
       });
       logC.refresh();
+    }
+    //
+  }
+
+  void uploadFile() async {
+    image = await picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 80,
+      maxHeight: 600,
+      maxWidth: 600,
+    );
+    if (image != null) {
+      update();
     }
   }
 }

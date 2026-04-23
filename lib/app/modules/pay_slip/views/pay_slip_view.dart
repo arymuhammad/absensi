@@ -1,8 +1,6 @@
 import 'dart:io';
 import 'dart:math' as math;
-
 import 'package:absensi/app/data/helper/app_colors.dart';
-import 'package:absensi/app/data/model/login_model.dart';
 import 'package:absensi/app/data/model/payslip_result_model.dart';
 import 'package:absensi/app/modules/pay_slip/views/widget/pay_slip_desc.dart';
 import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
@@ -16,30 +14,37 @@ import 'package:lottie/lottie.dart';
 
 import '../../../data/helper/const.dart';
 import '../../../data/helper/custom_dialog.dart';
+import '../../login/controllers/login_controller.dart';
 import '../controllers/pay_slip_controller.dart';
 import 'widget/pay_slip_store_desc.dart';
 
 class PaySlipView extends GetView<PaySlipController> {
-  PaySlipView({super.key, this.userData});
-  final Data? userData;
+  PaySlipView({super.key});
+
+  final auth = Get.find<LoginController>();
   final payC = Get.find<PaySlipController>();
 
   @override
   Widget build(BuildContext context) {
+    final userData = auth.logUser.value;
+    
     late PayslipResult? payslip;
     late PayslipResult? payslipstore;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       appBar: AppBar(
         title: Text('PaySlip', style: titleTextStyle.copyWith(fontSize: 18)),
         centerTitle: true,
         backgroundColor: AppColors.itemsBackground,
-        flexibleSpace: Container(decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Color(0xFF1B2541), Color(0xFF3949AB)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-            ),),
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: AppColors.mainGradient(
+              context: context,
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -52,21 +57,36 @@ class PaySlipView extends GetView<PaySlipController> {
                 decoration: InputDecoration(
                   prefixIcon: const Icon(Icons.calendar_month_sharp),
                   hintText: 'Pilih Periode',
-                  fillColor: Colors.white,
+                  fillColor:
+                      isDark ? Theme.of(context).canvasColor : Colors.white,
                   filled: true,
                   isDense: true,
                   contentPadding: const EdgeInsets.all(5),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide.none,
+                    borderSide:
+                        isDark
+                            ? BorderSide(color: Colors.white.withOpacity(0.15))
+                            : BorderSide.none,
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide.none,
+                    borderSide:
+                        isDark
+                            ? BorderSide(color: Colors.white.withOpacity(0.15))
+                            : BorderSide.none,
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide.none,
+                    borderSide:
+                        isDark
+                            ? const BorderSide(
+                              color:
+                                  Colors
+                                      .blueAccent, // 🔥 biar ada feedback focus
+                              width: 1.2,
+                            )
+                            : BorderSide.none,
                   ),
                 ),
 
@@ -85,18 +105,18 @@ class PaySlipView extends GetView<PaySlipController> {
                     ).format(DateTime(periode.year, periode.month + 1, 0));
                     payC.isLoading.value = true;
 
-                    userData!.kodeCabang == "HO000"
+                    userData.kodeCabang == "HO000"
                         ? payC.getPaySlip(
-                          empId: userData!.nik!,
+                          empId: userData.nik!,
                           date1: payC.initDate.value,
                           date2: payC.endDate.value,
-                          branch: userData!.kodeCabang!,
+                          branch: userData.kodeCabang!,
                         )
                         : payC.getPaySlipStore(
-                          empId: userData!.nik!,
+                          empId: userData.nik!,
                           date1: payC.initDate.value,
                           date2: payC.endDate.value,
-                          branch: userData!.kodeCabang!,
+                          branch: userData.kodeCabang!,
                         );
                   }
                 },
@@ -117,20 +137,20 @@ class PaySlipView extends GetView<PaySlipController> {
               child: Obx(
                 () => CustomMaterialIndicator(
                   onRefresh: () async {
-                    if (userData!.kodeCabang! == "HO000") {
+                    if (userData.kodeCabang! == "HO000") {
                       await payC.getPaySlip(
-                        empId: userData!.nik!,
+                        empId: userData.nik!,
                         date1: payC.initDate.value,
                         date2: payC.endDate.value,
-                        branch: userData!.kodeCabang!,
+                        branch: userData.kodeCabang!,
                       );
                       showToast('Page Refreshed');
                     } else {
                       await payC.getPaySlipStore(
-                        empId: userData!.nik!,
+                        empId: userData.nik!,
                         date1: payC.initDate.value,
                         date2: payC.endDate.value,
-                        branch: userData!.kodeCabang!,
+                        branch: userData.kodeCabang!,
                       );
                       showToast('Page Refreshed');
                     }
@@ -153,7 +173,7 @@ class PaySlipView extends GetView<PaySlipController> {
                   },
                   child: FutureBuilder<PayslipResult?>(
                     future:
-                        userData!.kodeCabang! == "HO000"
+                        userData.kodeCabang! == "HO000"
                             ? payC.paySlipFuture.value
                             : payC.paySlipStoreFuture.value,
                     builder: (context, snapshot) {
@@ -166,13 +186,16 @@ class PaySlipView extends GetView<PaySlipController> {
                         return Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Lottie.asset('assets/animation/ketawa.json',height: 100,),
+                            Lottie.asset(
+                              'assets/animation/ketawa.json',
+                              height: 100,
+                            ),
                             // const SizedBox(height: 2),
                             const Text('Tidak ada data slip gaji tersedia'),
                           ],
                         );
                       } else {
-                        if (userData!.kodeCabang! == "HO000") {
+                        if (userData.kodeCabang! == "HO000") {
                           payslip = snapshot.data! as PayslipResult?;
                         } else {
                           payslipstore = snapshot.data! as PayslipResult?;
@@ -181,12 +204,11 @@ class PaySlipView extends GetView<PaySlipController> {
                           children: [
                             ListView(
                               children: [
-                                userData!.kodeCabang! == "HO000"
+                                userData.kodeCabang! == "HO000"
                                     ? PaySlipDesc(data: payslip!)
                                     : PaySlipStoreDesc(data: payslipstore!),
                               ],
                             ),
-                          
                           ],
                         );
                       }
@@ -195,7 +217,6 @@ class PaySlipView extends GetView<PaySlipController> {
                 ),
               ),
             ),
-           
           ],
         ),
       ),

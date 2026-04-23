@@ -9,6 +9,7 @@ import 'package:absensi/app/data/model/shift_kerja_model.dart';
 import 'package:sqflite/sqflite.dart';
 import '../model/visit_model.dart';
 import 'custom_dialog.dart';
+import 'db_result.dart';
 
 class SQLHelper {
   final _databaseName = "/absensi.db";
@@ -26,7 +27,12 @@ class SQLHelper {
     // Directory dataDirectory = await getApplicationDocumentsDirectory();
     String dbPath = await getDatabasesPath() + _databaseName;
     // print('db location : ' + dbPath);
-    return await openDatabase(dbPath, version: 1, onCreate: _onCreate);
+    return await openDatabase(
+      dbPath,
+      version: 4,
+      onCreate: _onCreate,
+      onUpgrade: _onUpgrade,
+    );
   }
 
   Future _onCreate(Database db, int version) async {
@@ -98,16 +104,19 @@ class SQLHelper {
         long_out TEXT,
         device_info TEXT,
         device_info2 TEXT,
-        is_rnd TEXT DEFAULT '0'
+        is_rnd TEXT DEFAULT '0',
+        status_sync TEXT DEFAULT 'PENDING',
+
+        UNIQUE (id_user, tgl_visit, visit_in)
       )
       """);
     await db.execute("""CREATE TABLE IF NOT EXISTS absen(
-        tanggal_masuk DATE PRIMARY KEY NOT NULL,
+        tanggal_masuk DATE NOT NULL,
         tanggal_pulang DATE,
-        id_user TEXT,
+        id_user TEXT NOT NULL,
         kode_cabang TEXT,
         nama TEXT,
-        id_shift INTEGER,
+        id_shift TEXT,
         jam_masuk TEXT,
         jam_pulang TEXT DEFAULT '',
         jam_absen_masuk TEXT,
@@ -119,7 +128,10 @@ class SQLHelper {
         lat_pulang TEXT DEFAULT '',
         long_pulang TEXT DEFAULT '',
         device_info TEXT,
-        device_info2 TEXT DEFAULT ''
+        device_info2 TEXT DEFAULT '',
+        status_sync TEXT DEFAULT 'PENDING',
+        
+        PRIMARY KEY (tanggal_masuk, id_user)
       )
       """);
     await db.execute("""CREATE TABLE IF NOT EXISTS server(
@@ -130,6 +142,98 @@ class SQLHelper {
         status TEXT
       )
       """);
+  }
+
+  Future _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      final result = await db.rawQuery("PRAGMA table_info(absen)");
+      final isExist = result.any((col) => col['name'] == 'status_sync');
+
+      if (!isExist) {
+        await db.execute(
+          "ALTER TABLE absen ADD COLUMN status_sync TEXT DEFAULT 'PENDING'",
+        );
+      }
+
+      final result2 = await db.rawQuery("PRAGMA table_info(tbl_visit_area)");
+      final isExist2 = result2.any((col) => col['name'] == 'status_sync');
+
+      if (!isExist2) {
+        await db.execute(
+          "ALTER TABLE tbl_visit_area ADD COLUMN status_sync TEXT DEFAULT 'PENDING'",
+        );
+      }
+    }
+    // 🔥 VERSI 4 → ubah PRIMARY KEY (WAJIB recreate table)
+    if (oldVersion < 3) {
+      await db.execute("ALTER TABLE absen RENAME TO absen_old");
+
+      await db.execute("""
+      CREATE TABLE absen(
+        tanggal_masuk DATE NOT NULL,
+        tanggal_pulang DATE,
+        id_user TEXT NOT NULL,
+        kode_cabang TEXT,
+        nama TEXT,
+        id_shift TEXT,
+        jam_masuk TEXT,
+        jam_pulang TEXT DEFAULT '',
+        jam_absen_masuk TEXT,
+        jam_absen_pulang TEXT DEFAULT '',
+        foto_masuk TEXT,
+        foto_pulang TEXT DEFAULT '',
+        lat_masuk TEXT,
+        long_masuk TEXT,
+        lat_pulang TEXT DEFAULT '',
+        long_pulang TEXT DEFAULT '',
+        device_info TEXT,
+        device_info2 TEXT DEFAULT '',
+        status_sync TEXT DEFAULT 'PENDING',
+        PRIMARY KEY (tanggal_masuk, id_user)
+      )
+    """);
+
+      await db.execute("""
+      INSERT OR IGNORE INTO absen SELECT * FROM absen_old
+    """);
+
+      await db.execute("DROP TABLE absen_old");
+    }
+    if (oldVersion < 4) {
+      await db.execute(
+        "ALTER TABLE tbl_visit_area RENAME TO tbl_visit_area_old",
+      );
+
+      await db.execute("""
+    CREATE TABLE tbl_visit_area(
+      id_user TEXT,
+      nama TEXT,
+      tgl_visit DATE,
+      visit_in TEXT,
+      jam_in TEXT,
+      visit_out TEXT,
+      jam_out TEXT,
+      foto_in TEXT,
+      lat_in TEXT,
+      long_in TEXT,
+      foto_out TEXT,
+      lat_out TEXT,
+      long_out TEXT,
+      device_info TEXT,
+      device_info2 TEXT,
+      is_rnd TEXT DEFAULT '0',
+      status_sync TEXT DEFAULT 'PENDING',
+      UNIQUE (id_user, tgl_visit, visit_in)
+    )
+  """);
+
+      await db.execute("""
+    INSERT INTO tbl_visit_area
+    SELECT * FROM tbl_visit_area_old
+  """);
+
+      await db.execute("DROP TABLE tbl_visit_area_old");
+    }
   }
 
   Future<List<LoginOffline>> loginUserOffline(
@@ -143,57 +247,121 @@ class SQLHelper {
     return res.map((e) => LoginOffline.fromJson(e)).toList();
   }
 
-  Future<void> insertDataAbsen(Absen todo) async {
+  Future<DbResult> insertDataAbsen(Absen todo) async {
     try {
       Database db = await instance.database;
-      // await db.insert('absen', todo.toJson());
-      //loadingDialog("Sedang mengirim data...", ""); //dipindah kembali ke form_absen.dart
-      await db
-          .insert('absen', todo.toJson())
-          .timeout(const Duration(minutes: 3))
-          .then((value) {
-            // Get.back();
-            return showToast('Data saved on local storage');
-            // return succesDialog(Get.context, "Y",
-            //     "Harap tidak menutup aplikasi selama proses syncron data absensi");
-          });
+      // validasi
+      if (todo.idShift == "0" || todo.idShift == "" || todo.idShift == null) {
+        return DbResult(success: false, message: "Invalid shift");
+      }
+
+      final result = await db.insert(
+        'absen',
+        todo.toJson(),
+        conflictAlgorithm: ConflictAlgorithm.ignore,
+      );
+
+      if (result == 0) {
+        return DbResult(success: false, message: "Duplicate data");
+      }
+
+      return DbResult(success: true, message: "Success");
     } on TimeoutException catch (e) {
-      return showToast(e.toString());
+      return DbResult(success: false, message: "Timeout: ${e.toString()}");
     } catch (e) {
-      return showToast(e.toString());
-      // return failedDialog(Get.context, 'ERROR', e.toString());
+      return DbResult(success: false, message: e.toString());
     }
   }
 
-  Future<void> updateDataAbsen(
+  Future<List<Absen>> getPendingAbsen() async {
+    final db = await instance.database;
+    final result = await db.query(
+      'absen',
+      where: 'status_sync != ?',
+      whereArgs: ['SUCCESS'],
+    );
+
+    return result.map((e) => Absen.fromJson(e)).toList();
+  }
+
+  Future<void> updateStatusAbsen(
+    String id,
+    String tglMasuk,
+    String status,
+  ) async {
+    final db = await instance.database;
+    await db.update(
+      'absen',
+      {"status_sync": status},
+      where: 'id_user = ? and tanggal_masuk=?',
+      whereArgs: [id, tglMasuk],
+    );
+  }
+
+  Future<List<Visit>> getPendingVisit() async {
+    final db = await instance.database;
+    final result = await db.query(
+      'tbl_visit_area',
+      where: 'status_sync != ?',
+      whereArgs: ['SUCCESS'],
+    );
+
+    return result.map((e) => Visit.fromJson(e)).toList();
+  }
+
+  Future<void> updateStatusVisit(
+    String id,
+    String tglVisit,
+    String branch,
+    String status,
+  ) async {
+    final db = await instance.database;
+    await db.update(
+      'tbl_visit_area',
+      {"status_sync": status},
+      where: 'id_user = ? and tgl_visit=? and visit_in=?',
+      whereArgs: [id, tglVisit, branch],
+    );
+  }
+
+  Future<DbResult> updateDataAbsen(
     Map<String, dynamic> todo,
     String idUser,
     String tglMasuk,
   ) async {
     try {
+      // validasi jika data kosong
+      if (todo.isEmpty) {
+        return DbResult(success: false, message: "No data update");
+      }
+
       Database db = await instance.database;
       // loadingDialog("Sedang mengirim data...", "");
-      await db
+      final result = await db
           .update(
             'absen',
             todo,
-            where: 'id_user = ? and tanggal_masuk = ?',
+            where: 'id_user = ? AND tanggal_masuk = ?',
             whereArgs: [idUser, tglMasuk],
           )
-          .timeout(const Duration(minutes: 3))
-          .then((value) {
-            return showToast('Data is successfully updated on local storage');
-            // Get.back();
-            // return succesDialog(Get.context, "Y",
-            //     "Harap tidak menutup aplikasi selama proses syncron data absensi");
-          });
-    } on TimeoutException catch (e) {
-      return showToast(e.toString());
+          .timeout(const Duration(minutes: 2));
+      // 🔥 cek apakah ada row yang ke-update
+      if (result == 0) {
+        return DbResult(
+          success: false,
+          message: "Data not found / No row affected",
+        );
+      }
+
+      return DbResult(success: true, message: "Update succeed");
+    } on TimeoutException {
+      return DbResult(
+        success: false,
+        message: "Timeout while updating database",
+      );
     } catch (e) {
-      return showToast(e.toString());
-      // return failedDialog(Get.context, 'ERROR', e.toString());
+      return DbResult(success: false, message: e.toString());
     }
-    // return res;
   }
 
   Future<void> deleteDataAbsenMasuk(String idUser, String tglMasuk) async {
@@ -348,61 +516,75 @@ class SQLHelper {
   ) async {
     Database db = await instance.database;
     var res = await db.rawQuery(
-      " SELECT A.*, B.nama_shift FROM absen A INNER JOIN shift_kerja B ON B.id = A.id_shift WHERE id_user =  '$idUser'  AND tanggal_masuk BETWEEN '$date1' AND '$date2' ORDER BY tanggal_masuk DESC LIMIT 7 ",
+      " SELECT A.*, B.nama_shift, C.nama_cabang FROM absen A INNER JOIN shift_kerja B ON B.id = A.id_shift INNER JOIN tbl_cabang C ON C.kode_cabang = A.kode_cabang WHERE id_user =  '$idUser'  AND tanggal_masuk BETWEEN '$date1' AND '$date2' ORDER BY tanggal_masuk DESC LIMIT 7 ",
     );
     return res.map((json) => Absen.fromJson(json)).toList();
   }
 
-  Future<void> insertDataVisit(Visit todo) async {
+  Future<DbResult> insertDataVisit(Visit todo) async {
     try {
       Database db = await instance.database;
-      await db
-          .insert('tbl_visit_area', todo.toJson())
-          .timeout(const Duration(minutes: 3))
-          .then((value) {
-            // Get.back();
-            return showToast('Data saved on local storage');
-            // return succesDialog(Get.context, "Y",
-            //     "Harap tidak menutup aplikasi selama proses syncron data absensi");
-          });
-    } on TimeoutException catch (e) {
-      return showToast(e.toString());
+      final result = await db
+          .insert(
+            'tbl_visit_area',
+            todo.toJson(),
+            conflictAlgorithm: ConflictAlgorithm.ignore,
+          )
+          .timeout(const Duration(minutes: 2));
+      // 🔥 kalau result == 0 → insert di-ignore (duplicate)
+      if (result == 0) {
+        return DbResult(
+          success: false,
+          message: "Duplicate data / already exists",
+        );
+      }
+
+      return DbResult(success: true, message: "Insert success");
+    } on TimeoutException {
+      return DbResult(success: false, message: "Timeout while inserting data");
     } catch (e) {
-      return showToast(e.toString());
-      // return failedDialog(Get.context, 'ERROR', e.toString());
+      return DbResult(success: false, message: e.toString());
     }
     // return res;
   }
 
-  Future<void> updateDataVisit(
+  Future<DbResult> updateDataVisit(
     Map<String, dynamic> todo,
     String idUser,
     String tglVisit,
     String visitIn,
   ) async {
     try {
+      // validasi jika data kosong
+      if (todo.isEmpty) {
+        return DbResult(success: false, message: "No data update");
+      }
+
       Database db = await instance.database;
-      await db
+      final result = await db
           .update(
             'tbl_visit_area',
             todo,
             where: 'id_user=? and tgl_visit=? and visit_in=?',
             whereArgs: [idUser, tglVisit, visitIn],
           )
-          .timeout(const Duration(minutes: 3))
-          .then((value) {
-            // Get.back();
-            return showToast('Data is successfully updated on local storage');
-            // return succesDialog(Get.context, "Y",
-            //     "Harap tidak menutup aplikasi selama proses syncron data absensi");
-          });
-    } on TimeoutException catch (e) {
-      return showToast(e.toString());
+          .timeout(const Duration(minutes: 2));
+      // 🔥 cek apakah ada row yang ke-update
+      if (result == 0) {
+        return DbResult(
+          success: false,
+          message: "Data not found / No row affected",
+        );
+      }
+      return DbResult(success: true, message: "Update succeed");
+    } on TimeoutException {
+      return DbResult(
+        success: false,
+        message: "Timeout while updating database",
+      );
     } catch (e) {
-      return showToast(e.toString());
-      // return failedDialog(Get.context, 'ERROR', e.toString());
+      return DbResult(success: false, message: e.toString());
     }
-    // return res;
   }
 
   Future<List<Visit>> getVisitToday(
@@ -469,16 +651,37 @@ class SQLHelper {
     return res.map((e) => LoginOffline.fromJson(e)).toList();
   }
 
-  Future<List<Absen>> getAllDataAbsen() async {
+  Future<List<Absen>> getAllDataAbsen(
+    String id,
+    String tgl1,
+    String tgl2,
+  ) async {
     Database db = await instance.database;
-    var res = await db.query('absen', orderBy: "tanggal_masuk DESC");
+    var res = await db.rawQuery(
+      '''
+  SELECT A.*, B.nama_shift, C.nama_cabang
+  FROM absen A
+  LEFT JOIN shift_kerja B ON B.id = A.id_shift
+  LEFT JOIN tbl_cabang C ON C.kode_cabang = A.kode_cabang
+  WHERE A.id_user = ? 
+    AND A.tanggal_masuk BETWEEN ? AND ?
+  ORDER BY A.tanggal_masuk DESC
+''',
+      [id, tgl1, tgl2],
+    );
     return res.map((json) => Absen.fromJson(json)).toList();
   }
 
-  Future<List<Visit>> getAllDataVisit() async {
+  Future<List<Visit>> getAllDataVisit(
+    String id,
+    String tgl1,
+    String tgl2,
+  ) async {
     Database db = await instance.database;
     var res = await db.query(
       'tbl_visit_area',
+      where: ' id_user =? AND tgl_visit BETWEEN ? AND ?',
+      whereArgs: [id, tgl1, tgl2],
       orderBy: "tgl_visit DESC, jam_in DESC",
     );
     return res.map((json) => Visit.fromJson(json)).toList();
@@ -501,7 +704,6 @@ class SQLHelper {
     var res = await db.query('server');
     return res.map((e) => ServerApi.fromJson(e)).toList();
   }
-
 
   // Future<void> updateFaceData(Map<String, dynamic> data, String id) async {
   //   try {

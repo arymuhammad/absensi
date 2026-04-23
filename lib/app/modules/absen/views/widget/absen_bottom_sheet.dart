@@ -4,7 +4,7 @@ import 'package:slider_button/slider_button.dart';
 import '../../../../data/helper/app_colors.dart';
 import '../../../../data/helper/const.dart';
 import '../../../../data/helper/custom_dialog.dart';
-import '../../../../data/model/login_model.dart';
+import '../../../login/controllers/login_controller.dart';
 import '../../controllers/absen_controller.dart';
 import 'absen_form.dart';
 import 'check_in.dart';
@@ -15,24 +15,26 @@ import 'visit_out.dart';
 import 'package:icons_plus/icons_plus.dart';
 
 class AbsenBottomSheet extends StatelessWidget {
-  const AbsenBottomSheet({
+  AbsenBottomSheet({
     super.key,
-    required this.data,
+
     required this.controller,
     required this.scrollController,
   });
 
-  final Data data;
+  final auth = Get.find<LoginController>();
   final AbsenController controller;
   final ScrollController scrollController;
 
   @override
   Widget build(BuildContext context) {
+    final data = auth.logUser.value;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeOut,
       decoration: BoxDecoration(
-        color: Colors.blueGrey[100],
+        color: isDark ? Theme.of(context).cardColor : Colors.blueGrey[100],
         borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
         boxShadow: [
           BoxShadow(
@@ -78,8 +80,8 @@ class AbsenBottomSheet extends StatelessWidget {
                   const SizedBox(width: 8),
                   Text(
                     controller.distanceStore.value > num.parse(data.areaCover!)
-                        ? "Location is not suitable"
-                        : "You are within the attendance radius",
+                        ? "Outside area"
+                        : "Inside area",
                     style: titleTextStyle.copyWith(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -149,8 +151,18 @@ class AbsenBottomSheet extends StatelessWidget {
 
             /// FORM
             data.visit == "1"
-                ? buildVisit(data: data, controller: controller)
-                : buildAbsen(data: data, controller: controller),
+                ? buildVisit(
+                  context: context,
+                  data: data,
+                  controller: controller,
+                  isDark: isDark,
+                )
+                : buildAbsen(
+                  context: context,
+                  isDark: isDark,
+                  data: data,
+                  controller: controller,
+                ),
 
             const SizedBox(height: 10),
 
@@ -158,14 +170,15 @@ class AbsenBottomSheet extends StatelessWidget {
             Align(
               alignment: Alignment.bottomCenter,
               child: Obx(() {
-                final enabled = controller.isEnabled.value;
+                final enabled =
+                    controller.isEnabled.value &&
+                    !controller.isTimeUntrusted.value &&
+                    !controller.isAppLocked.value;
+
                 return Container(
                   decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        const Color(0xFF1B2541).withOpacity(enabled ? 1 : 0.5),
-                        const Color(0xFF3949AB).withOpacity(enabled ? 1 : 0.5),
-                      ],
+                    gradient: AppColors.mainGradient(
+                      context: context,
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
@@ -190,6 +203,12 @@ class AbsenBottomSheet extends StatelessWidget {
                     height: 45,
                     shimmer: enabled,
                     action: () async {
+                      await controller.initTime();
+                      // 🔥 FORCE CHECK TIME TIAP SWIPE
+                      if (controller.isTimeUntrusted.value) {
+                        showToast("Jam tidak valid!");
+                        return false;
+                      }
                       if (!enabled) {
                         return false;
                       }
@@ -217,7 +236,7 @@ class AbsenBottomSheet extends StatelessWidget {
                             //     controller.selectedCabangVisit.isEmpty) {
                             //   showToast("please select a store");
                           } else {
-                            loadingDialog("open the camera", "");
+                            // loadingDialog("open the camera", "");
                             controller.stsAbsenSelected.value == "Check In"
                                 ? await visitIn(
                                   dataUser: data,
@@ -236,7 +255,7 @@ class AbsenBottomSheet extends StatelessWidget {
                               controller.selectedShift.isEmpty) {
                             showToast("please select absence shift first");
                           } else {
-                            loadingDialog("open the camera", "");
+                            // loadingDialog("open the camera", "");
                             controller.stsAbsenSelected.value == "Check In"
                                 ? await checkIn(
                                   data,

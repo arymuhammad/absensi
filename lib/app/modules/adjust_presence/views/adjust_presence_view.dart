@@ -2,13 +2,12 @@ import 'package:absensi/app/data/helper/app_colors.dart';
 import 'package:absensi/app/modules/adjust_presence/views/widget/adjust_data.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../../data/model/login_model.dart';
 import '../controllers/adjust_presence_controller.dart';
 import 'widget/req_app_update.dart';
 
 class AdjustPresenceView extends GetView<AdjustPresenceController> {
-  AdjustPresenceView({super.key, this.data});
-  final Data? data;
+  AdjustPresenceView({super.key});
+
   final ctrl = Get.put(AdjustPresenceController());
 
   @override
@@ -18,6 +17,15 @@ class AdjustPresenceView extends GetView<AdjustPresenceController> {
         title: const Text('Adjust Presence'),
         centerTitle: true,
         backgroundColor: AppColors.itemsBackground,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFF1B2541), Color(0xFF3949AB)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -54,11 +62,11 @@ class AdjustPresenceView extends GetView<AdjustPresenceController> {
                   // first tab bar view widget
                   Padding(
                     padding: const EdgeInsets.fromLTRB(8.0, 12, 8.0, 8.0),
-                    child: Center(child: AdjustData(userData: data!)),
+                    child: Center(child: AdjustData()),
                   ),
 
                   // second tab bar view widget
-                  Center(child: ReqAppUpdate(dataUser: data!)),
+                  Center(child: ReqAppUpdate()),
                 ],
               ),
             ),

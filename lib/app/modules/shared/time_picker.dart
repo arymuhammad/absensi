@@ -21,6 +21,7 @@ class CsTimePicker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 10),
       child: Column(
@@ -54,27 +55,28 @@ class CsTimePicker extends StatelessWidget {
               },
               controller: controller,
               decoration: InputDecoration(
-                  prefixIcon: const Icon(Icons.access_time_filled_rounded),
-                  errorStyle: const TextStyle(color: Colors.red),
-                  fillColor: Colors.white,
-                  filled: true,
-                  isDense: true, // 🔑 biar tinggi tetap rapih
-                  contentPadding: const EdgeInsets.all(5),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide.none,
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide.none,
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide.none,
-                  ),
-                  labelText: label,),
+                prefixIcon: const Icon(Icons.access_time_filled_rounded),
+                errorStyle: const TextStyle(color: Colors.red),
+                fillColor:isDark ? Theme.of(context).canvasColor : Colors.white,
+                filled: true,
+                isDense: true, // 🔑 biar tinggi tetap rapih
+                contentPadding: const EdgeInsets.all(5),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide.none,
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide.none,
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide.none,
+                ),
+                labelText: label,
+              ),
             ),
-          )
+          ),
         ],
       ),
     );

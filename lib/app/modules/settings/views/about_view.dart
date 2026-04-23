@@ -34,9 +34,9 @@ class AboutView extends GetView {
           // const CsBgImg(),
           Container(
             height: 250,
-           decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Color(0xFF1B2541), Color(0xFF3949AB)],
+            decoration: BoxDecoration(
+              gradient: AppColors.mainGradient(
+                context: context,
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
@@ -159,15 +159,12 @@ Widget buildChangelog(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                       Text(
-                        'Version',
-                        style: subtitleTextStyle,
-                      ),
+                      Text('Version', style: subtitleTextStyle),
                       Text(
                         'V$version',
                         style: const TextStyle(
@@ -175,14 +172,14 @@ Widget buildChangelog(
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                  const SizedBox(width: 5),
-                  
+                      const SizedBox(width: 5),
                     ],
                   ),
-                  const SizedBox(height:4),
-                  Column(crossAxisAlignment: CrossAxisAlignment.start,
+                  const SizedBox(height: 4),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Release Date', style: subtitleTextStyle,),
+                      Text('Release Date', style: subtitleTextStyle),
                       Text(
                         releaseDate,
                         style: const TextStyle(

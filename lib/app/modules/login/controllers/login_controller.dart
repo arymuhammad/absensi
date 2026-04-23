@@ -8,9 +8,12 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:crypto/crypto.dart';
 import '../../../data/model/foto_profil_model.dart';
+import '../../../data/theme_controller.dart';
+import '../../../routes/app_pages.dart';
 import '../../../services/service_api.dart';
 import '../../../data/model/login_model.dart';
 import '../../absen/controllers/absen_controller.dart';
+import '../views/login_view.dart';
 
 class LoginController extends GetxController with GetTickerProviderStateMixin {
   late TextEditingController email, username, password;
@@ -21,7 +24,7 @@ class LoginController extends GetxController with GetTickerProviderStateMixin {
   var selected = 0.obs;
   var logUser = Data().obs;
   var isPassHide = true.obs;
-
+  var isReady = false.obs;
   // var animationLink = 'assets/animation/animated_login.riv';
 
   // StateMachineController? stateMachineController;
@@ -29,6 +32,8 @@ class LoginController extends GetxController with GetTickerProviderStateMixin {
 
   @override
   void onInit() async {
+    super.onInit();
+    loadSession();
     ctrAnimated = AnimationController(
       duration: const Duration(milliseconds: 800),
       vsync: this,
@@ -41,7 +46,6 @@ class LoginController extends GetxController with GetTickerProviderStateMixin {
       }
     });
 
-    super.onInit();
     email = TextEditingController();
     username = TextEditingController();
     password = TextEditingController();
@@ -67,9 +71,9 @@ class LoginController extends GetxController with GetTickerProviderStateMixin {
     //checking data
     if (dataOffline.isNotEmpty) {
       // showToast("ambil data dari sqlite");
-      FotoProfil foto = await ServiceApi().getFotoProfil({
-        'id': dataOffline.first.id!,
-      });
+      // FotoProfil foto = await ServiceApi().getFotoProfil({
+      //   'id': dataOffline.first.id!,
+      // });
 
       await pref.setString(
         'userDataLogin',
@@ -84,7 +88,8 @@ class LoginController extends GetxController with GetTickerProviderStateMixin {
             nik: dataOffline[0].nik,
             lat: dataOffline[0].lat,
             long: dataOffline[0].long,
-            foto: foto.foto! != "" ? foto.foto! : dataOffline[0].foto,
+            // foto: foto.foto! != "" ? foto.foto! : dataOffline[0].foto,
+            foto: dataOffline[0].foto,
             noTelp: dataOffline[0].noTelp,
             level: dataOffline[0].level,
             levelUser: dataOffline[0].levelUser,
@@ -107,6 +112,7 @@ class LoginController extends GetxController with GetTickerProviderStateMixin {
 
       // (tempUser != "" ? Data.fromJson(jsonDecode(tempUser!)) : null)!;
       isAuth.value = await pref.setBool("is_login", true);
+      // isAuth.value = true;
       username.clear();
       password.clear();
 
@@ -152,6 +158,7 @@ class LoginController extends GetxController with GetTickerProviderStateMixin {
         var tempUser = pref.getString('userDataLogin');
         logUser.value = Data.fromJson(jsonDecode(tempUser!));
         isAuth.value = await pref.setBool("is_login", true);
+        // isAuth.value = true;
 
         await SQLHelper.instance
             .getDataUser(response.data!.id!)
@@ -201,13 +208,28 @@ class LoginController extends GetxController with GetTickerProviderStateMixin {
     }
   }
 
+  loadSession() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+
+    final status = pref.getBool('is_login') ?? false;
+    final userDataLogin = pref.getString('userDataLogin') ?? "";
+
+    if (status && userDataLogin.isNotEmpty) {
+      logUser.value = Data.fromJson(jsonDecode(userDataLogin));
+      isAuth.value = true;
+    } else {
+      isAuth.value = false;
+    }
+
+    isReady.value = true;
+  }
+
   logout() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
 
-    // await pref.setBool("is_login", false);
-    // await pref.remove('userDataLogin');
-    // await pref.remove('userLoc');
-    await pref.clear();
+    await pref.remove("is_login");
+    await pref.remove('userDataLogin');
+    // await pref.clear();
 
     logUser.value = Data();
 
@@ -221,16 +243,39 @@ class LoginController extends GetxController with GetTickerProviderStateMixin {
     //     Duration(milliseconds: 100),
     //   ); // Opsional delay sebentar untuk proses reset
     // }
+
     Get.delete<AbsenController>(force: true); // Hapus instance controller lama
     Get.delete<PaySlipController>(force: true);
-    // Get.reset();
-    Get.back();
 
-    // showToast("Logout Berhasil");
+    // Get.back();
   }
+
+  final navigatorKeys = List.generate(5, (_) => GlobalKey<NavigatorState>());
 
   selectedMenu(index) {
     selected.value = index;
+  }
+
+  NavigatorState? currentNavigator() {
+    return navigatorKeys[selected.value].currentState;
+  }
+
+  void pushInTab(Widget page) async {
+    NavigatorState? nav;
+
+    int retry = 0;
+
+    while (nav == null && retry < 5) {
+      await Future.delayed(const Duration(milliseconds: 50));
+      nav = currentNavigator();
+      retry++;
+    }
+
+    if (nav != null) {
+      nav.push(MaterialPageRoute(builder: (_) => page));
+    } else {
+      debugPrint("Navigator tetap null setelah retry");
+    }
   }
 
   String computeUserChecksum(Data user) {

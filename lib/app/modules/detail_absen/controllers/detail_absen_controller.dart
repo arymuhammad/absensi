@@ -84,7 +84,12 @@ class DetailAbsenController extends GetxController {
     }
   }
 
-  submitApproval(String id, String nama, String kodeCabang) async {
+  submitApproval(
+    String id,
+    String nama,
+    String kodeCabang,
+    String idShift,
+  ) async {
     if (jamAbsenMasuk.text != "" && jamAbsenPulang.text == "") {
       if (alasan.text == "") {
         failedDialog(
@@ -100,18 +105,58 @@ class DetailAbsenController extends GetxController {
             "Harap lampirkan bukti foto absen masuk",
           );
         } else {
-          var data = {
-            "status": "update_masuk",
-            "id_user": id,
-            "kode_cabang": kodeCabang,
-            "nama": nama,
-            "jam_absen_masuk": jamAbsenMasuk.text,
-            "tgl_masuk": tglMasuk.text,
-            "foto_masuk": image!.path,
-            "alasan": alasan.text,
-          };
-          loadingDialog("Mengirim data...", "");
-          await ServiceApi().reqUpdateAbs(data);
+          String jamAbsen = jamAbsenMasuk.text;
+          String jamPulang = "";
+          final now = DateTime.now();
+          final parts = jamAbsen.split(":");
+          DateTime nowLocal = DateTime(
+            now.year,
+            now.month,
+            now.day,
+            int.parse(parts[0]),
+            int.parse(parts[1]),
+          );
+          if (idShift == "5") {
+            // absC.jamPulang.value = DateFormat(
+            //   "HH:mm",
+            // ).format(nowLocal.add(const Duration(hours: 8)));
+
+            final nowPlus8 = nowLocal.add(const Duration(hours: 8));
+            jamAbsen = DateFormat("HH:mm").format(nowLocal);
+            jamPulang = DateFormat("HH:mm").format(nowPlus8);
+
+            // absC.jamMasuk.value = jamMasuk;
+            // absC.jamPulang.value = jamPulang;
+            var data = {
+              "status": "update_masuk_cst",
+              "id_user": id,
+              "kode_cabang": kodeCabang,
+              "nama": nama,
+              "jam_masuk": jamAbsen,
+              "jam_absen_masuk": jamAbsen,
+              "jam_pulang": jamPulang,
+              "tgl_masuk": tglMasuk.text,
+              "foto_masuk": image!.path,
+              "alasan": alasan.text,
+            };
+            loadingDialog("Mengirim data...", "");
+            // print(data);
+            await ServiceApi().reqUpdateAbs(data);
+          } else {
+            var data = {
+              "status": "update_masuk",
+              "id_user": id,
+              "kode_cabang": kodeCabang,
+              "nama": nama,
+              "jam_absen_masuk": jamAbsenMasuk.text,
+              "tgl_masuk": tglMasuk.text,
+              "foto_masuk": image!.path,
+              "alasan": alasan.text,
+            };
+            loadingDialog("Mengirim data...", "");
+            await ServiceApi().reqUpdateAbs(data);
+          }
+
           // after 2 sec
           // if (!Get.isRegistered<AdController>()) {
           //   Get.put(AdController());
@@ -158,6 +203,7 @@ class DetailAbsenController extends GetxController {
               "device_info2": devInfo.value,
               "alasan": alasan.text,
             };
+
             await ServiceApi().reqUpdateAbs(data);
             // after 2 sec
             // if (!Get.isRegistered<AdController>()) {
@@ -243,7 +289,7 @@ class DetailAbsenController extends GetxController {
         var data = {
           "status": "update_shift",
           "id_user": id,
-          "kode_cabang":kodeCabang,
+          "kode_cabang": kodeCabang,
           "nama": nama,
           "id_shift": selectedShift.value,
           "jam_masuk": jamMasuk.value,

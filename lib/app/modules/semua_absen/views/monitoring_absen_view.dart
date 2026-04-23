@@ -7,15 +7,19 @@ import 'package:icons_plus/icons_plus.dart';
 import 'package:intl/intl.dart';
 import 'package:shimmer/shimmer.dart';
 
-import '../../../data/model/login_model.dart';
+import '../../login/controllers/login_controller.dart';
 import 'search_form.dart';
 
 class MonitoringAbsenView extends GetView {
-  MonitoringAbsenView({super.key, this.userData});
+  MonitoringAbsenView({super.key});
+
+  final auth = Get.find<LoginController>();
   final absenC = Get.find<AbsenController>();
-  final Data? userData;
+
   @override
   Widget build(BuildContext context) {
+    final userData = auth.logUser.value;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
@@ -26,9 +30,16 @@ class MonitoringAbsenView extends GetView {
             color: AppColors.contentColorWhite,
           ),
         ),
-        backgroundColor: AppColors.itemsBackground,
-        // elevation: 0.0,
-        // iconTheme: const IconThemeData(color: Colors.black,),
+        // backgroundColor: AppColors.itemsBackground,
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: AppColors.mainGradient(
+              context: context,
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
         centerTitle: true,
       ),
       resizeToAvoidBottomInset: false,
@@ -49,15 +60,18 @@ class MonitoringAbsenView extends GetView {
                     borderRadius: BorderRadius.circular(10),
                   ),
                   elevation: 8,
-                  child: TextField(
-                    controller: absenC.filterAbsen,
-                    onChanged: (data) => absenC.filterDataAbsen,
-                    decoration: InputDecoration(
-                      prefixIcon: const Icon(Icons.search),
-                      hintText: 'Cari berdasarkan tanggal',
-                      labelText: 'Cari Absen',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
+                  child: SizedBox(
+                    height: 40,
+                    child: TextField(
+                      controller: absenC.filterAbsen,
+                      onChanged: (data) => absenC.filterDataAbsen,
+                      decoration: InputDecoration(
+                        prefixIcon: const Icon(Icons.search),
+                        hintText: 'Cari berdasarkan tanggal',
+                        labelText: 'Cari Absen',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
                       ),
                     ),
                   ),
@@ -85,7 +99,7 @@ class MonitoringAbsenView extends GetView {
               ),
               const Padding(
                 padding: EdgeInsets.only(left: 20.0, right: 20.0),
-                child: Divider(color: Colors.white, thickness: 2),
+                child: Divider(color: Colors.white, thickness: 1),
               ),
               Padding(
                 padding: const EdgeInsets.only(
@@ -554,11 +568,15 @@ class MonitoringAbsenView extends GetView {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(backgroundColor: AppColors.itemsBackground,
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: AppColors.itemsBackground,
         onPressed: () {
-          searchForm(userData!);
+          searchForm(context, userData, isDark, absenC);
         },
-        child: const Icon(Iconsax.calendar_search_outline,),
+        child: Icon(
+          Iconsax.calendar_search_outline,
+          color: isDark ? Colors.blue : Colors.white,
+        ),
       ),
     );
   }

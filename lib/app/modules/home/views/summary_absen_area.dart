@@ -4,7 +4,6 @@ import 'dart:math' as math;
 import 'package:absensi/app/data/helper/duration_count.dart';
 import 'package:absensi/app/modules/absen/controllers/absen_controller.dart';
 import 'package:absensi/app/data/helper/custom_dialog.dart';
-import 'package:absensi/app/data/model/login_model.dart';
 import 'package:absensi/app/modules/home/views/widget/summary_today.dart';
 import 'package:absensi/app/modules/shared/history_card.dart';
 import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
@@ -15,37 +14,40 @@ import 'package:get/get.dart';
 import '../../../data/helper/app_colors.dart';
 import '../../../data/helper/const.dart';
 import '../../detail_absen/views/detail_visit_view.dart';
+import '../../login/controllers/login_controller.dart';
 import '../../shared/history_card_shimmer.dart';
 import 'main_menu.dart';
 
 class SummaryAbsenArea extends GetView {
-  SummaryAbsenArea({super.key, this.userData});
-  final Data? userData;
+  SummaryAbsenArea({super.key});
+
+  final auth = Get.find<LoginController>();
   final absenC = Get.find<AbsenController>();
 
   @override
   Widget build(BuildContext context) {
+    final userData = auth.logUser.value;
     return Expanded(
       child: Column(
         children: [
-          SummaryToday(listDataUser: userData!),
+          SummaryToday(listDataUser: userData),
           const SizedBox(height: 5),
           Expanded(
             child: CustomMaterialIndicator(
               onRefresh: () async {
                 var paramSingleVisit = {
                   "mode": "single",
-                  "id_user": userData!.id,
+                  "id_user": userData.id,
                   "tgl_visit": absenC.realDateServer,
                 };
                 var paramLimitVisit = {
                   "mode": "limit",
-                  "id_user": userData!.id!,
+                  "id_user": userData.id!,
                   "tanggal1": absenC.initDate1,
                   "tanggal2": absenC.initDate2,
                 };
 
-                absenC.isLoading.value = true;
+                // absenC.isLoading.value = true;
                 await absenC.getLimitVisit(paramLimitVisit);
                 await absenC.getVisitToday(paramSingleVisit);
                 showToast("Page Refreshed");
@@ -70,7 +72,7 @@ class SummaryAbsenArea extends GetView {
                 padding: EdgeInsets.zero,
                 children: [
                   // const SizedBox(height: 5),
-                  MainMenu(userData: userData!),
+                  MainMenu(userData: userData),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -86,8 +88,8 @@ class SummaryAbsenArea extends GetView {
                   const SizedBox(height: 5),
                   Obx(
                     () =>
-                        absenC.isLoading.value
-                            ?ListView.builder(
+                        absenC.isLoading.value && absenC.dataLimitVisit.isEmpty
+                            ? ListView.builder(
                               padding: const EdgeInsets.only(bottom: 8),
                               shrinkWrap: true,
                               physics: const NeverScrollableScrollPhysics(),
@@ -100,7 +102,7 @@ class SummaryAbsenArea extends GetView {
                             ? SizedBox(
                               height: Get.size.height / 3,
                               child: const Center(
-                                child: Text('Belum ada riwayat visit'),
+                                child: Text('There is no visit history yet'),
                               ),
                             )
                             : ListView.separated(
@@ -112,14 +114,14 @@ class SummaryAbsenArea extends GetView {
                               itemCount: absenC.dataLimitVisit.length,
                               itemBuilder: (c, i) {
                                 final data = absenC.dataLimitVisit[i];
-                               
+
                                 return InkWell(
                                   onTap: () {
                                     var detailData = {
                                       "foto_profil":
-                                          userData!.foto != ""
-                                              ? userData!.foto
-                                              : userData!.nama,
+                                          userData.foto != ""
+                                              ? userData.foto
+                                              : userData.nama,
                                       "nama": data.nama!,
                                       "id_user": data.id!,
                                       "store": data.namaCabang!,
@@ -173,11 +175,8 @@ class SummaryAbsenArea extends GetView {
                                     stsM: '',
                                     stsP: '',
                                   ),
-
-                                
                                 );
                               },
-                             
                             ),
                   ),
                 ],

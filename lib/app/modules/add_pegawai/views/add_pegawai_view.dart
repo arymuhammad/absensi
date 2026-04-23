@@ -18,6 +18,7 @@ class AddPegawaiView extends GetView<AddPegawaiController> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       body: Stack(
         children: [
@@ -25,10 +26,7 @@ class AddPegawaiView extends GetView<AddPegawaiController> {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             radius: 0,
-            child: Container(
-              height: 250,
-              
-            ),
+            child: Container(height: 250),
           ),
           ListView(
             scrollDirection: Axis.vertical,
@@ -48,9 +46,7 @@ class AddPegawaiView extends GetView<AddPegawaiController> {
                   color: AppColors.contentColorWhite,
                 ),
               ),
-              const SizedBox(
-                height: 40,
-              ),
+              const SizedBox(height: 40),
               Obx(
                 () => Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -61,32 +57,35 @@ class AddPegawaiView extends GetView<AddPegawaiController> {
                           SizedBox(
                             height: 50,
                             child: DropdownButtonFormField(
-                              value: controller.brandCabang.value == ""
-                                  ? null
-                                  : controller.brandCabang.value,
+                              value:
+                                  controller.brandCabang.value == ""
+                                      ? null
+                                      : controller.brandCabang.value,
                               onChanged: (data) {
                                 controller.brandCabang.value = data!;
                                 controller.selectedCabang.value = "";
                                 controller.store.clear();
                               },
-                              items: controller.listBrand
-                                  .map((e) => DropdownMenuItem(
-                                      value: e.brandCabang!.toString(),
-                                      child: Text(e.brandCabang!)))
-                                  .toList(),
-                              decoration: const InputDecoration(
-                                  labelText: 'Brand',
-                                  filled: true,
-                                  fillColor: Colors.white,
-                                  contentPadding: EdgeInsets.all(8),
-                                  border: OutlineInputBorder()),
-                              dropdownColor: Colors.white,
-                              
+                              items:
+                                  controller.listBrand
+                                      .map(
+                                        (e) => DropdownMenuItem(
+                                          value: e.brandCabang!.toString(),
+                                          child: Text(e.brandCabang!),
+                                        ),
+                                      )
+                                      .toList(),
+                              decoration:  InputDecoration(
+                                labelText: 'Brand',
+                                filled: true,
+                                fillColor: isDark? Theme.of(context).canvasColor: Colors.white,
+                                contentPadding: const EdgeInsets.all(8),
+                                border: const OutlineInputBorder(),
+                              ),
+                              dropdownColor: isDark? Theme.of(context).canvasColor: Colors.white,
                             ),
                           ),
-                          const SizedBox(
-                            height: 10,
-                          ),
+                          const SizedBox(height: 10),
                           SizedBox(
                             height: 50,
                             child: FutureBuilder(
@@ -98,33 +97,38 @@ class AddPegawaiView extends GetView<AddPegawaiController> {
                                   dataCabang!.map((data) {
                                     allStore.add(data.namaCabang!);
                                   }).toList();
-                                  return TypeAheadFormField<String>(autoFlipDirection: true,
+                                  return TypeAheadFormField<String>(
+                                    autoFlipDirection: true,
                                     textFieldConfiguration:
                                         TextFieldConfiguration(
-                                      controller: controller.store,
-                                      decoration: const InputDecoration(
-                                        labelText: 'Cabang',
-                                        border: OutlineInputBorder(),
-                                        filled: true,
-                                        fillColor: Colors.white,
-                                      ),
-                                    ),
+                                          controller: controller.store,
+                                          decoration: InputDecoration(
+                                            labelText: 'Cabang',
+                                            border: const OutlineInputBorder(),
+                                            filled: true,
+                                            fillColor: isDark? Theme.of(context).canvasColor: Colors.white,
+                                          ),
+                                        ),
                                     suggestionsCallback: (pattern) {
-                                      return allStore.where((option) => option
-                                          .toLowerCase()
-                                          .contains(pattern.toLowerCase()));
+                                      return allStore.where(
+                                        (option) => option
+                                            .toLowerCase()
+                                            .contains(pattern.toLowerCase()),
+                                      );
                                     },
                                     itemBuilder: (context, suggestion) {
                                       return ListTile(
-                                        tileColor: Colors.white,
+                                        tileColor: isDark? Theme.of(context).canvasColor: Colors.white,
                                         title: Text(suggestion),
                                       );
                                     },
                                     onSuggestionSelected: (suggestion) {
                                       controller.store.text = suggestion;
-                                      for (int i = 0;
-                                          i < dataCabang.length;
-                                          i++) {
+                                      for (
+                                        int i = 0;
+                                        i < dataCabang.length;
+                                        i++
+                                      ) {
                                         if (dataCabang[i].namaCabang ==
                                             suggestion) {
                                           controller.selectedCabang.value =
@@ -139,22 +143,18 @@ class AddPegawaiView extends GetView<AddPegawaiController> {
                                 return const Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    Center(
-                                      child: CupertinoActivityIndicator(),
-                                    ),
+                                    Center(child: CupertinoActivityIndicator()),
                                     SizedBox(width: 5),
                                     Text('Sedang memuat...'),
                                   ],
                                 );
                               },
                             ),
-                          )
+                          ),
                         ],
                       ),
                     ),
-                    const SizedBox(
-                      width: 5,
-                    ),
+                    const SizedBox(width: 5),
                     InkWell(
                       onTap: () => controller.uploadImageProfile(),
                       child: ClipRect(
@@ -163,31 +163,34 @@ class AddPegawaiView extends GetView<AddPegawaiController> {
                             if (c.image != null || c.webImage.isNotEmpty) {
                               return kIsWeb
                                   ? Container(
-                                      height: 110,
-                                      width: 110,
-                                      decoration: BoxDecoration(
-                                          color: Colors.grey[300]),
-                                      child: Image.memory(
-                                        c.webImage,
-                                        fit: BoxFit.contain,
-                                      ),
-                                    )
+                                    height: 110,
+                                    width: 110,
+                                    decoration: BoxDecoration(
+                                      color: isDark? Theme.of(context).canvasColor: Colors.grey[300],
+                                    ),
+                                    child: Image.memory(
+                                      c.webImage,
+                                      fit: BoxFit.contain,
+                                    ),
+                                  )
                                   : Container(
-                                      height: 110,
-                                      width: 110,
-                                      decoration: BoxDecoration(
-                                          color: Colors.grey[300]),
-                                      child: Image.file(
-                                        File(c.image!.path),
-                                        fit: BoxFit.cover,
-                                      ),
-                                    );
+                                    height: 110,
+                                    width: 110,
+                                    decoration: BoxDecoration(
+                                      color: isDark? Theme.of(context).canvasColor: Colors.grey[300],
+                                    ),
+                                    child: Image.file(
+                                      File(c.image!.path),
+                                      fit: BoxFit.cover,
+                                    ),
+                                  );
                             } else {
                               return Container(
                                 height: 110,
                                 width: 110,
-                                decoration:
-                                    BoxDecoration(color: Colors.grey[300]),
+                                decoration: BoxDecoration(
+                                  color: isDark? Theme.of(context).canvasColor: Colors.grey[300],
+                                ),
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
@@ -201,7 +204,7 @@ class AddPegawaiView extends GetView<AddPegawaiController> {
                                       style: subtitleTextStyle.copyWith(
                                         color: Colors.blue,
                                       ),
-                                    )
+                                    ),
                                   ],
                                 ),
                               );
@@ -209,13 +212,11 @@ class AddPegawaiView extends GetView<AddPegawaiController> {
                           },
                         ),
                       ),
-                    )
+                    ),
                   ],
                 ),
               ),
-              const SizedBox(
-                height: 10,
-              ),
+              const SizedBox(height: 10),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -226,34 +227,32 @@ class AddPegawaiView extends GetView<AddPegawaiController> {
                           height: 50,
                           child: TextField(
                             controller: controller.username,
-                            decoration: const InputDecoration(
-                                labelText: 'Username',
-                                filled: true,
-                                fillColor: Colors.white,
-                                border: OutlineInputBorder()),
+                            decoration: InputDecoration(
+                              labelText: 'Username',
+                              filled: true,
+                              fillColor: isDark? Theme.of(context).canvasColor: Colors.white,
+                              border: const OutlineInputBorder(),
+                            ),
                           ),
                         ),
-                        const SizedBox(
-                          height: 10,
-                        ),
+                        const SizedBox(height: 10),
                         SizedBox(
                           height: 50,
                           child: TextField(
                             obscureText: true,
                             controller: controller.pass,
-                            decoration: const InputDecoration(
-                                labelText: 'Password',
-                                filled: true,
-                                fillColor: Colors.white,
-                                border: OutlineInputBorder()),
+                            decoration: InputDecoration(
+                              labelText: 'Password',
+                              filled: true,
+                              fillColor: isDark? Theme.of(context).canvasColor: Colors.white,
+                              border: const OutlineInputBorder(),
+                            ),
                           ),
-                        )
+                        ),
                       ],
                     ),
                   ),
-                  const SizedBox(
-                    width: 5,
-                  ),
+                  const SizedBox(width: 5),
                   Expanded(
                     child: Column(
                       children: [
@@ -261,36 +260,34 @@ class AddPegawaiView extends GetView<AddPegawaiController> {
                           height: 50,
                           child: TextField(
                             controller: controller.name,
-                            decoration: const InputDecoration(
-                                labelText: 'Nama',
-                                filled: true,
-                                fillColor: Colors.white,
-                                border: OutlineInputBorder()),
+                            decoration: InputDecoration(
+                              labelText: 'Nama',
+                              filled: true,
+                              fillColor:  isDark? Theme.of(context).canvasColor:Colors.white,
+                              border: const OutlineInputBorder(),
+                            ),
                           ),
                         ),
-                        const SizedBox(
-                          height: 10,
-                        ),
+                        const SizedBox(height: 10),
                         SizedBox(
                           height: 50,
                           child: TextField(
                             controller: controller.telp,
-                            decoration: const InputDecoration(
-                                labelText: 'No Telp',
-                                filled: true,
-                                fillColor: Colors.white,
-                                border: OutlineInputBorder()),
+                            decoration:  InputDecoration(
+                              labelText: 'No Telp',
+                              filled: true,
+                              fillColor: isDark? Theme.of(context).canvasColor: Colors.white,
+                              border: const OutlineInputBorder(),
+                            ),
                             keyboardType: TextInputType.phone,
                           ),
-                        )
+                        ),
                       ],
                     ),
                   ),
                 ],
               ),
-              const SizedBox(
-                height: 10,
-              ),
+              const SizedBox(height: 10),
               SizedBox(
                 height: 50,
                 child: FutureBuilder(
@@ -302,28 +299,38 @@ class AddPegawaiView extends GetView<AddPegawaiController> {
                       dataLevel!.map((data) {
                         allLevel.add(data.namaLevel!);
                       }).toList();
-          
-                      return TypeAheadFormField<String>(autoFlipDirection: true,
+
+                      return TypeAheadFormField<String>(
+                        autoFlipDirection: true,
                         textFieldConfiguration: TextFieldConfiguration(
                           controller: controller.level,
-                          decoration: const InputDecoration(
+                          decoration:  InputDecoration(
                             labelText: 'Level User',
-                            border: OutlineInputBorder(),
+                            border: const OutlineInputBorder(),
                             filled: true,
-                            fillColor: Colors.white,
+                            fillColor: isDark? Theme.of(context).canvasColor: Colors.white,
                           ),
                         ),
                         suggestionsCallback: (pattern) {
-                          return allLevel.where((option) => option
-                              .toLowerCase()
-                              .contains(pattern.toLowerCase()));
+                          return allLevel.where(
+                            (option) => option.toLowerCase().contains(
+                              pattern.toLowerCase(),
+                            ),
+                          );
                         },
                         itemBuilder: (context, suggestion) {
-                          return  Padding(
+                          return Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: SizedBox(
                               height: 30,
-                              child: Text(suggestion, style: titleTextStyle.copyWith(fontSize: 18, fontWeight: FontWeight.normal),)),
+                              child: Text(
+                                suggestion,
+                                style: titleTextStyle.copyWith(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.normal,
+                                ),
+                              ),
+                            ),
                           );
                         },
                         onSuggestionSelected: (suggestion) {
@@ -341,9 +348,7 @@ class AddPegawaiView extends GetView<AddPegawaiController> {
                     return const Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Center(
-                          child: CupertinoActivityIndicator(),
-                        ),
+                        Center(child: CupertinoActivityIndicator()),
                         SizedBox(width: 5),
                         Text('Sedang memuat...'),
                       ],
@@ -351,9 +356,7 @@ class AddPegawaiView extends GetView<AddPegawaiController> {
                   },
                 ),
               ),
-              const SizedBox(
-                height: 10,
-              ),
+              const SizedBox(height: 10),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 105),
                 child: ContainerMainColor(
@@ -361,27 +364,27 @@ class AddPegawaiView extends GetView<AddPegawaiController> {
                   end: Alignment.bottomCenter,
                   radius: 30,
                   child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.transparent,
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(50)),
-                          minimumSize: const Size(70, 50)),
-                      onPressed: () {
-                        controller.addUpdatePegawai(context, "add", Data());
-                      },
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'REGISTER',
-                            style: titleTextStyle,
-                          ),
-                          const Icon(Iconsax.arrow_right_bold)
-                        ],
-                      )),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.transparent,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(50),
+                      ),
+                      minimumSize: const Size(70, 50),
+                    ),
+                    onPressed: () {
+                      controller.addUpdatePegawai(context, "add", Data());
+                    },
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('REGISTER', style: titleTextStyle),
+                        const Icon(Iconsax.arrow_right_bold),
+                      ],
+                    ),
+                  ),
                 ),
-              )
+              ),
             ],
           ),
         ],

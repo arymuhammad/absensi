@@ -25,4 +25,24 @@ class AppColors {
   static const Color contentColorRed = Color(0xFFE80054);
   static const Color contentColorCyan = Color(0xFF50E4FF);
   static const Color contentDefBtn = Color(0xFF0091EA);
+
+  static LinearGradient mainGradient({
+    BuildContext? context,
+    AlignmentGeometry? begin,
+    AlignmentGeometry? end,
+  }) {
+   
+    final isDark = Theme.of(context!).brightness == Brightness.dark;
+
+    return LinearGradient(
+      colors:
+          isDark
+              ? [const Color(0xFF0F172A), const Color(0xFF1E293B)]
+              : [const Color(0xFF1B2541), const Color(0xFF3949AB)],
+      // begin: Alignment.bottomCenter,
+      // end: Alignment.topCenter,
+      begin: begin!,
+      end: end!,
+    );
+  }
 }

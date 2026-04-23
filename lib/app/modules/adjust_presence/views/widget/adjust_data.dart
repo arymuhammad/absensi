@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:absensi/app/data/helper/custom_dialog.dart';
-import 'package:absensi/app/data/model/login_model.dart';
 import 'package:absensi/app/modules/adjust_presence/controllers/adjust_presence_controller.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/cupertino.dart';
@@ -14,8 +13,8 @@ import '../expanded_data_absen.dart';
 import '../expanded_data_visit.dart';
 
 class AdjustData extends GetView<AdjustPresenceController> {
-  AdjustData({super.key, required this.userData});
-  final Data userData;
+  AdjustData({super.key,});
+ 
   final ctrl = Get.find<AdjustPresenceController>();
   @override
   Widget build(BuildContext context) {

@@ -3,7 +3,6 @@ import 'package:absensi/app/data/helper/app_colors.dart';
 import 'package:absensi/app/data/helper/const.dart';
 import 'package:absensi/app/data/helper/db_helper.dart';
 import 'package:absensi/app/data/helper/custom_dialog.dart';
-import 'package:absensi/app/data/model/login_model.dart';
 import 'package:absensi/app/modules/add_pegawai/controllers/add_pegawai_controller.dart';
 import 'package:absensi/app/modules/login/controllers/login_controller.dart';
 import 'package:flutter/material.dart';
@@ -15,13 +14,14 @@ import 'package:sqflite/sqflite.dart';
 import '../../../services/service_api.dart';
 
 class BackupView extends GetView {
-  BackupView({super.key, this.userData});
-  final Data? userData;
+  BackupView({super.key});
   final ctrl = Get.put(AddPegawaiController());
   final auth = Get.put(LoginController());
 
   @override
   Widget build(BuildContext context) {
+    final userData = auth.logUser.value;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
@@ -40,9 +40,9 @@ class BackupView extends GetView {
           // const CsBgImg(),
           Container(
             height: 250,
-           decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Color(0xFF1B2541), Color(0xFF3949AB)],
+            decoration: BoxDecoration(
+              gradient: AppColors.mainGradient(
+                context: context,
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
@@ -205,7 +205,7 @@ class BackupView extends GetView {
                         const Divider(),
                         OutlinedButton.icon(
                           style: ButtonStyle(
-                            shape: MaterialStateProperty.all(
+                            shape: WidgetStateProperty.all(
                               RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(20),
                               ),
@@ -213,9 +213,13 @@ class BackupView extends GetView {
                           ),
                           icon: Icon(Icons.camera_front, color: mainColor),
                           onPressed: () async {
-                            if (userData!.visit == '0') {
-                              var tempDataAbs =
-                                  await SQLHelper.instance.getAllDataAbsen();
+                            if (userData.visit == '0') {
+                              var tempDataAbs = await SQLHelper.instance
+                                  .getAllDataAbsen(
+                                    userData.id!,
+                                    ctrl.initDate1,
+                                    ctrl.initDate2,
+                                  );
                               for (var i in tempDataAbs) {
                                 var data = {
                                   "tanggal_masuk": i.tanggalMasuk,
@@ -240,8 +244,12 @@ class BackupView extends GetView {
                                 await ServiceApi().reSubmitAbsen(data);
                               }
                             } else {
-                              var tempDataVisit =
-                                  await SQLHelper.instance.getAllDataVisit();
+                              var tempDataVisit = await SQLHelper.instance
+                                  .getAllDataVisit(
+                                    userData.id!,
+                                    ctrl.initDate1,
+                                    ctrl.initDate2,
+                                  );
 
                               for (var i in tempDataVisit) {
                                 var data = {
@@ -266,22 +274,24 @@ class BackupView extends GetView {
                               }
                             }
                             showToast(
-                              userData!.visit == '0'
+                              userData.visit == '0'
                                   ? 'Data absen berhasil dikirim ulang'
                                   : 'Data visit berhasil dikirim ulang',
                             );
                           },
                           label: Text(
-                            userData!.visit == '0'
+                            userData.visit == '0'
                                 ? 'Kirim ulang data absensi'
                                 : 'Kirim ulang data visit',
-                            style: const TextStyle(color: Colors.black),
+                            style: TextStyle(
+                              color: isDark ? Colors.grey : Colors.black,
+                            ),
                           ),
                         ),
                         const SizedBox(height: 5),
                         OutlinedButton.icon(
                           style: ButtonStyle(
-                            shape: MaterialStateProperty.all(
+                            shape: WidgetStateProperty.all(
                               RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(20),
                               ),
@@ -289,36 +299,48 @@ class BackupView extends GetView {
                           ),
                           icon: Icon(Icons.people, color: red),
                           onPressed: () async {
-                            if (userData!.visit == '0') {
+                            if (userData.visit == '0') {
                               // cek data absen
                               loadingDialog("menghapus data...", "");
                               var tempDataAbs = await SQLHelper.instance
                                   .getAbsenToday(
-                                    userData!.id!,
+                                    userData.id!,
                                     DateFormat(
                                       'yyyy-MM-dd',
                                     ).format(DateTime.now()),
                                   );
-                              if (tempDataAbs.isNotEmpty &&
+                              final today = DateFormat(
+                                'yyyy-MM-dd',
+                              ).format(DateTime.now());
+                              final hasCheckInOnly =
+                                  tempDataAbs.isNotEmpty &&
                                   tempDataAbs.first.tanggalMasuk != null &&
-                                  tempDataAbs.first.tanggalPulang == null) {
-                                SQLHelper.instance.deleteDataAbsenMasuk(
-                                  tempDataAbs.first.idUser!,
-                                  tempDataAbs.first.tanggalMasuk!,
+                                  tempDataAbs.first.tanggalPulang == null;
+
+                              if (hasCheckInOnly) {
+                                // ===============================
+                                // 🧹 DELETE CHECK IN (MASUK)
+                                // ===============================
+                                final firstData = tempDataAbs.first;
+
+                                await SQLHelper.instance.deleteDataAbsenMasuk(
+                                  firstData.idUser!,
+                                  firstData.tanggalMasuk!,
                                 );
 
-                                var dataLive = {
+                                final dataLive = {
                                   "type": "absen",
                                   "status": "masuk",
-                                  "id": userData!.id!,
-                                  "tanggal_masuk": DateFormat(
-                                    'yyyy-MM-dd',
-                                  ).format(DateTime.now()),
+                                  "id": userData.id!,
+                                  "tanggal_masuk": today,
                                 };
 
                                 await ServiceApi().deleteAbsVst(dataLive);
                               } else {
-                                var dataLocal = {
+                                // ===============================
+                                // 🧹 DELETE CHECK OUT (PULANG)
+                                // ===============================
+                                final dataLocal = {
                                   "tanggal_pulang": null,
                                   "jam_absen_pulang": "",
                                   "foto_pulang": "",
@@ -326,62 +348,75 @@ class BackupView extends GetView {
                                   "long_pulang": "",
                                   "device_info2": "",
                                 };
-                                SQLHelper.instance.deleteDataAbsenPulang(
+
+                                await SQLHelper.instance.deleteDataAbsenPulang(
                                   dataLocal,
-                                  userData!.id!,
-                                  DateFormat(
-                                    'yyyy-MM-dd',
-                                  ).format(DateTime.now()),
+                                  userData.id!,
+                                  today,
                                 );
 
-                                var dataLive = {
+                                final dataLive = {
                                   "type": "absen",
                                   "status": "pulang",
-                                  "id": userData!.id!,
-                                  "tanggal_masuk": DateFormat(
-                                    'yyyy-MM-dd',
-                                  ).format(DateTime.now()),
+                                  "id": userData.id!,
+                                  "tanggal_masuk": today,
                                 };
-                                // log(dataLive.toString());
+
                                 await ServiceApi().deleteAbsVst(dataLive);
                               }
                             } else {
-                              // cek data visit
-                              loadingDialog("menghapus data...", "");
+                              final today = DateFormat(
+                                'yyyy-MM-dd',
+                              ).format(DateTime.now());
+                              //cek data visit
                               var tempDataVisit = await SQLHelper.instance
                                   .getVisitToday(
-                                    userData!.id!,
+                                    userData.id!,
                                     DateFormat(
                                       'yyyy-MM-dd',
                                     ).format(DateTime.now()),
                                     "",
                                     0,
                                   );
+                              final hasData = tempDataVisit.isNotEmpty;
+                              final firstVisit =
+                                  hasData ? tempDataVisit.first : null;
 
-                              if (tempDataVisit.isNotEmpty &&
-                                  tempDataVisit.first.tglVisit != null &&
-                                  tempDataVisit.first.visitIn != "" &&
-                                  tempDataVisit.first.jamIn != "" &&
-                                  tempDataVisit.first.visitOut == "" &&
-                                  tempDataVisit.first.jamOut == "") {
-                                SQLHelper.instance.deleteDataVisitMasuk(
-                                  tempDataVisit.first.id!,
-                                  tempDataVisit.first.tglVisit!,
-                                  tempDataVisit.first.visitIn!,
+                              final isCheckInOnly =
+                                  hasData &&
+                                  firstVisit!.tglVisit != null &&
+                                  firstVisit.visitIn != "" &&
+                                  firstVisit.jamIn != "" &&
+                                  firstVisit.visitOut == "" &&
+                                  firstVisit.jamOut == "";
+
+                              if (isCheckInOnly) {
+                                // ===============================
+                                // 🧹 DELETE MASUK
+                                // ===============================
+                                loadingDialog("menghapus data masuk...", "");
+
+                                await SQLHelper.instance.deleteDataVisitMasuk(
+                                  firstVisit.id!,
+                                  firstVisit.tglVisit!,
+                                  firstVisit.visitIn!,
                                 );
 
-                                var dataLive = {
+                                final dataLive = {
                                   "type": "visit",
                                   "status": "masuk",
-                                  "id": userData!.id!,
-                                  "tgl_visit": DateFormat(
-                                    'yyyy-MM-dd',
-                                  ).format(DateTime.now()),
-                                  "visit_in": tempDataVisit.first.visitIn!,
+                                  "id": userData.id!,
+                                  "tgl_visit": today,
+                                  "visit_in": firstVisit.visitIn!,
                                 };
+
                                 await ServiceApi().deleteAbsVst(dataLive);
+                                Get.back();
                               } else {
-                                var data = {
+                                // ===============================
+                                // 🧹 DELETE PULANG
+                                // ===============================
+                                final data = {
                                   "visit_out": "",
                                   "jam_out": "",
                                   "foto_out": "",
@@ -389,37 +424,40 @@ class BackupView extends GetView {
                                   "long_out": "",
                                   "device_info2": "",
                                 };
-                                SQLHelper.instance.deleteDataVisitPulang(
+
+                                loadingDialog("menghapus data pulang...", "");
+
+                                await SQLHelper.instance.deleteDataVisitPulang(
                                   data,
-                                  userData!.id!,
-                                  DateFormat(
-                                    'yyyy-MM-dd',
-                                  ).format(DateTime.now()),
+                                  userData.id!,
+                                  today,
                                 );
 
-                                var dataLive = {
+                                final dataLive = {
                                   "type": "visit",
                                   "status": "pulang",
-                                  "id": userData!.id!,
-                                  "tgl_visit": DateFormat(
-                                    'yyyy-MM-dd',
-                                  ).format(DateTime.now()),
-                                  "visit_in": tempDataVisit.first.visitIn ?? "",
+                                  "id": userData.id!,
+                                  "tgl_visit": today,
+                                  // 🔥 SAFE
+                                  "visit_in": firstVisit?.visitIn ?? "",
                                 };
-                                // log(dataLive.toString());
+
                                 await ServiceApi().deleteAbsVst(dataLive);
+                                Get.back();
                               }
                             }
                           },
                           label: Text(
-                            'Hapus data ${userData!.visit == '0' ? 'absen' : 'visit'} masuk / pulang',
-                            style: const TextStyle(color: Colors.black),
+                            'Hapus data ${userData.visit == '0' ? 'absen' : 'visit'} masuk / pulang',
+                            style: TextStyle(
+                              color: isDark ? Colors.grey : Colors.black,
+                            ),
                           ),
                         ),
                         const SizedBox(height: 5),
                         OutlinedButton.icon(
                           style: ButtonStyle(
-                            shape: MaterialStateProperty.all(
+                            shape: WidgetStateProperty.all(
                               RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(20),
                               ),
@@ -430,9 +468,11 @@ class BackupView extends GetView {
                             await SQLHelper.instance.truncateShift();
                             showToast('Data Shift berhasil dihapus');
                           },
-                          label: const Text(
+                          label: Text(
                             'Hapus data shift',
-                            style: TextStyle(color: Colors.black),
+                            style: TextStyle(
+                              color: isDark ? Colors.grey : Colors.black,
+                            ),
                           ),
                         ),
                         const SizedBox(height: 5),
@@ -449,9 +489,11 @@ class BackupView extends GetView {
                             await SQLHelper.instance.truncateCabang();
                             showToast('Data Cabang berhasil dihapus');
                           },
-                          label: const Text(
+                          label: Text(
                             'Hapus data cabang',
-                            style: TextStyle(color: Colors.black),
+                            style: TextStyle(
+                              color: isDark ? Colors.grey : Colors.black,
+                            ),
                           ),
                         ),
                         const SizedBox(height: 5),
@@ -482,9 +524,11 @@ class BackupView extends GetView {
                             });
                             showToast('Data berhasil dihapus');
                           },
-                          label: const Text(
+                          label: Text(
                             'Hapus Semua Data',
-                            style: TextStyle(color: Colors.black),
+                            style: TextStyle(
+                              color: isDark ? Colors.grey : Colors.black,
+                            ),
                           ),
                         ),
                       ],

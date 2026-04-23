@@ -13,6 +13,7 @@ class UpdatePassword extends GetView {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
@@ -20,29 +21,20 @@ class UpdatePassword extends GetView {
           'Update Password',
           style: titleTextStyle.copyWith(fontSize: 18),
         ),
-        backgroundColor: Colors.transparent.withOpacity(0.4),
-        flexibleSpace:Container(decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Color(0xFF1B2541), Color(0xFF3949AB)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-            ),
-            ),
+        backgroundColor: Colors.transparent,
         elevation: 0,
-        shadowColor: Colors.transparent,
         // iconTheme: const IconThemeData(color: Colors.black,),
         // centerTitle: true,
       ),
-      // resizeToAvoidBottomInset: false,
+      resizeToAvoidBottomInset: true,
       body: Stack(
         children: [
           // const CsBgImg(),
           Container(
             height: 250,
-           decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Color(0xFF1B2541), Color(0xFF3949AB)],
+            decoration: BoxDecoration(
+              gradient: AppColors.mainGradient(
+                context: context,
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
@@ -94,29 +86,29 @@ class UpdatePassword extends GetView {
                   decoration: inputDecoration(
                     label: 'Type new password',
                     prefixIcon: Icons.lock_outline,
+                    isDark: isDark,
+                    context: context,
                   ),
                 ),
                 const SizedBox(height: 20),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 80),
-                  child: Container(decoration: BoxDecoration(
-    gradient: const LinearGradient(
-      colors: [
-        Color(0xFF1B2541),
-        Color(0xFF3949AB),
-      ],
-      begin: Alignment.topLeft,
-      end: Alignment.bottomRight,
-    ),
-    borderRadius: BorderRadius.circular(30),
-    boxShadow: [
-      BoxShadow(
-        color: Colors.blueAccent.withOpacity(0.4),
-        blurRadius: 8,
-        offset: const Offset(0, 4),
-      ),
-    ],
-  ),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFF1B2541), Color(0xFF3949AB)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(30),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.blueAccent.withOpacity(0.4),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
                     child: ElevatedButton(
                       onPressed: () async {
                         await pegawaiC.updatePassword(

@@ -1,0 +1,2 @@
+D:/apps/absensi/android/app/.cxx/Debug/h1h2s4u6/x86_64/CMakeFiles/edit_cache.dir
+D:/apps/absensi/android/app/.cxx/Debug/h1h2s4u6/x86_64/CMakeFiles/rebuild_cache.dir

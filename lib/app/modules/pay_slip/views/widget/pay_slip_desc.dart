@@ -19,6 +19,7 @@ class PaySlipDesc extends StatelessWidget {
   Widget build(BuildContext context) {
     final model = data.payslipModel!;
     const blue = Color(0xFF4E73A8);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return SingleChildScrollView(
       child: Padding(
@@ -30,7 +31,7 @@ class PaySlipDesc extends StatelessWidget {
           child: ClipPath(
             clipper: ReceiptClipper(),
             child: Container(
-              color: const Color(0xFFFFFDF7),
+              color: isDark? Theme.of(context).cardColor: const Color(0xFFFFFDF7),
               child: Stack(
                 children: [
                   /// 🔹 WATERMARK

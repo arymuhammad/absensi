@@ -19,29 +19,31 @@ class Absen {
   String? namaShift;
   String? devInfo;
   String? devInfo2;
+  String? statusSync;
 
-  Absen(
-      {this.idUser,
-      this.tanggalMasuk,
-      this.tanggalPulang,
-      this.nama,
-      this.namaCabang,
-      this.kodeCabang,
-      this.idShift,
-      this.jamMasuk,
-      this.jamPulang,
-      this.jamAbsenMasuk,
-      this.jamAbsenPulang,
-      this.fotoMasuk,
-      this.fotoPulang,
-      this.latMasuk,
-      this.longMasuk,
-      this.latPulang,
-      this.longPulang,
-      this.namaShift,
-      this.devInfo,
-      this.devInfo2,
-      });
+  Absen({
+    this.idUser,
+    this.tanggalMasuk,
+    this.tanggalPulang,
+    this.nama,
+    this.namaCabang,
+    this.kodeCabang,
+    this.idShift,
+    this.jamMasuk,
+    this.jamPulang,
+    this.jamAbsenMasuk,
+    this.jamAbsenPulang,
+    this.fotoMasuk,
+    this.fotoPulang,
+    this.latMasuk,
+    this.longMasuk,
+    this.latPulang,
+    this.longPulang,
+    this.namaShift,
+    this.devInfo,
+    this.devInfo2,
+    this.statusSync,
+  });
 
   Absen.fromJson(Map<String, dynamic> json) {
     idUser = json['id_user'];
@@ -50,7 +52,7 @@ class Absen {
     nama = json['nama'];
     namaCabang = json['nama_cabang'];
     kodeCabang = json['kode_cabang'];
-    idShift = json['id_shift'].toString();
+    idShift = json['id_shift']?.toString();
     jamMasuk = json['jam_masuk'];
     jamPulang = json['jam_pulang'];
     jamAbsenMasuk = json['jam_absen_masuk'];
@@ -74,6 +76,13 @@ class Absen {
     data['nama'] = nama;
     // data['nama_cabang'] = namaCabang;
     data['kode_cabang'] = kodeCabang;
+    if (idShift == null ||
+        idShift == '' ||
+        idShift == '0' ||
+        idShift == 'null') {
+      throw Exception("Invalid id_shift");
+    }
+
     data['id_shift'] = idShift;
     data['jam_masuk'] = jamMasuk;
     data['jam_pulang'] = jamPulang;
@@ -88,6 +97,7 @@ class Absen {
     // data['nama_shift'] = namaShift;
     data['device_info'] = devInfo;
     data['device_info2'] = devInfo2;
+    data['status_sync'] = statusSync;
     return data;
   }
 }

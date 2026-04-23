@@ -18,6 +18,7 @@ class ExpandedDataAbsen extends StatelessWidget {
   final ctrl = Get.put(AdjustPresenceController());
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return data.idUser != null
         ? Expanded(
             child: ListView(children: [
@@ -164,14 +165,14 @@ class ExpandedDataAbsen extends StatelessWidget {
                                   child: CsTextField(
                                       controller: ctrl.jamMasukUpdate
                                         ..text = data.jamAbsenMasuk!,
-                                      label: 'Jam Masuk'),
+                                      label: 'Jam Masuk', isDark: isDark,),
                                 ),
                                 SizedBox(
                                   width: Get.size.width / 2.3,
                                   child: CsTextField(
                                       controller: ctrl.jamPulangUpdate
                                         ..text = data.jamAbsenPulang!,
-                                      label: 'Jam Pulang'),
+                                      label: 'Jam Pulang',isDark: isDark,),
                                 ),
                               ],
                             ),
@@ -180,7 +181,7 @@ class ExpandedDataAbsen extends StatelessWidget {
                             ),
                             CsTextField(
                                 controller: ctrl.foto..text = data.fotoPulang! !="" ?data.fotoPulang!:'',
-                                label: 'Foto'),
+                                label: 'Foto', isDark: isDark,),
                             const SizedBox(
                               height: 5,
                             ),
@@ -192,14 +193,14 @@ class ExpandedDataAbsen extends StatelessWidget {
                                   child: CsTextField(
                                       controller: ctrl.lat
                                         ..text = data.latMasuk!,
-                                      label: 'Lat'),
+                                      label: 'Lat', isDark: isDark,),
                                 ),
                                 SizedBox(
                                   width: Get.size.width / 2.3,
                                   child: CsTextField(
                                       controller: ctrl.long
                                         ..text = data.longMasuk!,
-                                      label: 'Long'),
+                                      label: 'Long', isDark: isDark,),
                                 ),
                               ],
                             ),
@@ -208,7 +209,7 @@ class ExpandedDataAbsen extends StatelessWidget {
                             ),
                             CsTextField(
                                 controller: ctrl.device..text = data.devInfo!,
-                                label: 'Device'),
+                                label: 'Device', isDark: isDark,),
                             const SizedBox(
                               height: 5,
                             ),

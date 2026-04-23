@@ -13,6 +13,8 @@ import '../modules/leave/bindings/leave_binding.dart';
 import '../modules/leave/views/leave_view.dart';
 import '../modules/login/bindings/login_binding.dart';
 import '../modules/login/views/login_view.dart';
+import '../modules/overtime/bindings/overtime_binding.dart';
+import '../modules/overtime/views/overtime_view.dart';
 import '../modules/pay_slip/bindings/pay_slip_binding.dart';
 import '../modules/pay_slip/views/pay_slip_view.dart';
 import '../modules/ping/bindings/ping_binding.dart';
@@ -101,6 +103,11 @@ class AppPages {
       name: _Paths.PING,
       page: () => const PingIndicator(host: ''),
       binding: PingBinding(),
+    ),
+    GetPage(
+      name: _Paths.OVERTIME,
+      page: () =>  OvertimeView(),
+      binding: OvertimeBinding(),
     ),
   ];
 }

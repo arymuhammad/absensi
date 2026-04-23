@@ -74,6 +74,27 @@ class AddPegawaiController extends GetxController {
   var latestVer = "";
   var backup = false.obs;
   var restore = false.obs;
+
+  var initDate1 =
+      DateFormat('yyyy-MM-dd')
+          .format(
+            DateTime.parse(
+              DateTime(DateTime.now().year, DateTime.now().month, 1).toString(),
+            ),
+          )
+          .toString();
+  var initDate2 =
+      DateFormat('yyyy-MM-dd')
+          .format(
+            DateTime.parse(
+              DateTime(
+                DateTime.now().year,
+                DateTime.now().month + 1,
+                0,
+              ).toString(),
+            ),
+          )
+          .toString();
   // var supportedAbi = "";
   @override
   void onInit() async {
@@ -136,8 +157,8 @@ class AddPegawaiController extends GetxController {
             Uri.parse(
               // supportedAbi == 'arm64-v8a'
               //     ? 'http://103.156.15.61/update apk/absensiApp.arm64v8a.apk'
-                  // : 
-                  'http://103.156.15.61/update_apk/absensiApp.apk',
+              // :
+              'http://103.156.15.61/update_apk/absensiApp.apk',
             ),
           )
           .timeout(const Duration(seconds: 20));
@@ -261,8 +282,8 @@ class AddPegawaiController extends GetxController {
                     .execute(
                       // supportedAbi == 'arm64-v8a'
                       //     ? 'http://103.156.15.61/update apk/absensiApp.arm64v8a.apk'
-                          // :
-                           'http://103.156.15.61/update_apk/absensiApp.apk',
+                      // :
+                      'http://103.156.15.61/update_apk/absensiApp.apk',
                       // OPTIONAL
                       // destinationFilename: '/',
                       //OPTIONAL, ANDROID ONLY - ABILITY TO VALIDATE CHECKSUM OF FILE:

@@ -1,6 +1,5 @@
 import 'package:absensi/app/data/helper/app_colors.dart';
 import 'package:absensi/app/data/helper/const.dart';
-import 'package:absensi/app/data/model/login_model.dart';
 import 'package:absensi/app/modules/home/views/summary_absen.dart';
 import 'package:absensi/app/modules/home/views/summary_absen_area.dart';
 import 'package:absensi/app/modules/leave/controllers/leave_controller.dart';
@@ -15,8 +14,8 @@ import '../../login/controllers/login_controller.dart';
 import '../controllers/home_controller.dart';
 
 class HomeView extends GetView<HomeController> {
-  HomeView({super.key, this.listDataUser});
-  final Data? listDataUser;
+  HomeView({super.key});
+  final auth = Get.find<LoginController>();
   final absenC = Get.put(AbsenController());
   final adjCtrl = Get.put(AdjustPresenceController());
   final leaveC = Get.put(LeaveController());
@@ -24,6 +23,7 @@ class HomeView extends GetView<HomeController> {
 
   @override
   Widget build(BuildContext context) {
+    final listDataUser = auth.logUser.value;
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: Stack(
@@ -46,7 +46,7 @@ class HomeView extends GetView<HomeController> {
                       () => Row(
                         children: [
                           Text(
-                            '${greetingC.greeting.value}${listDataUser!.nama!.split(' ')[0]}',
+                            '${greetingC.greeting.value}${listDataUser.nama!.split(' ')[0]}',
                             style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 16,
@@ -96,8 +96,8 @@ class HomeView extends GetView<HomeController> {
                             child: RoundedImage(
                               height: 60,
                               width: 60,
-                              foto: listDataUser!.foto!,
-                              name: listDataUser!.nama!,
+                              foto: listDataUser.foto!,
+                              name: listDataUser.nama!,
                               headerProfile: true,
                             ),
                           ),
@@ -107,19 +107,50 @@ class HomeView extends GetView<HomeController> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              listDataUser!.levelUser!.capitalize!,
+                              listDataUser.levelUser!.capitalize!,
                               style: subtitleTextStyle.copyWith(
                                 color: Colors.white,
                                 fontSize: 16,
                               ),
                             ),
                             Text(
-                              listDataUser!.namaCabang!.capitalize!,
+                              listDataUser.namaCabang!.capitalize!,
 
                               softWrap: true,
                               style: const TextStyle(
                                 fontSize: 16,
                                 color: Colors.grey,
+                              ),
+                            ),
+                            Obx(
+                              () => Row(
+                                children: [
+                                  Container(
+                                    height: 5,
+                                    width: 5,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(100),
+                                      color:   !absenC.isOffline.value
+                                              ? Colors.green
+                                              : Colors.grey,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 2),
+                                  Text(
+                                    !absenC.isOffline.value
+                                        ? 'Online'
+                                        : 'Offline',
+
+                                    softWrap: true,
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color:
+                                          !absenC.isOffline.value
+                                              ? Colors.green
+                                              : Colors.grey,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ],
@@ -194,9 +225,9 @@ class HomeView extends GetView<HomeController> {
                 //     ],
                 //   ),
                 // ),
-                listDataUser!.visit == "1"
-                    ? SummaryAbsenArea(userData: listDataUser!)
-                    : SummaryAbsen(userData: listDataUser!),
+                listDataUser.visit == "1"
+                    ? SummaryAbsenArea()
+                    : SummaryAbsen(),
               ],
             ),
           ),

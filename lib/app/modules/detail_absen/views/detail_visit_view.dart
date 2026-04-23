@@ -42,6 +42,9 @@ class DetailVisitView extends GetView {
         child: const Icon(HeroIcons.map_pin, color: AppColors.contentColorBlue),
       ),
     ];
+
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
@@ -52,17 +55,19 @@ class DetailVisitView extends GetView {
             color: AppColors.contentColorWhite,
           ),
         ),
-        backgroundColor: AppColors.itemsBackground,
+        // backgroundColor: AppColors.itemsBackground,
         // elevation: 0.0,
         // iconTheme: const IconThemeData(color: Colors.black,),
         centerTitle: true,
-        flexibleSpace:Container(decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Color(0xFF1B2541), Color(0xFF3949AB)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-            ),)
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: AppColors.mainGradient(
+              context: context,
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
       ),
       resizeToAvoidBottomInset: false,
 
@@ -76,6 +81,7 @@ class DetailVisitView extends GetView {
                 data: detailData,
                 marker: markersMasuk,
                 isIn: true,
+                isDark: isDark,
               ),
               // const SizedBox(height: 10),
               Visibility(
@@ -84,7 +90,7 @@ class DetailVisitView extends GetView {
                   child: Padding(
                     padding: EdgeInsets.all(8.0),
                     child: Text(
-                      'Tidak ada data keluar ',
+                      'No Visit Out data ',
                       style: TextStyle(fontSize: 18),
                     ),
                   ),
@@ -97,6 +103,7 @@ class DetailVisitView extends GetView {
                   data: detailData,
                   markerOut: markersPulang,
                   isIn: false,
+                  isDark: isDark,
                 ),
               ),
             ],
@@ -112,6 +119,7 @@ class DetailVisitView extends GetView {
     List<Marker>? marker,
     List<Marker>? markerOut,
     required bool isIn,
+    required bool isDark,
   }) {
     String getGoogleMapsUrl(double lat, double lng) {
       return 'https://www.google.com/maps/search/?api=1&query=$lat,$lng';
@@ -125,13 +133,13 @@ class DetailVisitView extends GetView {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 10),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(22),
-        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        color: isDark ? Theme.of(context).cardColor : Colors.white,
         boxShadow: [
           BoxShadow(
-            blurRadius: 25,
-            offset: const Offset(0, 16),
-            color: Colors.black.withOpacity(.18),
+            blurRadius: 30,
+            offset: const Offset(0, 18),
+            color: Colors.black.withOpacity(.12),
           ),
         ],
       ),
@@ -139,12 +147,12 @@ class DetailVisitView extends GetView {
         children: [
           /// ================= HEADER =================
           Container(
-            height: 52,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            // height: 52,
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
             decoration: BoxDecoration(
               color: headerColor,
               borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(22),
+                top: Radius.circular(24),
               ),
             ),
             child: Row(
@@ -217,8 +225,11 @@ class DetailVisitView extends GetView {
                         TileLayer(
                           urlTemplate:
                               'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                          userAgentPackageName:
-                              'dev.fleaflet.flutter_map.example',
+                          subdomains: const ['a', 'b', 'c', 'd'],
+                          userAgentPackageName: 'com.absensi.urbanco',
+                          maxNativeZoom: 19,
+                          tileSize: 256,
+                          retinaMode: true,
                         ),
                         MarkerLayer(markers: isIn ? marker! : markerOut!),
                       ],
@@ -266,7 +277,8 @@ class DetailVisitView extends GetView {
                     child: Container(
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color:
+                            isDark ? Theme.of(context).cardColor : Colors.white,
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: Row(
@@ -304,17 +316,29 @@ class DetailVisitView extends GetView {
                                   data['store'].toString().capitalize!,
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(color:  isDark
+                                            ? Colors.white60
+                                            : Colors.grey[600]),
                                 ),
-                                
+
                                 const SizedBox(height: 4),
                                 Text(
                                   FormatWaktu.formatIndo(
                                     tanggal: DateTime.parse(data!['tgl_visit']),
                                   ),
-                                ),const SizedBox(height: 4),
+                                  style: TextStyle(
+                                    color:
+                                        isDark
+                                            ? Colors.white60
+                                            : Colors.grey[600],
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
                                 Row(
                                   children: [
-                                    const Icon(Icons.smartphone, size: 14),
+                                    Icon(Icons.smartphone, size: 14,color:  isDark
+                                            ? Colors.white60
+                                            : Colors.grey[600]),
                                     const SizedBox(width: 4),
                                     Expanded(
                                       child: Text(
@@ -327,7 +351,13 @@ class DetailVisitView extends GetView {
                                                 .capitalize!,
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
-                                        style: const TextStyle(fontSize: 12),
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          color:
+                                              isDark
+                                                  ? Colors.white60
+                                                  : Colors.grey[600],
+                                        ),
                                       ),
                                     ),
                                   ],

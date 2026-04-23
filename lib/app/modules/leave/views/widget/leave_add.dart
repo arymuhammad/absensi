@@ -21,6 +21,7 @@ class LeaveAdd extends StatelessWidget {
   final leaveC = Get.find<LeaveController>();
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -32,13 +33,15 @@ class LeaveAdd extends StatelessWidget {
         ),
         backgroundColor: AppColors.itemsBackground,
         centerTitle: true,
-        flexibleSpace: Container(decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Color(0xFF1B2541), Color(0xFF3949AB)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-            ),),
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFF1B2541), Color(0xFF3949AB)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -74,6 +77,7 @@ class LeaveAdd extends StatelessWidget {
                 onChanged: (val) {
                   leaveC.selectedLeave.value = val;
                 },
+                isDark: isDark,
               ),
               Obx(
                 () => Visibility(
@@ -88,6 +92,7 @@ class LeaveAdd extends StatelessWidget {
                         controller: leaveC.otherLeave,
                         label: 'Lainnya',
                         maxLines: 1,
+                        isDark: isDark,
                       ),
                     ],
                   ),
@@ -145,6 +150,7 @@ class LeaveAdd extends StatelessWidget {
                               },
                               maxLines: 1,
                               keyboardType: TextInputType.number,
+                              isDark: isDark,
                             ),
                           ),
                         ),
@@ -166,12 +172,14 @@ class LeaveAdd extends StatelessWidget {
                 controller: leaveC.reasonLeave,
                 label: 'Alasan kebutuhan cuti',
                 maxLines: 3,
+                isDark: isDark,
               ),
               const SizedBox(height: 10),
               CsTextField(
                 controller: leaveC.addrLeave,
                 label: 'Alamat selama cuti',
                 maxLines: 3,
+                isDark: isDark,
               ),
               const SizedBox(height: 10),
               CsTextField(
@@ -179,6 +187,7 @@ class LeaveAdd extends StatelessWidget {
                 label: 'Phone',
                 maxLines: 1,
                 keyboardType: TextInputType.number,
+                isDark: isDark,
               ),
               const SizedBox(height: 10),
               FutureBuilder<List<User>>(
@@ -256,7 +265,7 @@ class LeaveAdd extends StatelessWidget {
                             e.nama!,
                             overflow: TextOverflow.ellipsis,
                             maxLines: 1,
-                            style: TextStyle(color: Colors.black),
+                            style: const TextStyle(color: Colors.black),
                           );
                         }).toList();
                       },
@@ -308,7 +317,7 @@ class LeaveAdd extends StatelessWidget {
                 fontsize: 14,
                 label: 'Tanda tangan',
                 onPressed: () {
-                  openDialogSign();
+                  openDialogSign(context);
                 },
               ),
               const SizedBox(height: 10),
@@ -319,7 +328,7 @@ class LeaveAdd extends StatelessWidget {
     );
   }
 
-  openDialogSign() {
+  openDialogSign(BuildContext context) {
     Get.bottomSheet(
       Container(
         height: 250,
@@ -377,6 +386,8 @@ class LeaveAdd extends StatelessWidget {
                     } else if (leaveC.ctrSign.value.isEmpty) {
                       showToast("Harap buat tanda tangan dahulu");
                     } else {
+                      // Get.back();
+                      // loadingDialog("Mengirim pengajuan cuti...", "");
                       await leaveC.submitLeaveReq(
                         cabang: userData!.kodeCabang!,
                         idUser: userData!.id!,
@@ -395,6 +406,7 @@ class LeaveAdd extends StatelessWidget {
                         levelUserPengganti: leaveC.selectedLevelUser.value,
                         parentId: userData!.parentId!,
                       );
+                      // Navigator.pop(context);
                     }
                   },
                   child: const Text('Ajukan Cuti'),

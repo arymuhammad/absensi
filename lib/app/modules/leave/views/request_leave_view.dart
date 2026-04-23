@@ -15,15 +15,19 @@ import '../../../data/helper/custom_dialog.dart';
 import '../../../data/helper/format_waktu.dart';
 import '../../../data/model/leave_model.dart';
 import '../../../data/model/login_model.dart';
+import '../../login/controllers/login_controller.dart';
 import '../controllers/leave_controller.dart';
 
 class RequestLeaveView extends GetView<LeaveController> {
-  RequestLeaveView({super.key, this.userData});
-  final Data? userData;
+  RequestLeaveView({super.key});
+
+  final auth = Get.find<LoginController>();
   final leaveC = Get.find<LeaveController>();
 
   @override
   Widget build(BuildContext context) {
+    final userData = auth.logUser.value;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -33,15 +37,17 @@ class RequestLeaveView extends GetView<LeaveController> {
             color: AppColors.contentColorWhite,
           ),
         ),
-        backgroundColor: AppColors.itemsBackground,
+        // backgroundColor: AppColors.itemsBackground,
         centerTitle: true,
-        flexibleSpace:Container(decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Color(0xFF1B2541), Color(0xFF3949AB)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-            ),)
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: AppColors.mainGradient(
+              context: context,
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
       ),
       body: Stack(
         children: [
@@ -49,10 +55,10 @@ class RequestLeaveView extends GetView<LeaveController> {
             onRefresh: () async {
               var param = {
                 "type": "get_pending_req_leave",
-                "kode_cabang": userData!.kodeCabang!,
-                "id_user": userData!.id!,
-                "level": userData!.level!,
-                "parent_id": userData!.parentId!,
+                "kode_cabang": userData.kodeCabang!,
+                "id_user": userData.id!,
+                "level": userData.level!,
+                "parent_id": userData.parentId!,
               };
               await leaveC.getLeaveReq(param);
               showToast('Page Refreshed');
@@ -412,7 +418,10 @@ class RequestLeaveView extends GetView<LeaveController> {
                                   isHasLeftBorder: true,
                                   isHasRightBorder: true,
                                   borderRadius: BorderRadius.circular(5),
-                                  backgroundColor: Colors.white,
+                                  backgroundColor:
+                                      isDark
+                                          ? Theme.of(context).cardColor
+                                          : Colors.white,
                                   title: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
@@ -480,16 +489,22 @@ class RequestLeaveView extends GetView<LeaveController> {
                                       const SizedBox(height: 6),
                                       Text(
                                         leave.jenisCuti!,
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                           fontSize: 15,
-                                          color: Colors.black87,
+                                          color:
+                                              isDark
+                                                  ? Colors.grey
+                                                  : Colors.black87,
                                         ),
                                       ),
                                       Text(
                                         leaveStats,
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                           fontSize: 14,
-                                          color: Colors.black54,
+                                          color:
+                                              isDark
+                                                  ? Colors.grey
+                                                  : Colors.black54,
                                         ),
                                       ),
                                       Text(
@@ -506,46 +521,102 @@ class RequestLeaveView extends GetView<LeaveController> {
                                     Text.rich(
                                       TextSpan(
                                         children: [
-                                          const TextSpan(
+                                          TextSpan(
                                             text:
                                                 'Saya yang bertanda tangan dibawah ini:\n',
+                                            style: TextStyle(
+                                              color:
+                                                  isDark
+                                                      ? Colors.grey
+                                                      : Colors.black,
+                                            ),
                                           ),
-                                          const TextSpan(text: 'Nama    : '),
+                                          TextSpan(
+                                            text: 'Nama    : ',
+                                            style: TextStyle(
+                                              color:
+                                                  isDark
+                                                      ? Colors.grey
+                                                      : Colors.black,
+                                            ),
+                                          ),
                                           TextSpan(
                                             text: '${leave.nama}\n',
-                                            style: const TextStyle(
+                                            style: TextStyle(
                                               fontWeight: FontWeight.bold,
+                                              color:
+                                                  isDark
+                                                      ? Colors.grey
+                                                      : Colors.black,
                                             ),
                                           ),
-                                          const TextSpan(text: 'Jabatan : '),
+                                          TextSpan(
+                                            text: 'Jabatan : ',
+                                            style: TextStyle(
+                                              color:
+                                                  isDark
+                                                      ? Colors.grey
+                                                      : Colors.black,
+                                            ),
+                                          ),
                                           TextSpan(
                                             text: '${leave.namaLevel}\n\n',
-                                            style: const TextStyle(
+                                            style: TextStyle(
                                               fontWeight: FontWeight.bold,
+                                              color:
+                                                  isDark
+                                                      ? Colors.grey
+                                                      : Colors.black,
                                             ),
                                           ),
-                                          const TextSpan(
+                                          TextSpan(
                                             text:
                                                 'Hendak mengajukan permohonan cuti ',
+                                            style: TextStyle(
+                                              color:
+                                                  isDark
+                                                      ? Colors.grey
+                                                      : Colors.black,
+                                            ),
                                           ),
                                           TextSpan(
                                             text: leave.jenisCuti,
-                                            style: const TextStyle(
+                                            style: TextStyle(
                                               fontWeight: FontWeight.bold,
+                                              color:
+                                                  isDark
+                                                      ? Colors.grey
+                                                      : Colors.black,
                                             ),
                                           ),
-                                          const TextSpan(
+                                          TextSpan(
                                             text: '\nuntuk jangka waktu ',
+                                            style: TextStyle(
+                                              color:
+                                                  isDark
+                                                      ? Colors.grey
+                                                      : Colors.black,
+                                            ),
                                           ),
                                           TextSpan(
                                             text:
                                                 '${DateTime.parse(leave.tgl2!).difference(DateTime.parse(leave.tgl1!)).inDays + 1} hari,',
-                                            style: const TextStyle(
+                                            style: TextStyle(
                                               fontWeight: FontWeight.bold,
+                                              color:
+                                                  isDark
+                                                      ? Colors.grey
+                                                      : Colors.black,
                                             ),
                                           ),
-                                          const TextSpan(
+                                          TextSpan(
                                             text: ' terhitung dari ',
+                                            style: TextStyle(
+                                              color:
+                                                  isDark
+                                                      ? Colors.grey
+                                                      : Colors.black,
+                                            ),
                                           ),
                                           TextSpan(
                                             text: FormatWaktu.formatIndo(
@@ -553,19 +624,35 @@ class RequestLeaveView extends GetView<LeaveController> {
                                                 leave.tgl1!,
                                               ),
                                             ),
-                                            style: const TextStyle(
+                                            style: TextStyle(
                                               fontWeight: FontWeight.bold,
+                                              color:
+                                                  isDark
+                                                      ? Colors.grey
+                                                      : Colors.black,
                                             ),
                                           ),
-                                          const TextSpan(text: ' sampai '),
+                                          TextSpan(
+                                            text: ' sampai ',
+                                            style: TextStyle(
+                                              color:
+                                                  isDark
+                                                      ? Colors.grey
+                                                      : Colors.black,
+                                            ),
+                                          ),
                                           TextSpan(
                                             text: FormatWaktu.formatIndo(
                                               tanggal: DateTime.parse(
                                                 leave.tgl2!,
                                               ),
                                             ),
-                                            style: const TextStyle(
+                                            style: TextStyle(
                                               fontWeight: FontWeight.bold,
+                                              color:
+                                                  isDark
+                                                      ? Colors.grey
+                                                      : Colors.black,
                                             ),
                                           ),
                                         ],
@@ -635,9 +722,9 @@ class RequestLeaveView extends GetView<LeaveController> {
                                                           "type": "reject",
                                                           "uid": leave.uid!,
                                                           "level":
-                                                              userData!.level,
+                                                              userData.level,
                                                           "acc_name":
-                                                              userData!.nama,
+                                                              userData.nama,
                                                           "sign": "0",
                                                         };
                                                         await ServiceApi()
@@ -646,12 +733,12 @@ class RequestLeaveView extends GetView<LeaveController> {
                                                           "type":
                                                               "get_pending_req_leave",
                                                           "kode_cabang":
-                                                              userData!
+                                                              userData
                                                                   .kodeCabang!,
                                                           "id_user":
-                                                              userData!.id!,
+                                                              userData.id!,
                                                           "level":
-                                                              userData!.level!,
+                                                              userData.level!,
                                                         };
                                                         leaveC.isLoading.value =
                                                             true;
@@ -676,7 +763,7 @@ class RequestLeaveView extends GetView<LeaveController> {
                                                   : () {
                                                     signDialog(
                                                       context,
-                                                      userData!,
+                                                      userData,
                                                       leave.uid!,
                                                     );
                                                   },

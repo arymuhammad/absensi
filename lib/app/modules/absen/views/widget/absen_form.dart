@@ -1,6 +1,7 @@
 // import 'package:absensi/app/modules/absen/controllers/absen_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+// import 'package:path/path.dart';
 import '../../../../data/helper/custom_dialog.dart';
 import '../../../../data/helper/format_waktu.dart';
 import '../../../../data/helper/time_service.dart';
@@ -12,7 +13,12 @@ import '../../controllers/absen_controller.dart';
 /// =======================================================
 /// UI BUILDER
 /// =======================================================
-Widget buildAbsen({required Data? data, required AbsenController controller,}) {
+Widget buildAbsen({
+  required Data data,
+  required AbsenController controller,
+  required BuildContext context,
+  required bool isDark,
+}) {
   return Obx(() {
     if (controller.isCheckingAbsen.value) {
       return const Center(child: CircularProgressIndicator());
@@ -23,7 +29,7 @@ Widget buildAbsen({required Data? data, required AbsenController controller,}) {
       // WidgetsBinding.instance.addPostFrameCallback((_) {
       //   controller.stsAbsenSelected.value = "Check Out";
       // });
-
+      controller.stsAbsenSelected.value = "Check Out";
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -36,7 +42,9 @@ Widget buildAbsen({required Data? data, required AbsenController controller,}) {
           ),
           const SizedBox(height: 8),
           CsDropdownCabang(
-            hintText: data!.namaCabang,
+            context: context,
+            isDark: isDark,
+            hintText: data.namaCabang,
             dataUser: data,
             value:
                 controller.selectedCabang.value.isEmpty
@@ -59,9 +67,10 @@ Widget buildAbsen({required Data? data, required AbsenController controller,}) {
             child: DropdownButtonFormField<String>(
               key: const ValueKey('sts_absen'),
               decoration: InputDecoration(
-                fillColor: Colors.white,
+                fillColor:
+                    isDark ? Theme.of(context).canvasColor : Colors.white,
                 filled: true,
-                isDense: true,
+                // isDense: true,
                 contentPadding: const EdgeInsets.all(5),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
@@ -83,7 +92,6 @@ Widget buildAbsen({required Data? data, required AbsenController controller,}) {
               onChanged: (val) {
                 if (val != null) {
                   controller.stsAbsenSelected.value = val;
-                  
                 }
               },
             ),
@@ -93,7 +101,9 @@ Widget buildAbsen({required Data? data, required AbsenController controller,}) {
         const SizedBox(height: 5),
 
         CsDropdownCabang(
-          hintText: data!.namaCabang,
+          context: context,
+          isDark: isDark,
+          hintText: data.namaCabang,
           dataUser: data,
           value:
               controller.selectedCabang.value.isEmpty
@@ -107,51 +117,56 @@ Widget buildAbsen({required Data? data, required AbsenController controller,}) {
         Obx(
           () => Visibility(
             visible: controller.stsAbsenSelected.value != "Check Out",
-            child: CsDropdownShiftKerja(
-              page: 'absen',
-              value:
-                  controller.selectedShift.value.isEmpty
-                      ? null
-                      : controller.selectedShift.value,
-              onChanged: (val) async {
-                if (val == "5") {
-                  final DateTime? now = await getServerTimeLocal();
-                  final nowTime = FormatWaktu.formatJamMenit(
-                    jamMenit:
-                        "${now!.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}",
-                  );
-
-                  if (nowTime.isAfter(
-                        FormatWaktu.formatJamMenit(jamMenit: '08:59'),
-                      ) &&
-                      nowTime.isBefore(
-                        FormatWaktu.formatJamMenit(jamMenit: '15:00'),
-                      )) {
-                    controller.selectedShift.value = "";
-                    dialogMsg(
-                      'INFO',
-                      'Cannot select this shift before\n15:00 local time.',
+            child: SizedBox(
+              height: 40,
+              child: CsDropdownShiftKerja(
+                page: 'absen',
+                value:
+                    controller.selectedShift.value.isEmpty
+                        ? null
+                        : controller.selectedShift.value,
+                onChanged: (val) async {
+                  if (val == "5") {
+                    final DateTime now = await getSecureTime();
+                    final nowTime = FormatWaktu.formatJamMenit(
+                      jamMenit:
+                          "${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}",
                     );
-                    return;
-                  }
 
-                  controller.selectedShift.value = val!;
-                } else {
-                  for (final s in controller.shiftKerja) {
-                    if (s.id == val) {
-                      controller.selectedShift.value = val!;
-                      controller.jamMasuk.value = s.jamMasuk!;
-                      controller.jamPulang.value = s.jamPulang!;
-                      break;
+                    if (nowTime.isAfter(
+                          FormatWaktu.formatJamMenit(jamMenit: '08:59'),
+                        ) &&
+                        nowTime.isBefore(
+                          FormatWaktu.formatJamMenit(jamMenit: '15:00'),
+                        )) {
+                      controller.selectedShift.value = "";
+                      dialogMsg(
+                        'INFO',
+                        'Cannot select this shift before\n15:00 local time.',
+                      );
+                      return;
+                    }
+
+                    controller.selectedShift.value = val!;
+                  } else {
+                    for (final s in controller.shiftKerja) {
+                      if (s.id == val) {
+                        
+                        controller.selectedShift.value = val!;
+                        controller.jamMasuk.value = s.jamMasuk!;
+                        controller.jamPulang.value = s.jamPulang!;
+                        break;
+                      }
                     }
                   }
-                }
 
-                dialogMsg(
-                  'INFO',
-                  'Make sure the work shift selected is appropriate',
-                );
-              },
+                  dialogMsg(
+                    'INFO',
+                    'Make sure the work shift selected is appropriate',
+                  );
+                },
+                isDark: isDark,
+              ),
             ),
           ),
         ),

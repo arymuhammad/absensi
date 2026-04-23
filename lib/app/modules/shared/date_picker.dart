@@ -16,14 +16,15 @@ class CsDatePicker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return DateTimeField(
       controller: controller,
       enabled: editable,
-      style: const TextStyle(fontSize: 16),
+      style: const TextStyle(fontSize: 14),
       decoration: InputDecoration(
-        prefixIcon: const Icon(Iconsax.calendar_edit_outline),
+        prefixIcon: const Icon(Iconsax.calendar_edit_outline, ),
         hintText: label,
-        fillColor: Colors.white,
+        fillColor: isDark?Theme.of(context).canvasColor: Colors.white,
         filled: true,
         isDense: true, // 🔑 biar tinggi tetap rapih
         contentPadding: const EdgeInsets.all(5),

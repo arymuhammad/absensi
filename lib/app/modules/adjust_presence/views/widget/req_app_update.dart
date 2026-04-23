@@ -12,16 +12,18 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icons_plus/icons_plus.dart';
-import '../../../../data/model/login_model.dart';
+import '../../../login/controllers/login_controller.dart';
 import 'upt_shift.dart';
 
 class ReqAppUpdate extends GetView {
-  ReqAppUpdate({super.key, required this.dataUser});
-  final Data dataUser;
+  ReqAppUpdate({super.key});
+  final auth = Get.find<LoginController>();
   final adjCtrl = Get.put(AdjustPresenceController());
 
   @override
   Widget build(BuildContext context) {
+    final dataUser = auth.logUser.value;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Padding(
       padding: const EdgeInsets.fromLTRB(8.0, 15.0, 8.0, 8.0),
       child: Column(
@@ -172,9 +174,9 @@ class ReqAppUpdate extends GetView {
                                       2,
                                     ),
                                     childrenPadding: const EdgeInsets.fromLTRB(
+                                      8,
                                       2,
-                                      2,
-                                      2,
+                                      8,
                                       2,
                                     ),
                                     isHasBottomBorder: true,
@@ -184,6 +186,8 @@ class ReqAppUpdate extends GetView {
                                     collapsedBackgroundColor:
                                         i.isRead == "" && i.accept != ""
                                             ? Colors.blue[200]
+                                            : isDark
+                                            ? Theme.of(context).canvasColor
                                             : Colors.white,
                                     onExpansionChanged: (value) {
                                       // print(value);
@@ -254,16 +258,28 @@ class ReqAppUpdate extends GetView {
                                           ),
                                         ),
                                         // const SizedBox(height: 5),
-                                        Text(i.nama, style: titleTextStyle),
+                                        Text(
+                                          i.nama,
+                                          style: titleTextStyle.copyWith(
+                                            color:
+                                                isDark
+                                                    ? Colors.grey[600]
+                                                    : Colors.black,
+                                          ),
+                                        ),
                                         Text(
                                           i.namaCabang,
                                           style: subtitleTextStyle,
                                         ),
                                         Row(
                                           children: [
-                                            const Icon(
+                                            Icon(
                                               Iconsax.calendar_1_outline,
-                                              color: AppColors.itemsBackground,
+                                              color:
+                                                  isDark
+                                                      ? Colors.grey[600]
+                                                      : AppColors
+                                                          .itemsBackground,
                                               size: 15,
                                             ),
                                             const SizedBox(width: 2),
@@ -283,19 +299,17 @@ class ReqAppUpdate extends GetView {
                                     // border: Border.all(),
                                     children: [
                                       i.status == "update_masuk" ||
+                                              i.status == "update_masuk_cst" ||
                                               i.status == "update_pulang"
                                           ? UptMasukPulang(
                                             data: i,
-                                            dataUser: dataUser,
+                                            
                                           )
                                           : i.status == "update_data_absen"
-                                          ? UptDataAbsen(
-                                            data: i,
-                                            dataUser: dataUser,
-                                          )
+                                          ? UptDataAbsen(data: i)
                                           : UptShift(
                                             data: i,
-                                            dataUser: dataUser,
+                                          
                                           ),
                                     ],
                                   ),

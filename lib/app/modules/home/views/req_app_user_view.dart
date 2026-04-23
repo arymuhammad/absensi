@@ -11,14 +11,18 @@ import 'package:icons_plus/icons_plus.dart';
 import 'package:intl/intl.dart';
 
 import '../../adjust_presence/controllers/adjust_presence_controller.dart';
+import '../../login/controllers/login_controller.dart';
 import '../../shared/dropdown.dart';
 
 class ReqAppUserView extends GetView {
-  ReqAppUserView({super.key, this.userData});
-  final Data? userData;
+  ReqAppUserView({super.key});
+  final auth = Get.find<LoginController>();
   final adjCtrl = Get.put(AdjustPresenceController());
+  
   @override
   Widget build(BuildContext context) {
+    final userData = auth.logUser.value;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -33,13 +37,15 @@ class ReqAppUserView extends GetView {
         // iconTheme: const IconThemeData(color: Colors.black,),
         centerTitle: true,
         actions: [Container()],
-        flexibleSpace: Container(decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Color(0xFF1B2541), Color(0xFF3949AB)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-            ),),
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: AppColors.mainGradient(
+              context: context,
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
       ),
       extendBodyBehindAppBar: true,
       body: Stack(
@@ -47,13 +53,14 @@ class ReqAppUserView extends GetView {
           Padding(
             padding: const EdgeInsets.fromLTRB(8.0, 100, 8, 8),
             child: Card(
+              color: isDark ? Theme.of(context).canvasColor : Colors.white,
               child: Container(
                 // height: 400,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10),
-                  color: Colors.white,
+                  color: isDark ? Theme.of(context).canvasColor : Colors.white,
                 ),
-                child: ReqAppUpdate(dataUser: userData!),
+                child: ReqAppUpdate(),
               ),
             ),
           ),
@@ -64,24 +71,27 @@ class ReqAppUserView extends GetView {
             (context) => FloatingActionButton(
               backgroundColor: AppColors.itemsBackground,
               onPressed: () {
-                dialogSearchData(context);
+                dialogSearchData(context, isDark, userData);
               },
-              child: const Icon(Icons.manage_search_outlined),
+              child: Icon(
+                Icons.manage_search_outlined,
+                color: isDark ? Colors.blue : Colors.white,
+              ),
             ),
       ),
     );
   }
 
-  dialogSearchData(BuildContext context) {
+  dialogSearchData(BuildContext context, bool isDark, Data userData) {
     Get.bottomSheet(
-      backgroundColor: Colors.white,
+      backgroundColor: isDark ? Colors.black : Colors.white,
       SingleChildScrollView(
         child: Container(
           // Atur tinggi sesuai kebutuhan, misal 400
           height: 250,
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.only(
+          decoration: BoxDecoration(
+            color: isDark ? Theme.of(context).cardColor : Colors.white,
+            borderRadius: const BorderRadius.only(
               topLeft: Radius.circular(10),
               topRight: Radius.circular(10),
             ),
@@ -128,6 +138,7 @@ class ReqAppUserView extends GetView {
                             //     adjCtrl.lastDate);
                           },
                           label: 'Status',
+                          isDark: isDark,
                         ),
                       ),
                       const SizedBox(width: 5),
@@ -156,6 +167,7 @@ class ReqAppUserView extends GetView {
                             //     adjCtrl.lastDate);
                           },
                           label: 'Kategori',
+                          isDark: isDark,
                         ),
                       ),
                     ],
@@ -171,13 +183,13 @@ class ReqAppUserView extends GetView {
                       child: DateTimeField(
                         controller: adjCtrl.dateInput1,
                         style: const TextStyle(fontSize: 16),
-                        decoration: const InputDecoration(
-                          contentPadding: EdgeInsets.all(0.5),
-                          prefixIcon: Icon(Iconsax.calendar_edit_outline),
+                        decoration: InputDecoration(
+                          contentPadding: const EdgeInsets.all(0.5),
+                          prefixIcon: const Icon(Iconsax.calendar_edit_outline),
                           hintText: 'Tanggal Awal',
                           filled: true,
-                          fillColor: Colors.white,
-                          border: OutlineInputBorder(),
+                          fillColor: isDark ? Colors.black : Colors.white,
+                          border: const OutlineInputBorder(),
                         ),
                         format: DateFormat("yyyy-MM-dd"),
                         onShowPicker: (context, currentValue) {
@@ -195,13 +207,13 @@ class ReqAppUserView extends GetView {
                       child: DateTimeField(
                         controller: adjCtrl.dateInput2,
                         style: const TextStyle(fontSize: 16),
-                        decoration: const InputDecoration(
-                          contentPadding: EdgeInsets.all(0.5),
-                          prefixIcon: Icon(Iconsax.calendar_edit_outline),
+                        decoration: InputDecoration(
+                          contentPadding: const EdgeInsets.all(0.5),
+                          prefixIcon: const Icon(Iconsax.calendar_edit_outline),
                           hintText: 'Tanggal Akhir',
                           filled: true,
-                          fillColor: Colors.white,
-                          border: OutlineInputBorder(),
+                          fillColor: isDark ? Colors.black : Colors.white,
+                          border: const OutlineInputBorder(),
                         ),
                         format: DateFormat("yyyy-MM-dd"),
                         onShowPicker: (context, currentValue) {
@@ -255,6 +267,7 @@ class ReqAppUserView extends GetView {
                           if (DateTime.parse(
                             tglA,
                           ).isAfter(DateTime.parse(tglB))) {
+                            Get.back();
                             failedDialog(
                               context,
                               'ERROR',
@@ -270,8 +283,8 @@ class ReqAppUserView extends GetView {
                                 await adjCtrl.getReqAppUpt(
                                   adjCtrl.selectedStatus.value,
                                   adjCtrl.selectedType.value,
-                                  userData!.level,
-                                  userData!.id,
+                                  userData.level,
+                                  userData.id,
                                   adjCtrl.dateInput1.text,
                                   adjCtrl.dateInput2.text,
                                 );

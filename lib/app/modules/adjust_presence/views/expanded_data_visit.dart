@@ -16,154 +16,170 @@ class ExpandedDataVisit extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return dataVisit.isNotEmpty
         ? Obx(
-            () => Expanded(
-                child: ListView(children: [
-              ExpansionTileGroup(
+          () => Expanded(
+            child: ListView(
+              children: [
+                ExpansionTileGroup(
                   toggleType: ToggleType.expandOnlyCurrent,
                   spaceBetweenItem: 10,
                   children: [
                     for (var i in dataVisit)
                       ExpansionTileItem(
-                          controlAffinity: ListTileControlAffinity.trailing,
-                          border: Border.all(),
-                          isHasBottomBorder: true,
-                          isHasTopBorder: true,
-                          isHasLeftBorder: true,
-                          isHasRightBorder: true,
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(10)),
-                          title: Text(i.nama!),
-                          subtitle: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                        controlAffinity: ListTileControlAffinity.trailing,
+                        border: Border.all(),
+                        isHasBottomBorder: true,
+                        isHasTopBorder: true,
+                        isHasLeftBorder: true,
+                        isHasRightBorder: true,
+                        borderRadius: const BorderRadius.all(
+                          Radius.circular(10),
+                        ),
+                        title: Text(i.nama!),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(i.id!),
+                            Text(
+                              DateFormat(
+                                'dd MMM yyyy',
+                              ).format(DateTime.parse(i.tglVisit!)),
+                            ),
+                          ],
+                        ),
+                        children: [
+                          Column(
                             children: [
-                              Text(i.id!),
-                              Text(DateFormat('dd MMM yyyy')
-                                  .format(DateTime.parse(i.tglVisit!)))
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  SizedBox(
+                                    width: Get.size.width / 2,
+                                    child: DateTimeField(
+                                      controller:
+                                          ctrl.datePulangupd
+                                            ..text =
+                                                i.tglVisit != null
+                                                    ? i.tglVisit!
+                                                    : "",
+                                      style: const TextStyle(fontSize: 16),
+                                      decoration: const InputDecoration(
+                                        contentPadding: EdgeInsets.all(0.5),
+                                        prefixIcon: Icon(
+                                          Icons.calendar_month_outlined,
+                                        ),
+                                        hintText: 'Tanggal Visit',
+                                        filled: true,
+                                        fillColor: Colors.white,
+                                        border: OutlineInputBorder(),
+                                      ),
+                                      format: DateFormat("yyyy-MM-dd"),
+                                      onShowPicker: (context, currentValue) {
+                                        return showDatePicker(
+                                          context: context,
+                                          firstDate: DateTime(1900),
+                                          initialDate:
+                                              currentValue ?? DateTime.now(),
+                                          lastDate: DateTime(2100),
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                  CsElevatedButtonIcon(
+                                    label: '',
+                                    icon: const Icon(Icons.save_as_rounded),
+                                    onPressed:
+                                        () => ctrl.updateDataVisit(
+                                          i.id,
+                                          i.tglVisit,
+                                          i.visitIn,
+                                        ),
+                                    size: Size(
+                                      Get.mediaQuery.size.width / 3,
+                                      50,
+                                    ),
+                                    fontSize: 18,
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 5),
+                              CsTextField(
+                                controller: ctrl.visit..text = i.visitIn!,
+                                label: 'Visit',
+                                isDark: isDark,
+                              ),
+                              const SizedBox(height: 5),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  SizedBox(
+                                    width: Get.size.width / 2.3,
+                                    child: CsTextField(
+                                      controller: ctrl.jamIn..text = i.jamIn!,
+                                      label: 'IN',
+                                      isDark: isDark,
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: Get.size.width / 2.3,
+                                    child: CsTextField(
+                                      controller: ctrl.jamOut..text = i.jamOut!,
+                                      label: 'OUT',
+                                      isDark: isDark,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 5),
+                              CsTextField(
+                                controller: ctrl.foto..text = i.fotoIn!,
+                                label: 'Foto',
+                                isDark: isDark,
+                              ),
+                              const SizedBox(height: 5),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  SizedBox(
+                                    width: Get.size.width / 2.3,
+                                    child: CsTextField(
+                                      controller: ctrl.lat..text = i.latIn!,
+                                      label: 'Lat',
+                                      isDark: isDark,
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: Get.size.width / 2.3,
+                                    child: CsTextField(
+                                      controller: ctrl.long..text = i.longIn!,
+                                      label: 'Long',
+                                      isDark: isDark,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 5),
+                              CsTextField(
+                                controller: ctrl.device..text = i.deviceInfo!,
+                                label: 'Device',
+                                isDark: isDark,
+                              ),
+                              const SizedBox(height: 5),
                             ],
                           ),
-                          children: [
-                            Column(
-                              children: [
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    SizedBox(
-                                      width: Get.size.width / 2,
-                                      child: DateTimeField(
-                                          controller: ctrl.datePulangupd
-                                            ..text = i.tglVisit != null
-                                                ? i.tglVisit!
-                                                : "",
-                                          style: const TextStyle(fontSize: 16),
-                                          decoration: const InputDecoration(
-                                              contentPadding:
-                                                  EdgeInsets.all(0.5),
-                                              prefixIcon: Icon(Icons
-                                                  .calendar_month_outlined),
-                                              hintText: 'Tanggal Visit',
-                                              filled: true,
-                                              fillColor: Colors.white,
-                                              border: OutlineInputBorder()),
-                                          format: DateFormat("yyyy-MM-dd"),
-                                          onShowPicker:
-                                              (context, currentValue) {
-                                            return showDatePicker(
-                                                context: context,
-                                                firstDate: DateTime(1900),
-                                                initialDate: currentValue ??
-                                                    DateTime.now(),
-                                                lastDate: DateTime(2100));
-                                          }),
-                                    ),
-                                    CsElevatedButtonIcon(
-                                      label: '',
-                                      icon: const Icon(Icons.save_as_rounded),
-                                      onPressed: () => ctrl.updateDataVisit(
-                                          i.id, i.tglVisit, i.visitIn),
-                                      size: Size(
-                                          Get.mediaQuery.size.width / 3, 50),
-                                          fontSize: 18,
-                                    )
-                                  ],
-                                ),
-                                const SizedBox(
-                                  height: 5,
-                                ),
-                                CsTextField(
-                                    controller: ctrl.visit..text = i.visitIn!,
-                                    label: 'Visit'),
-                                const SizedBox(
-                                  height: 5,
-                                ),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    SizedBox(
-                                      width: Get.size.width / 2.3,
-                                      child: CsTextField(
-                                          controller: ctrl.jamIn
-                                            ..text = i.jamIn!,
-                                          label: 'IN'),
-                                    ),
-                                    SizedBox(
-                                      width: Get.size.width / 2.3,
-                                      child: CsTextField(
-                                          controller: ctrl.jamOut
-                                            ..text = i.jamOut!,
-                                          label: 'OUT'),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(
-                                  height: 5,
-                                ),
-                                CsTextField(
-                                    controller: ctrl.foto..text = i.fotoIn!,
-                                    label: 'Foto'),
-                                const SizedBox(
-                                  height: 5,
-                                ),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    SizedBox(
-                                      width: Get.size.width / 2.3,
-                                      child: CsTextField(
-                                          controller: ctrl.lat..text = i.latIn!,
-                                          label: 'Lat'),
-                                    ),
-                                    SizedBox(
-                                      width: Get.size.width / 2.3,
-                                      child: CsTextField(
-                                          controller: ctrl.long
-                                            ..text = i.longIn!,
-                                          label: 'Long'),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(
-                                  height: 5,
-                                ),
-                                CsTextField(
-                                    controller: ctrl.device
-                                      ..text = i.deviceInfo!,
-                                    label: 'Device'),
-                                const SizedBox(
-                                  height: 5,
-                                ),
-                              ],
-                            )
-                          ])
-                  ])
-            ])),
-          )
-        : const Center(
-            child: Text('Belum ada data'),
-          );
+                        ],
+                      ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        )
+        : const Center(child: Text('Belum ada data'));
   }
 }

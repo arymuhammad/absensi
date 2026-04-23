@@ -19,9 +19,10 @@ class EditDataAbsen extends GetView<DetailAbsenController> {
   final detailC = Get.put(DetailAbsenController());
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       height: 500,
-      decoration: BoxDecoration(color: Colors.grey[300]),
+      decoration: BoxDecoration(color: isDark?Theme.of(context).cardColor: Colors.grey[300]),
       child: SingleChildScrollView(
         scrollDirection: Axis.vertical,
         child: Padding(
@@ -119,6 +120,7 @@ class EditDataAbsen extends GetView<DetailAbsenController> {
                       'Make sure the work shift selected \nis appropriate',
                     );
                   },
+                  isDark: isDark,
                   // },
                 ),
               ),
@@ -226,6 +228,7 @@ class EditDataAbsen extends GetView<DetailAbsenController> {
                 child: CsTextField(
                   controller: detailC.alasan,
                   label: 'Reason for data change',
+                  isDark: isDark,
                 ),
               ),
               // const SizedBox(height: 5),
@@ -246,6 +249,7 @@ class EditDataAbsen extends GetView<DetailAbsenController> {
                         data['id_user'],
                         data['nama'],
                         data['kode_cabang'],
+                        data['id_shift'],
                       );
                     },
                     backgroundColor: Colors.transparent,

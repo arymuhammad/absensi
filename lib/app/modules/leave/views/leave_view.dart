@@ -4,28 +4,30 @@ import 'dart:math' as math;
 import 'package:absensi/app/data/helper/app_colors.dart';
 import 'package:absensi/app/data/helper/custom_dialog.dart';
 import 'package:absensi/app/data/helper/format_waktu.dart';
-import 'package:absensi/app/data/model/login_model.dart';
 import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 import 'package:expansion_tile_group/expansion_tile_group.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:startapp_sdk/startapp.dart';
+// import 'package:startapp_sdk/startapp.dart';
 import 'package:step_progress/step_progress.dart';
 import 'package:get/get.dart';
 import 'package:icons_plus/icons_plus.dart';
 import '../../../data/helper/const.dart';
 import '../../../data/model/leave_model.dart';
+import '../../login/controllers/login_controller.dart';
 import '../controllers/leave_controller.dart';
-import 'widget/leave_add.dart';
+import 'widget/leave_add_sheet.dart';
 
 class LeaveView extends GetView<LeaveController> {
-  LeaveView({super.key, this.userData});
-  final Data? userData;
+  LeaveView({super.key});
 
+  final auth = Get.find<LoginController>();
   final leaveC = Get.find<LeaveController>();
 
   @override
   Widget build(BuildContext context) {
+    final userData = auth.logUser.value;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -40,43 +42,49 @@ class LeaveView extends GetView<LeaveController> {
         actions: [
           IconButton(
             onPressed: () async {
-              loadingDialog('Mengecek sisa saldo cuti kamu', '');
-              await leaveC.leaveBalanceCheck(userData!);
-              Get.back();
-              userData!.leaveBalance == "0"
+              leaveC.generateUid();
+              // print(userData!.leaveBalance);
+              userData.leaveBalance == "0"
                   ? showToast(
                     "Saldo Cuti Anda Habis\nAnda tidak dapat mengajukan permohonan cuti",
                   )
-                  : Get.to(() {
-                    leaveC.generateUid();
+                  : Get.bottomSheet(
+                    LeaveAddSheet(userData: userData),
+                    isScrollControlled: true,
+                    // useRootNavigator: true, // 🔥 WAJIB
+                  );
+              //  Get.to(() {
+              //   leaveC.generateUid();
 
-                    return LeaveAdd(userData: userData);
-                  }, transition: Transition.cupertino);
+              //   return LeaveAdd(userData: userData);
+              // }, transition: Transition.cupertino);
             },
             icon: const Icon(Icons.format_list_bulleted_add),
           ),
         ],
-        flexibleSpace: Container(decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Color(0xFF1B2541), Color(0xFF3949AB)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-            ),),
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: AppColors.mainGradient(
+              context: context,
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
       ),
       body: Stack(
         children: [
           Column(
             children: [
               const SizedBox(height: 5),
-         
+
               Expanded(
                 child: CustomMaterialIndicator(
                   onRefresh: () async {
                     //  leaveC.leaveBalanceCheck(userData!);
                     await leaveC.getLeaveReq({
                       "type": "",
-                      "id_user": userData!.id!,
+                      "id_user": userData.id!,
                     });
                     showToast('Page Refreshed');
                     // leaveC.isLoading.value = true;
@@ -732,7 +740,10 @@ class LeaveView extends GetView<LeaveController> {
                                         isHasLeftBorder: true,
                                         isHasRightBorder: true,
                                         borderRadius: BorderRadius.circular(5),
-                                        backgroundColor: Colors.white,
+                                        backgroundColor:
+                                            isDark
+                                                ? Theme.of(context).cardColor
+                                                : Colors.white,
                                         title: Column(
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
@@ -779,35 +790,39 @@ class LeaveView extends GetView<LeaveController> {
                                               children: [
                                                 const Icon(
                                                   Iconsax.calendar_1_outline,
-                                                  color:
-                                                      AppColors.itemsBackground,
+                                                  color: Colors.blue,
                                                   size: 20,
                                                 ),
                                                 const SizedBox(width: 5),
                                                 Text(
                                                   '${FormatWaktu.formatShortEng(tanggal: DateTime.parse(leave.tgl1!))} - ${FormatWaktu.formatShortEng(tanggal: DateTime.parse(leave.tgl2!))}',
-                                                  style: titleTextStyle.copyWith(
-                                                    fontSize: 15,
-                                                    color:
-                                                        AppColors
-                                                            .itemsBackground,
-                                                  ),
+                                                  style: titleTextStyle
+                                                      .copyWith(
+                                                        fontSize: 15,
+                                                        color: Colors.blue,
+                                                      ),
                                                 ),
                                               ],
                                             ),
                                             const SizedBox(height: 6),
                                             Text(
                                               leave.jenisCuti!,
-                                              style: const TextStyle(
+                                              style: TextStyle(
                                                 fontSize: 16,
-                                                color: Colors.black87,
+                                                color:
+                                                    isDark
+                                                        ? Colors.grey
+                                                        : Colors.black87,
                                               ),
                                             ),
                                             Text(
                                               leaveStats,
-                                              style: const TextStyle(
+                                              style: TextStyle(
                                                 fontSize: 14,
-                                                color: Colors.black54,
+                                                color:
+                                                    isDark
+                                                        ? Colors.grey
+                                                        : Colors.black54,
                                               ),
                                             ),
                                             Text(

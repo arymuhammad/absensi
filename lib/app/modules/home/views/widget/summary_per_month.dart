@@ -17,6 +17,7 @@ class SummaryPerMonth extends StatelessWidget {
   final absenC = Get.find<HomeController>();
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Column(
@@ -45,7 +46,7 @@ class SummaryPerMonth extends StatelessWidget {
           const SizedBox(height: 5),
           userData!.visit == "1"
               ? _buildVisit()
-              : _buildAbsen(userData!, absenC),
+              : _buildAbsen(userData!, absenC, isDark),
         ],
       ),
     );
@@ -70,17 +71,14 @@ Widget _buildLoadingOrValue(String? value) {
   }
 }
 
-_buildAbsen(Data userData, HomeController absenC) {
-  return Obx(()=>FutureBuilder<SummaryAbsenModel>(
+_buildAbsen(Data userData, HomeController absenC, bool isDark) {
+  return Obx(
+    () => FutureBuilder<SummaryAbsenModel>(
       future: absenC.futureSummary.value,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Row(
-            children: [
-              presentShimmer(),
-              presentShimmer(),
-              presentShimmer(),
-            ],
+            children: [presentShimmer(), presentShimmer(), presentShimmer()],
           );
         } else if (snapshot.hasError) {
           return const Column(
@@ -103,12 +101,12 @@ _buildAbsen(Data userData, HomeController absenC) {
               Expanded(
                 flex: 1,
                 child: Container(
-                  decoration: const BoxDecoration(
-                    borderRadius: BorderRadius.only(
+                  decoration: BoxDecoration(
+                    borderRadius: const BorderRadius.only(
                       topLeft: Radius.circular(5),
                       bottomLeft: Radius.circular(5),
                     ),
-                    color: Colors.white,
+                    color: isDark ? Theme.of(context).cardColor : Colors.white,
                   ),
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
@@ -146,7 +144,10 @@ _buildAbsen(Data userData, HomeController absenC) {
                             const SizedBox(width: 5),
                             const Text(
                               'Day',
-                              style: TextStyle(color: Colors.grey, fontSize: 12),
+                              style: TextStyle(
+                                color: Colors.grey,
+                                fontSize: 12,
+                              ),
                             ),
                           ],
                         ),
@@ -158,7 +159,9 @@ _buildAbsen(Data userData, HomeController absenC) {
               Expanded(
                 flex: 1,
                 child: Container(
-                  decoration: const BoxDecoration(color: Colors.white),
+                  decoration: BoxDecoration(
+                    color: isDark ? Theme.of(context).cardColor : Colors.white,
+                  ),
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Column(
@@ -196,7 +199,10 @@ _buildAbsen(Data userData, HomeController absenC) {
                             const SizedBox(width: 5),
                             const Text(
                               'Day',
-                              style: TextStyle(color: Colors.grey, fontSize: 12),
+                              style: TextStyle(
+                                color: Colors.grey,
+                                fontSize: 12,
+                              ),
                             ),
                           ],
                         ),
@@ -208,12 +214,12 @@ _buildAbsen(Data userData, HomeController absenC) {
               Expanded(
                 flex: 1,
                 child: Container(
-                  decoration: const BoxDecoration(
-                    borderRadius: BorderRadius.only(
+                  decoration: BoxDecoration(
+                    borderRadius: const BorderRadius.only(
                       topRight: Radius.circular(5),
                       bottomRight: Radius.circular(5),
                     ),
-                    color: Colors.white,
+                    color: isDark ? Theme.of(context).cardColor : Colors.white,
                   ),
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
@@ -246,7 +252,10 @@ _buildAbsen(Data userData, HomeController absenC) {
                             const SizedBox(width: 5),
                             const Text(
                               'Day',
-                              style: TextStyle(color: Colors.grey, fontSize: 12),
+                              style: TextStyle(
+                                color: Colors.grey,
+                                fontSize: 12,
+                              ),
                             ),
                           ],
                         ),

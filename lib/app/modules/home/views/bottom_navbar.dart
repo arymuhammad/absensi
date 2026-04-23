@@ -1,5 +1,3 @@
-import 'package:absensi/app/data/model/login_model.dart';
-import 'package:absensi/app/modules/absen/views/absen_view.dart';
 import 'package:absensi/app/modules/home/controllers/home_controller.dart';
 import 'package:absensi/app/modules/home/views/home_view.dart';
 import 'package:absensi/app/modules/profil/views/profil_view.dart';
@@ -10,16 +8,16 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../absen/controllers/absen_controller.dart';
+import '../../absen/views/absen_view.dart';
 import '../../login/controllers/login_controller.dart';
 import '../../semua_absen/views/riwayat_visit_view.dart';
 import 'modern_bottombar.dart';
 
 class BottomNavBar extends GetView {
-  BottomNavBar({super.key, required this.listDataUser});
-  final loginC = Get.put(LoginController());
+  BottomNavBar({super.key});
+  final logC = Get.find<LoginController>();
   final loc = Get.put(AbsenController());
   final homeC = Get.put(HomeController());
-  final Data listDataUser;
 
   final List<GlobalKey<NavigatorState>> navigatorKeys = [
     GlobalKey<NavigatorState>(),
@@ -31,12 +29,13 @@ class BottomNavBar extends GetView {
 
   @override
   Widget build(BuildContext context) {
+    final listDataUser = logC.logUser.value;
     final List<Widget> widgetList = <Widget>[
       Navigator(
         key: navigatorKeys[0],
         onGenerateRoute: (settings) {
           return MaterialPageRoute(
-            builder: (_) => HomeView(listDataUser: listDataUser),
+            builder: (_) => HomeView(),
           );
         },
       ),
@@ -45,7 +44,7 @@ class BottomNavBar extends GetView {
             key: navigatorKeys[1],
             onGenerateRoute: (settings) {
               return MaterialPageRoute(
-                builder: (_) => RiwayatVisitView(userData: listDataUser),
+                builder: (_) => RiwayatVisitView(),
               );
             },
           )
@@ -53,16 +52,16 @@ class BottomNavBar extends GetView {
             key: navigatorKeys[1],
             onGenerateRoute: (settings) {
               return MaterialPageRoute(
-                builder: (_) => SemuaAbsenView(data: listDataUser),
+                builder: (_) => SemuaAbsenView(),
               );
             },
           ),
-      AbsenView(data: listDataUser),
+      AbsenView(),
       Navigator(
         key: navigatorKeys[3],
         onGenerateRoute: (settings) {
           return MaterialPageRoute(
-            builder: (_) => SettingsView(listDataUser: listDataUser),
+            builder: (_) => SettingsView(),
           );
         },
       ),
@@ -70,7 +69,7 @@ class BottomNavBar extends GetView {
         key: navigatorKeys[4],
         onGenerateRoute: (settings) {
           return MaterialPageRoute(
-            builder: (_) => ProfilView(listDataUser: listDataUser),
+            builder: (_) => ProfilView(),
           );
         },
       ),
@@ -88,39 +87,39 @@ class BottomNavBar extends GetView {
     // ];
     return Scaffold(
       body: Obx(
-        () => IndexedStack(index: loginC.selected.value, children: widgetList),
+        () => IndexedStack(index: logC.selected.value, children: widgetList),
       ),
 
       bottomNavigationBar: Obx(
         () => ModernBottomBar(
-          selectedIndex: loginC.selected.value,
+          selectedIndex: logC.selected.value,
           onTap: (index) async {
             // ✅ Jika tab aktif ditekan ulang, kembali ke halaman awal
-            if (loginC.selected.value == index) {
+            if (logC.selected.value == index) {
               navigatorKeys[index].currentState?.popUntil(
                 (route) => route.isFirst,
               );
             }
 
             if (index == 1) {
-              loginC.selectedMenu(index);
+              logC.selectedMenu(index);
               loc.isLoading.value = true;
               loc.searchDate.value = "";
               listDataUser.visit == "1"
-                  ? loc.getAllVisited(listDataUser.id!)
+                  ? loc.getAllVisited(listDataUser.id!, '', '')
                   : loc.getAllAbsen(listDataUser.id!, '', '');
             } else if (index == 2) {
               loc.isLoading.value = true;
               loc.lokasi.value = "";
               // loadingDialog('Finding your location', '');
-              loginC.selectedMenu(index);
+              logC.selectedMenu(index);
               await loc.getLoc(listDataUser);
               // Get.back();
             } else {
-              loginC.selectedMenu(index);
+              logC.selectedMenu(index);
             }
           },
-        ),    
+        ),
       ),
     );
   }

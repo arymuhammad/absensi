@@ -1,5 +1,4 @@
 import 'package:absensi/app/data/helper/convert_time.dart';
-import 'package:absensi/app/data/model/login_model.dart';
 import 'package:absensi/app/modules/adjust_presence/controllers/adjust_presence_controller.dart';
 import 'package:absensi/app/modules/home/controllers/home_controller.dart';
 import 'package:flutter/material.dart';
@@ -10,18 +9,21 @@ import 'package:widget_zoom/widget_zoom.dart';
 import '../../../../data/helper/const.dart';
 import '../../../../data/model/req_app_model.dart';
 import '../../../../services/service_api.dart';
+import '../../../login/controllers/login_controller.dart';
 import '../../../shared/elevated_button.dart';
 import '../../../shared/text_field.dart';
 
 class UptDataAbsen extends StatelessWidget {
-  UptDataAbsen({super.key, required this.data, this.dataUser});
+  UptDataAbsen({super.key, required this.data});
   final ReqApp data;
-  final Data? dataUser;
+  final auth = Get.find<LoginController>();
   final adjCtrl = Get.put(AdjustPresenceController());
   final homeC = Get.find<HomeController>();
   @override
   Widget build(BuildContext context) {
-   final levelId = dataUser!.level;
+    final dataUser = auth.logUser.value;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final levelId = dataUser.level;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -95,12 +97,16 @@ class UptDataAbsen extends StatelessWidget {
         Text('Alasan Perubahan Data', style: titleTextStyle),
         Text(data.alasan!, style: subtitleTextStyle),
         Visibility(
-          visible: data.accept == "" && (['1','26']).contains(levelId) ? true : false,
+          visible:
+              data.accept == "" && (['1', '26']).contains(levelId)
+                  ? true
+                  : false,
           child: SizedBox(
             height: 45,
             child: CsTextField(
               controller: adjCtrl.keteranganApp,
               label: 'Keterangan',
+              isDark: isDark,
             ),
           ),
         ),
@@ -117,7 +123,10 @@ class UptDataAbsen extends StatelessWidget {
         ),
         // const Divider(thickness: 2),
         Visibility(
-          visible: data.accept == "" && (['1','26']).contains(levelId) ? true : false,
+          visible:
+              data.accept == "" && (['1', '26']).contains(levelId)
+                  ? true
+                  : false,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
@@ -151,8 +160,8 @@ class UptDataAbsen extends StatelessWidget {
                   };
                   adjCtrl.appAbs(dataUptApp, dataUptAbs);
                   homeC.reloadPendingAdj(
-                    idUser: dataUser!.id!,
-                    level: dataUser!.level!,
+                    idUser: dataUser.id!,
+                    level: dataUser.level!,
                   );
                   homeC.futurePendAdj.value;
                 },
@@ -172,8 +181,8 @@ class UptDataAbsen extends StatelessWidget {
                   };
                   adjCtrl.appAbs(dataUptApp, {});
                   homeC.reloadPendingAdj(
-                    idUser: dataUser!.id!,
-                    level: dataUser!.level!,
+                    idUser: dataUser.id!,
+                    level: dataUser.level!,
                   );
                   homeC.futurePendAdj.value;
                 },

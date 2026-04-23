@@ -32,7 +32,7 @@ class HistoryCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(14),
         boxShadow: [
           BoxShadow(
@@ -64,7 +64,7 @@ class HistoryCard extends StatelessWidget {
                   _monthName(date).toUpperCase(),
                   style: TextStyle(
                     fontSize: smallScreen ? 11 : 13,
-                    color: Colors.white70,
+                    color: Colors.white,
                   ),
                 ),
                 // const SizedBox(height: 1),
@@ -81,7 +81,7 @@ class HistoryCard extends StatelessWidget {
                   _dayName(date).toUpperCase(),
                   style: TextStyle(
                     fontSize: smallScreen ? 11 : 13,
-                    color: Colors.white70,
+                    color: Colors.white,
                   ),
                 ),
               ],
@@ -105,12 +105,14 @@ class HistoryCard extends StatelessWidget {
                       // ),
                       // const SizedBox(width: 6),
                       _timeColumn(
+                        context,
                         checkIn,
                         'Check In',
                         stsM == "Late" ? red! : green!,
                       ),
                       _divider(),
                       _timeColumn(
+                        context,
                         checkOut,
                         'Check Out',
                         stsP == "Minus Time" || stsP == "Absent"
@@ -121,6 +123,7 @@ class HistoryCard extends StatelessWidget {
                       ),
                       _divider(),
                       _timeColumn(
+                        context,
                         duration,
                         'Total Hours',
                         Colors.black87,
@@ -143,9 +146,13 @@ class HistoryCard extends StatelessWidget {
                       Expanded(
                         child: Text(
                           location,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 13,
-                            color: Colors.black87,
+                            color:
+                                Theme.of(context).brightness == Brightness.dark
+                                    ? Colors
+                                        .white70 // 🌙 dark → terang
+                                    : Colors.black87,
                           ),
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -173,6 +180,7 @@ class HistoryCard extends StatelessWidget {
   }
 
   static Widget _timeColumn(
+    BuildContext context,
     String time,
     String label,
     Color color, {
@@ -186,7 +194,12 @@ class HistoryCard extends StatelessWidget {
           style: TextStyle(
             fontSize: 16,
             fontWeight: bold ? FontWeight.w700 : FontWeight.w600,
-            color: color,
+            color:
+                Theme.of(context).brightness == Brightness.dark &&
+                        label == 'Total Hours'
+                    ? Colors
+                        .white70 // 🌙 dark → terang
+                    : color,
           ),
         ),
         Text(label, style: const TextStyle(fontSize: 13, color: Colors.grey)),
