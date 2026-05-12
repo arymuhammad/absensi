@@ -7,11 +7,7 @@ import '../../../../data/helper/custom_dialog.dart';
 import '../../../login/controllers/login_controller.dart';
 import '../../controllers/absen_controller.dart';
 import 'absen_form.dart';
-import 'check_in.dart';
-import 'check_out.dart';
 import 'visit_form.dart';
-import 'visit_in.dart';
-import 'visit_out.dart';
 import 'package:icons_plus/icons_plus.dart';
 
 class AbsenBottomSheet extends StatelessWidget {
@@ -203,76 +199,14 @@ class AbsenBottomSheet extends StatelessWidget {
                     height: 45,
                     shimmer: enabled,
                     action: () async {
-                      await controller.initTime();
-                      // 🔥 FORCE CHECK TIME TIAP SWIPE
-                      if (controller.isTimeUntrusted.value) {
-                        showToast("Jam tidak valid!");
+                      final result = await controller.executeAction(data);
+
+                      if (!result.success) {
+                        showToast(result.message);
                         return false;
                       }
-                      if (!enabled) {
-                        return false;
-                      }
-                      // if (controller.isTimeUntrusted.value) {
-                      //   showToast(
-                      //     "Jam perangkat tidak valid.\nTidak dapat melakukan absensi.",
-                      //   );
-                      //   return false;
-                      // }
-                      // if (data.visit == "1") {
 
-                      if (controller.stsAbsenSelected.value.isEmpty) {
-                        showToast("please select check in / out first");
-                      } else {
-                        if (data.visit == "1") {
-                          // visit
-                          if (controller.optVisitSelected.isEmpty) {
-                            showToast("please select RND / Visit first");
-                          } else if (controller.optVisitSelected.value ==
-                                  "Research and Development" &&
-                              controller.rndLoc.text.isEmpty) {
-                            showToast("please fill in the location");
-                            // } else if (controller.optVisitSelected.value ==
-                            //         "Store Visit" &&
-                            //     controller.selectedCabangVisit.isEmpty) {
-                            //   showToast("please select a store");
-                          } else {
-                            // loadingDialog("open the camera", "");
-                            controller.stsAbsenSelected.value == "Check In"
-                                ? await visitIn(
-                                  dataUser: data,
-                                  latitude: controller.latFromGps.value,
-                                  longitude: controller.longFromGps.value,
-                                )
-                                : await visitOut(
-                                  dataUser: data,
-                                  latitude: controller.latFromGps.value,
-                                  longitude: controller.longFromGps.value,
-                                );
-                          }
-                        } else {
-                          // absen
-                          if (controller.stsAbsenSelected.value == "Check In" &&
-                              controller.selectedShift.isEmpty) {
-                            showToast("please select absence shift first");
-                          } else {
-                            // loadingDialog("open the camera", "");
-                            controller.stsAbsenSelected.value == "Check In"
-                                ? await checkIn(
-                                  data,
-                                  controller.latFromGps.value,
-                                  controller.longFromGps.value,
-                                )
-                                : await checkOut(
-                                  data,
-                                  controller.latFromGps.value,
-                                  controller.longFromGps.value,
-                                );
-                          }
-                        }
-                      }
-                      // } else {
-                      // }
-
+                      showToast(result.message); // optional success message
                       return false;
                     },
                     label: Text(

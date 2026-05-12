@@ -107,7 +107,7 @@ checkIn(Data dataUser, double latitude, double longitude) async {
     // ===============================
     // 4️⃣ FOTO WAJIB
     // ===============================
-    await absC.uploadFotoAbsen();
+    await absC.uploadFotoAbsen(isVisit: false);
     Get.back();
 
     if (absC.image == null) {
@@ -259,9 +259,9 @@ checkIn(Data dataUser, double latitude, double longitude) async {
       "tanggal2": absC.initDate2,
     });
 
-    homeC.reloadSummary(dataUser.id!);
-    absC.startTimer(10);
-    absC.resend();
+    homeC.getSummAttPerMonth(dataUser.id!);
+    // absC.startTimer(10);
+    // absC.resend();
   } catch (e) {
     failedDialog(Get.context, "Error", e.toString());
   } finally {

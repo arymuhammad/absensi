@@ -1,8 +1,5 @@
-import 'dart:convert';
 import 'package:absensi/app/data/helper/app_colors.dart';
-import 'package:absensi/app/data/model/login_model.dart';
 import 'package:absensi/app/modules/login/controllers/login_controller.dart';
-import 'package:absensi/root_view.dart';
 import 'package:absensi/splash.dart';
 
 // import 'package:alarm/alarm.dart';
@@ -13,11 +10,7 @@ import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:month_year_picker/month_year_picker.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:splash_screen_view/SplashScreenView.dart';
 import 'app/data/theme_controller.dart';
-import 'app/modules/home/views/bottom_navbar.dart';
-import 'app/modules/login/views/login_view.dart';
 import 'app/routes/app_pages.dart';
 
 void main() async {

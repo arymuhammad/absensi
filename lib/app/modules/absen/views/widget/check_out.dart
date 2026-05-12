@@ -76,7 +76,7 @@ Future<void> checkOut(Data dataUser, double latitude, double longitude) async {
     // =======================
     // 📷 FOTO
     // =======================
-    await absC.uploadFotoAbsen();
+    await absC.uploadFotoAbsen(isVisit: false);
     Get.back();
 
     if (absC.image == null) {
@@ -228,9 +228,9 @@ Future<void> checkOut(Data dataUser, double latitude, double longitude) async {
       "tanggal2": absC.initDate2,
     });
 
-    homeC.reloadSummary(dataUser.id!);
-    absC.startTimer(10);
-    absC.resend();
+    homeC.getSummAttPerMonth(dataUser.id!);
+    // absC.startTimer(10);
+    // absC.resend();
   } finally {
     // 🔥 TUTUP LOADING DI SINI
     if (isLoadingShown && (Get.isDialogOpen ?? false)) {

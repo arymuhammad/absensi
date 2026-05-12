@@ -8,8 +8,19 @@ class User {
   String? level;
   String? namaLevel;
   String? foto;
+  bool? isActive;
 
-  User({this.id, this.username, this.password, this.nama, this.noTelp, this.kodeCabang, this.level, this.foto});
+  User({
+    this.id,
+    this.username,
+    this.password,
+    this.nama,
+    this.noTelp,
+    this.kodeCabang,
+    this.level,
+    this.foto,
+    this.isActive,
+  });
 
   User.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -21,6 +32,7 @@ class User {
     level = json['level'].toString();
     namaLevel = json['nama_level'].toString();
     foto = json['foto'];
+    isActive = (json['active'] == "1" ? true : false);
   }
 
   Map<String, dynamic> toJson() {

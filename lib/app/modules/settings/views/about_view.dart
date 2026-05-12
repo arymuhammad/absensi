@@ -12,10 +12,11 @@ import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../data/helper/const.dart';
+import '../../home/controllers/home_controller.dart';
 
 class AboutView extends GetView {
   AboutView({super.key});
-  final absC = Get.put(AbsenController());
+  final homeC = Get.find<HomeController>();
   final setC = Get.put(SettingsController());
   @override
   Widget build(BuildContext context) {
@@ -56,7 +57,7 @@ class AboutView extends GetView {
                       title: const Text('Check for app updates'),
                       onTap: () {
                         if (Platform.isAndroid) {
-                          absC.checkForUpdates("about");
+                          homeC.checkForUpdates("about");
                           // launchUrl(
                           //     Uri.parse('http://103.156.15.61/update apk/absensiApp.apk'));
                         } else {
@@ -73,7 +74,7 @@ class AboutView extends GetView {
                     ListTile(
                       title: const Text('Application version'),
                       subtitle: Text(
-                        'V${absC.currVer}',
+                        'V${homeC.currVer}',
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ),
@@ -124,7 +125,7 @@ Widget buildChangelog(
     onRefresh: () async {
       setC.isLoading.value = true;
       final readDoc = await http
-          .get(Uri.parse('http://103.156.15.61/update apk/changeLog.xml'))
+          .get(Uri.parse('http://103.156.15.61/update_apk/changeLog.xml'))
           .timeout(const Duration(seconds: 20));
       await setC.parseChangelogXml(readDoc.body);
       showToast('Page Refreshed');

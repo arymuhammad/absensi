@@ -5,6 +5,7 @@ import 'package:absensi/app/data/model/cabang_model.dart';
 import 'package:absensi/app/data/model/login_offline_model.dart';
 import 'package:absensi/app/data/model/server_api_model.dart';
 import 'package:absensi/app/data/model/shift_kerja_model.dart';
+import 'package:absensi/app/modules/absen/views/absen_view_backup.dart';
 // import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 import '../model/visit_model.dart';
@@ -25,10 +26,11 @@ class SQLHelper {
 
   Future<Database> _initDatabase() async {
     // Directory dataDirectory = await getApplicationDocumentsDirectory();
-    String dbPath = await getDatabasesPath() + _databaseName;
+    String dbPath = await getDatabasesPath();
+    String path = '$dbPath/$_databaseName';
     // print('db location : ' + dbPath);
     return await openDatabase(
-      dbPath,
+      path,
       version: 4,
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
@@ -300,9 +302,10 @@ class SQLHelper {
 
   Future<List<Visit>> getPendingVisit() async {
     final db = await instance.database;
+    // print("DB PATH APP: ${db.path}");
     final result = await db.query(
       'tbl_visit_area',
-      where: 'status_sync != ?',
+      where: 'status_sync IS NULL OR status_sync != ?',
       whereArgs: ['SUCCESS'],
     );
 
@@ -316,12 +319,14 @@ class SQLHelper {
     String status,
   ) async {
     final db = await instance.database;
+    // final result = 
     await db.update(
       'tbl_visit_area',
       {"status_sync": status},
       where: 'id_user = ? and tgl_visit=? and visit_in=?',
       whereArgs: [id, tglVisit, branch],
     );
+    // print('UPDATE RESULT: $result');
   }
 
   Future<DbResult> updateDataAbsen(
@@ -726,6 +731,44 @@ class SQLHelper {
   //   var res = await db.query('tbl_user', columns: ["data_wajah"], where: 'id=?', whereArgs: [id]);
   //   return res.map((e) => e).toList();
   // }
+  Future<List<String>> getAllPhotoPaths({required bool isVisit}) async {
+    final db = await database;
 
-  Future close() async => _database!.close();
+    final abs = await db.rawQuery('''
+    SELECT foto_masuk, foto_pulang FROM absen
+  ''');
+    final vst = await db.rawQuery('''
+    SELECT foto_in, foto_out FROM tbl_visit_area
+  ''');
+
+    List<String> paths = [];
+    if (isVisit) {
+      for (var row in vst) {
+        if (row['foto_in'] != null && row['foto_in'] != '') {
+          paths.add(row['foto_in'] as String);
+        }
+        if (row['foto_out'] != null && row['foto_out'] != '') {
+          paths.add(row['foto_out'] as String);
+        }
+      }
+    } else {
+      for (var row in abs) {
+        if (row['foto_masuk'] != null && row['foto_masuk'] != '') {
+          paths.add(row['foto_masuk'] as String);
+        }
+        if (row['foto_pulang'] != null && row['foto_pulang'] != '') {
+          paths.add(row['foto_pulang'] as String);
+        }
+      }
+    }
+
+    return paths;
+  }
+
+  Future<void> close() async {
+    if (_database != null) {
+      await _database!.close();
+      _database = null; // 🔥 WAJIB
+    }
+  }
 }

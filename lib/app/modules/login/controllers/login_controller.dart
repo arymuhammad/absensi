@@ -63,149 +63,153 @@ class LoginController extends GetxController with GetTickerProviderStateMixin {
     SharedPreferences pref = await SharedPreferences.getInstance();
     var data = {"username": username.text, "password": password.text};
     //get data from local storage
-    var dataOffline = await SQLHelper.instance.loginUserOffline(
-      username.text,
-      md5.convert(utf8.encode(password.text)).toString(),
-    );
+    // var dataOffline = await SQLHelper.instance.loginUserOffline(
+    //   username.text,
+    //   md5.convert(utf8.encode(password.text)).toString(),
+    // );
 
     //checking data
-    if (dataOffline.isNotEmpty) {
+    // if (dataOffline.isNotEmpty) {
       // showToast("ambil data dari sqlite");
       // FotoProfil foto = await ServiceApi().getFotoProfil({
       //   'id': dataOffline.first.id!,
       // });
 
-      await pref.setString(
-        'userDataLogin',
-        jsonEncode(
-          Data(
-            id: dataOffline[0].id,
-            nama: dataOffline[0].nama,
-            username: dataOffline[0].username,
-            password: dataOffline[0].password,
-            kodeCabang: dataOffline[0].kodeCabang,
-            namaCabang: dataOffline[0].namaCabang,
-            nik: dataOffline[0].nik,
-            lat: dataOffline[0].lat,
-            long: dataOffline[0].long,
-            // foto: foto.foto! != "" ? foto.foto! : dataOffline[0].foto,
-            foto: dataOffline[0].foto,
-            noTelp: dataOffline[0].noTelp,
-            level: dataOffline[0].level,
-            levelUser: dataOffline[0].levelUser,
-            areaCover: dataOffline[0].areaCover,
-            cekStok: dataOffline[0].cekStok,
-            visit: dataOffline[0].visit,
-            idRegion: dataOffline[0].idRegion,
-            leaveBalance: dataOffline[0].leaveBalance,
-            createdAt: dataOffline[0].createdAt,
-            parentId: dataOffline[0].parentId,
-            namaParent: dataOffline[0].namaParent,
-          ),
-        ),
-      );
+    //   await pref.setString(
+    //     'userDataLogin',
+    //     jsonEncode(
+    //       Data(
+    //         id: dataOffline[0].id,
+    //         nama: dataOffline[0].nama,
+    //         username: dataOffline[0].username,
+    //         password: dataOffline[0].password,
+    //         kodeCabang: dataOffline[0].kodeCabang,
+    //         namaCabang: dataOffline[0].namaCabang,
+    //         nik: dataOffline[0].nik,
+    //         lat: dataOffline[0].lat,
+    //         long: dataOffline[0].long,
+    //         // foto: foto.foto! != "" ? foto.foto! : dataOffline[0].foto,
+    //         foto: dataOffline[0].foto,
+    //         noTelp: dataOffline[0].noTelp,
+    //         level: dataOffline[0].level,
+    //         levelUser: dataOffline[0].levelUser,
+    //         areaCover: dataOffline[0].areaCover,
+    //         cekStok: dataOffline[0].cekStok,
+    //         visit: dataOffline[0].visit,
+    //         idRegion: dataOffline[0].idRegion,
+    //         leaveBalance: dataOffline[0].leaveBalance,
+    //         createdAt: dataOffline[0].createdAt,
+    //         parentId: dataOffline[0].parentId,
+    //         namaParent: dataOffline[0].namaParent,
+    //       ),
+    //     ),
+    //   );
 
-      var tempUser = pref.getString('userDataLogin');
-      // print('user data login $tempUser');
-      // final user = userDataLogin != "" ? Data.fromJson(jsonDecode(userDataLogin!)) : null;
-      logUser.value = Data.fromJson(jsonDecode(tempUser!));
+    //   var tempUser = pref.getString('userDataLogin');
+    //   // print('user data login $tempUser');
+    //   // final user = userDataLogin != "" ? Data.fromJson(jsonDecode(userDataLogin!)) : null;
+    //   logUser.value = Data.fromJson(jsonDecode(tempUser!));
 
-      // (tempUser != "" ? Data.fromJson(jsonDecode(tempUser!)) : null)!;
-      isAuth.value = await pref.setBool("is_login", true);
-      // isAuth.value = true;
-      username.clear();
-      password.clear();
+    //   // (tempUser != "" ? Data.fromJson(jsonDecode(tempUser!)) : null)!;
+    //   isAuth.value = await pref.setBool("is_login", true);
+    //   // isAuth.value = true;
+    //   username.clear();
+    //   password.clear();
 
-      showToast("Selamat datang ${dataOffline[0].nama}");
-      // Pastikan controller AbsenController sudah didaftarkan
-      // if (!Get.isRegistered<AbsenController>()) {
-      //   Get.put(AbsenController());
-      // }
-    } else {
-      var response = await ServiceApi().loginUser(data);
-      // showToast("ambil data dari server");
-      // dataUser.value = response;
-      if (response.success == true) {
-        await pref.setString(
-          'userDataLogin',
-          jsonEncode(
-            Data(
-              id: response.data!.id,
-              nama: response.data!.nama,
-              username: response.data!.username,
-              password: response.data!.password,
-              kodeCabang: response.data!.kodeCabang,
-              namaCabang: response.data!.namaCabang,
-              nik: response.data!.nik,
-              lat: response.data!.lat,
-              long: response.data!.long,
-              foto: response.data!.foto,
-              noTelp: response.data!.noTelp,
-              level: response.data!.level,
-              levelUser: response.data!.levelUser,
-              areaCover: response.data!.areaCover,
-              cekStok: response.data!.cekStok,
-              visit: response.data!.visit,
-              idRegion: response.data!.idRegion,
-              leaveBalance: response.data!.leaveBalance,
-              createdAt: response.data!.createdAt,
-              parentId: response.data!.parentId,
-              namaParent: response.data!.namaParent,
-            ),
-          ),
-        );
-
-        var tempUser = pref.getString('userDataLogin');
-        logUser.value = Data.fromJson(jsonDecode(tempUser!));
-        isAuth.value = await pref.setBool("is_login", true);
-        // isAuth.value = true;
-
-        await SQLHelper.instance
-            .getDataUser(response.data!.id!)
-            .then((data) => userSqlite.value = data);
-
-        if (userSqlite.isEmpty) {
-          //insert user data to sqlite
-          await SQLHelper.instance.insertDataUser(
-            LoginOffline(
-              id: '${response.data!.id}',
-              nama: '${response.data!.nama}',
-              namaCabang: '${response.data!.namaCabang}',
-              nik: '${response.data!.nik}',
-              noTelp: '${response.data!.noTelp}',
-              levelUser: '${response.data!.levelUser}',
-              foto: '${response.data!.foto}',
-              lat: '${response.data!.lat}',
-              long: '${response.data!.long}',
-              kodeCabang: '${response.data!.kodeCabang}',
-              level: '${response.data!.level}',
-              username: '${response.data!.username}',
-              password: '${response.data!.password}',
-              areaCover: '${response.data!.areaCover}',
-              visit: '${response.data!.visit}',
-              cekStok: '${response.data!.cekStok}',
-              idRegion: '${response.data!.idRegion}',
-              leaveBalance: '${response.data!.leaveBalance}',
-              createdAt: '${response.data!.createdAt}',
-              parentId: '${response.data!.parentId}',
-              namaParent: '${response.data!.namaParent}',
+    //   showToast("Selamat datang ${dataOffline[0].nama}");
+    //   // Pastikan controller AbsenController sudah didaftarkan
+    //   // if (!Get.isRegistered<AbsenController>()) {
+    //   //   Get.put(AbsenController());
+    //   // }
+    // } else {
+      try {
+        var response = await ServiceApi().loginUser(data);
+        // showToast("ambil data dari server");
+        // dataUser.value = response;
+        if (response.success == true) {
+          await pref.setString(
+            'userDataLogin',
+            jsonEncode(
+              Data(
+                id: response.data!.id,
+                nama: response.data!.nama,
+                username: response.data!.username,
+                password: response.data!.password,
+                kodeCabang: response.data!.kodeCabang,
+                namaCabang: response.data!.namaCabang,
+                nik: response.data!.nik,
+                lat: response.data!.lat,
+                long: response.data!.long,
+                foto: response.data!.foto,
+                noTelp: response.data!.noTelp,
+                level: response.data!.level,
+                levelUser: response.data!.levelUser,
+                areaCover: response.data!.areaCover,
+                cekStok: response.data!.cekStok,
+                visit: response.data!.visit,
+                idRegion: response.data!.idRegion,
+                leaveBalance: response.data!.leaveBalance,
+                createdAt: response.data!.createdAt,
+                parentId: response.data!.parentId,
+                namaParent: response.data!.namaParent,
+              ),
             ),
           );
-          //end of insert statement
+
+          var tempUser = pref.getString('userDataLogin');
+          logUser.value = Data.fromJson(jsonDecode(tempUser!));
+          isAuth.value = await pref.setBool("is_login", true);
+          // isAuth.value = true;
+
+          // await SQLHelper.instance
+          //     .getDataUser(response.data!.id!)
+          //     .then((data) => userSqlite.value = data);
+
+          // if (userSqlite.isEmpty) {
+          //   //insert user data to sqlite
+          //   await SQLHelper.instance.insertDataUser(
+          //     LoginOffline(
+          //       id: '${response.data!.id}',
+          //       nama: '${response.data!.nama}',
+          //       namaCabang: '${response.data!.namaCabang}',
+          //       nik: '${response.data!.nik}',
+          //       noTelp: '${response.data!.noTelp}',
+          //       levelUser: '${response.data!.levelUser}',
+          //       foto: '${response.data!.foto}',
+          //       lat: '${response.data!.lat}',
+          //       long: '${response.data!.long}',
+          //       kodeCabang: '${response.data!.kodeCabang}',
+          //       level: '${response.data!.level}',
+          //       username: '${response.data!.username}',
+          //       password: '${response.data!.password}',
+          //       areaCover: '${response.data!.areaCover}',
+          //       visit: '${response.data!.visit}',
+          //       cekStok: '${response.data!.cekStok}',
+          //       idRegion: '${response.data!.idRegion}',
+          //       leaveBalance: '${response.data!.leaveBalance}',
+          //       createdAt: '${response.data!.createdAt}',
+          //       parentId: '${response.data!.parentId}',
+          //       namaParent: '${response.data!.namaParent}',
+          //     ),
+          //   );
+          //   //end of insert statement
+          // }
+
+          username.clear();
+          password.clear();
+
+          showToast("Selamat datang ${response.data!.nama}");
+          // Pastikan controller AbsenController sudah didaftarkan
+          // if (!Get.isRegistered<AbsenController>()) {
+          //   Get.put(AbsenController());
+          // }
+        } else {
+          showToast(response.message ?? "Terjadi kesalahan");
         }
-
-        username.clear();
-        password.clear();
-
-        showToast("Selamat datang ${response.data!.nama}");
-        // Pastikan controller AbsenController sudah didaftarkan
-        // if (!Get.isRegistered<AbsenController>()) {
-        //   Get.put(AbsenController());
-        // }
-      } else {
-        showToast("User tidak ditemukan\nHarap periksa username dan password");
+      } catch (e) {
+        showToast(e.toString()); // 🔥 semua error masuk sini
       }
-    }
+    // }
   }
 
   loadSession() async {

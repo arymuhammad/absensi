@@ -8,13 +8,18 @@ import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 import 'package:expansion_tile_group/expansion_tile_group.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:photo_view/photo_view.dart';
 // import 'package:startapp_sdk/startapp.dart';
 import 'package:step_progress/step_progress.dart';
 import 'package:get/get.dart';
 import 'package:icons_plus/icons_plus.dart';
 import '../../../data/helper/const.dart';
-import '../../../data/model/leave_model.dart';
+import '../../../data/helper/helper_ui.dart';
+import '../../../data/model/req_leave_model.dart';
+import '../../../services/service_api.dart';
+import '../../approval/widget/bottom_search_live.dart';
 import '../../login/controllers/login_controller.dart';
+import '../../shared/container_main_color.dart';
 import '../controllers/leave_controller.dart';
 import 'widget/leave_add_sheet.dart';
 
@@ -42,22 +47,40 @@ class LeaveView extends GetView<LeaveController> {
         actions: [
           IconButton(
             onPressed: () async {
-              leaveC.generateUid();
-              // print(userData!.leaveBalance);
-              userData.leaveBalance == "0"
-                  ? showToast(
-                    "Saldo Cuti Anda Habis\nAnda tidak dapat mengajukan permohonan cuti",
-                  )
-                  : Get.bottomSheet(
-                    LeaveAddSheet(userData: userData),
-                    isScrollControlled: true,
-                    // useRootNavigator: true, // 🔥 WAJIB
-                  );
-              //  Get.to(() {
-              //   leaveC.generateUid();
+              BuildContext? dialogContext;
 
-              //   return LeaveAdd(userData: userData);
-              // }, transition: Transition.cupertino);
+              showDialog(
+                context: context,
+                barrierDismissible: false,
+                builder: (ctx) {
+                  dialogContext = ctx;
+
+                  return const Center(child: CircularProgressIndicator());
+                },
+              );
+
+              await leaveC.leaveBalanceCheck(userData);
+
+              if (dialogContext != null) {
+                Navigator.of(dialogContext!).pop();
+              }
+
+              final newUserData = auth.logUser.value;
+
+              leaveC.generateUid();
+
+              if (newUserData.leaveBalance == "0") {
+                showToast(
+                  "Saldo Cuti Anda Habis\nAnda tidak dapat mengajukan permohonan cuti",
+                );
+
+                return;
+              }
+
+              Get.bottomSheet(
+                LeaveAddSheet(userData: newUserData),
+                isScrollControlled: true,
+              );
             },
             icon: const Icon(Icons.format_list_bulleted_add),
           ),
@@ -129,878 +152,708 @@ class LeaveView extends GetView<LeaveController> {
                               ],
                             )
                             : Padding(
-                              padding: const EdgeInsets.all(8.0),
+                              padding: const EdgeInsets.fromLTRB(
+                                8.0,
+                                0.0,
+                                8.0,
+                                8.0,
+                              ),
                               child: ListView(
                                 children: [
-                                  ExpansionTileGroup(
-                                    toggleType: ToggleType.expandOnlyCurrent,
-                                    spaceBetweenItem: 5,
-                                    children: List.generate(leaveC.listLeaveReq.length, (
-                                      i,
-                                    ) {
-                                      final leave = leaveC.listLeaveReq[i];
-                                      // Fungsi untuk menghitung totalSteps
-                                      var validLevels = [
-                                        "19",
-                                        "26",
-                                        "50",
-                                        "59",
-                                      ];
-                                      int getTotalSteps() {
-                                        //                                         print('parentId: "${leave.parentId}"');
-                                        // print('levelId: "${leave.levelId}", isInValidLevels: ${validLevels.contains(leave.levelId)}');
-                                        if (leave.parentId == "3" &&
-                                            !validLevels.contains(
-                                              leave.levelId,
-                                            )) {
-                                          return 4;
-                                        }
-                                        return 3;
-                                      }
+                                  Card(
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: ExpansionTileGroup(
+                                        toggleType:
+                                            ToggleType.expandOnlyCurrent,
+                                        spaceBetweenItem: 5,
+                                        children: List.generate(leaveC.listLeaveReq.length, (
+                                          i,
+                                        ) {
+                                          final leave = leaveC.listLeaveReq[i];
 
-                                      int totalSteps = getTotalSteps();
-                                      // Data base nodeTitles full (4 steps)
-                                      List<String> nodeTitlesFull = const [
-                                        'Apply',
-                                        'Store Manager',
-                                        'Area Manager',
-                                        'HRD',
-                                      ];
+                                          // ================== STEP CONFIG ==================
+                                          List<String> getNodeTitles(
+                                            ReqLeaveModel leave,
+                                          ) {
+                                            if (leave.parentId == "3") {
+                                              final skipStore =
+                                                  leave.levelId == "19" ||
+                                                  leave.levelId == "20";
 
-                                      // Node titles untuk 3 steps (kurangi 1 step, misalnya tanpa step terakhir "HR")
-                                      List<String> nodeTitles3Steps = const [
-                                        'Apply',
-                                        // 'Store Manager',
-                                        'Area Manager',
-                                        'HRD',
-                                      ];
+                                              if (skipStore) {
+                                                return [
+                                                  'Apply',
+                                                  'Area Manager',
+                                                  'Ops',
+                                                  'HR',
+                                                ];
+                                              }
 
-                                      // Fungsi untuk dapatkan nodeTitles berdasarkan kondisi user dan totalSteps
-                                      List<String> getNodeTitles() {
-                                        if (leave.parentId == "2") {
-                                          return [
-                                            'Apply',
-                                            leave.levelId == "29" ||
-                                                    leave.levelId == "80" ||
-                                                    leave.levelId == "60"
-                                                ? 'General Manager'
-                                                : 'Operational Manager',
-                                            'HRD',
-                                          ];
-                                        } else if (leave.parentId == "3") {
-                                          if (leave.levelId == "19" ||
-                                              leave.levelId == "50" ||
-                                              leave.levelId == "59") {
-                                            // Level 19 di parent 3; 3 steps tapi sM seperti contoh kamu
-                                            return nodeTitles3Steps;
-                                          } else if (leave.levelId == "26") {
-                                            return const [
+                                              return [
+                                                'Apply',
+                                                'Store Manager',
+                                                'Area Manager',
+                                                'Ops',
+                                                'HR',
+                                              ];
+                                            }
+
+                                            if (leave.parentId == "2") {
+                                              return [
+                                                'Apply',
+                                                (leave.levelId == "29" ||
+                                                        leave.levelId == "80" ||
+                                                        leave.levelId == "60")
+                                                    ? 'General Manager'
+                                                    : 'Operational Manager',
+                                                'HR',
+                                              ];
+                                            }
+
+                                            if (leave.parentId == "4") {
+                                              return [
+                                                'Apply',
+                                                leave.levelId != '43'
+                                                    ? 'IT Manager'
+                                                    : 'General Manager',
+                                                'HR',
+                                              ];
+                                            }
+
+                                            if (leave.parentId == "5") {
+                                              return [
+                                                'Apply',
+                                                leave.levelId != '77'
+                                                    ? 'EDITORIAL Manager'
+                                                    : 'General Manager',
+                                                'HR',
+                                              ];
+                                            }
+
+                                            if (leave.parentId == "8") {
+                                              return [
+                                                'Apply',
+                                                leave.levelId != '18'
+                                                    ? 'HR Manager'
+                                                    : 'General Manager',
+                                                'HR',
+                                              ];
+                                            }
+
+                                            if (leave.parentId == "9") {
+                                              return [
+                                                'Apply',
+                                                leave.levelId != '41'
+                                                    ? 'Brand Manager'
+                                                    : 'General Manager',
+                                                'HR',
+                                              ];
+                                            }
+
+                                            return [
                                               'Apply',
-                                              'Operational Manager',
-                                              'HRD',
+                                              'Store Manager',
+                                              'Area Manager',
+                                              'HR',
                                             ];
-                                            // }
-                                            // else if (userData!.levelId == "50" ||
-                                            //     userData!.levelId == "59") {
-                                            //   // Tambahkan jika ingin memperhatikan levelId 50 dan 59
-                                            //   return nodeTitlesFull; // misal 4 steps
-                                          } else {
-                                            // parentId 3 tapi levelId bukan yg disebut di atas, pakai 4 steps
-                                            return nodeTitlesFull;
                                           }
-                                        } else if (leave.parentId == "4") {
-                                          // Parent 4 misal default sD atau hD
 
-                                          return [
-                                            'Apply',
-                                            leave.parentId == "4" &&
-                                                    leave.levelId != '43'
-                                                ? 'IT Manager'
-                                                : 'General Manager',
-                                            'HRD',
-                                          ];
-                                        } else if (leave.parentId == "5") {
-                                          // Contoh untuk parent 5 bisa disesuaikan
-                                          return [
-                                            'Apply',
-                                            leave.parentId == "5" &&
-                                                    leave.levelId != '77'
-                                                ? 'EDITORIAL Manager'
-                                                : 'General Manager',
-                                            'HRD',
-                                          ];
-                                        } else if (leave.parentId == "8") {
-                                          return [
-                                            'Apply',
-                                            leave.parentId == "8" &&
-                                                    leave.levelId != '18'
-                                                ? 'HRD Manager'
-                                                : 'General Manager',
-                                            'HRD',
-                                          ];
-                                        } else if (leave.parentId == "9") {
-                                          return [
-                                            'Apply',
-                                            leave.parentId == "9" &&
-                                                    leave.levelId != '41'
-                                                ? 'Brand Manager'
-                                                : 'General Manager',
-                                            'HRD',
-                                          ];
-                                        } else {
-                                          // Default fallback
-                                          return nodeTitlesFull;
-                                        }
-                                      }
+                                          // ================== APPROVAL MAPPING ==================
+                                          String? getApprovalValue(
+                                            ReqLeaveModel leave,
+                                            int index,
+                                          ) {
+                                            if (leave.parentId == "3") {
+                                              final skipStore =
+                                                  leave.levelId == "19" ||
+                                                  leave.levelId == "20";
 
-                                      // Fungsi untuk mendapatkan step label dan currentStep
-                                      Map<String, dynamic> getStepInfo(
-                                        LeaveModel leave,
-                                      ) {
-                                        String stepLabel = "";
-                                        int currentStep = 0;
-
-                                        // Kondisi untuk initial step (step 0)
-                                        if (leave.acc1 == null &&
-                                            leave.acc2 == null &&
-                                            leave.acc3 == null) {
-                                          if (leave.parentId == "3" &&
-                                              leave.levelId != "19" &&
-                                              leave.levelId != "26" &&
-                                              leave.levelId != "50" &&
-                                              leave.levelId != "59") {
-                                            stepLabel = "Store Manager";
-                                          } else if (leave.parentId == "3" &&
-                                              (leave.levelId == "19" ||
-                                                  leave.levelId == "59")) {
-                                            stepLabel = "Area Manager";
-                                          } else if (leave.parentId == "3" &&
-                                              (leave.levelId == "26" ||
-                                                  leave.levelId == "50")) {
-                                            stepLabel = "Operational Manager";
-                                          } else if (leave.parentId == "4" &&
-                                              leave.levelId != "43") {
-                                            stepLabel = "IT Manager";
-                                          } else if (leave.parentId == "4" &&
-                                              leave.levelId == "43") {
-                                            stepLabel = "General Manager";
-                                          } else if (leave.parentId == "5" &&
-                                              leave.levelId != "77") {
-                                            stepLabel = "EDITORIAL Manager";
-                                          } else if (leave.parentId == "5" &&
-                                              leave.levelId == "77") {
-                                            stepLabel = "General Manager";
-                                          } else if (leave.parentId == "8" &&
-                                              leave.levelId != "18") {
-                                            stepLabel = "HRD Manager";
-                                          } else if (leave.parentId == "8" &&
-                                              leave.levelId == "18") {
-                                            stepLabel = "General Manager";
-                                          } else if (leave.parentId == "9" &&
-                                              leave.levelId != "41") {
-                                            stepLabel = "Brand Manager";
-                                          } else if (leave.parentId == "9" &&
-                                              leave.levelId == "41") {
-                                            stepLabel = "General Manager";
-                                          } else {
-                                            stepLabel = "";
-                                          }
-                                          currentStep = 0;
-                                        }
-                                        // Kondisi step 1 jika totalSteps == 4, step 1 dan 2 masih ada
-                                        else if (totalSteps == 4) {
-                                          if (leave.acc2 == null &&
-                                              leave.acc3 == null) {
-                                            stepLabel =
-                                                leave.acc1 == "0"
-                                                    ? "Store Manager"
-                                                    : "Area Manager";
-                                            currentStep = 1;
-                                          } else if (leave.acc3 == null) {
-                                            stepLabel =
-                                                leave.acc2 == "0"
-                                                    ? "Area Manager"
-                                                    : "HRD";
-                                            currentStep = 2;
-                                          } else {
-                                            stepLabel = "HRD";
-                                            currentStep = 3;
-                                          }
-                                        }
-                                        // Kondisi jika totalSteps == 3, hanya ada 3 step (step 0,1,2)
-                                        else {
-                                          if (totalSteps == 3) {
-                                            if (leave.acc3 == null) {
-                                              // Step 1 - berdasarkan acc2 dan userData
-                                              if (leave.parentId == "2") {
-                                                if (leave.levelId == "29" ||
-                                                    leave.levelId == "80" ||
-                                                    leave.levelId == "60") {
-                                                  stepLabel =
-                                                      leave.acc2 == "0" ||
-                                                              leave.acc2 == null
-                                                          ? "General Manager"
-                                                          : "HRD";
-                                                  currentStep =
-                                                      leave.acc2 == null
-                                                          ? 0
-                                                          : 1;
-                                                } else {
-                                                  // print(leave.levelId);
-                                                  stepLabel =
-                                                      leave.acc2 == "0" ||
-                                                              leave.acc2 == null
-                                                          ? "Operational Manager"
-                                                          : "HRD";
-                                                  currentStep =
-                                                      leave.acc2 == null
-                                                          ? 0
-                                                          : 1;
-                                                }
-                                              } else if (leave.parentId ==
-                                                  "3") {
-                                                if (leave.levelId == "19" ||
-                                                    leave.levelId == "59") {
-                                                  stepLabel =
-                                                      leave.acc2 == "0" ||
-                                                              leave.acc2 == null
-                                                          ? "Area Manager"
-                                                          : "HRD";
-                                                  currentStep =
-                                                      leave.acc2 == null
-                                                          ? 0
-                                                          : 1;
-                                                } else if (leave.levelId ==
-                                                        "26" ||
-                                                    leave.levelId == "50") {
-                                                  // print(leave.levelId);
-                                                  stepLabel =
-                                                      leave.acc2 == "0" ||
-                                                              leave.acc2 == null
-                                                          ? "Operational Manager"
-                                                          : "HRD";
-                                                  currentStep =
-                                                      leave.acc2 == null
-                                                          ? 0
-                                                          : 1;
-                                                }
-                                              } else if (leave.parentId ==
-                                                  "4") {
-                                                if (leave.levelId == "43") {
-                                                  stepLabel =
-                                                      leave.acc2 == "0" ||
-                                                              leave.acc2 == null
-                                                          ? "General Manager"
-                                                          : "HRD";
-                                                  currentStep =
-                                                      leave.acc2 == null
-                                                          ? 0
-                                                          : 1;
-                                                } else {
-                                                  // print(leave.levelId);
-                                                  stepLabel =
-                                                      leave.acc2 == "0" ||
-                                                              leave.acc2 == null
-                                                          ? "IT Manager"
-                                                          : "HRD";
-                                                  currentStep =
-                                                      leave.acc2 == null
-                                                          ? 0
-                                                          : 1;
-                                                }
-                                              } else if (leave.parentId ==
-                                                  "5") {
-                                                if (leave.levelId == "77") {
-                                                  stepLabel =
-                                                      leave.acc2 == "0" ||
-                                                              leave.acc2 == null
-                                                          ? "General Manager"
-                                                          : "HRD";
-                                                  currentStep =
-                                                      leave.acc2 == null
-                                                          ? 0
-                                                          : 1;
-                                                } else {
-                                                  stepLabel =
-                                                      leave.acc2 == "0" ||
-                                                              leave.acc2 == null
-                                                          ? "EDITORIAL Manager"
-                                                          : "HRD";
-                                                  currentStep =
-                                                      leave.acc2 == null
-                                                          ? 0
-                                                          : 1;
-                                                }
-                                              } else if (leave.parentId ==
-                                                  "8") {
-                                                if (leave.levelId == "18") {
-                                                  stepLabel =
-                                                      leave.acc2 == "0" ||
-                                                              leave.acc2 == null
-                                                          ? "General Manager"
-                                                          : "HRD";
-                                                  currentStep =
-                                                      leave.acc2 == null
-                                                          ? 0
-                                                          : 1;
-                                                } else {
-                                                  stepLabel =
-                                                      leave.acc2 == "0" ||
-                                                              leave.acc2 == null
-                                                          ? "HRD Manager"
-                                                          : "HRD";
-                                                  currentStep =
-                                                      leave.acc2 == null
-                                                          ? 0
-                                                          : 1;
-                                                }
-                                              } else if (leave.parentId ==
-                                                  "9") {
-                                                if (leave.levelId == "41") {
-                                                  stepLabel =
-                                                      leave.acc2 == "0" ||
-                                                              leave.acc2 == null
-                                                          ? "General Manager"
-                                                          : "HRD";
-                                                  currentStep =
-                                                      leave.acc2 == null
-                                                          ? 0
-                                                          : 1;
-                                                } else {
-                                                  stepLabel =
-                                                      leave.acc2 == "0" ||
-                                                              leave.acc2 == null
-                                                          ? "Brand Manager"
-                                                          : "HRD";
-                                                  currentStep =
-                                                      leave.acc2 == null
-                                                          ? 0
-                                                          : 1;
+                                              if (skipStore) {
+                                                switch (index) {
+                                                  case 1:
+                                                    return leave.acc2;
+                                                  case 2:
+                                                    return leave.acc3;
+                                                  case 3:
+                                                    return leave.acc4;
+                                                  default:
+                                                    return null;
                                                 }
                                               } else {
-                                                stepLabel = "";
+                                                switch (index) {
+                                                  case 1:
+                                                    return leave.acc1;
+                                                  case 2:
+                                                    return leave.acc2;
+                                                  case 3:
+                                                    return leave.acc3;
+                                                  case 4:
+                                                    return leave.acc4;
+                                                  default:
+                                                    return null;
+                                                }
                                               }
-                                            } else {
-                                              // Step 2 - acc3 sudah ada, label HRD
+                                            }
 
-                                              stepLabel = "HRD";
-                                              currentStep = 2;
+                                            // 🔥 INI YANG DIPERBAIKI
+                                            // selain parentId 3 → hanya pakai acc2 & acc4
+                                            switch (index) {
+                                              case 1:
+                                                return leave.acc2; // atasan
+                                              case 2:
+                                                return leave.acc4; // HR
+                                              default:
+                                                return null;
                                             }
                                           }
-                                        }
 
-                                        return {
-                                          'stepLabel': stepLabel,
-                                          'currentStep': currentStep,
-                                        };
-                                      }
+                                          // ================== STATUS ==================
+                                          String getStepStatus(
+                                            ReqLeaveModel leave,
+                                          ) {
+                                            bool isEmpty(String? val) =>
+                                                val == null || val.isEmpty;
 
-                                      // Penggunaan di dalam List.generate
-                                      // final leave = leaveC.listLeaveReq[i];
-                                      final stepInfo = getStepInfo(leave);
-                                      final String stepLabel =
-                                          stepInfo['stepLabel'];
-                                      final int currentStep =
-                                          stepInfo['currentStep'];
+                                            // 🔴 reject tetap global
+                                            if (leave.acc1 == 'reject' ||
+                                                leave.acc2 == 'reject' ||
+                                                leave.acc3 == 'reject' ||
+                                                leave.acc4 == 'reject') {
+                                              return "rejected";
+                                            }
 
-                                      final controller = StepProgressController(
-                                        initialStep: currentStep,
-                                        totalSteps: totalSteps,
-                                      );
+                                            // ======================
+                                            // 🔥 KHUSUS PARENT 3
+                                            // ======================
+                                            if (leave.parentId == "3") {
+                                              final skipStore =
+                                                  leave.levelId == "19" ||
+                                                  leave.levelId == "20";
 
-                                      // Fungsi untuk status leave per step index
-                                      String getLeaveStatusForStep(
-                                        int stepIndex,
-                                      ) {
-                                        if (stepIndex >= totalSteps) {
-                                          // Step tidak valid, bisa return status default atau kosong
-                                          return "";
-                                        }
+                                              if (skipStore) {
+                                                // acc2 → acc3 → acc4
+                                                if (isEmpty(leave.acc2) ||
+                                                    isEmpty(leave.acc3) ||
+                                                    isEmpty(leave.acc4)) {
+                                                  return "pending";
+                                                }
+                                              } else {
+                                                // acc1 → acc2 → acc3 → acc4
+                                                if (isEmpty(leave.acc1) ||
+                                                    isEmpty(leave.acc2) ||
+                                                    isEmpty(leave.acc3) ||
+                                                    isEmpty(leave.acc4)) {
+                                                  return "pending";
+                                                }
+                                              }
 
-                                        String? val;
-                                        if (totalSteps == 4) {
-                                          // Mapping for 4 steps: acc1, acc2, acc3
-                                          switch (stepIndex) {
-                                            case 1:
-                                              val = leave.acc1;
-                                              break;
-                                            case 2:
-                                              val = leave.acc2;
-                                              break;
-                                            case 3:
-                                              val = leave.acc3;
-                                              break;
-                                            default:
-                                              val =
-                                                  null; // step 0 or other - no approval
-                                              break;
+                                              return "approved";
+                                            }
+
+                                            // ======================
+                                            // 🔥 SEMUA PARENT LAIN
+                                            // ======================
+                                            // Apply → Atasan → HR
+                                            // 👉 acc2 & acc4 doang
+                                            if (isEmpty(leave.acc2) ||
+                                                isEmpty(leave.acc4)) {
+                                              return "pending";
+                                            }
+
+                                            return "approved";
                                           }
-                                        } else if (totalSteps == 3) {
-                                          // Mapping for 3 steps: acc1, acc2 (acc3 tidak digunakan)
-                                          switch (stepIndex) {
-                                            case 1:
-                                              val = leave.acc2;
-                                              break;
-                                            case 2:
-                                              val = leave.acc3;
-                                              break;
-                                            default:
-                                              val =
-                                                  null; // step 0 or other - no approval
-                                              break;
-                                          }
-                                        } else {
-                                          // fallback, misal totalSteps < 3
-                                          val = null;
-                                        }
-                                        int waitLimit = totalSteps == 4 ? 2 : 1;
-                                        int cancelStep =
-                                            totalSteps == 4 ? 3 : 2;
 
-                                        if (val == '0' &&
-                                                stepIndex == cancelStep ||
-                                            val == '0') {
-                                          return "Canceled by";
-                                        } else if (val == null ||
-                                            stepIndex <= waitLimit) {
-                                          return "Waiting Approval";
-                                        } else {
-                                          return "Approved by";
-                                        }
-                                      }
+                                          // ================== COLOR ==================
+                                          Color getStepColor(
+                                            ReqLeaveModel leave,
+                                            int index,
+                                          ) {
+                                            final val = getApprovalValue(
+                                              leave,
+                                              index,
+                                            );
 
-                                      Color getBackgroundColorForStep(
-                                        int index,
-                                      ) {
-                                        if (index >= totalSteps) {
-                                          // misal kembalikan warna abu-abu jika step tidak valid
-                                          return Colors.grey;
-                                        }
+                                            if (index == 0) return Colors.green;
 
-                                        String? val;
-                                        if (totalSteps == 4) {
-                                          // Mapping for 4 steps: acc1, acc2, acc3
-                                          switch (index) {
-                                            case 1:
-                                              val = leave.acc1;
-                                              break;
-                                            case 2:
-                                              val = leave.acc2;
-                                              break;
-                                            case 3:
-                                              val = leave.acc3;
-                                              break;
-                                            default:
-                                              val =
-                                                  null; // step 0 or other - no approval
-                                              break;
-                                          }
-                                        } else if (totalSteps == 3) {
-                                          // Mapping for 3 steps: acc1, acc2 (acc3 tidak digunakan)
-                                          switch (index) {
-                                            case 1:
-                                              val = leave.acc2;
-                                              break;
-                                            case 2:
-                                              val = leave.acc3;
-                                              break;
-                                            default:
-                                              val =
-                                                  null; // step 0 or other - no approval
-                                              break;
-                                          }
-                                        } else {
-                                          // fallback, misal totalSteps < 3
-                                          val = null;
-                                        }
+                                            bool previousApproved = true;
 
-                                        if (val == '0') {
-                                          return red!;
-                                        } else if (val == null && index != 0) {
-                                          return Colors.grey;
-                                        } else {
-                                          return Colors.green;
-                                        }
-                                      }
-
-                                      Widget iconBuilder(
-                                        int index,
-                                        int completedStepIndex,
-                                      ) {
-                                        if (index >= totalSteps) {
-                                          // Step diluar totalSteps, tampilkan icon waiting
-                                          return const Icon(
-                                            Icons.hourglass_empty,
-                                            color: Colors.grey,
-                                          );
-                                        }
-
-                                        String? val;
-
-                                        if (totalSteps == 4) {
-                                          // Mapping for 4 steps: acc1, acc2, acc3
-                                          switch (index) {
-                                            case 1:
-                                              val = leave.acc1;
-                                              break;
-                                            case 2:
-                                              val = leave.acc2;
-                                              break;
-                                            case 3:
-                                              val = leave.acc3;
-                                              break;
-                                            default:
-                                              val =
-                                                  null; // step 0 or other - no approval
-                                              break;
-                                          }
-                                        } else if (totalSteps == 3) {
-                                          // Mapping for 3 steps: acc1, acc2 (acc3 tidak digunakan)
-                                          switch (index) {
-                                            case 1:
-                                              val = leave.acc2;
-                                              break;
-                                            case 2:
-                                              val = leave.acc3;
-                                              break;
-                                            default:
-                                              val =
-                                                  null; // step 0 or other - no approval
-                                              break;
-                                          }
-                                        } else {
-                                          // fallback, misal totalSteps < 3
-                                          val = null;
-                                        }
-
-                                        // Jika index 0 (initial step), biasanya tidak ada val approval -> tampilkan check (atau sesuai logic)
-                                        if (index == 0) {
-                                          return const Icon(
-                                            Icons.check,
-                                            color: Colors.white,
-                                            size: 18,
-                                          );
-                                        }
-
-                                        if (val == '0') {
-                                          // Approval rejected
-                                          return const Icon(
-                                            Icons.close,
-                                            color: Colors.white,
-                                            size: 18,
-                                          );
-                                        } else if (val == null && index != 0) {
-                                          // Menunggu approval
-                                          return const Icon(
-                                            Icons.hourglass_empty,
-                                            color: Colors.grey,
-                                          );
-                                        } else {
-                                          // Approval accepted
-                                          return const Icon(
-                                            Icons.check,
-                                            color: Colors.white,
-                                            size: 18,
-                                          );
-                                        }
-                                      }
-
-                                      final leaveStats =
-                                          (currentStep == 0)
-                                              ? "Waiting Approval"
-                                              : getLeaveStatusForStep(
-                                                currentStep,
+                                            for (int i = 1; i < index; i++) {
+                                              final prevVal = getApprovalValue(
+                                                leave,
+                                                i,
                                               );
-                                      // print('current step: $currentStep');
-                                      // final totalSteps = getTotalSteps();
-                                      final nodeTitles = getNodeTitles()
-                                          .sublist(0, totalSteps);
+                                              if (prevVal == null ||
+                                                  prevVal == 'reject') {
+                                                previousApproved = false;
+                                                break;
+                                              }
+                                            }
 
-                                      return ExpansionTileItem(
-                                        key: Key(
-                                          'leave_tile_$i',
-                                        ), // key unik per item penting!
-                                        controlAffinity:
-                                            ListTileControlAffinity.trailing,
-                                        tilePadding: const EdgeInsets.fromLTRB(
-                                          8,
-                                          2,
-                                          8,
-                                          2,
-                                        ),
-                                        childrenPadding:
-                                            const EdgeInsets.fromLTRB(
-                                              8,
-                                              2,
-                                              8,
-                                              2,
+                                            if (val == 'reject') return red!;
+                                            if (!previousApproved ||
+                                                val == null) {
+                                              return Colors.grey;
+                                            }
+
+                                            return Colors.green;
+                                          }
+
+                                          // ================== ICON ==================
+                                          Widget buildStepIcon(
+                                            ReqLeaveModel leave,
+                                            int index,
+                                          ) {
+                                            if (index == 0) {
+                                              return const Icon(
+                                                Icons.check,
+                                                color: Colors.white,
+                                                size: 18,
+                                              );
+                                            }
+
+                                            final val = getApprovalValue(
+                                              leave,
+                                              index,
+                                            );
+
+                                            // ❌ kalau step ini reject
+                                            if (val == 'reject') {
+                                              return const Icon(
+                                                Icons.close,
+                                                color: Colors.white,
+                                                size: 18,
+                                              );
+                                            }
+
+                                            // 🔥 CEK: apakah semua step sebelumnya sudah approved?
+                                            bool previousApproved = true;
+
+                                            for (int i = 1; i < index; i++) {
+                                              final prevVal = getApprovalValue(
+                                                leave,
+                                                i,
+                                              );
+
+                                              if (prevVal == null ||
+                                                  prevVal == 'reject') {
+                                                previousApproved = false;
+                                                break;
+                                              }
+                                            }
+
+                                            // ⏳ kalau belum waktunya (step sebelumnya belum selesai)
+                                            if (!previousApproved) {
+                                              return const Icon(
+                                                Icons.hourglass_empty,
+                                                color: Colors.grey,
+                                              );
+                                            }
+
+                                            // ⏳ kalau step ini belum di-acc
+                                            if (val == null) {
+                                              return const Icon(
+                                                Icons.hourglass_empty,
+                                                color: Colors.grey,
+                                              );
+                                            }
+
+                                            // ✅ baru boleh hijau
+                                            return const Icon(
+                                              Icons.check,
+                                              color: Colors.white,
+                                              size: 18,
+                                            );
+                                          }
+
+                                          // ================== CURRENT STEP ==================
+                                          int getCurrentStep(
+                                            ReqLeaveModel leave,
+                                          ) {
+                                            if (leave.parentId == "3") {
+                                              final skipStore =
+                                                  leave.levelId == "19" ||
+                                                  leave.levelId == "20";
+
+                                              if (skipStore) {
+                                                if (leave.acc2 == null)
+                                                  return 0;
+                                                if (leave.acc3 == null)
+                                                  return 1;
+                                                if (leave.acc4 == null)
+                                                  return 2;
+                                                return 3;
+                                              } else {
+                                                if (leave.acc1 == null)
+                                                  return 0;
+                                                if (leave.acc2 == null)
+                                                  return 1;
+                                                if (leave.acc3 == null)
+                                                  return 2;
+                                                if (leave.acc4 == null)
+                                                  return 3;
+                                                return 4;
+                                              }
+                                            }
+
+                                            // 🔥 FIX NON PARENT 3
+                                            if (leave.acc2 == null) return 0;
+                                            if (leave.acc4 == null) return 1;
+                                            return 2;
+                                          }
+
+                                          final nodeTitles = getNodeTitles(
+                                            leave,
+                                          );
+                                          final totalSteps = nodeTitles.length;
+
+                                          final currentStep = getCurrentStep(
+                                            leave,
+                                          );
+                                          final safeStep =
+                                              currentStep >= totalSteps
+                                                  ? totalSteps - 1
+                                                  : currentStep;
+
+                                          final controller =
+                                              StepProgressController(
+                                                initialStep: safeStep,
+                                                totalSteps: totalSteps,
+                                              );
+                                          final leaveStats = getStepStatus(
+                                            leave,
+                                          );
+                                          final color = getStatusColor(
+                                            leaveStats,
+                                          );
+
+                                          return ExpansionTileItem(
+                                            key: Key(
+                                              'leave_tile_$i',
+                                            ), // key unik per item penting!
+                                            controlAffinity:
+                                                ListTileControlAffinity
+                                                    .trailing,
+                                            tilePadding:
+                                                const EdgeInsets.fromLTRB(
+                                                  8,
+                                                  2,
+                                                  8,
+                                                  2,
+                                                ),
+                                            childrenPadding:
+                                                const EdgeInsets.fromLTRB(
+                                                  8,
+                                                  2,
+                                                  8,
+                                                  2,
+                                                ),
+                                            isHasBottomBorder: true,
+                                            isHasTopBorder: true,
+                                            isHasLeftBorder: true,
+                                            isHasRightBorder: true,
+                                            borderRadius: BorderRadius.circular(
+                                              5,
                                             ),
-                                        isHasBottomBorder: true,
-                                        isHasTopBorder: true,
-                                        isHasLeftBorder: true,
-                                        isHasRightBorder: true,
-                                        borderRadius: BorderRadius.circular(5),
-                                        backgroundColor:
-                                            isDark
-                                                ? Theme.of(context).cardColor
-                                                : Colors.white,
-                                        title: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Container(
+                                            backgroundColor:
+                                                isDark
+                                                    ? Theme.of(
+                                                      context,
+                                                    ).cardColor
+                                                    : Colors.white,
+                                            title: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Row(
+                                                  children: [
+                                                    const Icon(
+                                                      Iconsax
+                                                          .calendar_1_outline,
+                                                      color: Colors.blue,
+                                                      size: 20,
+                                                    ),
+                                                    const SizedBox(width: 5),
+                                                    Text(
+                                                      '${FormatWaktu.formatShortEng(tanggal: DateTime.parse(leave.tgl1!))} - ${FormatWaktu.formatShortEng(tanggal: DateTime.parse(leave.tgl2!))}',
+                                                      style: titleTextStyle
+                                                          .copyWith(
+                                                            fontSize: 15,
+                                                            color: Colors.blue,
+                                                          ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                const SizedBox(height: 6),
+                                                Text(
+                                                  leave.jenisCuti!,
+                                                  style: const TextStyle(
+                                                    fontSize: 15,
+                                                    // color:
+                                                    // isDark
+                                                    //     ? Colors.grey
+                                                    //     : Colors.black87,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            trailing: Container(
                                               padding:
                                                   const EdgeInsets.symmetric(
-                                                    horizontal: 5,
-                                                    vertical: 2,
+                                                    horizontal: 10,
+                                                    vertical: 4,
                                                   ),
                                               decoration: BoxDecoration(
                                                 color:
-                                                    leaveStats ==
-                                                            "Waiting Approval"
+                                                    leaveStats == "pending"
                                                         ? Colors.amber
+                                                            .withOpacity(.1)
                                                         : leaveStats ==
-                                                            "Approved by"
+                                                            "approved"
                                                         ? Colors.green
-                                                        : Colors.grey,
+                                                            .withOpacity(.1)
+                                                        : red!.withOpacity(.1),
                                                 borderRadius:
-                                                    const BorderRadius.only(
-                                                      topRight: Radius.circular(
-                                                        20,
-                                                      ),
-                                                      bottomRight:
-                                                          Radius.circular(20),
-                                                    ),
+                                                    BorderRadius.circular(20),
                                               ),
                                               child: Text(
-                                                leaveStats == "Waiting Approval"
-                                                    ? 'Pending'
-                                                    : leaveStats ==
-                                                        "Approved by"
-                                                    ? 'Approved'
-                                                    : 'Canceled',
-                                                style: const TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: 14,
+                                                leaveStats.toUpperCase(),
+                                                style: TextStyle(
+                                                  color: color,
+                                                  fontSize: 10,
+                                                  fontWeight: FontWeight.bold,
                                                 ),
                                               ),
                                             ),
-                                            const SizedBox(height: 5),
-                                            Row(
-                                              children: [
-                                                const Icon(
-                                                  Iconsax.calendar_1_outline,
-                                                  color: Colors.blue,
-                                                  size: 20,
+                                            children: [
+                                              const SizedBox(height: 15),
+                                              Text.rich(
+                                                TextSpan(
+                                                  children: [
+                                                    const TextSpan(
+                                                      text:
+                                                          'Saya yang bertanda tangan dibawah ini:\n',
+                                                    ),
+                                                    const TextSpan(
+                                                      text: 'Nama    : ',
+                                                    ),
+                                                    TextSpan(
+                                                      text:
+                                                          '${leave.nama!.capitalize}\n',
+                                                      style: const TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                    const TextSpan(
+                                                      text: 'Jabatan : ',
+                                                    ),
+                                                    TextSpan(
+                                                      text:
+                                                          '${leave.namaLevel!.capitalize}\n\n',
+                                                      style: const TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                    const TextSpan(
+                                                      text:
+                                                          'Hendak mengajukan permohonan cuti ',
+                                                    ),
+                                                    TextSpan(
+                                                      text: leave.jenisCuti,
+                                                      style: const TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                    const TextSpan(
+                                                      text:
+                                                          '\nuntuk jangka waktu ',
+                                                    ),
+                                                    TextSpan(
+                                                      text:
+                                                          // '${DateTime.parse(leave.tgl2!).difference(DateTime.parse(leave.tgl1!)).inDays} hari,',
+                                                          '${leave.jumlahCuti} Hari',
+                                                      style: const TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                    const TextSpan(
+                                                      text: ' terhitung dari ',
+                                                    ),
+                                                    TextSpan(
+                                                      text:
+                                                          FormatWaktu.formatIndo(
+                                                            tanggal:
+                                                                DateTime.parse(
+                                                                  leave.tgl1!,
+                                                                ),
+                                                          ),
+                                                      style: const TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                    const TextSpan(
+                                                      text: ' sampai ',
+                                                    ),
+                                                    TextSpan(
+                                                      text:
+                                                          FormatWaktu.formatIndo(
+                                                            tanggal:
+                                                                DateTime.parse(
+                                                                  leave.tgl2!,
+                                                                ),
+                                                          ),
+                                                      style: const TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                  style: const TextStyle(
+                                                    fontSize: 15,
+                                                  ), // default style
                                                 ),
-                                                const SizedBox(width: 5),
-                                                Text(
-                                                  '${FormatWaktu.formatShortEng(tanggal: DateTime.parse(leave.tgl1!))} - ${FormatWaktu.formatShortEng(tanggal: DateTime.parse(leave.tgl2!))}',
-                                                  style: titleTextStyle
-                                                      .copyWith(
-                                                        fontSize: 15,
+                                              ),
+                                              const SizedBox(height: 10),
+                                              const Text(
+                                                'Alasan cuti:',
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                              Text(leave.alasan!),
+                                              const SizedBox(height: 10),
+                                              const Text(
+                                                'Alamat selama cuti:',
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                              Text(leave.alamat!),
+                                              const SizedBox(height: 10),
+                                              const Text(
+                                                'Telp / WhatsApp aktif:',
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                              Text(leave.telp!),
+                                              const SizedBox(height: 10),
+                                              const Text(
+                                                'File terlampir',
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                              leave.attachFile == null ||
+                                                      leave.attachFile!.isEmpty
+                                                  ? const Text('-')
+                                                  : InkWell(
+                                                    onTap: () {
+                                                      showDialog(
+                                                        context: context,
+                                                        builder: (context) {
+                                                          return Dialog(
+                                                            backgroundColor:
+                                                                Colors.black,
+                                                            insetPadding:
+                                                                const EdgeInsets.all(
+                                                                  0,
+                                                                ),
+                                                            child: GestureDetector(
+                                                              onTap:
+                                                                  () =>
+                                                                      Navigator.of(
+                                                                        context,
+                                                                      ).pop(),
+                                                              child: PhotoView(
+                                                                imageProvider:
+                                                                    NetworkImage(
+                                                                      '${ServiceApi().baseUrl}${leave.attachFile!}',
+                                                                    ),
+                                                                backgroundDecoration:
+                                                                    const BoxDecoration(
+                                                                      color:
+                                                                          Colors
+                                                                              .black,
+                                                                    ),
+                                                              ),
+                                                            ),
+                                                          );
+                                                        },
+                                                      );
+                                                    },
+                                                    child: const Text(
+                                                      'show file',
+                                                      style: TextStyle(
                                                         color: Colors.blue,
                                                       ),
-                                                ),
-                                              ],
-                                            ),
-                                            const SizedBox(height: 6),
-                                            Text(
-                                              leave.jenisCuti!,
-                                              style: TextStyle(
-                                                fontSize: 16,
-                                                color:
-                                                    isDark
-                                                        ? Colors.grey
-                                                        : Colors.black87,
-                                              ),
-                                            ),
-                                            Text(
-                                              leaveStats,
-                                              style: TextStyle(
-                                                fontSize: 14,
-                                                color:
-                                                    isDark
-                                                        ? Colors.grey
-                                                        : Colors.black54,
-                                              ),
-                                            ),
-                                            Text(
-                                              stepLabel,
-                                              style: const TextStyle(
-                                                fontSize: 14,
-                                                color: Colors.blue,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        children: [
-                                          const SizedBox(height: 15),
-                                          Text.rich(
-                                            TextSpan(
-                                              children: [
-                                                const TextSpan(
-                                                  text:
-                                                      'Saya yang bertanda tangan dibawah ini:\n',
-                                                ),
-                                                const TextSpan(
-                                                  text: 'Nama    : ',
-                                                ),
-                                                TextSpan(
-                                                  text: '${leave.nama}\n',
-                                                  style: const TextStyle(
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                                const TextSpan(
-                                                  text: 'Jabatan : ',
-                                                ),
-                                                TextSpan(
-                                                  text:
-                                                      '${leave.namaLevel}\n\n',
-                                                  style: const TextStyle(
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                                const TextSpan(
-                                                  text:
-                                                      'Hendak mengajukan permohonan cuti ',
-                                                ),
-                                                TextSpan(
-                                                  text: leave.jenisCuti,
-                                                  style: const TextStyle(
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                                const TextSpan(
-                                                  text: '\nuntuk jangka waktu ',
-                                                ),
-                                                TextSpan(
-                                                  text:
-                                                      '${DateTime.parse(leave.tgl2!).difference(DateTime.parse(leave.tgl1!)).inDays + 1} hari,',
-                                                  style: const TextStyle(
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                                const TextSpan(
-                                                  text: ' terhitung dari ',
-                                                ),
-                                                TextSpan(
-                                                  text: FormatWaktu.formatIndo(
-                                                    tanggal: DateTime.parse(
-                                                      leave.tgl1!,
                                                     ),
                                                   ),
-                                                  style: const TextStyle(
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
+                                              const SizedBox(height: 10),
+                                              StepProgress(
+                                                totalSteps: totalSteps,
+                                                controller: controller,
+                                                padding: const EdgeInsets.all(
+                                                  10,
                                                 ),
-                                                const TextSpan(
-                                                  text: ' sampai ',
-                                                ),
-                                                TextSpan(
-                                                  text: FormatWaktu.formatIndo(
-                                                    tanggal: DateTime.parse(
-                                                      leave.tgl2!,
-                                                    ),
-                                                  ),
-                                                  style: const TextStyle(
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                              ],
-                                              style: const TextStyle(
-                                                color: Colors.black,
-                                              ), // default style
-                                            ),
-                                          ),
-                                          const SizedBox(height: 10),
-                                          const Text(
-                                            'Alasan cuti:',
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                          Text(leave.alasan!),
-                                          const SizedBox(height: 10),
-                                          const Text(
-                                            'Alamat selama cuti:',
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                          Text(leave.alamat!),
-                                          const SizedBox(height: 10),
-                                          const Text(
-                                            'Telp:',
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                          Text(leave.telp!),
-                                          const SizedBox(height: 10),
-                                          const Text(
-                                            'Selanjutnya, tugas akan diserahkan kepada:',
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                          Text(
-                                            '${leave.userPengganti!}\n${leave.idUserPengganti} - ${leave.levelUserPengganti}',
-                                          ),
-                                          const SizedBox(height: 15),
-                                          StepProgress(
-                                            totalSteps: totalSteps,
-                                            controller: controller,
-                                            padding: const EdgeInsets.all(10),
-                                            nodeTitles: nodeTitles,
-                                            nodeIconBuilder: (
-                                              index,
-                                              completedStepIndex,
-                                            ) {
-                                              final bgColor =
-                                                  getBackgroundColorForStep(
+                                                nodeTitles: nodeTitles,
+                                                nodeIconBuilder: (index, _) {
+                                                  final bgColor = getStepColor(
+                                                    leave,
                                                     index,
                                                   );
-                                              final icon = iconBuilder(
-                                                index,
-                                                completedStepIndex,
-                                              );
-                                              return Container(
-                                                decoration: BoxDecoration(
-                                                  color: bgColor,
-                                                  shape: BoxShape.circle,
-                                                ),
-                                                // padding: const EdgeInsets.all(6),
-                                                child: icon,
-                                              );
-                                            },
-                                            theme: const StepProgressThemeData(
-                                              lineLabelAlignment:
-                                                  Alignment.bottomCenter,
-                                              stepLineSpacing: 9,
-                                              stepLineStyle: StepLineStyle(
-                                                lineThickness: 6,
-                                                borderRadius: Radius.circular(
-                                                  4,
-                                                ),
+                                                  final icon = buildStepIcon(
+                                                    leave,
+                                                    index,
+                                                  );
+                                                  return Container(
+                                                    decoration: BoxDecoration(
+                                                      color: bgColor,
+                                                      shape: BoxShape.circle,
+                                                    ),
+                                                    // padding: const EdgeInsets.all(6),
+                                                    child: icon,
+                                                  );
+                                                },
+                                                theme:
+                                                    const StepProgressThemeData(
+                                                      lineLabelAlignment:
+                                                          Alignment
+                                                              .bottomCenter,
+                                                      stepLineSpacing: 9,
+                                                      stepLineStyle:
+                                                          StepLineStyle(
+                                                            lineThickness: 3,
+                                                            borderRadius:
+                                                                Radius.circular(
+                                                                  4,
+                                                                ),
+                                                          ),
+                                                      defaultForegroundColor:
+                                                          Colors.grey,
+                                                      activeForegroundColor:
+                                                          Colors.green,
+                                                      enableRippleEffect: true,
+                                                      lineLabelStyle:
+                                                          StepLabelStyle(
+                                                            labelAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .end,
+                                                          ),
+                                                    ),
+                                                onStepChanged: (index) {},
+                                                onStepNodeTapped: (index) {},
                                               ),
-                                              defaultForegroundColor:
-                                                  Colors.grey,
-                                              activeForegroundColor:
-                                                  Colors.green,
-                                              enableRippleEffect: true,
-                                              lineLabelStyle: StepLabelStyle(
-                                                labelAxisAlignment:
-                                                    CrossAxisAlignment.end,
-                                              ),
-                                            ),
-                                            onStepChanged: (index) {},
-                                            onStepNodeTapped: (index) {},
-                                          ),
-                                        ],
-                                      );
-                                    }),
+                                            ],
+                                          );
+                                        }),
+                                      ),
+                                    ),
                                   ),
                                 ],
                               ),
@@ -1010,17 +863,26 @@ class LeaveView extends GetView<LeaveController> {
               ),
             ],
           ),
-
-          // if (leaveC.bannerAd != null)
-          //   Align(
-          //     alignment: Alignment.bottomCenter,
-          //     child: SizedBox(
-          //       width: leaveC.bannerAd!.value.size.width.toDouble(),
-          //       height: leaveC.bannerAd!.value.size.height.toDouble(),
-          //       child: AdWidget(ad: leaveC.bannerAd!.value),
-          //     ),
-          //   ),
         ],
+      ),
+      floatingActionButton: Builder(
+        builder:
+            (context) => ContainerMainColor(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              radius: 30,
+              child: FloatingActionButton(
+                backgroundColor: Colors.transparent,
+                onPressed: () {
+                  final userData = auth.logUser.value;
+                  bottomSearchLive(context, isDark, userData, leaveC);
+                },
+                child: Icon(
+                  Icons.manage_search_outlined,
+                  color: isDark ? Colors.blue : Colors.white,
+                ),
+              ),
+            ),
       ),
     );
   }

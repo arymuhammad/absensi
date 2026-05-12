@@ -41,11 +41,12 @@ class SummaryAbsen extends GetView {
               onRefresh: () async {
                 final online = await absenC.isOnline();
                 if (online) {
-                  homeC.reloadPendingAdj(
+                  homeC.getPendingAdj(
                     idUser: userData.id!,
+                    idCabang: userData.kodeCabang!,
                     level: userData.level!,
                   );
-                  homeC.reloadSummary(userData.id!);
+                  homeC.getSummAttPerMonth(userData.id!);
                   await absenC.getLastUserData(dataUser: userData);
                 }
                 var paramLimit = {
@@ -92,7 +93,7 @@ class SummaryAbsen extends GetView {
               child: ListView(
                 padding: EdgeInsets.zero,
                 children: [
-                  SummaryPerMonth(userData: userData),
+                  SummaryPerMonth(),
                   // const SizedBox(height: 5),
                   MainMenu(userData: userData),
                   Row(

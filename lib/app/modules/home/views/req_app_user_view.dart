@@ -3,6 +3,7 @@ import 'package:absensi/app/data/helper/const.dart';
 import 'package:absensi/app/data/helper/custom_dialog.dart';
 import 'package:absensi/app/data/model/login_model.dart';
 import 'package:absensi/app/modules/adjust_presence/views/widget/req_app_update.dart';
+import 'package:absensi/app/modules/shared/container_main_color.dart';
 import 'package:absensi/app/modules/shared/elevated_button_icon.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/material.dart';
@@ -15,10 +16,11 @@ import '../../login/controllers/login_controller.dart';
 import '../../shared/dropdown.dart';
 
 class ReqAppUserView extends GetView {
-  ReqAppUserView({super.key});
+  ReqAppUserView({super.key, required this.isInbox});
   final auth = Get.find<LoginController>();
   final adjCtrl = Get.put(AdjustPresenceController());
-  
+  final bool isInbox;
+
   @override
   Widget build(BuildContext context) {
     final userData = auth.logUser.value;
@@ -60,7 +62,7 @@ class ReqAppUserView extends GetView {
                   borderRadius: BorderRadius.circular(10),
                   color: isDark ? Theme.of(context).canvasColor : Colors.white,
                 ),
-                child: ReqAppUpdate(),
+                child: ReqAppUpdate(isInbox: isInbox),
               ),
             ),
           ),
@@ -68,14 +70,19 @@ class ReqAppUserView extends GetView {
       ),
       floatingActionButton: Builder(
         builder:
-            (context) => FloatingActionButton(
-              backgroundColor: AppColors.itemsBackground,
-              onPressed: () {
-                dialogSearchData(context, isDark, userData);
-              },
-              child: Icon(
-                Icons.manage_search_outlined,
-                color: isDark ? Colors.blue : Colors.white,
+            (context) => ContainerMainColor(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              radius: 30,
+              child: FloatingActionButton(
+                backgroundColor: Colors.transparent,
+                onPressed: () {
+                  dialogSearchData(context, isDark, userData);
+                },
+                child: Icon(
+                  Icons.manage_search_outlined,
+                  color: isDark ? Colors.blue : Colors.white,
+                ),
               ),
             ),
       ),
@@ -285,6 +292,7 @@ class ReqAppUserView extends GetView {
                                   adjCtrl.selectedType.value,
                                   userData.level,
                                   userData.id,
+                                  userData.kodeCabang,
                                   adjCtrl.dateInput1.text,
                                   adjCtrl.dateInput2.text,
                                 );

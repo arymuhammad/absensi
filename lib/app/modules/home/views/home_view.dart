@@ -5,7 +5,6 @@ import 'package:absensi/app/modules/home/views/summary_absen_area.dart';
 import 'package:absensi/app/modules/leave/controllers/leave_controller.dart';
 import 'package:absensi/app/modules/shared/container_main_color.dart';
 import 'package:absensi/app/modules/shared/rounded_image.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../absen/controllers/absen_controller.dart';
@@ -23,7 +22,6 @@ class HomeView extends GetView<HomeController> {
 
   @override
   Widget build(BuildContext context) {
-    final listDataUser = auth.logUser.value;
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: Stack(
@@ -36,14 +34,15 @@ class HomeView extends GetView<HomeController> {
           ),
           Padding(
             padding: const EdgeInsets.only(left: 15.0, top: 45.0, right: 15.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Obx(
-                      () => Row(
+            child: Obx(() {
+              final listDataUser = auth.logUser.value;
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
                         children: [
                           Text(
                             '${greetingC.greeting.value}${listDataUser.nama!.split(' ')[0]}',
@@ -60,77 +59,71 @@ class HomeView extends GetView<HomeController> {
                           ),
                         ],
                       ),
-                    ),
-                    // Obx(() => Image(image: greetingC.icon.value, width: 42)),
-                    // const Padding(
-                    //   padding: EdgeInsets.all(8.0),
-                    //   child: PingIndicator(host: '103.156.15.61'),
-                    // ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        InkWell(
-                          onTap: () {
-                            // Get.to(
-                            //   () => ProfilView(listDataUser: listDataUser!),
-                            // );
-                            final loginC = Get.find<LoginController>();
-                            loginC.selected.value = 4;
-                          },
-                          child: Container(
-                            width: 60,
-                            height: 60,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: Colors.lightBlue,
-                                width: 1,
-                              ), // border putih tebal 4
-                            ),
-                            child: RoundedImage(
-                              height: 60,
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          InkWell(
+                            onTap: () {
+                              // Get.to(
+                              //   () => ProfilView(listDataUser: listDataUser!),
+                              // );
+
+                              auth.selected.value = 4;
+                            },
+                            child: Container(
                               width: 60,
-                              foto: listDataUser.foto!,
-                              name: listDataUser.nama!,
-                              headerProfile: true,
+                              height: 60,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: Colors.lightBlue,
+                                  width: 1,
+                                ), // border putih tebal 4
+                              ),
+                              child: RoundedImage(
+                                height: 60,
+                                width: 60,
+                                foto: listDataUser.foto!,
+                                name: listDataUser.nama!,
+                                headerProfile: true,
+                              ),
                             ),
                           ),
-                        ),
-                        const SizedBox(width: 8),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              listDataUser.levelUser!.capitalize!,
-                              style: subtitleTextStyle.copyWith(
-                                color: Colors.white,
-                                fontSize: 16,
+                          const SizedBox(width: 8),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                listDataUser.levelUser!.capitalize!,
+                                style: subtitleTextStyle.copyWith(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                ),
                               ),
-                            ),
-                            Text(
-                              listDataUser.namaCabang!.capitalize!,
+                              Text(
+                                listDataUser.namaCabang!.capitalize!,
 
-                              softWrap: true,
-                              style: const TextStyle(
-                                fontSize: 16,
-                                color: Colors.grey,
+                                softWrap: true,
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.grey,
+                                ),
                               ),
-                            ),
-                            Obx(
-                              () => Row(
+                              Row(
                                 children: [
                                   Container(
                                     height: 5,
                                     width: 5,
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(100),
-                                      color:   !absenC.isOffline.value
+                                      color:
+                                          !absenC.isOffline.value
                                               ? Colors.green
                                               : Colors.grey,
                                     ),
@@ -152,84 +145,22 @@ class HomeView extends GetView<HomeController> {
                                   ),
                                 ],
                               ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
+                            ],
+                          ),
+                        ],
+                      ),
 
-                    // ping widget
-                  ],
-                ),
-                const SizedBox(height: 5),
-                // Row(
-                //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                //   children: [
+                      // ping widget
+                    ],
+                  ),
+                  const SizedBox(height: 5),
 
-                //     Obx(
-                //       () => IconButton(
-                //         onPressed:
-                //             absenC.timerStat.value == true ||
-                //                     absenC.dataAbsen.isEmpty
-                //                 ? null
-                //                 : () async {
-                //                   if (absenC.dataAbsen.isEmpty) {
-                //                     absenC.startTimer(0);
-                //                     showToast("Tidak ada data absen hari ini");
-                //                   } else {
-                //                     loadingDialog("Sending data", "");
-                //                     absenC.startTimer(20);
-                //                     absenC.resend();
-
-                //                     await Future.delayed(
-                //                       const Duration(seconds: 2),
-                //                       () {
-                //                         Get.back();
-                //                       },
-                //                     );
-                //                   }
-                //                 },
-                //         icon: Icon(
-                //           Icons.change_circle_sharp,
-                //           size: 30.0,
-                //           color:
-                //               absenC.timerStat.value == true
-                //                   ? AppColors.mainTextColor3
-                //                   : AppColors.contentColorWhite,
-                //         ),
-                //         tooltip: 'Resend Data',
-                //       ),
-                //     ),
-                //   ],
-                // ),
-                // Visibility(
-                //   visible: listDataUser!.visit == "1" ? true : false,
-                //   child: Row(
-                //     children: [
-                //       const Icon(
-                //         FontAwesome.map_location_dot_solid,
-                //         size: 17,
-                //         color: AppColors.contentColorWhite,
-                //       ),
-                //       const SizedBox(width: 5),
-                //       Obx(
-                //         () => Text(
-                //           absenC.dataVisit.isNotEmpty &&
-                //                   absenC.dataVisit[0].namaCabang! != ""
-                //               ? absenC.dataVisit[0].namaCabang!
-                //               : '-',
-                //           style: const TextStyle(fontWeight: FontWeight.bold),
-                //           softWrap: true,
-                //         ),
-                //       ),
-                //     ],
-                //   ),
-                // ),
-                listDataUser.visit == "1"
-                    ? SummaryAbsenArea()
-                    : SummaryAbsen(),
-              ],
-            ),
+                  listDataUser.visit == "1"
+                      ? SummaryAbsenArea()
+                      : SummaryAbsen(),
+                ],
+              );
+            }),
           ),
           Positioned(
             top: 45,

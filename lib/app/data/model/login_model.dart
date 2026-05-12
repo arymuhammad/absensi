@@ -1,12 +1,14 @@
 class Login {
   bool? success;
   Data? data;
+  String? message;
 
-  Login({this.success, this.data});
+  Login({this.success, this.data, this.message});
 
   Login.fromJson(Map<String, dynamic> json) {
     success = json['success'];
     data = json['data'] != null ? Data.fromJson(json['data']) : null;
+    message = json['message'];
   }
 
   Map<String, dynamic> toJson() {
@@ -73,21 +75,21 @@ class Data {
     password = json['password'];
     kodeCabang = json['kode_cabang'];
     namaCabang = json['nama_cabang'];
-    nik = json['nik']??'';
+    nik = json['nik'] ?? '';
     lat = json['lat'];
     long = json['long'];
-    foto = json['foto']??'';
+    foto = json['foto'] ?? '';
     noTelp = json['no_telp'];
     level = json['level'];
     levelUser = json['level_user'];
     areaCover = json['area_coverage'];
     visit = json['visit'];
     cekStok = json['cek_stok'];
-    idRegion = json['id_region']??'';
+    idRegion = json['id_region'] ?? '';
     leaveBalance = json['leave_balance'];
-    createdAt = json['created_at']??'';
-    parentId = json['parent_id']??'';
-    namaParent = json['nama_parent']??'';
+    createdAt = json['created_at'] ?? '';
+    parentId = json['parent_id'] ?? '';
+    namaParent = json['nama_parent'] ?? '';
   }
 
   Map<String, dynamic> toJson() {

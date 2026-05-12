@@ -1,9 +1,8 @@
-import 'package:absensi/app/data/model/notif_model.dart';
 import 'package:absensi/app/modules/absen/controllers/absen_controller.dart';
 import 'package:absensi/app/modules/adjust_presence/controllers/adjust_presence_controller.dart';
+import 'package:absensi/app/modules/approval/main_tab.dart';
 import 'package:absensi/app/modules/home/controllers/home_controller.dart';
 import 'package:absensi/app/modules/leave/views/leave_view.dart';
-import 'package:absensi/app/modules/leave/views/request_leave_view.dart';
 import 'package:absensi/app/modules/overtime/views/overtime_view.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -12,6 +11,7 @@ import '../../../data/helper/const.dart';
 import '../../../data/model/login_model.dart';
 import '../../adjust_presence/views/adjust_presence_view.dart';
 import '../../leave/controllers/leave_controller.dart';
+import '../../overtime/controllers/overtime_controller.dart';
 import '../../pay_slip/controllers/pay_slip_controller.dart';
 import '../../pay_slip/views/pay_slip_view.dart';
 import '../../semua_absen/views/monitoring_absen_view.dart';
@@ -26,6 +26,7 @@ class MainMenu extends StatelessWidget {
   final leaveC = Get.find<LeaveController>();
   final homeC = Get.find<HomeController>();
   final payC = Get.put(PaySlipController());
+  final ovrC = Get.put(OvertimeController());
   // final logC = Get.find<LoginController>();
   @override
   Widget build(BuildContext context) {
@@ -44,13 +45,14 @@ class MainMenu extends StatelessWidget {
                 Text('Main Menu', style: titleTextStyle.copyWith(fontSize: 15)),
                 InkWell(
                   onTap: () {
-                    homeC.reloadPendingAdj(
+                    homeC.getPendingAdj(
                       idUser: userData!.id!,
+                      idCabang: userData!.kodeCabang!,
                       level: userData!.level!,
                     );
 
                     if ((userData!.parentId == "3" &&
-                            (userData!.level == "19" ||
+                            (userData!.level == "19" || userData!.level == "20" || userData!.level == "59" ||
                                 userData!.level == "26")) ||
                         (userData!.parentId == "4" &&
                             (userData!.level == "1" ||
@@ -66,7 +68,7 @@ class MainMenu extends StatelessWidget {
                         (userData!.parentId == "2" &&
                             userData!.level == "10") ||
                         (userData!.parentId == "1")) {
-                      homeC.reloadPendingApproval(
+                      homeC.getPendingApproval(
                         idUser: userData!.id!,
                         kodeCabang: userData!.kodeCabang!,
                         level: userData!.level!,
@@ -96,9 +98,7 @@ class MainMenu extends StatelessWidget {
                 children: [
                   Visibility(
                     visible:
-                        ((userData!.parentId == "3" &&
-                                    (userData!.level == "19" ||
-                                        userData!.level == "26")) ||
+                        ((userData!.parentId == "3" &&  (userData!.level == "19" || userData!.level == "20" || userData!.level == "59" ||  userData!.level == "26")) ||
                                 (userData!.parentId == "4" &&
                                     (userData!.level == "1" ||
                                         userData!.level == "43")) ||
@@ -106,6 +106,8 @@ class MainMenu extends StatelessWidget {
                                     userData!.level == "77") ||
                                 (userData!.parentId == "7" &&
                                     userData!.level == "23") ||
+                                (userData!.parentId == "8" &&
+                                    userData!.level == "17") ||
                                 (userData!.parentId == "8" &&
                                     userData!.level == "18") ||
                                 (userData!.parentId == "9" &&
@@ -120,9 +122,18 @@ class MainMenu extends StatelessWidget {
                         MenuIconWithBadge(
                           asset: 'assets/image/req-leave.png',
                           label: 'Approval',
-                          future: homeC.futurePendApp.value,
-                          badgeCount: (data) => data.totalRequest ?? 0,
+                          count: homeC.totalNotif,
+                          isLoading: homeC.isLoadingPending,
+                          isError: homeC.isErrorPending,
                           onTap: () {
+                            // clear list overtime first
+                            ovrC.listOvt.clear();
+
+                            // 🔥 reset sebelum masuk
+                            homeC.selectedTab.value = 0;
+                            homeC.isTabLoading.value = false;
+
+                            leaveC.listLeaveReq.clear();
                             var param = {
                               "type": "get_pending_req_leave",
                               "kode_cabang": userData!.kodeCabang!,
@@ -130,16 +141,16 @@ class MainMenu extends StatelessWidget {
                               "level": userData!.level!,
                               "parent_id": userData!.parentId!,
                             };
-                            leaveC.isLoading.value = true;
+                            // print(param);
+                            // leaveC.isLoading.value = true;
                             leaveC.getLeaveReq(param);
                             Navigator.push(
                               context,
-                              MaterialPageRoute(
-                                builder: (_) => RequestLeaveView(),
-                              ),
+                              MaterialPageRoute(builder: (_) => MainTab()),
                             );
                           },
                         ),
+
                         const SizedBox(width: 10),
                       ],
                     ),
@@ -162,22 +173,35 @@ class MainMenu extends StatelessWidget {
                       );
                     },
                   ),
-                  const SizedBox(width: 10),
-                  MenuIconItem(
-                    asset: 'assets/image/izin.png',
-                    label: 'Overtime',
-                    onTap: () {
-                      // Get.to(
-                      //   () => PaySlipView(userData: userData!),
-                      //   transition: Transition.cupertino,
-                      // );
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => OvertimeView(),
+                  Visibility(
+                    visible: userData!.kodeCabang != "HO000",
+                    child: Row(
+                      children: [
+                        const SizedBox(width: 10),
+                        MenuIconItem(
+                          asset: 'assets/image/izin.png',
+                          label: 'Overtime',
+                          onTap: () {
+                            // Get.to(
+                            //   () => PaySlipView(userData: userData!),
+                            //   transition: Transition.cupertino,
+                            // );
+                            ovrC.listOvt.clear();
+                            ovrC.isLoading.value = true;
+                            ovrC.getListOvertime(
+                              idUser: userData!.id!,
+                              level: userData!.level!,
+                              type: "get_by_id",
+                              status: "",
+                            );
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (_) => OvertimeView()),
+                            );
+                          },
                         ),
-                      );
-                    },
+                      ],
+                    ),
                   ),
                   const SizedBox(width: 10),
                   Visibility(
@@ -185,35 +209,32 @@ class MainMenu extends StatelessWidget {
                         userData!.parentId == "3" || userData!.parentId == "4",
                     child: Row(
                       children: [
-                        Obx(
-                          () => MenuIconWithBadge(
-                            asset: 'assets/image/notif.png',
-                            label: 'Inbox',
-                            future: homeC.futurePendAdj.value,
-                            badgeCount: (data) {
-                              // print(data.totalNotif);
-                              return data.totalNotif ?? 0;
-                            },
-                            onTap: () {
-                              // Get.to(() {
-                              adjCtrl.getReqAppUpt(
-                                '',
-                                '',
-                                userData!.level,
-                                userData!.id,
-                                adjCtrl.initDate,
-                                adjCtrl.lastDate,
-                              );
-                              //   return ReqAppUserView(userData: userData!);
-                              // }, transition: Transition.cupertino);
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => ReqAppUserView(),
-                                ),
-                              );
-                            },
-                          ),
+                        MenuIconItem(
+                          asset: 'assets/image/notif.png',
+                          label: 'Inbox',
+                          // count: homeC.pendingAdjCount,
+                          // isLoading: homeC.isLoadingAdj,
+                          // isError: homeC.isErrorAdj,
+                          onTap: () {
+                            // Get.to(() {
+                            adjCtrl.getReqAppUpt(
+                              '',
+                              'inbox',
+                              userData!.level,
+                              userData!.id,
+                              userData!.kodeCabang,
+                              adjCtrl.initDate,
+                              adjCtrl.lastDate,
+                            );
+                            //   return ReqAppUserView(userData: userData!);
+                            // }, transition: Transition.cupertino);
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => ReqAppUserView(isInbox: true),
+                              ),
+                            );
+                          },
                         ),
                         const SizedBox(width: 10),
                       ],
@@ -229,16 +250,17 @@ class MainMenu extends StatelessWidget {
                       // );
                       Navigator.push(
                         context,
-                        MaterialPageRoute(
-                          builder: (_) => PaySlipView(),
-                        ),
+                        MaterialPageRoute(builder: (_) => PaySlipView()),
                       );
                     },
                   ),
                   const SizedBox(width: 10),
                   Visibility(
                     visible:
-                        userData!.level == "1" || userData!.level == "26"
+                        userData!.level == "1" ||
+                                userData!.level == "26" ||
+                                userData!.level == "19" ||
+                                userData!.level == "20"
                             ? true
                             : false,
                     child: Row(
@@ -273,6 +295,7 @@ class MainMenu extends StatelessWidget {
                           '',
                           userData!.level,
                           userData!.id,
+                          userData!.kodeCabang,
                           adjCtrl.initDate,
                           adjCtrl.lastDate,
                         );
@@ -346,16 +369,18 @@ class MenuIconWithBadge extends StatelessWidget {
   final String asset;
   final String label;
   final VoidCallback onTap;
-  final Future<NotifModel> future;
-  final int Function(NotifModel data) badgeCount;
+  final RxInt count;
+  final RxBool isLoading;
+  final RxBool isError;
 
   const MenuIconWithBadge({
     super.key,
     required this.asset,
     required this.label,
     required this.onTap,
-    required this.future,
-    required this.badgeCount,
+    required this.count,
+    required this.isLoading,
+    required this.isError,
   });
 
   @override
@@ -376,50 +401,48 @@ class MenuIconWithBadge extends StatelessWidget {
             SizedBox(
               height: 30,
               width: 30,
-              child: FutureBuilder<NotifModel>(
-                future: future,
-                builder: (context, snapshot) {
-                  return Stack(
-                    clipBehavior: Clip.none,
-                    children: [
-                      Image.asset(asset),
+              child: Obx(() {
+                return Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    Image.asset(asset),
 
-                      if (snapshot.connectionState == ConnectionState.waiting)
-                        const Positioned(
-                          top: -2,
-                          right: -2,
-                          child: SizedBox(
-                            width: 14,
-                            height: 14,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          ),
-                        )
-                      else if (snapshot.hasError)
-                        const Positioned(
-                          top: -2,
-                          right: -2,
-                          child: Icon(Icons.error, color: Colors.red, size: 14),
-                        )
-                      else if (snapshot.hasData &&
-                          badgeCount(snapshot.data!) > 0)
-                        Positioned(
-                          top: -4,
-                          right: -4,
-                          child: Badge(
-                            label: Text(
-                              badgeCount(snapshot.data!).toString(),
-                              style: const TextStyle(
-                                fontSize: 10,
-                                color: Colors.white,
-                              ),
-                              overflow: TextOverflow.ellipsis,
+                    /// 🔄 LOADING
+                    if (isLoading.value)
+                      const Positioned(
+                        top: -2,
+                        right: -2,
+                        child: SizedBox(
+                          width: 14,
+                          height: 14,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                      )
+                    /// ❌ ERROR
+                    else if (isError.value)
+                      const Positioned(
+                        top: -2,
+                        right: -2,
+                        child: Icon(Icons.error, color: Colors.red, size: 14),
+                      )
+                    /// 🔔 BADGE
+                    else if (count.value > 0)
+                      Positioned(
+                        top: -4,
+                        right: -4,
+                        child: Badge(
+                          label: Text(
+                            count.value.toString(),
+                            style: const TextStyle(
+                              fontSize: 10,
+                              color: Colors.white,
                             ),
                           ),
                         ),
-                    ],
-                  );
-                },
-              ),
+                      ),
+                  ],
+                );
+              }),
             ),
 
             const SizedBox(height: 6),
@@ -427,9 +450,7 @@ class MenuIconWithBadge extends StatelessWidget {
             Text(
               label,
               textAlign: TextAlign.center,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+              style: const TextStyle(fontSize: 13),
             ),
           ],
         ),

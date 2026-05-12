@@ -3,20 +3,22 @@ import 'package:absensi/app/data/helper/app_colors.dart';
 import 'package:absensi/app/data/helper/const.dart';
 import 'package:absensi/app/data/helper/db_helper.dart';
 import 'package:absensi/app/data/helper/custom_dialog.dart';
+import 'package:absensi/app/modules/absen/controllers/absen_controller.dart';
 import 'package:absensi/app/modules/add_pegawai/controllers/add_pegawai_controller.dart';
 import 'package:absensi/app/modules/login/controllers/login_controller.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:lottie/lottie.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:sqflite/sqflite.dart';
 import '../../../services/service_api.dart';
 
 class BackupView extends GetView {
   BackupView({super.key});
-  final ctrl = Get.put(AddPegawaiController());
-  final auth = Get.put(LoginController());
+  final ctrl = Get.find<AddPegawaiController>();
+  final auth = Get.find<LoginController>();
+  final absC = Get.find<AbsenController>();
 
   @override
   Widget build(BuildContext context) {
@@ -90,45 +92,62 @@ class BackupView extends GetView {
                             style: ElevatedButton.styleFrom(
                               backgroundColor: AppColors.itemsBackground,
                             ),
-                            onPressed: () async {
-                              ctrl.backup.value = true;
-                              final dbFolder = await getDatabasesPath();
+                            // onPressed: () async {
+                            //   try {
+                            //     ctrl.backup.value = true;
+                            //     final dbPath = await getDatabasesPath();
+                            //     final source = File('$dbPath/absensi.db');
 
-                              var status =
-                                  await Permission.manageExternalStorage.status;
-                              if (!status.isGranted) {
-                                await Permission.manageExternalStorage
-                                    .request();
-                              }
+                            //     // 🔥 ambil bytes dari file DB
+                            //     final bytes = await source.readAsBytes();
+                            //     String? outputFile = await FilePicker.platform
+                            //         .saveFile(
+                            //           dialogTitle: 'Simpan Backup Database',
+                            //           fileName: 'absensi.db',
+                            //           bytes: bytes,
+                            //         );
 
-                              var status1 = await Permission.storage.status;
-                              if (!status1.isGranted) {
-                                await Permission.storage.request();
-                              }
+                            //     if (outputFile == null) {
+                            //       ctrl.backup.value = false;
+                            //       return;
+                            //     }
 
-                              try {
-                                File source1 = File('$dbFolder/absensi.db');
+                            //     await source.copy(outputFile);
+                            //     ctrl.backup.value = false;
+                            //     showToast('Backup berhasil');
+                            //   } catch (e) {
+                            //     ctrl.backup.value = false;
+                            //     showToast('Backup gagal: $e');
+                            //     // print(e);
+                            //   }
+                            //   // var status =
+                            //   //     await Permission.manageExternalStorage.status;
+                            //   // if (!status.isGranted) {
+                            //   //   await Permission.manageExternalStorage
+                            //   //       .request();
+                            //   // }
 
-                                Directory copyTo = Directory(
-                                  '/storage/emulated/0/URBANCO SPOT',
-                                );
-                                await copyTo.create();
-                                await source1.copy(
-                                  '/storage/emulated/0/URBANCO SPOT/absensi.db',
-                                );
-                              } catch (e) {
-                                // print(
-                                //     "================== error =====${e.toString()}");
-                              }
-                              await Future.delayed(
-                                const Duration(seconds: 3),
-                                () {
-                                  ctrl.backup.value = false;
-                                },
-                              );
+                            //   // var status1 = await Permission.storage.status;
+                            //   // if (!status1.isGranted) {
+                            //   //   await Permission.storage.request();
+                            //   // }
 
-                              showToast('Successfully Backup DataBase');
-                            },
+                            //   // try {
+                            //   //   File source1 = File('$dbFolder/absensi.db');
+
+                            //   //   Directory copyTo = Directory(
+                            //   //     '/storage/emulated/0/URBANCO SPOT/db',
+                            //   //   );
+                            //   //   await copyTo.create();
+                            //   //   await source1.copy(
+                            //   //     '/storage/emulated/0/URBANCO SPOT/db/absensi.db',
+                            //   //   );
+                            //   // } catch (e) {
+                            //   //   // print(
+                            //   //   //     "================== error =====${e.toString()}");
+                            //   // }
+                            // },
+                            onPressed: ctrl.backupDatabase,
                             label: const Text('Backup'),
                           ),
                           const Text('Cadangkan data'),
@@ -141,42 +160,79 @@ class BackupView extends GetView {
                             style: ElevatedButton.styleFrom(
                               backgroundColor: AppColors.itemsBackground,
                             ),
+                            onPressed: ctrl.restoreDatabase,
 
-                            onPressed: () async {
-                              ctrl.restore.value = true;
-                              var databasesPath = await getDatabasesPath();
-                              // var dbPath = join(databasesPath, 'penjualan.db');
+                            // onPressed: () async {
+                            //   try {
+                            //     ctrl.restore.value = true;
 
-                              var status =
-                                  await Permission.manageExternalStorage.status;
-                              if (!status.isGranted) {
-                                await Permission.manageExternalStorage
-                                    .request();
-                              }
+                            //     FilePickerResult? result = await FilePicker
+                            //         .platform
+                            //         .pickFiles(withData: true);
 
-                              var status1 = await Permission.storage.status;
-                              if (!status1.isGranted) {
-                                await Permission.storage.request();
-                              }
+                            //     if (result == null) {
+                            //       ctrl.restore.value = false;
+                            //       return;
+                            //     }
 
-                              try {
-                                File savedDb = File(
-                                  "/storage/emulated/0/URBANCO SPOT/absensi.db",
-                                );
+                            //     final fileBytes = result.files.single.bytes;
 
-                                await savedDb.copy('$databasesPath/absensi.db');
-                              } catch (e) {
-                                // print(
-                                //     "================== error =====${e.toString()}");
-                              }
-                              await Future.delayed(
-                                const Duration(seconds: 3),
-                                () {
-                                  ctrl.restore.value = false;
-                                },
-                              );
-                              showToast('Successfully Restored Database');
-                            },
+                            //     if (fileBytes == null) {
+                            //       showToast('File tidak valid');
+                            //       ctrl.restore.value = false;
+                            //       return;
+                            //     }
+
+                            //     final dbPath = await getDatabasesPath();
+
+                            //     await SQLHelper.instance.close();
+                            //     await deleteDatabase('$dbPath/absensi.db');
+
+                            //     final file = File('$dbPath/absensi.db');
+                            //     await file.writeAsBytes(fileBytes);
+
+                            //     await SQLHelper.instance.database;
+
+                            //     ctrl.restore.value = false;
+                            //     showToast('Restore berhasil');
+                            //   } catch (e) {
+                            //     ctrl.restore.value = false;
+                            //     showToast('Restore gagal: $e');
+                            //   }
+                            //   // var databasesPath = await getDatabasesPath();
+                            //   // // var dbPath = join(databasesPath, 'penjualan.db');
+
+                            //   // var status =
+                            //   //     await Permission.manageExternalStorage.status;
+                            //   // if (!status.isGranted) {
+                            //   //   await Permission.manageExternalStorage
+                            //   //       .request();
+                            //   // }
+
+                            //   // var status1 = await Permission.storage.status;
+                            //   // if (!status1.isGranted) {
+                            //   //   await Permission.storage.request();
+                            //   // }
+
+                            //   // try {
+                            //   //   File savedDb = File(
+                            //   //     "/storage/emulated/0/URBANCO SPOT/db/absensi.db",
+                            //   //   );
+                            //   //   // 🔴 1. CLOSE DB DULU
+                            //   //   await SQLHelper.instance.close();
+
+                            //   //   // 🔴 2. HAPUS DB LAMA (WAJIB BIAR BERSIH)
+                            //   //   await deleteDatabase(
+                            //   //     '$databasesPath/absensi.db',
+                            //   //   );
+
+                            //   //   // 🔴 3. COPY DB BARU
+                            //   //   await savedDb.copy('$databasesPath/absensi.db');
+                            //   // } catch (e) {
+                            //   //   // print(
+                            //   //   //     "================== error =====${e.toString()}");
+                            //   // }
+                            // },
                             label: const Text('Restore'),
                           ),
                           const Text('Pulihkan data'),
@@ -213,66 +269,69 @@ class BackupView extends GetView {
                           ),
                           icon: Icon(Icons.camera_front, color: mainColor),
                           onPressed: () async {
-                            if (userData.visit == '0') {
-                              var tempDataAbs = await SQLHelper.instance
-                                  .getAllDataAbsen(
-                                    userData.id!,
-                                    ctrl.initDate1,
-                                    ctrl.initDate2,
-                                  );
-                              for (var i in tempDataAbs) {
-                                var data = {
-                                  "tanggal_masuk": i.tanggalMasuk,
-                                  "tanggal_pulang": i.tanggalPulang,
-                                  "id": i.idUser,
-                                  "kode_cabang": i.kodeCabang,
-                                  "nama": i.nama,
-                                  "id_shift": i.idShift,
-                                  "jam_masuk": i.jamMasuk,
-                                  "jam_pulang": i.jamPulang,
-                                  "jam_absen_masuk": i.jamAbsenMasuk,
-                                  "jam_absen_pulang": i.jamAbsenPulang,
-                                  "foto_masuk": File(i.fotoMasuk.toString()),
-                                  "foto_pulang": File(i.fotoPulang!),
-                                  "lat_masuk": i.latMasuk,
-                                  "long_masuk": i.longMasuk,
-                                  "lat_pulang": i.latPulang,
-                                  "long_pulang": i.longPulang,
-                                  "device_info": i.devInfo,
-                                  "device_info2": i.devInfo2,
-                                };
-                                await ServiceApi().reSubmitAbsen(data);
-                              }
-                            } else {
-                              var tempDataVisit = await SQLHelper.instance
-                                  .getAllDataVisit(
-                                    userData.id!,
-                                    ctrl.initDate1,
-                                    ctrl.initDate2,
-                                  );
+                            absC.triggerSyncSafe(
+                              isVisit: userData.visit == "1",
+                            );
+                            // if (userData.visit == '0') {
+                            //   var tempDataAbs = await SQLHelper.instance
+                            //       .getAllDataAbsen(
+                            //         userData.id!,
+                            //         ctrl.initDate1,
+                            //         ctrl.initDate2,
+                            //       );
+                            //   for (var i in tempDataAbs) {
+                            //     var data = {
+                            //       "tanggal_masuk": i.tanggalMasuk,
+                            //       "tanggal_pulang": i.tanggalPulang,
+                            //       "id": i.idUser,
+                            //       "kode_cabang": i.kodeCabang,
+                            //       "nama": i.nama,
+                            //       "id_shift": i.idShift,
+                            //       "jam_masuk": i.jamMasuk,
+                            //       "jam_pulang": i.jamPulang,
+                            //       "jam_absen_masuk": i.jamAbsenMasuk,
+                            //       "jam_absen_pulang": i.jamAbsenPulang,
+                            //       "foto_masuk": File(i.fotoMasuk.toString()),
+                            //       "foto_pulang": File(i.fotoPulang!),
+                            //       "lat_masuk": i.latMasuk,
+                            //       "long_masuk": i.longMasuk,
+                            //       "lat_pulang": i.latPulang,
+                            //       "long_pulang": i.longPulang,
+                            //       "device_info": i.devInfo,
+                            //       "device_info2": i.devInfo2,
+                            //     };
+                            //     await ServiceApi().reSubmitAbsen(data);
+                            //   }
+                            // } else {
+                            //   var tempDataVisit = await SQLHelper.instance
+                            //       .getAllDataVisit(
+                            //         userData.id!,
+                            //         ctrl.initDate1,
+                            //         ctrl.initDate2,
+                            //       );
 
-                              for (var i in tempDataVisit) {
-                                var data = {
-                                  "id": i.id!,
-                                  "nama": i.nama!,
-                                  "tgl_visit": i.tglVisit!,
-                                  "visit_in": i.visitIn!,
-                                  "jam_in": i.jamIn!,
-                                  "visit_out": i.visitOut,
-                                  "jam_out": i.jamOut,
-                                  "foto_in": File(i.fotoIn!.toString()),
-                                  "lat_in": i.latIn!,
-                                  "long_in": i.longIn!,
-                                  "foto_out": File(i.fotoOut.toString()),
-                                  "lat_out": i.latOut,
-                                  "long_out": i.longOut,
-                                  "device_info": i.deviceInfo!,
-                                  "device_info2": i.deviceInfo2,
-                                  "is_rnd": i.isRnd!,
-                                };
-                                await ServiceApi().reSubmitVisit(data);
-                              }
-                            }
+                            //   for (var i in tempDataVisit) {
+                            //     var data = {
+                            //       "id": i.id!,
+                            //       "nama": i.nama!,
+                            //       "tgl_visit": i.tglVisit!,
+                            //       "visit_in": i.visitIn!,
+                            //       "jam_in": i.jamIn!,
+                            //       "visit_out": i.visitOut,
+                            //       "jam_out": i.jamOut,
+                            //       "foto_in": File(i.fotoIn!.toString()),
+                            //       "lat_in": i.latIn!,
+                            //       "long_in": i.longIn!,
+                            //       "foto_out": File(i.fotoOut.toString()),
+                            //       "lat_out": i.latOut,
+                            //       "long_out": i.longOut,
+                            //       "device_info": i.deviceInfo!,
+                            //       "device_info2": i.deviceInfo2,
+                            //       "is_rnd": i.isRnd!,
+                            //     };
+                            //     await ServiceApi().reSubmitVisit(data);
+                            //   }
+                            // }
                             showToast(
                               userData.visit == '0'
                                   ? 'Data absen berhasil dikirim ulang'

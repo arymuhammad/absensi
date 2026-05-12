@@ -23,17 +23,33 @@ class _CustomQrScannerPageState extends State<CustomQrScannerPage> {
 
   void _onQRViewCreated(QRViewController ctrl) {
     controller = ctrl;
+
     controller!.scannedDataStream.listen((scanData) {
-      if (scanData.code!.split(' ').length < 3) {
+      final code = scanData.code ?? '';
+
+      // format baru:
+      // UF001|a8x92kd
+      if (!code.contains('|')) {
         controller?.pauseCamera();
         Navigator.of(context).pop();
         showToast('QR tidak dikenali');
-      } else {
-        widget.onDetect(scanData.code ?? '');
-        // print('ini hasil scan ${scanData.code}');
+        return;
+      }
+
+      final split = code.split('|');
+
+      // minimal harus ada kode + token
+      if (split.length < 2) {
         controller?.pauseCamera();
         Navigator.of(context).pop();
+        showToast('Format QR salah');
+        return;
       }
+
+      widget.onDetect(code);
+
+      controller?.pauseCamera();
+      Navigator.of(context).pop();
     });
   }
 

@@ -21,6 +21,7 @@ abstract class Routes {
   static const PAY_SLIP = _Paths.PAY_SLIP;
   static const PING = _Paths.PING;
   static const OVERTIME = _Paths.OVERTIME;
+  static const REGION_AREA = _Paths.REGION_AREA;
 }
 
 abstract class _Paths {
@@ -43,4 +44,5 @@ abstract class _Paths {
   static const PAY_SLIP = '/pay-slip';
   static const PING = '/ping';
   static const OVERTIME = '/overtime';
+  static const REGION_AREA = '/region-area';
 }

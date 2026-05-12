@@ -163,6 +163,7 @@ class ExpandedDataAbsen extends StatelessWidget {
                                 SizedBox(
                                   width: Get.size.width / 2.3,
                                   child: CsTextField(
+                                    enabled: true,
                                       controller: ctrl.jamMasukUpdate
                                         ..text = data.jamAbsenMasuk!,
                                       label: 'Jam Masuk', isDark: isDark,),
@@ -170,6 +171,7 @@ class ExpandedDataAbsen extends StatelessWidget {
                                 SizedBox(
                                   width: Get.size.width / 2.3,
                                   child: CsTextField(
+                                    enabled: true,
                                       controller: ctrl.jamPulangUpdate
                                         ..text = data.jamAbsenPulang!,
                                       label: 'Jam Pulang',isDark: isDark,),
@@ -180,6 +182,7 @@ class ExpandedDataAbsen extends StatelessWidget {
                               height: 5,
                             ),
                             CsTextField(
+                              enabled: true,
                                 controller: ctrl.foto..text = data.fotoPulang! !="" ?data.fotoPulang!:'',
                                 label: 'Foto', isDark: isDark,),
                             const SizedBox(
@@ -191,6 +194,7 @@ class ExpandedDataAbsen extends StatelessWidget {
                                 SizedBox(
                                   width: Get.size.width / 2.3,
                                   child: CsTextField(
+                                    enabled: true,
                                       controller: ctrl.lat
                                         ..text = data.latMasuk!,
                                       label: 'Lat', isDark: isDark,),
@@ -198,6 +202,7 @@ class ExpandedDataAbsen extends StatelessWidget {
                                 SizedBox(
                                   width: Get.size.width / 2.3,
                                   child: CsTextField(
+                                    enabled: true,
                                       controller: ctrl.long
                                         ..text = data.longMasuk!,
                                       label: 'Long', isDark: isDark,),
@@ -208,6 +213,7 @@ class ExpandedDataAbsen extends StatelessWidget {
                               height: 5,
                             ),
                             CsTextField(
+                              enabled: true,
                                 controller: ctrl.device..text = data.devInfo!,
                                 label: 'Device', isDark: isDark,),
                             const SizedBox(

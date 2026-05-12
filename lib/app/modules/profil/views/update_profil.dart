@@ -3,16 +3,17 @@ import 'package:absensi/app/data/helper/app_colors.dart';
 import 'package:absensi/app/data/model/login_model.dart';
 import 'package:absensi/app/modules/add_pegawai/controllers/add_pegawai_controller.dart';
 import 'package:absensi/app/modules/shared/container_main_color.dart';
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:get/get.dart';
-import 'package:icons_plus/icons_plus.dart';
 import 'package:intl/intl.dart';
 
 import '../../../data/helper/const.dart';
+import '../../../data/helper/custom_dialog.dart';
 import '../../../services/service_api.dart';
 import '../../shared/input_decoration.dart';
 
@@ -107,9 +108,7 @@ class UpdateProfil extends GetView {
                                               items:
                                                   ctr.listBrand
                                                       .map(
-                                                        (
-                                                          e,
-                                                        ) => DropdownMenuItem(
+                                                        (e) => DropdownMenuItem(
                                                           value:
                                                               e.brandCabang!
                                                                   .toString(),
@@ -146,21 +145,18 @@ class UpdateProfil extends GetView {
                                                       data.namaCabang!,
                                                     );
                                                   }).toList();
-                      
+
                                                   return TypeAheadFormField<
                                                     String
                                                   >(
                                                     autoFlipDirection: true,
                                                     textFieldConfiguration:
                                                         TextFieldConfiguration(
-                                                          controller:
-                                                              ctr.store,
+                                                          controller: ctr.store,
                                                           decoration:
                                                               inputDecoration(
-                                                                label:
-                                                                    'Branch',
-                                                                isDark:
-                                                                    isDark,
+                                                                label: 'Branch',
+                                                                isDark: isDark,
                                                                 context:
                                                                     context,
                                                               ),
@@ -185,11 +181,8 @@ class UpdateProfil extends GetView {
                                                         tileColor:
                                                             isDark
                                                                 ? Colors.black
-                                                                : Colors
-                                                                    .white,
-                                                        title: Text(
-                                                          suggestion,
-                                                        ),
+                                                                : Colors.white,
+                                                        title: Text(suggestion),
                                                       );
                                                     },
                                                     onSuggestionSelected: (
@@ -210,9 +203,7 @@ class UpdateProfil extends GetView {
                                                                   .value =
                                                               dataCabang[i]
                                                                   .kodeCabang!;
-                                                          ctr
-                                                                  .cabangName
-                                                                  .value =
+                                                          ctr.cabangName.value =
                                                               dataCabang[i]
                                                                   .namaCabang!;
                                                           ctr.lat.value =
@@ -228,16 +219,14 @@ class UpdateProfil extends GetView {
                                                       }
                                                     },
                                                   );
-                                                } else if (snapshot
-                                                    .hasError) {
+                                                } else if (snapshot.hasError) {
                                                   return Text(
                                                     '${snapshot.error}',
                                                   );
                                                 }
                                                 return const Row(
                                                   mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .center,
+                                                      MainAxisAlignment.center,
                                                   children: [
                                                     Center(
                                                       child:
@@ -257,9 +246,7 @@ class UpdateProfil extends GetView {
                                     InkWell(
                                       onTap: () => ctr.uploadImageProfile(),
                                       child: ClipRect(
-                                        child: GetBuilder<
-                                          AddPegawaiController
-                                        >(
+                                        child: GetBuilder<AddPegawaiController>(
                                           builder: (c) {
                                             if (c.image != null ||
                                                 c.webImage.isNotEmpty) {
@@ -315,23 +302,18 @@ class UpdateProfil extends GetView {
                                                         userData!.foto != ""
                                                             ? Image.network(
                                                               "${ServiceApi().baseUrl}${userData!.foto}",
-                                                              fit:
-                                                                  BoxFit
-                                                                      .cover,
+                                                              fit: BoxFit.cover,
                                                             )
                                                             : Image.network(
                                                               "https://ui-avatars.com/api/?name=${userData!.nama}",
-                                                              fit:
-                                                                  BoxFit
-                                                                      .cover,
+                                                              fit: BoxFit.cover,
                                                             ),
                                                   ),
                                                   const Positioned(
                                                     right: 0,
                                                     bottom: 0,
                                                     child: Icon(
-                                                      Icons
-                                                          .camera_alt_rounded,
+                                                      Icons.camera_alt_rounded,
                                                       color: Colors.grey,
                                                     ),
                                                   ),
@@ -349,8 +331,7 @@ class UpdateProfil extends GetView {
                               SizedBox(
                                 height: 44,
                                 child: TextField(
-                                  controller:
-                                      ctr.name..text = userData!.nama!,
+                                  controller: ctr.name..text = userData!.nama!,
                                   decoration: inputDecoration(
                                     label: 'Full Name',
                                     isDark: isDark,
@@ -395,16 +376,12 @@ class UpdateProfil extends GetView {
                                           context: context,
                                         ),
                                         format: DateFormat("yyyy-MM-dd"),
-                                        onShowPicker: (
-                                          context,
-                                          currentValue,
-                                        ) {
+                                        onShowPicker: (context, currentValue) {
                                           return showDatePicker(
                                             context: context,
                                             firstDate: DateTime(1900),
                                             initialDate:
-                                                currentValue ??
-                                                DateTime.now(),
+                                                currentValue ?? DateTime.now(),
                                             lastDate: DateTime(2100),
                                           );
                                         },
@@ -425,7 +402,7 @@ class UpdateProfil extends GetView {
                                       dataLevel!.map((data) {
                                         allLevel.add(data.namaLevel!);
                                       }).toList();
-                      
+
                                       return TypeAheadFormField<String>(
                                         autoFlipDirection: true,
                                         hideOnEmpty: true,
@@ -490,13 +467,13 @@ class UpdateProfil extends GetView {
                                                   dataLevel[i].cekStok!;
                                             }
                                           }
-                                           Future.delayed(const Duration(milliseconds: 300), () {
-                            scrollController.animateTo(
-                              scrollController.position.maxScrollExtent,
-                              duration: const Duration(milliseconds: 300),
-                              curve: Curves.easeInOut,
-                            );
-                          });
+                                          //                  Future.delayed(const Duration(milliseconds: 300), () {
+                                          //   scrollController.animateTo(
+                                          //     scrollController.position.maxScrollExtent,
+                                          //     duration: const Duration(milliseconds: 300),
+                                          //     curve: Curves.easeInOut,
+                                          //   );
+                                          // });
                                         },
                                       );
                                     } else if (snapshot.hasError) {
@@ -530,23 +507,34 @@ class UpdateProfil extends GetView {
                                       elevation: 0,
                                       backgroundColor: Colors.transparent,
                                       shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(
-                                          50,
-                                        ),
+                                        borderRadius: BorderRadius.circular(50),
                                       ),
-                                      minimumSize: Size(
-                                        Get.size.width / 2,
-                                        50,
-                                      ),
+                                      minimumSize: Size(Get.size.width / 2, 50),
                                     ),
-                                    onPressed: () {
+                                    onPressed: () async {
                                       // loadingDialog("updating data", "");
                                       ctr.isLoading.value = true;
-                                      ctr.addUpdatePegawai(
+                                      final result = await ctr.addUpdatePegawai(
                                         context,
                                         "update",
                                         userData!,
                                       );
+                                      ctr.isLoading.value = false;
+                                      if (result == true) {
+                                        Get.back(); // balik ke halaman sebelumnya
+
+                                        succesDialog(
+                                          context: Get.context!,
+                                          pageAbsen: "N",
+                                          desc: "Data berhasil diperbarui",
+                                          type: DialogType.success,
+                                          title: 'SUKSES',
+                                          btnOkOnPress: () {
+                                            // Get.back(); // tutup dialog
+                                            Navigator.pop(context); // balik ke halaman profile
+                                          },
+                                        );
+                                      }
                                     },
                                     child: Obx(
                                       () =>
@@ -574,8 +562,7 @@ class UpdateProfil extends GetView {
                                                 'UPDATE',
                                                 style: TextStyle(
                                                   color:
-                                                      AppColors
-                                                          .mainTextColor1,
+                                                      AppColors.mainTextColor1,
                                                 ),
                                               ),
                                     ),

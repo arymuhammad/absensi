@@ -26,19 +26,19 @@ class CsDatePicker extends StatelessWidget {
         hintText: label,
         fillColor: isDark?Theme.of(context).canvasColor: Colors.white,
         filled: true,
-        isDense: true, // 🔑 biar tinggi tetap rapih
+        // isDense: true, // 🔑 biar tinggi tetap rapih
         contentPadding: const EdgeInsets.all(5),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide.none,
+          // borderSide: BorderSide.none,
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide.none,
+          // borderSide: BorderSide.none,
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide.none,
+          // borderSide: BorderSide.none,
         ),
       ),
       format: DateFormat("yyyy-MM-dd"),

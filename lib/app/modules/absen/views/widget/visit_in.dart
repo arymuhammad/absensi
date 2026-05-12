@@ -77,7 +77,7 @@ visitIn({
     // =======================
     // 📷 FOTO
     // =======================
-    await absC.uploadFotoAbsen();
+    await absC.uploadFotoAbsen(isVisit: true);
     // Get.back();
 
     if (absC.image == null) {
@@ -173,8 +173,8 @@ visitIn({
       "tanggal2": absC.initDate2,
     });
 
-    absC.startTimer(10);
-    absC.resend();
+    // absC.startTimer(10);
+    // absC.resend();
 
     Get.back(); // tutup loading
 

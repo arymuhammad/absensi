@@ -76,7 +76,7 @@ visitOut({
     // =======================
     // 📷 FOTO (FIX: TANPA GET.BACK)
     // =======================
-    await absC.uploadFotoAbsen();
+    await absC.uploadFotoAbsen(isVisit: true);
 
     if (absC.image == null) {
       failedDialog(Get.context, "Warning", "Check out was cancelled");
@@ -164,8 +164,8 @@ visitOut({
       "tanggal2": absC.initDate2,
     });
 
-    absC.startTimer(10);
-    absC.resend();
+    // absC.startTimer(10);
+    // absC.resend();
 
     Get.back(); // ✅ tutup loading
     // =======================

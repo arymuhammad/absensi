@@ -89,6 +89,7 @@ class DetailAbsenController extends GetxController {
     String nama,
     String kodeCabang,
     String idShift,
+    String level,
   ) async {
     if (jamAbsenMasuk.text != "" && jamAbsenPulang.text == "") {
       if (alasan.text == "") {
@@ -130,6 +131,7 @@ class DetailAbsenController extends GetxController {
             var data = {
               "status": "update_masuk_cst",
               "id_user": id,
+              "level": level,
               "kode_cabang": kodeCabang,
               "nama": nama,
               "jam_masuk": jamAbsen,
@@ -146,6 +148,7 @@ class DetailAbsenController extends GetxController {
             var data = {
               "status": "update_masuk",
               "id_user": id,
+              "level": level,
               "kode_cabang": kodeCabang,
               "nama": nama,
               "jam_absen_masuk": jamAbsenMasuk.text,
@@ -192,6 +195,7 @@ class DetailAbsenController extends GetxController {
             var data = {
               "status": "update_pulang",
               "id_user": id,
+              "level": level,
               "kode_cabang": kodeCabang,
               "nama": nama,
               "tgl_masuk": tglMasuk.text,
@@ -246,6 +250,7 @@ class DetailAbsenController extends GetxController {
             var data = {
               "status": "update_data_absen",
               "id_user": id,
+              "level": level,
               "kode_cabang": kodeCabang,
               "nama": nama,
               "tgl_masuk": tglMasuk.text,
@@ -289,6 +294,7 @@ class DetailAbsenController extends GetxController {
         var data = {
           "status": "update_shift",
           "id_user": id,
+          "level": level,
           "kode_cabang": kodeCabang,
           "nama": nama,
           "id_shift": selectedShift.value,

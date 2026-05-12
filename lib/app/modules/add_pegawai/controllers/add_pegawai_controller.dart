@@ -13,11 +13,10 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
-import 'package:ota_update/ota_update.dart';
-import 'package:percent_indicator/linear_percent_indicator.dart';
-import 'package:xml/xml.dart' as xml;
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:sqflite/sqflite.dart';
 // import 'package:file_picker/file_picker.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -26,6 +25,7 @@ import '../../../data/helper/custom_dialog.dart';
 import '../../../data/model/cabang_model.dart';
 import '../../../data/model/cek_user_model.dart';
 import '../../../data/model/foto_profil_model.dart';
+import '../../../data/model/user_model.dart';
 import '../../login/controllers/login_controller.dart';
 // import 'package:google_ml_vision/google_ml_vision.dart';
 
@@ -37,7 +37,9 @@ class AddPegawaiController extends GetxController {
       store,
       telp,
       level,
-      joinDate;
+      joinDate,
+      filterUser;
+  final RxString searchKeyword = ''.obs;
   final FocusNode focusNodecabang = FocusNode();
   final FocusNode focusNodelevel = FocusNode();
   final GlobalKey autocompleteKeyBrand = GlobalKey();
@@ -74,6 +76,8 @@ class AddPegawaiController extends GetxController {
   var latestVer = "";
   var backup = false.obs;
   var restore = false.obs;
+  var listUser = <User>[].obs;
+  RxList<User> searchUser = RxList<User>([]);
 
   var initDate1 =
       DateFormat('yyyy-MM-dd')
@@ -96,6 +100,7 @@ class AddPegawaiController extends GetxController {
           )
           .toString();
   // var supportedAbi = "";
+
   @override
   void onInit() async {
     super.onInit();
@@ -107,6 +112,7 @@ class AddPegawaiController extends GetxController {
     telp = TextEditingController();
     level = TextEditingController();
     joinDate = TextEditingController();
+    filterUser = TextEditingController();
     getBrandCabang();
     getLevel();
 
@@ -135,6 +141,7 @@ class AddPegawaiController extends GetxController {
     telp.dispose();
     level.dispose();
     joinDate.dispose();
+    filterUser.dispose();
   }
 
   getBrandCabang() async {
@@ -142,189 +149,21 @@ class AddPegawaiController extends GetxController {
     return listBrand.value = response;
   }
 
-  checkForUpdate(context, status) async {
-    if (status != "onInit") {
-      loadingDialog("Checking for updates...", "");
-    }
+  Future<List<User>> getUser(String branchCode, String parentId) async {
+    final response = await ServiceApi().getUserCabang(branchCode, parentId);
+    isLoading.value = false;
+    searchUser.value = response;
+    return listUser.value = response;
+  }
 
-    try {
-      final readDoc = await http.get(
-        Uri.parse('http://103.156.15.61/update_apk/updateLog.xml'),
-      );
+  List<User> get filterDataUser {
+    final q = searchKeyword.value.toLowerCase();
 
-      final response = await http
-          .head(
-            Uri.parse(
-              // supportedAbi == 'arm64-v8a'
-              //     ? 'http://103.156.15.61/update apk/absensiApp.arm64v8a.apk'
-              // :
-              'http://103.156.15.61/update_apk/absensiApp.apk',
-            ),
-          )
-          .timeout(const Duration(seconds: 20));
-      Get.back();
-      if (response.statusCode == 200) {
-        //parsing readDoc
-        final document = xml.XmlDocument.parse(readDoc.body);
-        final itemsNode = document.findElements('items').first;
-        final updates = itemsNode.findElements('update');
-        latestVer = itemsNode.findElements('versi').first.innerText;
-        //start looping item on readDoc
-        updateList.clear();
-        for (final listUpdates in updates) {
-          final name = listUpdates.findElements('name').first.innerText;
-          final desc = listUpdates.findElements('desc').first.innerText;
-          final icon = listUpdates.findElements('icon').first.innerText;
-          final color = listUpdates.findElements('color').first.innerText;
+    if (q.isEmpty) return listUser;
 
-          updateList.add({
-            'name': name,
-            'desc': desc,
-            'icon': icon,
-            'color': color,
-          });
-        }
-        //end loop item on readDoc
-        if (latestVer == currVer) {
-          // Get.back();
-          succesDialog(
-            context: context,
-            pageAbsen: "N",
-            desc: "No system updates",
-            type: DialogType.info,
-            title: 'INFO',
-            btnOkOnPress: () => Get.back(),
-          );
-          // dialogMsgScsUpd("", "Tidak ada pembaruan sistem");
-        } else {
-          Get.defaultDialog(
-            radius: 2,
-            onWillPop: () async {
-              return false;
-            },
-            title: 'Update Available',
-            content: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  "What's new",
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                ),
-                const SizedBox(height: 5),
-                for (var i in updateList)
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Icon(
-                            IconData(
-                              int.parse(i['icon']),
-                              fontFamily: 'MaterialIcons',
-                            ),
-                            color: Color(int.parse(i['color'])),
-                          ),
-                          const SizedBox(width: 5),
-                          Text(
-                            '${i['name']}',
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18,
-                            ),
-                          ),
-                        ],
-                      ),
-                      Text(
-                        i['desc'],
-                        style: TextStyle(color: Colors.grey[500]),
-                      ),
-                      const SizedBox(height: 5),
-                    ],
-                  ),
-              ],
-            ),
-            textConfirm: 'Download Update',
-            confirmTextColor: Colors.white,
-            onConfirm: () {
-              Get.back(closeOverlays: true);
-              try {
-                Get.defaultDialog(
-                  title: 'Software update',
-                  radius: 2,
-                  barrierDismissible: false,
-                  onWillPop: () async {
-                    return false;
-                  },
-                  content: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Divider(),
-                      const Text('Downloading updates...'),
-                      Obx(() => Text('${(downloadProgress.value).toInt()}%')),
-                      const SizedBox(height: 5),
-                      Obx(
-                        () => LinearPercentIndicator(
-                          lineHeight: 10.0,
-                          percent: downloadProgress.value / 100,
-                          backgroundColor: Colors.grey[220],
-                          progressColor: Colors.blue,
-                          barRadius: const Radius.circular(5),
-                        ),
-                      ),
-                      const SizedBox(height: 5),
-                    ],
-                  ),
-                );
-                //LINK CONTAINS APK OF FLUTTER HELLO WORLD FROM FLUTTER SDK EXAMPLES
-                OtaUpdate()
-                    .execute(
-                      // supportedAbi == 'arm64-v8a'
-                      //     ? 'http://103.156.15.61/update apk/absensiApp.arm64v8a.apk'
-                      // :
-                      'http://103.156.15.61/update_apk/absensiApp.apk',
-                      // OPTIONAL
-                      // destinationFilename: '/',
-                      //OPTIONAL, ANDROID ONLY - ABILITY TO VALIDATE CHECKSUM OF FILE:
-                      // sha256checksum:
-                      //     "d6da28451a1e15cf7a75f2c3f151befad3b80ad0bb232ab15c20897e54f21478",
-                    )
-                    .listen(
-                      (OtaEvent event) {
-                        downloadProgress.value = double.parse(event.value!);
-                      },
-                      // onError: errorHandle(Error()),
-                      // onDone: logC.logout,
-                    );
-              } on http.ClientException catch (e) {
-                showToast('Failed to make OTA update. Details: $e');
-              }
-            },
-          );
-        }
-      } else {
-        Get.defaultDialog(
-          title: 'Info',
-          middleText:
-              'There are no app updates. \nYour system is already up to date',
-          onCancel: () => Get.back(),
-          textCancel: 'Close',
-        );
-      }
-    } on SocketException catch (e) {
-      Get.back(closeOverlays: true);
-      Get.defaultDialog(
-        title: e.toString(),
-        middleText: 'Check your internet connection',
-        textConfirm: 'Refresh',
-        confirmTextColor: Colors.white,
-        onConfirm: () {
-          checkForUpdate(context, "");
-          Get.back(closeOverlays: true);
-        },
-      );
-    }
+    return listUser.where((e) {
+      return e.nama!.toLowerCase().contains(q);
+    }).toList();
   }
 
   Future<List<Cabang>> getCabang() async {
@@ -341,7 +180,7 @@ class AddPegawaiController extends GetxController {
   void uploadImageProfile() async {
     if (kIsWeb) {
       fileResult = await FilePicker.platform.pickFiles(
-        compressionQuality: 50,
+        compressionQuality: 60,
         allowedExtensions: ['jpg', 'jpeg', 'png'],
         withReadStream: true,
         // // this will return PlatformFile object with read stream
@@ -350,7 +189,7 @@ class AddPegawaiController extends GetxController {
     } else {
       image = await picker.pickImage(
         source: ImageSource.gallery,
-        imageQuality: 50,
+        imageQuality: 60,
         maxHeight: 600,
         maxWidth: 600,
       );
@@ -360,22 +199,34 @@ class AddPegawaiController extends GetxController {
     }
   }
 
-  addUpdatePegawai(context, String mode, Data dataUser) async {
+  Future<bool> addUpdatePegawai(context, String mode, Data dataUser) async {
     Random random = Random();
     int randomNumber = random.nextInt(100);
     final response = await ServiceApi().getUser();
     cekDataUser.value = response;
 
-    var lstUser = [];
-    cekDataUser.map((e) {
-      lstUser.add(e.username!);
-    }).toList();
-    var lstPhone = [];
-    cekDataUser.map((e) {
-      lstPhone.add(e.notelp!);
-    }).toList();
+    // var lstUser = [];
+    // cekDataUser.map((e) {
+    //   lstUser.add(e.username!);
+    // }).toList();
+    // var lstPhone = [];
+    // cekDataUser.map((e) {
+    //   lstPhone.add(e.notelp!);
+    // }).toList();
+    final isUsrExist = cekDataUser.any(
+      (dt) => dt.username?.trim() == username.text.trim(),
+    );
+    final inputTelp = telp.text.trim();
+    final oldTelp = dataUser.noTelp?.trim() ?? '';
+
+    // // hanya validasi kalau user isi field
+    // if (inputTelp.isNotEmpty) {
+    //   final isNumExist = cekDataUser.any(
+    //     (dt) => (dt.notelp ?? '').trim() == inputTelp,
+    //   );
+    // }
     if (mode == "add") {
-      loadingDialog("Updating data", "Please wait");
+      loadingDialog("Registering user", "Please wait");
       if (selectedCabang.isNotEmpty &&
           username.text != "" &&
           pass.text != "" &&
@@ -383,9 +234,10 @@ class AddPegawaiController extends GetxController {
           telp.text != "" &&
           selectedCabang.isNotEmpty &&
           selectedLevel.isNotEmpty) {
-        if (image != null && image!.name.split(".").last == "jpg" ||
-            image != null && image!.name.split(".").last == "jpeg" ||
-            image != null && image!.name.split(".").last == "png" ||
+        if (image != null &&
+                (image!.name.endsWith("jpg") ||
+                    image!.name.endsWith("jpeg") ||
+                    image!.name.endsWith("png")) ||
             fileResult != null) {
           var data = {
             "status": mode,
@@ -402,30 +254,34 @@ class AddPegawaiController extends GetxController {
                     : File(image!.path.toString()),
           };
 
-          if (lstUser.contains(username.text) && lstPhone.contains(telp.text)) {
-            Get.back();
-            warningDialog(
-              Get.context!,
-              "Warning",
-              "Username and Phone Number are already registered\nPlease change Username and Phone Number",
+          if (isUsrExist && isPhoneExist(inputTelp)) {
+            _showWarning(
+              "Username and Phone Number are already registered\nPlease change both",
             );
-          } else if (lstUser.contains(username.text)) {
-            Get.back();
-            warningDialog(
-              Get.context!,
-              "Warning",
+            return false;
+          } else if (isUsrExist) {
+            _showWarning(
               "Username is already registered\nPlease change it to another username",
             );
-          } else if (lstPhone.contains(telp.text)) {
-            Get.back();
-            warningDialog(
-              Get.context!,
-              "Warning",
+            return false;
+          } else if (isPhoneExist(inputTelp)) {
+            _showWarning(
               "This phone number is already registered\nPlease enter another phone number",
             );
+            return false;
           } else {
             // succesDialog(context, "N", "Data berhasil disimpan", DialogType.success, 'SUKSES');
-            await ServiceApi().addUpdatePegawai(data, mode);
+            final isSuccess = await ServiceApi().addUpdatePegawai(data, mode);
+            if (!isSuccess) {
+              Get.back(); // tutup loading
+              warningDialog(
+                Get.context!,
+                "Error",
+                "Failed to update data. Please try again",
+              );
+              isLoading.value = false;
+              return false;
+            }
             selectedCabang.value = "";
             username.clear();
             store.clear();
@@ -435,9 +291,10 @@ class AddPegawaiController extends GetxController {
             telp.clear();
             selectedLevel.value = "";
             brandCabang.value = "";
-            lstUser.clear();
-            lstPhone.clear();
+            // lstUser.clear();
+
             image = null;
+            return true;
           }
         } else {
           var data = {
@@ -450,29 +307,34 @@ class AddPegawaiController extends GetxController {
             "kode_cabang": selectedCabang.value,
             "level": selectedLevel.value,
           };
-          if (lstUser.contains(username.text) && lstPhone.contains(telp.text)) {
-            Get.back();
-            warningDialog(
-              Get.context!,
-              "Warning",
-              "Username and Phone Number are already registered\nPlease change Username and Phone Number",
+
+          if (isUsrExist && isPhoneExist(inputTelp)) {
+            _showWarning(
+              "Username and Phone Number are already registered\nPlease change both",
             );
-          } else if (lstUser.contains(username.text)) {
-            Get.back();
-            warningDialog(
-              Get.context!,
-              "Warning",
+            return false;
+          } else if (isUsrExist) {
+            _showWarning(
               "Username is already registered\nPlease change it to another username",
             );
-          } else if (lstPhone.contains(telp.text)) {
-            Get.back();
-            warningDialog(
-              Get.context!,
-              "Warning",
+            return false;
+          } else if (isPhoneExist(inputTelp)) {
+            _showWarning(
               "This phone number is already registered\nPlease enter another phone number",
             );
+            return false;
           } else {
-            await ServiceApi().addUpdatePegawai(data, mode);
+            final isSuccess = await ServiceApi().addUpdatePegawai(data, mode);
+            if (!isSuccess) {
+              Get.back(); // tutup loading
+              warningDialog(
+                Get.context!,
+                "Error",
+                "Failed to update data. Please try again",
+              );
+              isLoading.value = false;
+              return false;
+            }
             selectedCabang.value = "";
             username.clear();
             store.clear();
@@ -482,9 +344,9 @@ class AddPegawaiController extends GetxController {
             telp.clear();
             selectedLevel.value = "";
             brandCabang.value = "";
-            lstUser.clear();
-            lstPhone.clear();
+            // lstUser.clear();
             image = null;
+            return true;
           }
         }
       } else {
@@ -494,20 +356,22 @@ class AddPegawaiController extends GetxController {
           "Warning",
           "Please fill in the data in all columns",
         );
+        return false;
       }
     } else {
       loadingDialog("Updating data", "Please wait");
 
-      if (image != null && image!.name.split(".").last == "jpg" ||
-          image != null && image!.name.split(".").last == "jpeg" ||
-          image != null && image!.name.split(".").last == "png" ||
+      if (image != null &&
+              (image!.name.endsWith("jpg") ||
+                  image!.name.endsWith("jpeg") ||
+                  image!.name.endsWith("png")) ||
           fileResult != null) {
         var data = {
           "status": mode,
           "id": dataUser.id,
           "username": dataUser.username,
           "nama": name.text != "" ? name.text : dataUser.nama,
-          "no_telp": telp.text != "" ? telp.text : dataUser.noTelp,
+          "no_telp": inputTelp.isNotEmpty ? inputTelp : oldTelp,
           "kode_cabang":
               selectedCabang.value != ""
                   ? selectedCabang.value
@@ -519,7 +383,7 @@ class AddPegawaiController extends GetxController {
           "created_at": joinDate.text.isNotEmpty ? joinDate.text : null,
         };
 
-        if (telp.text == dataUser.noTelp) {
+        if (inputTelp.isNotEmpty && isPhoneExist(inputTelp)) {
           Get.back();
           warningDialog(
             Get.context!,
@@ -527,8 +391,20 @@ class AddPegawaiController extends GetxController {
             "This phone number is already registered\nPlease enter another phone number",
           );
           isLoading.value = false;
+          return false;
         } else {
-          await ServiceApi().addUpdatePegawai(data, mode);
+          final isSuccess = await ServiceApi().addUpdatePegawai(data, mode);
+
+          if (!isSuccess) {
+            Get.back(); // tutup loading
+            warningDialog(
+              Get.context!,
+              "Error",
+              "Failed to update data. Please try again",
+            );
+            isLoading.value = false;
+            return false;
+          }
           // langsung update sharedpref tanpa harus re login
           var newUsr = await ServiceApi().fetchCurrentUser({
             "username": dataUser.username!,
@@ -548,7 +424,7 @@ class AddPegawaiController extends GetxController {
           SQLHelper.instance.updateDataUser(
             {
               "nama": name.text != "" ? name.text : dataUser.nama,
-              "no_telp": telp.text != "" ? telp.text : dataUser.noTelp,
+              "no_telp": inputTelp.isNotEmpty ? inputTelp : oldTelp,
               "kode_cabang":
                   selectedCabang.value != ""
                       ? selectedCabang.value
@@ -605,14 +481,15 @@ class AddPegawaiController extends GetxController {
           joinDate.clear();
           selectedLevel.value = "";
           brandCabang.value = "";
-          lstPhone.clear();
+
           isLoading.value = false;
           image = null;
+          return true;
         }
         // Get.back();
       } else {
         // if (lstPhone.contains(telp.text)) {
-        if (telp.text == dataUser.noTelp) {
+        if (inputTelp.isNotEmpty && isPhoneExist(inputTelp)) {
           Get.back();
           warningDialog(
             Get.context!,
@@ -620,12 +497,13 @@ class AddPegawaiController extends GetxController {
             "This phone number is already registered\nPlease enter another phone number",
           );
           isLoading.value = false;
+          return false;
         } else {
           var data = {
             "status": mode,
             "id": dataUser.id,
             "nama": name.text != "" ? name.text : dataUser.nama,
-            "no_telp": telp.text != "" ? telp.text : dataUser.noTelp,
+            "no_telp": inputTelp.isNotEmpty ? inputTelp : oldTelp,
             "kode_cabang":
                 selectedCabang.value != ""
                     ? selectedCabang.value
@@ -638,8 +516,17 @@ class AddPegawaiController extends GetxController {
           };
           // loadingDialog("updating data", "");
           // print(data);
-          await ServiceApi().addUpdatePegawai(data, mode);
-
+          final isSuccess = await ServiceApi().addUpdatePegawai(data, mode);
+          if (!isSuccess) {
+            Get.back(); // tutup loading
+            warningDialog(
+              Get.context!,
+              "Error",
+              "Failed to update data. Please try again",
+            );
+            isLoading.value = false;
+            return false;
+          }
           // langsung update sharedpref tanpa harus re login
           var newUsr = await ServiceApi().fetchCurrentUser({
             "username": dataUser.username!,
@@ -659,7 +546,7 @@ class AddPegawaiController extends GetxController {
           SQLHelper.instance.updateDataUser(
             {
               "nama": name.text != "" ? name.text : dataUser.nama,
-              "no_telp": telp.text != "" ? telp.text : dataUser.noTelp,
+              "no_telp": inputTelp.isNotEmpty ? inputTelp : oldTelp,
               "kode_cabang":
                   selectedCabang.value != ""
                       ? selectedCabang.value
@@ -706,12 +593,19 @@ class AddPegawaiController extends GetxController {
           joinDate.clear();
           selectedLevel.value = "";
           brandCabang.value = "";
-          lstPhone.clear();
+
           isLoading.value = false;
           image = null;
+          return true;
         }
       }
     }
+  }
+
+  bool isPhoneExist(String inputTelp) {
+    final val = inputTelp.trim();
+
+    return cekDataUser.any((dt) => (dt.notelp ?? '').trim() == val);
   }
 
   void cekUser(context) async {
@@ -858,7 +752,7 @@ class AddPegawaiController extends GetxController {
         // "parent_id": newUsr.parentId!,
         // "cek_stok":
         //     cekStok.value != "" ? cekStok.value : userData.cekStok,
-        "nik": newUsr.createdAt,
+        "nik": newUsr.nik,
       },
       userData.id!,
       userData.username!,
@@ -883,6 +777,125 @@ class AddPegawaiController extends GetxController {
         newUser.username!,
       );
       logC.refresh();
+    }
+  }
+
+  void _showWarning(String msg) {
+    Get.back();
+    warningDialog(Get.context!, "Warning", msg);
+  }
+
+  updateUsrState({String? id, required bool active}) async {
+    final sts = active == true ? '1' : '0';
+    var data = {"status": "update_status", "id_user": id, "active": sts};
+    // print(data);
+    return await ServiceApi().uptStsUsr(data);
+  }
+
+  Future<void> backupDatabase() async {
+    try {
+      backup.value = true;
+
+      final dbPath = await getDatabasesPath();
+      final source = File('$dbPath/absensi.db');
+
+      if (!await source.exists()) {
+        throw 'Database tidak ditemukan';
+      }
+
+      final bytes = await source.readAsBytes();
+
+      if (Platform.isAndroid) {
+        // ✅ ANDROID → Save File dialog
+        String? outputFile = await FilePicker.platform.saveFile(
+          dialogTitle: 'Simpan Backup Database',
+          fileName: 'absensi.db',
+          bytes: bytes,
+        );
+
+        if (outputFile == null) {
+          backup.value = false;
+          return;
+        }
+
+        await File(outputFile).writeAsBytes(bytes);
+
+        showToast('Backup berhasil disimpan');
+      } else if (Platform.isIOS) {
+        // 🍎 iOS → Share / Save to Files
+        final dir = await getTemporaryDirectory();
+        final backupFile = File('${dir.path}/absensi_backup.db');
+
+        await backupFile.writeAsBytes(bytes);
+
+        showToast('Pilih "Save to Files" untuk menyimpan backup');
+
+        await SharePlus.instance.share(
+          ShareParams(files: [XFile(backupFile.path)]),
+        );
+      }
+
+      backup.value = false;
+    } catch (e) {
+      backup.value = false;
+      showToast('Backup gagal: $e');
+    }
+  }
+
+  Future<void> restoreDatabase() async {
+    try {
+      restore.value = true;
+      showToast('Pilih file backup dengan ekstensi .db');
+      final result = await FilePicker.platform.pickFiles(
+        allowMultiple: false,
+        type: FileType.any,
+      );
+
+      if (result == null) {
+        restore.value = false;
+        return;
+      }
+
+      final path = result.files.single.path;
+
+      if (path == null) {
+        restore.value = false;
+        throw 'Path file tidak valid';
+      }
+
+      // ✅ VALIDASI
+      if (!path.toLowerCase().endsWith('.db')) {
+        restore.value = false;
+        throw 'File harus database (.db)';
+      }
+
+      final pickedFile = File(path);
+
+      if (!await pickedFile.exists()) {
+        restore.value = false;
+        throw 'File tidak ditemukan';
+      }
+
+      final dbPath = await getDatabasesPath();
+
+      // 🔴 penting: tutup DB dulu
+      await SQLHelper.instance.close();
+
+      // 🔴 hapus DB lama
+      await deleteDatabase('$dbPath/absensi.db');
+
+      // 🔴 copy file baru
+      final newDb = File('$dbPath/absensi.db');
+      await newDb.writeAsBytes(await pickedFile.readAsBytes());
+
+      // 🔴 buka ulang DB
+      await SQLHelper.instance.database;
+
+      restore.value = false;
+      showToast('Restore berhasil');
+    } catch (e) {
+      restore.value = false;
+      showToast('Restore gagal: $e');
     }
   }
 }

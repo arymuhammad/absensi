@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 class CsTextField extends StatelessWidget {
+  final bool enabled;
   final String label;
   final String? hint;
   final Widget? icon;
@@ -11,6 +12,7 @@ class CsTextField extends StatelessWidget {
   final bool isDark;
   const CsTextField({
     super.key,
+   required this.enabled,
     required this.label,
     this.hint,
     this.icon,
@@ -18,16 +20,17 @@ class CsTextField extends StatelessWidget {
     this.maxLines,
     this.onChanged,
     this.keyboardType,
-   required this.isDark
+    required this.isDark,
   });
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      enabled: enabled,
       controller: controller,
       maxLines: maxLines,
       decoration: InputDecoration(
-        fillColor: isDark ? Theme.of(context).canvasColor : Colors.white,
+        fillColor: isDark ? Theme.of(context).cardColor : Colors.white,
         filled: true,
         // isDense: true, // 🔑 biar tinggi tetap rapih
         contentPadding: const EdgeInsets.all(5),
@@ -44,7 +47,7 @@ class CsTextField extends StatelessWidget {
           // borderSide: BorderSide.none,
         ),
         labelText: label,
-        hintText: hint??'',
+        hintText: hint ?? '',
         prefixIcon: icon,
       ),
       onChanged: onChanged,

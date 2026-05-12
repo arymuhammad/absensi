@@ -106,7 +106,7 @@ class ExpandedDataVisit extends StatelessWidget {
                                 ],
                               ),
                               const SizedBox(height: 5),
-                              CsTextField(
+                              CsTextField(enabled: true,
                                 controller: ctrl.visit..text = i.visitIn!,
                                 label: 'Visit',
                                 isDark: isDark,
@@ -118,7 +118,7 @@ class ExpandedDataVisit extends StatelessWidget {
                                 children: [
                                   SizedBox(
                                     width: Get.size.width / 2.3,
-                                    child: CsTextField(
+                                    child: CsTextField(enabled: true,
                                       controller: ctrl.jamIn..text = i.jamIn!,
                                       label: 'IN',
                                       isDark: isDark,
@@ -126,7 +126,7 @@ class ExpandedDataVisit extends StatelessWidget {
                                   ),
                                   SizedBox(
                                     width: Get.size.width / 2.3,
-                                    child: CsTextField(
+                                    child: CsTextField(enabled: true,
                                       controller: ctrl.jamOut..text = i.jamOut!,
                                       label: 'OUT',
                                       isDark: isDark,
@@ -135,7 +135,7 @@ class ExpandedDataVisit extends StatelessWidget {
                                 ],
                               ),
                               const SizedBox(height: 5),
-                              CsTextField(
+                              CsTextField(enabled: true,
                                 controller: ctrl.foto..text = i.fotoIn!,
                                 label: 'Foto',
                                 isDark: isDark,
@@ -147,7 +147,7 @@ class ExpandedDataVisit extends StatelessWidget {
                                 children: [
                                   SizedBox(
                                     width: Get.size.width / 2.3,
-                                    child: CsTextField(
+                                    child: CsTextField(enabled: true,
                                       controller: ctrl.lat..text = i.latIn!,
                                       label: 'Lat',
                                       isDark: isDark,
@@ -155,7 +155,7 @@ class ExpandedDataVisit extends StatelessWidget {
                                   ),
                                   SizedBox(
                                     width: Get.size.width / 2.3,
-                                    child: CsTextField(
+                                    child: CsTextField(enabled: true,
                                       controller: ctrl.long..text = i.longIn!,
                                       label: 'Long',
                                       isDark: isDark,
@@ -164,7 +164,7 @@ class ExpandedDataVisit extends StatelessWidget {
                                 ],
                               ),
                               const SizedBox(height: 5),
-                              CsTextField(
+                              CsTextField(enabled: true,
                                 controller: ctrl.device..text = i.deviceInfo!,
                                 label: 'Device',
                                 isDark: isDark,

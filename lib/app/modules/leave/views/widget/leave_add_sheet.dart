@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icons_plus/icons_plus.dart';
@@ -9,7 +10,6 @@ import '../../../../data/helper/app_colors.dart';
 import '../../../../data/helper/const.dart';
 import '../../../../data/helper/custom_dialog.dart';
 import '../../../../data/model/login_model.dart';
-import '../../../../data/model/user_model.dart';
 import '../../../shared/date_picker.dart';
 import '../../../shared/dropdown.dart';
 import '../../../shared/elevated_button.dart';
@@ -89,11 +89,10 @@ class LeaveAddSheet extends StatelessWidget {
                       const SizedBox(height: 10),
 
                       SizedBox(
-                        height: 45,
                         child: CsDropDown(
                           label: 'Mengajukan permohonan',
                           items:
-                              leaveC.listLeaves
+                              leaveC.leaveType
                                   .map(
                                     (e) => DropdownMenuItem(
                                       value: e,
@@ -102,29 +101,71 @@ class LeaveAddSheet extends StatelessWidget {
                                   )
                                   .toList(),
                           onChanged: (val) {
-                            leaveC.selectedLeave.value = val;
+                            leaveC.selectedLeaveType.value = val;
                           },
                           isDark: isDark,
                         ),
                       ),
+                      const SizedBox(height: 5),
+                      Obx(() {
+                        if (leaveC.selectedLeaveType.value != "Lainnya") {
+                          return const SizedBox();
+                        }
+                        final data = leaveC.leaveList;
+                        return CsDropDown(
+                          items:
+                              data
+                                  .map(
+                                    (e) => DropdownMenuItem(
+                                      value: e.name,
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(e.name!),
+                                          Text('${e.duration!} Hari'),
+                                        ],
+                                      ),
+                                    ),
+                                  )
+                                  .toList(),
 
-                      Obx(
-                        () => Visibility(
-                          visible:
-                              leaveC.selectedLeave.value ==
-                              "Lain-lain, sebutkan",
-                          child: Column(
-                            children: [
-                              const SizedBox(height: 10),
-                              CsTextField(
-                                controller: leaveC.otherLeave,
-                                label: 'Lainnya',
-                                isDark: isDark,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
+                          value:
+                              leaveC.selectedLeave.value.isNotEmpty
+                                  ? leaveC.selectedLeave.value
+                                  : null,
+
+                          onChanged: (val) {
+                            leaveC.selectedLeave.value = val;
+
+                            final selected = data.firstWhere(
+                              (e) => e.name == val,
+                              orElse: () => data.first,
+                            );
+
+                            leaveC.amtTkn.text = selected.duration.toString();
+                            leaveC.remainingOff(
+                              userData!.leaveBalance!,
+                              selected.duration!,
+                            );
+                          },
+                          selectedItemBuilder: (context) {
+                            return data.map((e) {
+                              return Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(e.name!),
+                                  Text(' - ${e.duration!} Hari'),
+                                ],
+                              );
+                            }).toList();
+                          },
+
+                          label: 'Pilih jenis cuti',
+                          isDark: isDark,
+                        );
+                      }),
 
                       const SizedBox(height: 10),
 
@@ -132,62 +173,43 @@ class LeaveAddSheet extends StatelessWidget {
                       DataTable(
                         border: TableBorder.all(),
                         headingRowHeight: 30,
-                        columns: [
-                          DataColumn(
-                            label: Text(
-                              'Saldo Cuti',
-                              style: titleTextStyle.copyWith(fontSize: 14),
-                            ),
-                          ),
-                          DataColumn(
-                            label: Text(
-                              'Diambil',
-                              style: titleTextStyle.copyWith(fontSize: 14),
-                            ),
-                          ),
-                          DataColumn(
-                            label: Text(
-                              'Sisa Cuti',
-                              style: titleTextStyle.copyWith(fontSize: 14),
-                            ),
-                          ),
+                        columns: const [
+                          DataColumn(label: Text('Saldo Cuti')),
+                          DataColumn(label: Text('Diambil')),
+                          DataColumn(label: Text('Sisa Cuti')),
                         ],
                         rows: [
                           DataRow(
                             cells: [
-                              DataCell(
-                                Text(
-                                  userData!.leaveBalance!,
-                                  style: titleTextStyle.copyWith(fontSize: 18),
-                                ),
-                              ),
+                              DataCell(Text(userData!.leaveBalance!)),
                               DataCell(
                                 SizedBox(
                                   height: 40,
                                   width: 65,
-                                  child: CsTextField(
-                                    controller: leaveC.amtTkn,
-                                    keyboardType: TextInputType.number,
-                                    maxLines: 1,
-                                    onChanged: (val) {
-                                      leaveC.remainingOff(
-                                        userData!.leaveBalance!,
-                                        val,
-                                      );
-                                    },
-                                    label: '',
-                                    isDark: isDark,
+                                  child: Obx(
+                                    () => CsTextField(
+                                      enabled:
+                                          leaveC.selectedLeaveType.value !=
+                                          "Lainnya",
+                                      controller: leaveC.amtTkn,
+                                      keyboardType: TextInputType.number,
+                                      maxLines: 1,
+                                      onChanged: (val) {
+                                        leaveC.remainingOff(
+                                          userData!.leaveBalance!,
+                                          val,
+                                        );
+                                      },
+                                      label: '',
+                                      isDark: isDark,
+                                    ),
                                   ),
                                 ),
                               ),
                               DataCell(
                                 Obx(
-                                  () => Text(
-                                    leaveC.remainDays.value.toString(),
-                                    style: titleTextStyle.copyWith(
-                                      fontSize: 18,
-                                    ),
-                                  ),
+                                  () =>
+                                      Text(leaveC.remainDays.value.toString()),
                                 ),
                               ),
                             ],
@@ -198,6 +220,7 @@ class LeaveAddSheet extends StatelessWidget {
                       const SizedBox(height: 10),
 
                       CsTextField(
+                        enabled: true,
                         controller: leaveC.reasonLeave,
                         label: 'Alasan cuti',
                         maxLines: 3,
@@ -208,6 +231,7 @@ class LeaveAddSheet extends StatelessWidget {
                       const SizedBox(height: 10),
 
                       CsTextField(
+                        enabled: true,
                         controller: leaveC.addrLeave,
                         label: 'Alamat cuti',
                         maxLines: 3,
@@ -221,6 +245,7 @@ class LeaveAddSheet extends StatelessWidget {
                       const SizedBox(height: 10),
 
                       CsTextField(
+                        enabled: true,
                         controller: leaveC.phone,
                         label: 'No WhatsApp aktif',
                         hint: '6285xxxxxx',
@@ -232,100 +257,91 @@ class LeaveAddSheet extends StatelessWidget {
                       const SizedBox(height: 10),
 
                       //attach file
-                      Align(
-                        alignment: Alignment.topLeft,
-                        child: InkWell(
-                          onTap: () => leaveC.uploadFile(),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              GetBuilder<LeaveController>(
-                                builder: (c) {
-                                  if (c.image != null) {
-                                    return Container(
-                                      height: 65,
-                                      width: 65,
-                                      decoration: BoxDecoration(
-                                        color: Colors.grey[300],
-                                      ),
-                                      child: Image.file(
-                                        File(c.image!.path),
-                                        fit: BoxFit.cover,
-                                      ),
-                                    );
-                                  } else {
-                                    return Container(
-                                      height: 65,
-                                      width: 65,
-                                      decoration: const BoxDecoration(
-                                        color: Colors.grey,
-                                      ),
-                                      child: const Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Icon(Icons.camera_alt),
-                                          Text('Upload'),
-                                        ],
-                                      ),
-                                    );
-                                  }
-                                },
+                      Obx(
+                        () => Visibility(
+                          visible: leaveC.selectedLeaveType.value == "Lainnya",
+                          child: Align(
+                            alignment: Alignment.topLeft,
+                            child: InkWell(
+                              onTap: () => leaveC.uploadFile(),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  GetBuilder<LeaveController>(
+                                    builder: (c) {
+                                      if (c.image != null) {
+                                        return Container(
+                                          height: 65,
+                                          width: 65,
+                                          decoration: BoxDecoration(
+                                            color: Colors.grey[300],
+                                          ),
+                                          child: Image.file(
+                                            File(c.image!.path),
+                                            fit: BoxFit.cover,
+                                          ),
+                                        );
+                                      } else {
+                                        return Container(
+                                          height: 65,
+                                          width: 65,
+                                          decoration: const BoxDecoration(
+                                            color: Colors.grey,
+                                          ),
+                                          child: const Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Icon(Icons.camera_alt),
+                                              Text('Upload'),
+                                            ],
+                                          ),
+                                        );
+                                      }
+                                    },
+                                  ),
+                                  const SizedBox(width: 5),
+                                  const Text('*Upload file pendukung'),
+                                ],
                               ),
-                              const SizedBox(width: 5),
-                              const Text('*Lampirkan file pendukung'),
-                            ],
+                            ),
                           ),
                         ),
                       ),
 
-                      /// 🔹 DROPDOWN USER
-                      // FutureBuilder<List<User>>(
-                      //   future: leaveC.getUserCabang(
-                      //     userData!.kodeCabang!,
-                      //     userData!.parentId!,
-                      //   ),
-                      //   builder: (context, snapshot) {
-                      //     if (!snapshot.hasData) {
-                      //       return const CircularProgressIndicator();
-                      //     }
-
-                      //     final data = snapshot.data!;
-
-                      //     return DropdownButtonFormField<String>(
-                      //       value:
-                      //           leaveC.selectedIdUser.value.isEmpty
-                      //               ? null
-                      //               : leaveC.selectedIdUser.value,
-                      //       items:
-                      //           data
-                      //               .map(
-                      //                 (e) => DropdownMenuItem(
-                      //                   value: e.id,
-                      //                   child: Text(e.nama!),
-                      //                 ),
-                      //               )
-                      //               .toList(),
-                      //       onChanged: (val) {
-                      //         if (val == null) return;
-                      //         leaveC.selectedIdUser.value = val;
-                      //       },
-                      //       decoration: const InputDecoration(
-                      //         labelText: 'Penanggung jawab',
-                      //         border: OutlineInputBorder(),
-                      //       ),
-                      //     );
-                      //   },
-                      // ),
                       const SizedBox(height: 10),
 
                       /// 🔹 SIGN BUTTON
-                      CsElevatedButton(
-                        color: AppColors.itemsBackground,
-                        label: 'Tanda tangan',
-                        fontsize: 14,
-                        onPressed: () => openDialogSign(context),
-                      ),
+                      Obx(() {
+                        final int totalLeave =
+                            int.tryParse(leaveC.amtTkn.text) ?? 0;
+
+                        final bool invalidLeave =
+                            leaveC.remainDays.value < 0 || totalLeave <= 0;
+                        return CsElevatedButton(
+                          color: AppColors.itemsBackground,
+                          label:
+                              totalLeave <= 0
+                                  ? 'Jumlah cuti harus lebih dari 0'
+                                  : leaveC.remainDays.value < 0
+                                  ? 'Saldo cuti tidak cukup'
+                                  : 'Tanda tangan',
+                          fontsize: 14,
+                          onPressed:
+                              leaveC.selectedLeaveType.value.isEmpty ||
+                                      invalidLeave
+                                  ? null
+                                  : () {
+                                    if (leaveC.image == null &&
+                                        leaveC.selectedLeaveType.value ==
+                                            "Lainnya") {
+                                      showToast('Upload file pendukung');
+                                    } else {
+                                      openDialogSign(context);
+                                    }
+                                  },
+                        );
+                      }),
 
                       const SizedBox(height: 20),
                     ],
@@ -376,15 +392,18 @@ class LeaveAddSheet extends StatelessWidget {
                       nama: userData!.nama!,
                       jumlahCuti: leaveC.amtTkn.text,
                       saldoCuti: userData!.leaveBalance!,
-                      jenisCuti: leaveC.selectedLeave.value,
+                      jenisCuti:
+                          leaveC.selectedLeave.value.isNotEmpty
+                              ? leaveC.selectedLeave.value
+                              : leaveC.selectedLeaveType.value,
                       alasanCuti: leaveC.reasonLeave.text,
                       alamatCuti: leaveC.addrLeave.text,
                       telp: leaveC.phone.text,
-                      userPengganti: leaveC.selectedIdUser.value,
-                      levelUserPengganti: leaveC.selectedLevelUser.value,
+                      // userPengganti: leaveC.selectedIdUser.value,
+                      // levelUserPengganti: leaveC.selectedLevelUser.value,
                       parentId: userData!.parentId!,
                     );
-                    Get.back(); // tutup sheet
+                    // Get.back(); // tutup sheet
                   },
                   child: const Text('Ajukan'),
                 ),

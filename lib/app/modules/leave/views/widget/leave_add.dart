@@ -71,7 +71,7 @@ class LeaveAdd extends StatelessWidget {
               CsDropDown(
                 label: 'Mengajukan permohonan',
                 items:
-                    leaveC.listLeaves
+                    leaveC.leaveType
                         .map((e) => DropdownMenuItem(value: e, child: Text(e)))
                         .toList(),
                 onChanged: (val) {
@@ -79,25 +79,7 @@ class LeaveAdd extends StatelessWidget {
                 },
                 isDark: isDark,
               ),
-              Obx(
-                () => Visibility(
-                  visible:
-                      leaveC.selectedLeave.value == "Lain-lain, sebutkan"
-                          ? true
-                          : false,
-                  child: Column(
-                    children: [
-                      const SizedBox(height: 10),
-                      CsTextField(
-                        controller: leaveC.otherLeave,
-                        label: 'Lainnya',
-                        maxLines: 1,
-                        isDark: isDark,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+           
               const SizedBox(height: 10),
               DataTable(
                 border: TableBorder.all(),
@@ -140,6 +122,7 @@ class LeaveAdd extends StatelessWidget {
                             height: 40,
                             // width: 50,
                             child: CsTextField(
+                              enabled: true,
                               label: '',
                               controller: leaveC.amtTkn,
                               onChanged: (val) {
@@ -169,6 +152,7 @@ class LeaveAdd extends StatelessWidget {
               ),
               const SizedBox(height: 10),
               CsTextField(
+                enabled: true,
                 controller: leaveC.reasonLeave,
                 label: 'Alasan kebutuhan cuti',
                 maxLines: 3,
@@ -176,6 +160,7 @@ class LeaveAdd extends StatelessWidget {
               ),
               const SizedBox(height: 10),
               CsTextField(
+                enabled: true,
                 controller: leaveC.addrLeave,
                 label: 'Alamat selama cuti',
                 maxLines: 3,
@@ -183,6 +168,7 @@ class LeaveAdd extends StatelessWidget {
               ),
               const SizedBox(height: 10),
               CsTextField(
+                enabled: true,
                 controller: leaveC.phone,
                 label: 'Phone',
                 maxLines: 1,
@@ -363,14 +349,14 @@ class LeaveAdd extends StatelessWidget {
                     if (leaveC.datePick1.text.isEmpty ||
                         leaveC.datePick2.text.isEmpty) {
                       showToast("Tanggal cuti tidak boleh kosong");
-                    } else if (leaveC.selectedLeave.value.isEmpty) {
+                    } else if (leaveC.selectedLeaveType.value.isEmpty) {
                       showToast(
                         "Jenis pengajuan cuti tidak boleh kosong, harap pilih salah satu",
                       );
-                    } else if (leaveC.selectedLeave.value ==
-                            "Lain-lain, sebutkan" &&
-                        leaveC.otherLeave.text.isEmpty) {
-                      showToast("Harap isi jenis cuti pada kolom 'Lainnya'");
+                    } else if (leaveC.selectedLeaveType.value ==
+                            "Lainnya" &&
+                        leaveC.selectedLeave.value.isEmpty) {
+                      showToast("Harap pilih jenis cuti'");
                     } else if (leaveC.amtTkn.text.isEmpty) {
                       showToast("Jumlah cuti yang diambil tidak boleh kosong");
                     } else if (leaveC.reasonLeave.text.isEmpty) {
@@ -396,14 +382,14 @@ class LeaveAdd extends StatelessWidget {
                         jumlahCuti: leaveC.amtTkn.text,
                         saldoCuti: userData!.leaveBalance!,
                         jenisCuti:
-                            leaveC.otherLeave.text.isNotEmpty
-                                ? leaveC.otherLeave.text
-                                : leaveC.selectedLeave.value,
+                            leaveC.selectedLeave.value.isNotEmpty
+                                ? leaveC.selectedLeave.value
+                                : leaveC.selectedLeaveType.value,
                         alasanCuti: leaveC.reasonLeave.text,
                         alamatCuti: leaveC.addrLeave.text,
                         telp: leaveC.phone.text,
-                        userPengganti: leaveC.selectedIdUser.value,
-                        levelUserPengganti: leaveC.selectedLevelUser.value,
+                        // userPengganti: leaveC.selectedIdUser.value,
+                        // levelUserPengganti: leaveC.selectedLevelUser.value,
                         parentId: userData!.parentId!,
                       );
                       // Navigator.pop(context);

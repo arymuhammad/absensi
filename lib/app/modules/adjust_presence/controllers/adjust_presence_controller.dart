@@ -43,6 +43,7 @@ class AdjustPresenceController extends GetxController
   var listTarget = ["", "absen", "visit"];
   var target = "".obs;
   var idUser = "".obs;
+  var branchCode = "".obs;
   var levelUser = "".obs;
 
   late final TextEditingController date1,
@@ -78,9 +79,9 @@ class AdjustPresenceController extends GetxController
 
   var selectedStatus = "".obs;
   var statusReqApp = [
-    {"": "Unconfirmed"},
-    {"0": "Canceled"},
-    {"1": "Approved"},
+    {"pending": "Pending"},
+    {"reject": "Rejected"},
+    {"approved": "Approved"},
   ];
 
   var initDate =
@@ -135,6 +136,7 @@ class AdjustPresenceController extends GetxController
     );
     // var userID = Data.fromJson(jsonDecode(pref.getString('userDataLogin')!)).id!;
     idUser.value = dataUserLogin.id!;
+    branchCode.value = dataUserLogin.kodeCabang!;
     levelUser.value = dataUserLogin.level!;
   }
 
@@ -149,6 +151,7 @@ class AdjustPresenceController extends GetxController
     String? type,
     String? level,
     String? idUser,
+    String? branchCode,
     String? date1,
     String? date2,
   ) async {
@@ -157,10 +160,11 @@ class AdjustPresenceController extends GetxController
       type,
       level,
       idUser,
+      branchCode,
       date1,
       date2,
     );
-    listReqUpt.value = response;
+    listReqUpt.value = response ?? [];
     isLoading.value = false;
     return listReqUpt;
   }
@@ -340,16 +344,19 @@ class AdjustPresenceController extends GetxController
   appAbs(
     Map<String, dynamic> dataUptApp,
     Map<String, dynamic>? dataUptAbs,
+    bool isInbox,
   ) async {
     // print(dataUptApp['accept']);
-    if (dataUptApp['accept'] == "1") {
+    // print(dataUptApp['acc_4']);
+    if (dataUptApp['acc_4'] == "approved") {
       await ServiceApi().updateReqApp(dataUptApp);
       await ServiceApi().updateReqAdjAbs(dataUptAbs!);
       dialogMsg('INFO', 'Data berhasil diupdate');
       await getReqAppUpt(
         '',
-        '',
+        isInbox ? 'inbox' : 'approval',
         levelUser.value,
+        idUser.value,
         idUser.value,
         initDate,
         lastDate,
@@ -359,9 +366,10 @@ class AdjustPresenceController extends GetxController
       dialogMsg('INFO', 'Data berhasil diupdate');
       await getReqAppUpt(
         '',
-        '',
+        isInbox ? 'inbox' : 'approval',
         levelUser.value,
         idUser.value,
+        branchCode.value,
         initDate,
         lastDate,
       );
@@ -369,66 +377,66 @@ class AdjustPresenceController extends GetxController
     keteranganApp.clear();
   }
 
-  Stream<NotifModel> getAdjusmentData({
-    required String idUser,
-    required String level,
-  }) {
-    StreamController<NotifModel> controller = StreamController();
+  // Stream<NotifModel> getAdjusmentData({
+  //   required String idUser,
+  //   required String level,
+  // }) {
+  //   StreamController<NotifModel> controller = StreamController();
 
-    void connect() {
-      final url = Uri.parse(
-        '${dotenv.env['STREAM_NOTIF_URL']}?type=adjusment&id_user=$idUser&level=$level&date1=$initDate&date2=$lastDate',
-      );
-      // print(
-      //   '${dotenv.env['STREAM_NOTIF_URL']}?type=adjusment&id_user=$idUser&level=$level&date1=$initDate&date2=$lastDate',
-      // );
-      final sseClient = ManualSseClient(url);
+  //   void connect() {
+  //     final url = Uri.parse(
+  //       '${dotenv.env['STREAM_NOTIF_URL']}?type=adjusment&id_user=$idUser&level=$level&date1=$initDate&date2=$lastDate',
+  //     );
+  //     // print(
+  //     //   '${dotenv.env['STREAM_NOTIF_URL']}?type=adjusment&id_user=$idUser&level=$level&date1=$initDate&date2=$lastDate',
+  //     // );
+  //     final sseClient = ManualSseClient(url);
 
-      sseClient.connect().listen(
-        (dataStr) {
-          //  print('Received raw data: $dataStr');
-          try {
-            final jsonData = jsonDecode(dataStr);
-            // print(jsonData);
-            if (jsonData is Map<String, dynamic> &&
-                jsonData['success'] == true &&
-                jsonData['data'] != null) {
-              final model = NotifModel.fromJson(jsonData['data']);
-              // print('---------');
-              // print(model);
-              if (!controller.isClosed) controller.add(model);
-            } else {
-              if (!controller.isClosed) {
-                controller.addError('Tidak berhasil mendapatkan data');
-              }
-            }
-          } catch (e) {
-            if (!controller.isClosed) {
-              controller.addError('Parse JSON gagal: $e');
-            }
-          }
-        },
-        onError: (error) async {
-          if (!controller.isClosed) controller.addError(error);
-          // Reconnect after delay
-          await Future.delayed(const Duration(seconds: 5));
-          if (!controller.isClosed) connect();
-        },
-        onDone: () async {
-          // Reconnect after delay
-          await Future.delayed(const Duration(seconds: 5));
-          if (!controller.isClosed) connect();
-        },
-        cancelOnError: true,
-      );
-    }
+  //     sseClient.connect().listen(
+  //       (dataStr) {
+  //         //  print('Received raw data: $dataStr');
+  //         try {
+  //           final jsonData = jsonDecode(dataStr);
+  //           // print(jsonData);
+  //           if (jsonData is Map<String, dynamic> &&
+  //               jsonData['success'] == true &&
+  //               jsonData['data'] != null) {
+  //             final model = NotifModel.fromJson(jsonData['data']);
+  //             // print('---------');
+  //             // print(model);
+  //             if (!controller.isClosed) controller.add(model);
+  //           } else {
+  //             if (!controller.isClosed) {
+  //               controller.addError('Tidak berhasil mendapatkan data');
+  //             }
+  //           }
+  //         } catch (e) {
+  //           if (!controller.isClosed) {
+  //             controller.addError('Parse JSON gagal: $e');
+  //           }
+  //         }
+  //       },
+  //       onError: (error) async {
+  //         if (!controller.isClosed) controller.addError(error);
+  //         // Reconnect after delay
+  //         await Future.delayed(const Duration(seconds: 5));
+  //         if (!controller.isClosed) connect();
+  //       },
+  //       onDone: () async {
+  //         // Reconnect after delay
+  //         await Future.delayed(const Duration(seconds: 5));
+  //         if (!controller.isClosed) connect();
+  //       },
+  //       cancelOnError: true,
+  //     );
+  //   }
 
-    connect();
+  //   connect();
 
-    controller.onCancel = () {
-      controller.close();
-    };
+  //   controller.onCancel = () {
+  //     controller.close();
+  //   };
 
-    return controller.stream;
-  }
+  //   return controller.stream;
+  // }
 }

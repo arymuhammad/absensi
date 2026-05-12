@@ -106,10 +106,10 @@ class RiwayatVisitView extends GetView {
         ),
         backgroundColor: AppColors.itemsBackground,
         elevation: 0.0,
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Color(0xFF1B2541), Color(0xFF3949AB)],
+         flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: AppColors.mainGradient(
+              context: context,
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),

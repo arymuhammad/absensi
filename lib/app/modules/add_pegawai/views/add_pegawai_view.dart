@@ -4,6 +4,7 @@ import 'package:absensi/app/data/helper/app_colors.dart';
 import 'package:absensi/app/data/helper/const.dart';
 import 'package:absensi/app/data/model/login_model.dart';
 import 'package:absensi/app/modules/shared/container_main_color.dart';
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +12,7 @@ import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:get/get.dart';
 import 'package:icons_plus/icons_plus.dart';
 
+import '../../../data/helper/custom_dialog.dart';
 import '../controllers/add_pegawai_controller.dart';
 
 class AddPegawaiView extends GetView<AddPegawaiController> {
@@ -55,7 +57,7 @@ class AddPegawaiView extends GetView<AddPegawaiController> {
                       child: Column(
                         children: [
                           SizedBox(
-                            height: 50,
+                            height: 44,
                             child: DropdownButtonFormField(
                               value:
                                   controller.brandCabang.value == ""
@@ -75,19 +77,25 @@ class AddPegawaiView extends GetView<AddPegawaiController> {
                                         ),
                                       )
                                       .toList(),
-                              decoration:  InputDecoration(
+                              decoration: InputDecoration(
                                 labelText: 'Brand',
                                 filled: true,
-                                fillColor: isDark? Theme.of(context).canvasColor: Colors.white,
+                                fillColor:
+                                    isDark
+                                        ? Theme.of(context).canvasColor
+                                        : Colors.white,
                                 contentPadding: const EdgeInsets.all(8),
                                 border: const OutlineInputBorder(),
                               ),
-                              dropdownColor: isDark? Theme.of(context).canvasColor: Colors.white,
+                              dropdownColor:
+                                  isDark
+                                      ? Theme.of(context).canvasColor
+                                      : Colors.white,
                             ),
                           ),
                           const SizedBox(height: 10),
                           SizedBox(
-                            height: 50,
+                            height: 44,
                             child: FutureBuilder(
                               future: controller.getCabang(),
                               builder: (context, snapshot) {
@@ -104,9 +112,15 @@ class AddPegawaiView extends GetView<AddPegawaiController> {
                                           controller: controller.store,
                                           decoration: InputDecoration(
                                             labelText: 'Cabang',
+                                            contentPadding: const EdgeInsets.all(8),
                                             border: const OutlineInputBorder(),
                                             filled: true,
-                                            fillColor: isDark? Theme.of(context).canvasColor: Colors.white,
+                                            fillColor:
+                                                isDark
+                                                    ? Theme.of(
+                                                      context,
+                                                    ).canvasColor
+                                                    : Colors.white,
                                           ),
                                         ),
                                     suggestionsCallback: (pattern) {
@@ -118,7 +132,10 @@ class AddPegawaiView extends GetView<AddPegawaiController> {
                                     },
                                     itemBuilder: (context, suggestion) {
                                       return ListTile(
-                                        tileColor: isDark? Theme.of(context).canvasColor: Colors.white,
+                                        tileColor:
+                                            isDark
+                                                ? Theme.of(context).canvasColor
+                                                : Colors.white,
                                         title: Text(suggestion),
                                       );
                                     },
@@ -166,7 +183,10 @@ class AddPegawaiView extends GetView<AddPegawaiController> {
                                     height: 110,
                                     width: 110,
                                     decoration: BoxDecoration(
-                                      color: isDark? Theme.of(context).canvasColor: Colors.grey[300],
+                                      color:
+                                          isDark
+                                              ? Theme.of(context).canvasColor
+                                              : Colors.grey[300],
                                     ),
                                     child: Image.memory(
                                       c.webImage,
@@ -177,7 +197,10 @@ class AddPegawaiView extends GetView<AddPegawaiController> {
                                     height: 110,
                                     width: 110,
                                     decoration: BoxDecoration(
-                                      color: isDark? Theme.of(context).canvasColor: Colors.grey[300],
+                                      color:
+                                          isDark
+                                              ? Theme.of(context).canvasColor
+                                              : Colors.grey[300],
                                     ),
                                     child: Image.file(
                                       File(c.image!.path),
@@ -189,7 +212,10 @@ class AddPegawaiView extends GetView<AddPegawaiController> {
                                 height: 110,
                                 width: 110,
                                 decoration: BoxDecoration(
-                                  color: isDark? Theme.of(context).canvasColor: Colors.grey[300],
+                                  color:
+                                      isDark
+                                          ? Theme.of(context).canvasColor
+                                          : Colors.grey[300],
                                 ),
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
@@ -224,27 +250,33 @@ class AddPegawaiView extends GetView<AddPegawaiController> {
                     child: Column(
                       children: [
                         SizedBox(
-                          height: 50,
+                          height: 44,
                           child: TextField(
                             controller: controller.username,
                             decoration: InputDecoration(
                               labelText: 'Username',
                               filled: true,
-                              fillColor: isDark? Theme.of(context).canvasColor: Colors.white,
+                              fillColor:
+                                  isDark
+                                      ? Theme.of(context).canvasColor
+                                      : Colors.white,
                               border: const OutlineInputBorder(),
                             ),
                           ),
                         ),
                         const SizedBox(height: 10),
                         SizedBox(
-                          height: 50,
+                          height: 44,
                           child: TextField(
                             obscureText: true,
                             controller: controller.pass,
                             decoration: InputDecoration(
                               labelText: 'Password',
                               filled: true,
-                              fillColor: isDark? Theme.of(context).canvasColor: Colors.white,
+                              fillColor:
+                                  isDark
+                                      ? Theme.of(context).canvasColor
+                                      : Colors.white,
                               border: const OutlineInputBorder(),
                             ),
                           ),
@@ -257,26 +289,32 @@ class AddPegawaiView extends GetView<AddPegawaiController> {
                     child: Column(
                       children: [
                         SizedBox(
-                          height: 50,
+                          height: 44,
                           child: TextField(
                             controller: controller.name,
                             decoration: InputDecoration(
                               labelText: 'Nama',
                               filled: true,
-                              fillColor:  isDark? Theme.of(context).canvasColor:Colors.white,
+                              fillColor:
+                                  isDark
+                                      ? Theme.of(context).canvasColor
+                                      : Colors.white,
                               border: const OutlineInputBorder(),
                             ),
                           ),
                         ),
                         const SizedBox(height: 10),
                         SizedBox(
-                          height: 50,
+                          height: 44,
                           child: TextField(
                             controller: controller.telp,
-                            decoration:  InputDecoration(
+                            decoration: InputDecoration(
                               labelText: 'No Telp',
                               filled: true,
-                              fillColor: isDark? Theme.of(context).canvasColor: Colors.white,
+                              fillColor:
+                                  isDark
+                                      ? Theme.of(context).canvasColor
+                                      : Colors.white,
                               border: const OutlineInputBorder(),
                             ),
                             keyboardType: TextInputType.phone,
@@ -289,7 +327,7 @@ class AddPegawaiView extends GetView<AddPegawaiController> {
               ),
               const SizedBox(height: 10),
               SizedBox(
-                height: 50,
+                height: 44,
                 child: FutureBuilder(
                   future: controller.getLevel(),
                   builder: (context, snapshot) {
@@ -304,11 +342,14 @@ class AddPegawaiView extends GetView<AddPegawaiController> {
                         autoFlipDirection: true,
                         textFieldConfiguration: TextFieldConfiguration(
                           controller: controller.level,
-                          decoration:  InputDecoration(
+                          decoration: InputDecoration(
                             labelText: 'Level User',
                             border: const OutlineInputBorder(),
                             filled: true,
-                            fillColor: isDark? Theme.of(context).canvasColor: Colors.white,
+                            fillColor:
+                                isDark
+                                    ? Theme.of(context).canvasColor
+                                    : Colors.white,
                           ),
                         ),
                         suggestionsCallback: (pattern) {
@@ -372,8 +413,30 @@ class AddPegawaiView extends GetView<AddPegawaiController> {
                       ),
                       minimumSize: const Size(70, 50),
                     ),
-                    onPressed: () {
-                      controller.addUpdatePegawai(context, "add", Data());
+                    onPressed: () async {
+                      controller.isLoading.value = true;
+
+                      final result = await controller.addUpdatePegawai(
+                        context,
+                        "add",
+                        Data(),
+                      );
+                      controller.isLoading.value = false;
+                      if (result == true) {
+                        Get.back(); // balik ke halaman sebelumnya
+
+                        succesDialog(
+                          context: Get.context!,
+                          pageAbsen: "N",
+                          desc: "Registration successful\nplease log in",
+                          type: DialogType.success,
+                          title: 'SUCCESS',
+                          btnOkOnPress: () {
+                            // Get.back(); // tutup dialog
+                            Navigator.pop(context); // balik ke halaman profile
+                          },
+                        );
+                      }
                     },
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,

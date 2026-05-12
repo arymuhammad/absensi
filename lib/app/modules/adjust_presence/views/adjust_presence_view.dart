@@ -66,7 +66,7 @@ class AdjustPresenceView extends GetView<AdjustPresenceController> {
                   ),
 
                   // second tab bar view widget
-                  Center(child: ReqAppUpdate()),
+                  Center(child: ReqAppUpdate(isInbox: false)),
                 ],
               ),
             ),

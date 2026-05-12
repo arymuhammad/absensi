@@ -4,12 +4,14 @@ class CsDropDown extends StatelessWidget {
   const CsDropDown({
     super.key,
     this.items,
+    this.selectedItemBuilder,
     this.onChanged,
     this.value,
     required this.label,
     required this.isDark,
   });
   final List<DropdownMenuItem<dynamic>>? items;
+  final List<Widget> Function(BuildContext)? selectedItemBuilder;
   final void Function(dynamic)? onChanged;
   final dynamic value;
   final String label;
@@ -20,6 +22,7 @@ class CsDropDown extends StatelessWidget {
       items: items,
       onChanged: onChanged,
       value: value,
+      selectedItemBuilder: selectedItemBuilder,
       decoration: InputDecoration(
         labelText: label,
         border: const OutlineInputBorder(),

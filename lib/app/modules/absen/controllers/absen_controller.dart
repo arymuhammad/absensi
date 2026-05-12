@@ -1,13 +1,12 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
 // import 'dart:developer';
 import 'dart:io';
 import 'package:absensi/app/data/helper/db_helper.dart';
 import 'package:absensi/app/data/model/cek_visit_model.dart';
 import 'package:absensi/app/data/model/user_model.dart';
 import 'package:absensi/app/data/model/visit_model.dart';
-import 'package:absensi/app/modules/home/views/dialog_update_app.dart';
-import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:device_marketing_names/device_marketing_names.dart';
 import 'package:flutter/services.dart';
 // import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -23,11 +22,10 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:package_info_plus/package_info_plus.dart';
+import 'package:path/path.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'package:xml/xml.dart' as xml;
+import '../../../data/helper/db_result.dart';
 import '../../../data/helper/loading_progress.dart';
 import '../../../data/helper/time_service.dart';
 import '../../../data/model/login_model.dart';
@@ -41,8 +39,9 @@ import 'package:printing/printing.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:connectivity_plus/connectivity_plus.dart';
 // import 'package:device_info_null_safety/device_info_null_safety.dart';
-
+import 'package:path_provider/path_provider.dart';
 import '../../login/controllers/login_controller.dart';
+import '../views/logic/absen_usecase.dart';
 import '../views/widget/custom_qr_page.dart';
 
 class AbsenController extends GetxController
@@ -94,10 +93,11 @@ class AbsenController extends GetxController
   // var dateNowServer = "";
   var tglStream = DateTime.now().obs;
   var dateAbsen = "";
-  var downloadProgress = 0.0.obs;
-  var updateList = [];
-  var currVer = "";
-  var latestVer = "";
+  // var downloadProgress = 0.0.obs;
+  // var downloadStatus = "".obs;
+  // var updateList = [];
+  // var currVer = "";
+  // var latestVer = "";
   // var supportedAbi = "";
   var statsCon = "".obs;
   RxList<Absen> searchAbsen = RxList<Absen>([]);
@@ -141,7 +141,7 @@ class AbsenController extends GetxController
           .toString();
   DateTime? lastTime;
   final _dateStream = Rx<DateTime?>(null);
-  late StreamSubscription _sub;
+  // late StreamSubscription _sub;
   var remainingSec = 30.obs;
   var timerStat = false.obs;
   File? capturedImage;
@@ -182,399 +182,63 @@ class AbsenController extends GetxController
   bool isSyncingTime = false;
   final isAppLocked = false.obs;
   var visit = "".obs;
-  bool _hasTriggeredInitialSync = false;
+  var isAnimReady = false.obs;
+  final AbsenUseCase useCase = AbsenUseCase();
+
+  // bool _hasTriggeredInitialSync = false;
+  // bool _isHandlingReconnect = false;
 
   @override
   void onInit() {
+    // print("AbsenController INIT: ${hashCode}");
     super.onInit();
+    animController = AnimationController(
+      vsync: this,
+      duration: Duration(seconds: durationSeconds.value),
+    );
+    isAnimReady.value = true;
+    animController.addListener(() {
+      progress.value = 1 - animController.value;
+      final total = durationSeconds.value;
+
+      secondsLeft.value = (total - (total * animController.value)).ceil();
+
+      double p = progress.value;
+
+      if (p > 0.5) {
+        progressColor.value = Colors.green;
+      } else if (p > 0.2) {
+        progressColor.value = Colors.orange;
+      } else {
+        progressColor.value = Colors.red;
+      }
+    });
+
     _init();
-    // WidgetsBinding.instance.addObserver(this);
-    // try {
-    //   getShift();
-    //   SharedPreferences pref = await SharedPreferences.getInstance();
-    //   var dataUserLogin = Data.fromJson(
-    //     jsonDecode(pref.getString('userDataLogin')!),
-    //   );
-
-    //   idUser.value = dataUserLogin.id!;
-    //   visit.value = dataUserLogin.visit!;
-
-    //   /// =========================
-    //   /// 🔥 INIT ONLINE STATE
-    //   /// =========================
-    //   isOffline.value = !(await isReallyOnline());
-    //   await initTime();
-
-    //   // /// =========================
-    //   // /// 🔥 LISTENER NETWORK
-    //   // /// =========================
-    //   // ever(isOffline, (val) async {
-    //   //   await initTime(); // 🔥 refresh time tiap perubahan network
-    //   // });
-
-    //   /// =========================
-    //   /// 🔥 SYNC DATA
-    //   /// =========================
-    //   final isVisit = dataUserLogin.visit == "1";
-    //   // 🔥 1. COBA SYNC SEKALI DULU
-    //   final isDone = isVisit ? await syncVisit() : await syncAbsen();
-
-    //   // 🔥 2. KALAU MASIH ADA YANG BELUM → BARU AUTO SYNC
-    //   if (!isDone) {
-    //     startAutoSync(isVisit: isVisit);
-    //   }
-
-    //   /// =========================
-    //   /// 🔥 CONNECTIVITY LISTENER
-    //   /// =========================
-    //   connectivitySub = Connectivity().onConnectivityChanged.listen((_) async {
-    //     final nowOnline = await isReallyOnline();
-    //     final nowOffline = !nowOnline;
-    //     // 🔥 DETEKSI RECONNECT (offline → online)
-    //     if (isOffline.value == true && nowOffline == false) {
-    //       showToast("Reconnection, syncing data...");
-    //       if (isVisit) {
-    //         await syncVisit();
-    //       } else {
-    //         await syncAbsen();
-    //       }
-    //     }
-    //     // 🔄 UPDATE STATE
-    //     if (nowOffline != isOffline.value) {
-    //       isOffline.value = nowOffline;
-    //       if (!nowOffline) {
-    //         // 🔥 cuma refresh time saat balik online
-    //         await initTime();
-    //       }
-    //     }
-    //   });
-
-    //   /// =========================
-    //   /// 🔥 INIT CONTROLLER UI
-    //   /// =========================
-    //   date1 = TextEditingController();
-    //   date2 = TextEditingController();
-    //   store = TextEditingController();
-    //   userCab = TextEditingController();
-    //   rndLoc = TextEditingController();
-    //   selectedDate.value = null;
-
-    //   storeLatLng.value = LatLng(
-    //     double.parse(dataUserLogin.lat!),
-    //     double.parse(dataUserLogin.long!),
-    //   );
-    //   refreshAbsen(dataUserLogin);
-
-    //   searchAbsen.value = dataAllAbsen;
-    //   searchVisit.value = dataAllVisit;
-
-    //   /// =========================
-    //   /// 🔥 FETCH DATA
-    //   /// =========================
-    //   var paramLimit = {
-    //     "mode": "limit",
-    //     "id_user": dataUserLogin.id!,
-    //     "tanggal1": initDate1,
-    //     "tanggal2": initDate2,
-    //   };
-
-    //   var paramSingle = {
-    //     "mode": "single",
-    //     "id_user": dataUserLogin.id,
-    //     "tanggal_masuk": realDateServer,
-    //   };
-
-    //   var paramSingleVisit = {
-    //     "mode": "single",
-    //     "id_user": dataUserLogin.id,
-    //     "tgl_visit": realDateServer,
-    //   };
-
-    //   if (dataUserLogin.visit == "0") {
-    //     await getAbsenToday(paramSingle);
-    //     await getLimitAbsen(paramLimit);
-    //   } else {
-    //     await getVisitToday(paramSingleVisit);
-    //     await getLimitVisit(paramLimit);
-    //   }
-
-    //   getCabang();
-    //   animController = AnimationController(
-    //     vsync: this,
-    //     duration: Duration(seconds: durationSeconds.value),
-    //   );
-    //   animController.addListener(() {
-    //     progress.value = 1 - animController.value;
-    //     final total = durationSeconds.value;
-
-    //     secondsLeft.value = (total - (total * animController.value)).ceil();
-
-    //     double p = progress.value;
-
-    //     if (p > 0.5) {
-    //       progressColor.value = Colors.green;
-    //     } else if (p > 0.2) {
-    //       progressColor.value = Colors.orange;
-    //     } else {
-    //       progressColor.value = Colors.red;
-    //     }
-    //   });
-
-    //   everAll([lat, long, scannedLatLng, latFromGps, longFromGps], (_) {
-    //     if (!isMapReady.value) return;
-
-    //     WidgetsBinding.instance.addPostFrameCallback((_) {
-    //       _triggerSmartZoom(dataUserLogin);
-    //     });
-    //   });
-
-    //   ever(isOffline, (offline) {
-    //     if (!offline) {
-    //       storeLatLng.value = LatLng(
-    //         double.parse(dataUserLogin.lat!),
-    //         double.parse(dataUserLogin.long!),
-    //       );
-    //     }
-    //   });
-
-    //   PackageInfo packageInfo = await PackageInfo.fromPlatform();
-    //   currVer = packageInfo.version;
-
-    //   // print('VERSI SEKARANG $currVer');
-    //   final online = await absC.isOnline();
-    //   if (online) {
-    //     final readDoc = await http.get(
-    //       Uri.parse('http://103.156.15.61/update_apk/updateLog.xml'),
-    //     );
-
-    //     if (readDoc.statusCode == 200) {
-    //       //parsing readDoc
-    //       final document = xml.XmlDocument.parse(readDoc.body);
-    //       final cLog = document.findElements('items').first;
-    //       latestVer = cLog.findElements('versi').first.innerText;
-    //       if (compareVersion(latestVer, currVer) > 0) {
-    //         if (Platform.isAndroid) {
-    //           // final DeviceInfoNullSafety deviceInfoNullSafety =
-    //           //     DeviceInfoNullSafety();
-    //           // Map<String, dynamic> abiInfo = await deviceInfoNullSafety.abiInfo;
-    //           // var abi = abiInfo.entries.toList();
-    //           // supportedAbi = abi[1].value;
-    //           checkForUpdates("onInit");
-    //         } else {
-    //           launchUrl(
-    //             Uri.parse(
-    //               'https://apps.apple.com/us/app/urbanco-spot/id6476486235',
-    //             ),
-    //           );
-    //         }
-    //       }
-    //     }
-    //   }
-    // } catch (e) {
-    //   print("ERROR onInit: $e");
-    // }
   }
 
   Future<void> _init() async {
     WidgetsBinding.instance.addObserver(this);
+
     try {
-      await getShift();
-      SharedPreferences pref = await SharedPreferences.getInstance();
-      var dataUserLogin = Data.fromJson(
-        jsonDecode(pref.getString('userDataLogin')!),
-      );
+      final dataUser = await _loadUser();
 
-      idUser.value = dataUserLogin.id!;
-      visit.value = dataUserLogin.visit!;
+      await _safeRun(() => _initBasic(dataUser), "initBasic");
+      await _safeRun(() => _initConnectivity(dataUser), "initConnectivity");
+      await _safeRun(() => _initControllers(dataUser), "initControllers");
+      await _safeRun(() => _handleAbsenOrVisit(dataUser), "handleAbsenOrVisit");
 
-      /// =========================
-      /// 🔥 INIT ONLINE STATE
-      /// =========================
-      isOffline.value = !(await isReallyOnline());
-      await initTime();
-
-      // /// =========================
-      // /// 🔥 LISTENER NETWORK
-      // /// =========================
-      // ever(isOffline, (val) async {
-      //   await initTime(); // 🔥 refresh time tiap perubahan network
-      // });
-
-      /// =========================
-      /// 🔥 SYNC DATA
-      /// =========================
-      final isVisit = dataUserLogin.visit == "1";
-      // 🔥 1. COBA SYNC SEKALI DULU
-      final isDone = isVisit ? await syncVisit() : await syncAbsen();
-
-      // 🔥 2. KALAU MASIH ADA YANG BELUM → BARU AUTO SYNC
-      if (!isDone) {
-        startAutoSync(isVisit: isVisit);
-      }
-
-      /// =========================
-      /// 🔥 CONNECTIVITY LISTENER
-      /// =========================
-      connectivitySub = Connectivity().onConnectivityChanged.listen((_) async {
-        final nowOnline = await isReallyOnline();
-        final nowOffline = !nowOnline;
-        // 🔥 DETEKSI RECONNECT (offline → online)
-        if (isOffline.value == true && nowOffline == false) {
-          if (!isSyncing.value) {
-            showToast("Reconnection, syncing data...");
-            await triggerSync(isVisit: isVisit);
-          }
-          // if (isVisit) {
-          //   await syncVisit();
-          // } else {
-          //   await syncAbsen();
-          // }
-        }
-        // 🔄 UPDATE STATE
-        if (nowOffline != isOffline.value) {
-          isOffline.value = nowOffline;
-          if (!nowOffline) {
-            // 🔥 cuma refresh time saat balik online
-            await initTime();
-          }
-        }
-      });
-
-      /// =========================
-      /// 🔥 INIT CONTROLLER UI
-      /// =========================
-      date1 = TextEditingController();
-      date2 = TextEditingController();
-      store = TextEditingController();
-      userCab = TextEditingController();
-      rndLoc = TextEditingController();
-      selectedDate.value = null;
-
-      storeLatLng.value = LatLng(
-        double.parse(dataUserLogin.lat!),
-        double.parse(dataUserLogin.long!),
-      );
-      refreshAbsen(dataUserLogin);
-
-      searchAbsen.value = dataAllAbsen;
-      searchVisit.value = dataAllVisit;
-
-      /// =========================
-      /// 🔥 FETCH DATA
-      /// =========================
-      var paramLimit = {
-        "mode": "limit",
-        "id_user": dataUserLogin.id!,
-        "tanggal1": initDate1,
-        "tanggal2": initDate2,
-      };
-
-      var paramSingle = {
-        "mode": "single",
-        "id_user": dataUserLogin.id,
-        "tanggal_masuk": realDateServer,
-      };
-
-      var paramSingleVisit = {
-        "mode": "single",
-        "id_user": dataUserLogin.id,
-        "tgl_visit": realDateServer,
-      };
-
-      if (dataUserLogin.visit == "0") {
-        await getAbsenToday(paramSingle);
-        await getLimitAbsen(paramLimit);
-      } else {
-        await getVisitToday(paramSingleVisit);
-        await getLimitVisit(paramLimit);
-      }
-
-      getCabang();
-      animController = AnimationController(
-        vsync: this,
-        duration: Duration(seconds: durationSeconds.value),
-      );
-      animController.addListener(() {
-        progress.value = 1 - animController.value;
-        final total = durationSeconds.value;
-
-        secondsLeft.value = (total - (total * animController.value)).ceil();
-
-        double p = progress.value;
-
-        if (p > 0.5) {
-          progressColor.value = Colors.green;
-        } else if (p > 0.2) {
-          progressColor.value = Colors.orange;
-        } else {
-          progressColor.value = Colors.red;
-        }
-      });
-
-      everAll([lat, long, scannedLatLng, latFromGps, longFromGps], (_) {
-        if (!isMapReady.value) return;
-
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          _triggerSmartZoom(dataUserLogin);
-        });
-      });
-
-      ever(isOffline, (offline) {
-        if (!offline) {
-          storeLatLng.value = LatLng(
-            double.parse(dataUserLogin.lat!),
-            double.parse(dataUserLogin.long!),
-          );
-        }
-      });
-
-      PackageInfo packageInfo = await PackageInfo.fromPlatform();
-      currVer = packageInfo.version;
-
-      // print('VERSI SEKARANG $currVer');
-      final online = await absC.isOnline();
-      if (online) {
-        final readDoc = await http.get(
-          Uri.parse('http://103.156.15.61/update_apk/updateLog.xml'),
-        );
-
-        if (readDoc.statusCode == 200) {
-          //parsing readDoc
-          final document = xml.XmlDocument.parse(readDoc.body);
-          final cLog = document.findElements('items').first;
-          latestVer = cLog.findElements('versi').first.innerText;
-          if (compareVersion(latestVer, currVer) > 0) {
-            if (Platform.isAndroid) {
-              // final DeviceInfoNullSafety deviceInfoNullSafety =
-              //     DeviceInfoNullSafety();
-              // Map<String, dynamic> abiInfo = await deviceInfoNullSafety.abiInfo;
-              // var abi = abiInfo.entries.toList();
-              // supportedAbi = abi[1].value;
-              checkForUpdates("onInit");
-            } else {
-              launchUrl(
-                Uri.parse(
-                  'https://apps.apple.com/us/app/urbanco-spot/id6476486235',
-                ),
-              );
-            }
-          }
-        }
-      }
+      _safeRunSync(() => _initBackground(dataUser), "initBackground");
+      _safeRunSync(() => _initReactivity(dataUser), "initReactivity");
     } catch (e) {
-      print("ERROR onInit: $e");
+      // print("FATAL ERROR onInit: $e");
+      log('FATAL ERROR onInit: $e', name: 'ERROR fungsi _init');
     }
   }
 
   @override
   void onReady() {
-    if (!_hasTriggeredInitialSync) {
-      _hasTriggeredInitialSync = true;
-
-      Future.microtask(() {
-        triggerSync(isVisit: visit.value == "1");
-      });
-    }
+    triggerSyncSafe(isVisit: visit.value == "1");
   }
 
   @override
@@ -599,6 +263,146 @@ class AbsenController extends GetxController
     connectivitySub?.cancel();
     filterAbsen.dispose();
     super.onClose();
+  }
+
+  Future<Data> _loadUser() async {
+    final pref = await SharedPreferences.getInstance();
+    return Data.fromJson(jsonDecode(pref.getString('userDataLogin')!));
+  }
+
+  Future<void> _initBasic(Data user) async {
+    await getShift();
+
+    idUser.value = user.id!;
+    visit.value = user.visit!;
+
+    isOffline.value = !(await isReallyOnline());
+    await initTime();
+  }
+
+  Future<void> _initConnectivity(Data user) async {
+    connectivitySub = Connectivity().onConnectivityChanged.listen((_) async {
+      final nowOnline = await isReallyOnline();
+      final nowOffline = !nowOnline;
+
+      if (isOffline.value == true && !nowOffline) {
+        showToast("Reconnection, syncing data...");
+        triggerSyncSafe(isVisit: visit.value == "1");
+      }
+
+      if (nowOffline != isOffline.value) {
+        isOffline.value = nowOffline;
+
+        if (!nowOffline) {
+          await initTime();
+        }
+      }
+    });
+  }
+
+  Future<void> _initControllers(Data user) async {
+    date1 = TextEditingController();
+    date2 = TextEditingController();
+    store = TextEditingController();
+    userCab = TextEditingController();
+    rndLoc = TextEditingController();
+
+    selectedDate.value = null;
+
+    storeLatLng.value = LatLng(
+      double.parse(user.lat!),
+      double.parse(user.long!),
+    );
+  }
+
+  Future<void> _handleAbsenOrVisit(Data user) async {
+    final isVisit = user.visit == "1";
+
+    // print("isVisit: $isVisit");
+
+    var paramLimit = {
+      "mode": "limit",
+      "id_user": user.id!,
+      "tanggal1": initDate1,
+      "tanggal2": initDate2,
+    };
+
+    if (!isVisit) {
+      // print("jalan kan absen");
+
+      var paramSingle = {
+        "mode": "single",
+        "id_user": user.id,
+        "tanggal_masuk": realDateServer,
+      };
+
+      await getAbsenToday(paramSingle);
+      await getLimitAbsen(paramLimit);
+    } else {
+      // print("jalan kan visit");
+
+      var paramSingleVisit = {
+        "mode": "single",
+        "id_user": user.id,
+        "tgl_visit": realDateServer,
+      };
+
+      await getVisitToday(paramSingleVisit);
+      await getLimitVisit(paramLimit);
+    }
+  }
+
+  void _initBackground(Data user) {
+    _initHeavy(user);
+    getCabang();
+  }
+
+  void _initReactivity(Data user) {
+    everAll([lat, long, scannedLatLng, latFromGps, longFromGps], (_) {
+      if (!isMapReady.value) return;
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _triggerSmartZoom(user);
+      });
+    });
+
+    ever(isOffline, (offline) {
+      if (!offline) {
+        storeLatLng.value = LatLng(
+          double.parse(user.lat!),
+          double.parse(user.long!),
+        );
+      }
+    });
+  }
+
+  Future<void> _initHeavy(Data dataUserLogin) async {
+    final isVisit = dataUserLogin.visit == "1";
+
+    final isDone = isVisit ? await syncVisit() : await syncAbsen();
+
+    if (!isDone) {
+      startAutoSync(isVisit: isVisit);
+    }
+
+    // await initTime();
+  }
+
+  Future<void> _safeRun(Future<void> Function() fn, String name) async {
+    try {
+      await fn();
+    } catch (e) {
+      // print("ERROR di $name: $e");
+      log('ERROR di $name: $e', name: 'ERROR safeRun');
+    }
+  }
+
+  void _safeRunSync(void Function() fn, String name) {
+    try {
+      fn();
+    } catch (e) {
+      log('ERROR di $name: $e', name: 'ERROR safeRunSync');
+    }
   }
 
   Future<void> initTime() async {
@@ -657,9 +461,12 @@ class AbsenController extends GetxController
     int seconds = 20,
     String title = "Finding your location",
   }) {
+    if (!isAnimReady.value) return;
+
     durationSeconds.value = seconds;
     secondsLeft.value = seconds;
 
+    animController.stop(); // 🔥 reset dulu
     animController.duration = Duration(seconds: seconds);
     animController.forward(from: 0);
 
@@ -678,6 +485,10 @@ class AbsenController extends GetxController
   bool get isBeforeCheckoutLimitNow {
     final now = timeServer;
     return now!.isBefore(DateTime(now.year, now.month, now.day, 9, 1));
+  }
+
+  Future<DbResult> executeAction(Data data) async {
+    return await useCase.handleAction(data: data, controller: this);
   }
 
   Future<void> refreshAbsen(Data data) async {
@@ -730,22 +541,22 @@ class AbsenController extends GetxController
     searchDate.value = "";
   }
 
-  int compareVersion(String v1, String v2) {
-    List<String> parts1 = v1.split('.');
-    List<String> parts2 = v2.split('.');
+  // int compareVersion(String v1, String v2) {
+  //   List<String> parts1 = v1.split('.');
+  //   List<String> parts2 = v2.split('.');
 
-    int length =
-        (parts1.length > parts2.length) ? parts1.length : parts2.length;
+  //   int length =
+  //       (parts1.length > parts2.length) ? parts1.length : parts2.length;
 
-    for (int i = 0; i < length; i++) {
-      int p1 = (i < parts1.length) ? int.tryParse(parts1[i]) ?? 0 : 0;
-      int p2 = (i < parts2.length) ? int.tryParse(parts2[i]) ?? 0 : 0;
+  //   for (int i = 0; i < length; i++) {
+  //     int p1 = (i < parts1.length) ? int.tryParse(parts1[i]) ?? 0 : 0;
+  //     int p2 = (i < parts2.length) ? int.tryParse(parts2[i]) ?? 0 : 0;
 
-      if (p1 > p2) return 1;
-      if (p1 < p2) return -1;
-    }
-    return 0; // sama
-  }
+  //     if (p1 > p2) return 1;
+  //     if (p1 < p2) return -1;
+  //   }
+  //   return 0; // sama
+  // }
 
   void startTimer(int sec) {
     Timer.periodic(const Duration(seconds: 1), (timer) {
@@ -756,188 +567,6 @@ class AbsenController extends GetxController
       } else {
         timer.cancel();
         timerStat.value = false;
-      }
-    });
-  }
-
-  void _startDateStream(
-    paramSingle,
-    paramLimit,
-    paramSingleVisit,
-    Data dataUserLogin,
-  ) {
-    // Buat Stream yang mengeluarkan tanggal setiap detik
-    final dateStream = Stream.periodic(
-      const Duration(seconds: 5),
-      (_) => DateTime.now(),
-    );
-    // Perbarui nilai tanggal di _dateStream setiap kali Stream mengeluarkan nilai baru
-    _sub = dateStream.listen((date) async {
-      _dateStream.value = date;
-      tglStream.value = date;
-
-      if (dataUserLogin.visit == "0") {
-        // start cek absen
-
-        var tempDataAbs = await SQLHelper.instance.getAllAbsenToday(
-          realDateServer!,
-        );
-
-        await cekDataAbsen("masuk", idUser.value, realDateServer!);
-
-        if (cekAbsen.value.total == "0") {
-          if (tempDataAbs.isNotEmpty) {
-            for (var i in tempDataAbs) {
-              var data = {
-                "status": "add",
-                "id": i.idUser!,
-                "tanggal_masuk": i.tanggalMasuk!,
-                "kode_cabang": i.kodeCabang!,
-                "nama": i.nama!,
-                "id_shift": i.idShift!,
-                "jam_masuk": i.jamMasuk!,
-                "jam_pulang": i.jamPulang!,
-                "jam_absen_masuk": i.jamAbsenMasuk!,
-                "foto_masuk": File(i.fotoMasuk!),
-                "lat_masuk": i.latMasuk!,
-                "long_masuk": i.longMasuk!,
-                "device_info": i.devInfo!,
-              };
-              // submit data absensi ke server
-              // log(data.toString());
-              await ServiceApi().submitAbsen(data, true);
-            }
-            getAbsenToday(paramSingle);
-            getLimitAbsen(paramLimit);
-            _sub.cancel();
-          } else {
-            _sub.cancel();
-          }
-        } else {
-          await cekDataAbsen("pulang", idUser.value, realDateServer!);
-          if (cekAbsen.value.total == "1") {
-            if (tempDataAbs.isNotEmpty &&
-                tempDataAbs.first.tanggalPulang != null) {
-              for (var i in tempDataAbs) {
-                var data = {
-                  "status": "update",
-                  "id": i.idUser!,
-                  "tanggal_masuk": i.tanggalMasuk!,
-                  "tanggal_pulang": i.tanggalPulang!,
-                  "nama": i.nama!,
-                  "jam_absen_pulang": i.jamAbsenPulang!,
-                  "foto_pulang": File(i.fotoPulang!),
-                  "lat_pulang": i.latPulang!,
-                  "long_pulang": i.longPulang!,
-                  "device_info2": i.devInfo2!,
-                };
-                await ServiceApi().submitAbsen(data, true);
-              }
-              getAbsenToday(paramSingle);
-              getLimitAbsen(paramLimit);
-              _sub.cancel();
-            } else {
-              _sub.cancel();
-            }
-          } else {
-            _sub.cancel();
-          }
-        }
-        // urut.value++;
-        // end cek absen
-      } else {
-        // cek visit
-
-        var tempDataVisit = await SQLHelper.instance.getVisitToday(
-          idUser.value,
-          realDateServer!,
-          '',
-          0,
-        );
-
-        if (tempDataVisit.isNotEmpty) {
-          await cekDataVisit(
-            tempDataVisit.isNotEmpty && tempDataVisit.length == 1
-                ? "masuk"
-                : "masukv2",
-            idUser.value,
-            realDateServer!,
-            tempDataVisit.isNotEmpty && tempDataVisit.length == 1
-                ? tempDataVisit.first.visitIn!
-                : '',
-          );
-
-          if (cekVisit.value.total == "0" ||
-              int.parse(cekVisit.value.total) < tempDataVisit.length) {
-            if (tempDataVisit.isNotEmpty) {
-              for (var i in tempDataVisit) {
-                var data = {
-                  "status": "add",
-                  "id": i.id!,
-                  "nama": i.nama!,
-                  "tgl_visit": i.tglVisit!,
-                  "visit_in": i.visitIn!,
-                  "jam_in": i.jamIn!,
-                  // "foto_in": File(i.fotoIn!.toString()),
-                  "foto_in": File(i.fotoIn!),
-                  "lat_in": i.latIn!,
-                  "long_in": i.longIn!,
-                  "device_info": i.deviceInfo!,
-                  "is_rnd": i.isRnd!,
-                };
-                // log(data.toString());
-                await ServiceApi().submitVisit(data, true);
-              }
-              getVisitToday(paramSingleVisit);
-              getLimitVisit(paramLimit);
-              _sub.cancel();
-            } else {
-              // timerStat.value = false;
-              // startTimer(0);
-              _sub.cancel();
-            }
-          } else {
-            await cekDataVisit(
-              tempDataVisit.length == 1 ? "pulang" : "pulangv2",
-              idUser.value,
-              realDateServer!,
-              tempDataVisit.length == 1 ? tempDataVisit.first.visitIn! : '',
-            );
-
-            if (int.parse(cekVisit.value.total) > 0) {
-              if (tempDataVisit.first.jamOut != "") {
-                for (var i in tempDataVisit) {
-                  var data = {
-                    "status": "update",
-                    "id": i.id!,
-                    "nama": i.nama!,
-                    "tgl_visit": i.tglVisit!,
-                    "visit_out": i.visitOut!,
-                    "visit_in": i.visitIn!,
-                    "jam_in": i.jamIn!,
-                    "jam_out": i.jamOut!,
-                    // "foto_out": File(i.fotoOut!.toString()),
-                    "foto_out": File(i.fotoOut!),
-                    "lat_out": i.latOut!,
-                    "long_out": i.longOut!,
-                    "device_info2": i.deviceInfo2!,
-                  };
-
-                  await ServiceApi().submitVisit(data, true);
-                }
-                getVisitToday(paramSingleVisit);
-                getLimitVisit(paramLimit);
-                _sub.cancel();
-              } else {
-                _sub.cancel();
-              }
-            } else {
-              _sub.cancel();
-            }
-          }
-        } else {
-          _sub.cancel();
-        }
       }
     });
   }
@@ -1194,11 +823,12 @@ class AbsenController extends GetxController
 
       Get.back();
 
-      if (barcodeScanRes.isNotEmpty &&
-          ((barcodeScanRes.value.split(' ').length > 2 &&
-                  barcodeScanRes.value.split(' ')[2] != "URBAN&CO") ||
-              barcodeScanRes.isNotEmpty &&
-                  barcodeScanRes.value.split(' ').length < 3)) {
+      // if (barcodeScanRes.isNotEmpty &&
+      //     ((barcodeScanRes.value.split(' ').length > 2 &&
+      //             barcodeScanRes.value.split(' ')[2] != "URBAN&CO") ||
+      //         barcodeScanRes.isNotEmpty &&
+      //             barcodeScanRes.value.split(' ').length < 3)) {
+      if (!barcodeScanRes.value.contains('|')) {
         selectedCabang.value = "";
         selectedCabangVisit.value = "";
         isLoading.value = false;
@@ -1222,15 +852,44 @@ class AbsenController extends GetxController
         // lokasi.value =
         //     '${placemarks[0].street!}, ${placemarks[0].subLocality!}\n${placemarks[0].subAdministrativeArea!}, ${placemarks[0].administrativeArea!}';
 
-        scannedLatLng.value = LatLng(
-          double.parse(barcodeScanRes.value.split(' ')[0]),
-          double.parse(barcodeScanRes.value.split(' ')[1]),
-        );
-        // 🔥 Paksa circle tetap tampil
-        storeLatLng.value = scannedLatLng.value;
+        // scannedLatLng.value = LatLng(
+        //   double.parse(barcodeScanRes.value.split(' ')[0]),
+        //   double.parse(barcodeScanRes.value.split(' ')[1]),
+        // );
+        final split = barcodeScanRes.value.split('|');
+
+        if (split.length < 2) {
+          showToast("QR tidak valid");
+          return;
+        }
+
+        // final kodeCabang = split[0];
+        // final token = split[1];
+        final kodeCabang = split[0].trim();
+        final token = split[1].trim();
 
         // Step 2: Dapatkan posisi user
         startLoading(seconds: 15, title: 'Validating your QR code');
+        final qrRes = await ServiceApi().validateQr(
+          kode: kodeCabang,
+          token: token,
+        );
+
+        stopLoading();
+
+        if (!qrRes['success']) {
+          showToast('QR tidak valid');
+          return;
+        }
+        final qrData = qrRes['data'];
+
+        final qrLat = double.parse(qrData['lat'].toString());
+        final qrLong = double.parse(qrData['long'].toString());
+
+        scannedLatLng.value = LatLng(qrLat, qrLong);
+        // 🔥 Paksa circle tetap tampil
+        storeLatLng.value = scannedLatLng.value;
+
         // loadingDialog(, '');
         Position userPosition;
         try {
@@ -1255,8 +914,8 @@ class AbsenController extends GetxController
         double distanceMeter = Geolocator.distanceBetween(
           userPosition.latitude,
           userPosition.longitude,
-          double.parse(barcodeScanRes.value.split(' ')[0]),
-          double.parse(barcodeScanRes.value.split(' ')[1]),
+          qrLat,
+          qrLong,
         );
 
         // Step 4: Validasi
@@ -1265,17 +924,18 @@ class AbsenController extends GetxController
 
         // print(distanceMeter);
         // print(num.parse(dataUser!.areaCoverQR!));
-        final allowedRadius = await getCoveredQR(
-          kodeCabang: barcodeScanRes.value.split(' ')[3],
+        // final allowedRadius = await getCoveredQR(kodeCabang: kodeCabang);
+        final allowedRadius = double.parse(
+          qrData['area_coverage_qr'].toString(),
         );
 
         if (distanceMeter <= allowedRadius) {
           // dataUser!.visit == "1"
           // ?
           if (dataUser!.visit == "1") {
-            selectedCabangVisit.value = barcodeScanRes.value.split(' ')[3];
+            selectedCabangVisit.value = kodeCabang;
           } else {
-            selectedCabang.value = barcodeScanRes.value.split(' ')[3];
+            selectedCabang.value = kodeCabang;
           }
 
           // print(selectedCabangVisit.value);
@@ -1295,7 +955,7 @@ class AbsenController extends GetxController
             'Location validation successful. You are within the QR code area.',
           );
 
-          updateCircleFromQr(barcodeScanRes.value);
+          updateCircleFromQr(qrLat, qrLong);
 
           refreshZoom(dataUser);
 
@@ -1311,7 +971,7 @@ class AbsenController extends GetxController
           distanceStore.value = distanceMeter;
           showToast('Validation failed!');
 
-          updateCircleFromQr(barcodeScanRes.value);
+          updateCircleFromQr(qrLat, qrLong);
 
           refreshZoom(dataUser!);
 
@@ -1323,30 +983,30 @@ class AbsenController extends GetxController
     }
   }
 
-  Future<num> getCoveredQR({required String kodeCabang}) async {
-    try {
-      final response = await http.get(
-        Uri.parse(
-          '${ServiceApi().baseUrl}get_covered_qr?kode_cabang=$kodeCabang',
-        ),
-      );
+  // Future<num> getCoveredQR({required String kodeCabang}) async {
+  //   try {
+  //     final response = await http.get(
+  //       Uri.parse(
+  //         '${ServiceApi().baseUrl}get_covered_qr?kode_cabang=$kodeCabang',
+  //       ),
+  //     );
 
-      if (response.statusCode != 200) {
-        throw Exception("Server error ${response.statusCode}");
-      }
+  //     if (response.statusCode != 200) {
+  //       throw Exception("Server error ${response.statusCode}");
+  //     }
 
-      final result = jsonDecode(response.body);
+  //     final result = jsonDecode(response.body);
 
-      if (result['success'] != true || result['data'] == null) {
-        throw Exception("Invalid response");
-      }
+  //     if (result['success'] != true || result['data'] == null) {
+  //       throw Exception("Invalid response");
+  //     }
 
-      return num.parse(result['data']['area_coverage_qr']);
-    } catch (e) {
-      showToast("Failed to get QR radius");
-      return 0; // fallback aman
-    }
-  }
+  //     return num.parse(result['data']['area_coverage_qr']);
+  //   } catch (e) {
+  //     showToast("Failed to get QR radius");
+  //     return 0; // fallback aman
+  //   }
+  // }
 
   Future<CekAbsen> cekDataAbsen(
     String status,
@@ -1571,20 +1231,108 @@ class AbsenController extends GetxController
     return rows;
   }
 
-  Future<void> uploadFotoAbsen() async {
+  Future<void> uploadFotoAbsen({required bool isVisit}) async {
     image = await picker.pickImage(
       source: ImageSource.camera,
-      imageQuality: 70,
+      imageQuality: 80,
       maxHeight: 600,
       maxWidth: 600,
     );
 
-    if (image != null) {
-      // var img = base64.encode(File(image!.path).readAsBytesSync());
-      // log(image!.path, name: 'PATH');
+    // if (image != null) {
+    //   // var img = base64.encode(File(image!.path).readAsBytesSync());
+    //   // log(image!.path, name: 'PATH');
+    //   update();
+    // } else {
+    //   return;
+    // }
+
+    if (image == null) return;
+    try {
+      // 🔥 pindahkan ke storage permanent
+      final savedPath = await saveImage(
+        image!.path,
+        isVisit ? 'visit' : 'absen',
+      );
+
+      // 👉 simpan path baru (BUKAN cache)
+      image = XFile(savedPath);
+
+      // kalau kamu pakai variable lain untuk DB:
+      // fotoMasukPath = savedPath;
+
       update();
-    } else {
-      return;
+    } catch (e) {
+      showToast("Gagal menyimpan foto");
+    }
+  }
+
+  Future<String> saveImage(String sourcePath, String type) async {
+    final dir = await getApplicationDocumentsDirectory();
+
+    final folder = Directory('${dir.path}/UrbanCoSpot/$type');
+    if (!await folder.exists()) {
+      await folder.create(recursive: true);
+    }
+
+    final fileName =
+        '${DateTime.now().millisecondsSinceEpoch}_${basename(sourcePath)}';
+
+    final newPath = '${folder.path}/$fileName';
+
+    final newFile = await File(sourcePath).copy(newPath);
+
+    return newFile.path;
+  }
+
+  Future<void> deleteFileIfExists(String? path) async {
+    if (path == null || path.isEmpty) return;
+
+    final file = File(path);
+    if (await file.exists()) {
+      await file.delete();
+    }
+  }
+
+  Future<void> cleanupOrphanFiles({required bool isVisit}) async {
+    try {
+      final dir = await getApplicationDocumentsDirectory();
+      final photoDir = Directory(
+        '${dir.path}/UrbanCoSpot/${isVisit ? 'visit' : 'absen'}',
+      );
+
+      if (!await photoDir.exists()) return;
+
+      // 🔥 ambil semua file di folder
+      final files = photoDir.listSync();
+
+      // 🔥 ambil semua path dari DB
+      final dbPaths = await SQLHelper.instance.getAllPhotoPaths(
+        isVisit: isVisit,
+      );
+
+      for (var file in files) {
+        if (file is File) {
+          final path = file.path;
+
+          // // kalau file tidak ada di DB → hapus
+          // if (!dbPaths.contains(path)) {
+          //   await file.delete();
+          //   // optional debug
+          //   print('Deleted orphan file: $path');
+          // }
+
+          final dbSet = dbPaths.toSet();
+
+          if (!dbSet.contains(path)) {
+            await file.delete();
+          }
+        }
+      }
+
+      showToast('Cleanup selesai');
+    } catch (e) {
+      print('Cleanup error: $e');
     }
   }
 
@@ -1617,230 +1365,469 @@ class AbsenController extends GetxController
   }
 
   Future<bool> syncAbsen() async {
-    if (isSyncing.value) return false;
+    if (!await isOnline()) return true;
+
     isSyncing.value = true;
 
-    if (!await isOnline()) {
-      isSyncing.value = false;
-      return false;
-    }
+    try {
+      final pendingData = await SQLHelper.instance.getPendingAbsen();
 
-    showToast('collecting data');
-    final pendingData = await SQLHelper.instance.getPendingAbsen();
-
-    if (pendingData.isEmpty) {
-      stopAutoSync();
-      isSyncing.value = false;
-      showToast('no data found');
-      return true;
-    }
-    syncTotal.value = pendingData.length;
-    syncCurrent.value = 0;
-    showToast('sync started');
-
-    for (var item in pendingData) {
-      try {
-        Map<String, dynamic> data;
-        // =========================
-        // 🔥 CEK JENIS (MASUK / PULANG)
-        // =========================
-        if (item.jamAbsenPulang == null || item.jamAbsenPulang == '') {
-          // =========================
-          // ✅ INSERT (CHECK-IN)
-          // =========================
-          data = {
-            "status": "add",
-            "id": item.idUser,
-            "tanggal_masuk": item.tanggalMasuk,
-            "kode_cabang": item.kodeCabang,
-            "nama": item.nama,
-            "id_shift": item.idShift,
-            "jam_masuk": item.jamMasuk,
-            "jam_pulang": item.jamPulang,
-            "jam_absen_masuk": item.jamAbsenMasuk,
-            "foto_masuk": File(item.fotoMasuk!),
-            "lat_masuk": item.latMasuk,
-            "long_masuk": item.longMasuk,
-            "device_info": item.devInfo,
-          };
-        } else {
-          // =========================
-          // 🔄 UPDATE (CHECK-OUT)
-          // =========================
-          data = {
-            "status": "update",
-            "id": item.idUser,
-            "tanggal_masuk": item.tanggalMasuk,
-            "tanggal_pulang": item.tanggalPulang, // atau field khusus kalau ada
-            "nama": item.nama,
-            "jam_absen_pulang": item.jamAbsenPulang,
-            "foto_pulang": File(item.fotoPulang!),
-            "lat_pulang": item.latPulang,
-            "long_pulang": item.longPulang,
-            "device_info2": item.devInfo2,
-          };
-        }
-        await ServiceApi().submitAbsen(data, true);
-
-        await SQLHelper.instance.updateStatusAbsen(
-          item.idUser!,
-          item.tanggalMasuk!,
-          "SUCCESS",
-        );
-        // stopAutoSync();
-      } catch (e) {
-        await SQLHelper.instance.updateStatusAbsen(
-          item.idUser!,
-          item.tanggalMasuk!,
-          "FAILED",
-        );
+      if (pendingData.isEmpty) {
+        stopAutoSync();
+        showToast('no pending data on local storage');
+        return true;
       }
-      // 🔥 update progress tiap item
-      syncCurrent.value++;
-    }
-    // 🔥 cek ulang setelah loop
-    final remaining = await SQLHelper.instance.getPendingAbsen();
-    if (remaining.isEmpty) {
-      showToast('sync process is complete');
-      stopAutoSync();
-      var paramLimit = {
-        "mode": "limit",
-        "id_user": idUser.value,
-        "tanggal1": initDate1,
-        "tanggal2": initDate2,
-      };
 
-      var paramSingle = {
-        "mode": "single",
-        "id_user": idUser.value,
-        "tanggal_masuk": realDateServer,
-      };
-      getAbsenToday(paramSingle);
-      getLimitAbsen(paramLimit);
-      isSyncing.value = false;
-      syncTotal.value = 0;
+      syncTotal.value = pendingData.length;
       syncCurrent.value = 0;
-      return true;
-    } else {
-      showToast('some data failed, retrying...');
-      return false;
+      showToast('sync started');
+
+      for (var item in pendingData) {
+        try {
+          Map<String, dynamic> data;
+          // =========================
+          // 🔥 CEK JENIS (MASUK / PULANG)
+          // =========================
+          if (item.jamAbsenPulang == null || item.jamAbsenPulang == '') {
+            // =========================
+            // ✅ INSERT (CHECK-IN)
+            // =========================
+            final file = File(item.fotoMasuk!);
+
+            if (!await file.exists()) {
+              showToast('Sync failed, check in photo missing.');
+              await SQLHelper.instance.updateStatusAbsen(
+                item.idUser!,
+                item.tanggalMasuk!,
+                "FAILED",
+              );
+              continue; // ⛔ skip item ini
+            }
+
+            data = {
+              "status": "add",
+              "id": item.idUser,
+              "tanggal_masuk": item.tanggalMasuk,
+              "kode_cabang": item.kodeCabang,
+              "nama": item.nama,
+              "id_shift": item.idShift,
+              "jam_masuk": item.jamMasuk,
+              "jam_pulang": item.jamPulang,
+              "jam_absen_masuk": item.jamAbsenMasuk,
+              "foto_masuk": File(item.fotoMasuk!),
+              "lat_masuk": item.latMasuk,
+              "long_masuk": item.longMasuk,
+              "device_info": item.devInfo,
+            };
+          } else {
+            // =========================
+            // 🔄 UPDATE (CHECK-OUT)
+            // =========================
+            final file = File(item.fotoPulang!);
+
+            if (!await file.exists()) {
+              showToast('Sync failed, check out photo missing.');
+              await SQLHelper.instance.updateStatusAbsen(
+                item.idUser!,
+                item.tanggalMasuk!,
+                "FAILED",
+              );
+              continue; // ⛔ skip item ini
+            }
+
+            data = {
+              "status": "update",
+              "id": item.idUser,
+              "tanggal_masuk": item.tanggalMasuk,
+              "tanggal_pulang":
+                  item.tanggalPulang, // atau field khusus kalau ada
+              "nama": item.nama,
+              "jam_absen_pulang": item.jamAbsenPulang,
+              "foto_pulang": File(item.fotoPulang!),
+              "lat_pulang": item.latPulang,
+              "long_pulang": item.longPulang,
+              "device_info2": item.devInfo2,
+            };
+          }
+          final res = await ServiceApi().submitAbsen(data, true);
+          if (res != null && res['success'] == true) {
+            await SQLHelper.instance.updateStatusAbsen(
+              item.idUser!,
+              item.tanggalMasuk!,
+              "SUCCESS",
+            );
+            // stopAutoSync();
+
+            // =========================
+            // 🧹 HAPUS FILE FOTO
+            // =========================
+            if (item.jamAbsenPulang == null || item.jamAbsenPulang == '') {
+              // hanya hapus foto masuk kalau ini memang data check-in saja
+              await deleteFileIfExists(item.fotoMasuk);
+            } else {
+              // kalau sudah check-out → hapus dua-duanya
+              await deleteFileIfExists(item.fotoMasuk);
+              await deleteFileIfExists(item.fotoPulang);
+            }
+          } else {
+            throw Exception('API gagal');
+          }
+        } catch (e) {
+          await SQLHelper.instance.updateStatusAbsen(
+            item.idUser!,
+            item.tanggalMasuk!,
+            "FAILED",
+          );
+        }
+        // 🔥 update progress tiap item
+        syncCurrent.value++;
+      }
+      // 🔥 cek ulang setelah loop
+      final remaining = await SQLHelper.instance.getPendingAbsen();
+      if (remaining.isEmpty) {
+        await cleanupOrphanFiles(isVisit: false);
+        showToast('sync process is complete');
+        stopAutoSync();
+        var paramLimit = {
+          "mode": "limit",
+          "id_user": idUser.value,
+          "tanggal1": initDate1,
+          "tanggal2": initDate2,
+        };
+
+        var paramSingle = {
+          "mode": "single",
+          "id_user": idUser.value,
+          "tanggal_masuk": realDateServer,
+        };
+        getAbsenToday(paramSingle);
+        getLimitAbsen(paramLimit);
+        isSyncing.value = false;
+        syncTotal.value = 0;
+        syncCurrent.value = 0;
+        return true;
+      } else {
+        showToast('some data failed, retrying...');
+        return false;
+      }
+    } finally {
+      isSyncing.value = false; // 🔥 WAJIB di finally
     }
   }
 
   Future<bool> syncVisit() async {
-    if (isSyncing.value) return false;
+    if (!await isOnline()) return false;
+
     isSyncing.value = true;
 
-    if (!await isOnline()) {
-      isSyncing.value = false;
-      return false;
-    }
+    try {
+      final pendingData = await SQLHelper.instance.getPendingVisit();
 
-    showToast('collecting data');
-    final pendingData = await SQLHelper.instance.getPendingVisit();
-
-    if (pendingData.isEmpty) {
-      stopAutoSync();
-      isSyncing.value = false;
-      showToast('no data found');
-      return true;
-    }
-    syncTotal.value = pendingData.length;
-    syncCurrent.value = 0;
-    showToast('sync started');
-
-    for (var item in pendingData) {
-      try {
-        Map<String, dynamic> data;
-        // =========================
-        // 🔥 CEK JENIS (MASUK / PULANG)
-        // =========================
-        if (item.jamOut == null || item.jamOut == '') {
-          // =========================
-          // ✅ INSERT (VISIT-IN)
-          // =========================
-          data = {
-            "status": "add",
-            "id": item.id,
-            "nama": item.nama,
-            "tgl_visit": item.tglVisit,
-            "visit_in": item.visitIn,
-            "jam_in": item.jamIn,
-            "foto_in": File(item.fotoIn!),
-            "foto_out": "",
-            "lat_in": item.latIn,
-            "long_in": item.longIn,
-            "device_info": item.deviceInfo,
-            "is_rnd": item.isRnd,
-          };
-        } else {
-          // =========================
-          // 🔄 UPDATE (VISIT-OUT)
-          // =========================
-          data = {
-            "status": "update",
-            "id": item.id,
-            "nama": item.nama,
-            "tgl_visit": item.tglVisit,
-            "visit_out": item.visitOut,
-            "visit_in": item.visitOut,
-            "jam_out": item.jamOut,
-            "foto_out": File(item.fotoOut!),
-            "lat_out": item.latOut,
-            "long_out": item.longOut,
-            "device_info2": item.deviceInfo2,
-          };
-        }
-        await ServiceApi().submitVisit(data, true);
-
-        await SQLHelper.instance.updateStatusVisit(
-          item.id!,
-          item.tglVisit!,
-          item.visitIn!,
-          "SUCCESS",
-        );
-        // stopAutoSync();
-      } catch (e) {
-        await SQLHelper.instance.updateStatusVisit(
-          item.id!,
-          item.tglVisit!,
-          item.visitIn!,
-          "FAILED",
-        );
+      if (pendingData.isEmpty) {
+        stopAutoSync();
+        showToast('no pending data on local storage');
+        return true;
       }
-      // 🔥 update progress tiap item
-      syncCurrent.value++;
-    }
-    // 🔥 cek ulang setelah loop
-    final remaining = await SQLHelper.instance.getPendingVisit();
-    if (remaining.isEmpty) {
-      showToast('sync process is complete');
-      stopAutoSync();
-      var paramLimit = {
-        "mode": "limit",
-        "id_user": idUser.value,
-        "tanggal1": initDate1,
-        "tanggal2": initDate2,
-      };
 
-      var paramSingle = {
-        "mode": "single",
-        "id_user": idUser.value,
-        "tgl_visit": realDateServer,
-      };
-      getVisitToday(paramSingle);
-      getLimitVisit(paramLimit);
-      isSyncing.value = false;
-      syncTotal.value = 0;
+      syncTotal.value = pendingData.length;
       syncCurrent.value = 0;
-      return true;
-    } else {
-      showToast('some data failed, retrying...');
-      return false;
+      showToast('sync started');
+
+      for (var item in pendingData) {
+        try {
+          Map<String, dynamic> data;
+          final isVisitIn = item.jamOut == null || item.jamOut == '';
+          final visitKey = isVisitIn ? item.visitIn : item.visitOut;
+          // =========================
+          // 🔥 CEK JENIS (MASUK / PULANG)
+          // =========================
+          if (isVisitIn) {
+            // =========================
+            // ✅ INSERT (CHECK-IN)
+            // =========================
+            final file = File(item.fotoIn!);
+
+            if (!await file.exists()) {
+              showToast('Sync failed, check in photo missing.');
+              await SQLHelper.instance.updateStatusVisit(
+                item.id!,
+                item.tglVisit!,
+                item.visitIn!,
+                "FAILED",
+              );
+              continue; // ⛔ skip item ini
+            }
+
+            data = {
+              "status": "add",
+              "id": item.id,
+              "nama": item.nama,
+              "tgl_visit": item.tglVisit,
+              "visit_in": item.visitIn,
+              "jam_in": item.jamIn,
+              "foto_in": file,
+              "foto_out": "",
+              "lat_in": item.latIn,
+              "long_in": item.longIn,
+              "device_info": item.deviceInfo,
+              "is_rnd": item.isRnd,
+            };
+          } else {
+            // =========================
+            // 🔄 UPDATE (CHECK-OUT)
+            // =========================
+            final file = File(item.fotoOut!);
+
+            if (!await file.exists()) {
+              showToast('Sync failed, check out photo missing.');
+              await SQLHelper.instance.updateStatusVisit(
+                item.id!,
+                item.tglVisit!,
+                item.visitOut!,
+                "FAILED",
+              );
+              continue; // ⛔ skip item ini
+            }
+
+            data = {
+              "status": "update",
+              "id": item.id,
+              "nama": item.nama,
+              "tgl_visit": item.tglVisit,
+              "visit_out": item.visitOut,
+              "visit_in": item.visitIn,
+              "jam_out": item.jamOut,
+              "foto_out": file,
+              "lat_out": item.latOut,
+              "long_out": item.longOut,
+              "device_info2": item.deviceInfo2,
+            };
+          }
+          final res = await ServiceApi().submitVisit(data, true);
+          if (res != null && res['success'] == true) {
+            await SQLHelper.instance.updateStatusVisit(
+              item.id!,
+              item.tglVisit!,
+              visitKey!,
+              "SUCCESS",
+            );
+            // stopAutoSync();
+
+            // =========================
+            // 🧹 HAPUS FILE FOTO
+            // =========================
+            if (isVisitIn) {
+              // hanya hapus foto masuk kalau ini memang data check-in saja
+              await deleteFileIfExists(item.fotoIn);
+            } else {
+              // kalau sudah check-out → hapus dua-duanya
+              await deleteFileIfExists(item.fotoIn);
+              await deleteFileIfExists(item.fotoOut);
+            }
+          } else {
+            throw Exception('API gagal');
+          }
+        } catch (e) {
+          await SQLHelper.instance.updateStatusVisit(
+            item.id!,
+            item.tglVisit!,
+            item.visitIn!,
+            "FAILED",
+          );
+        }
+        // 🔥 update progress tiap item
+        syncCurrent.value++;
+      }
+      // 🔥 cek ulang setelah loop
+      final remaining = await SQLHelper.instance.getPendingVisit();
+      if (remaining.isEmpty) {
+        await cleanupOrphanFiles(isVisit: true);
+        showToast('sync process is complete');
+        stopAutoSync();
+        var paramLimit = {
+          "mode": "limit",
+          "id_user": idUser.value,
+          "tanggal1": initDate1,
+          "tanggal2": initDate2,
+        };
+
+        var paramSingle = {
+          "mode": "single",
+          "id_user": idUser.value,
+          "tgl_visit": realDateServer,
+        };
+
+        getVisitToday(paramSingle);
+        getLimitVisit(paramLimit);
+        isSyncing.value = false;
+        syncTotal.value = 0;
+        syncCurrent.value = 0;
+        return true;
+      } else {
+        showToast('some data failed, retrying...');
+        return false;
+      }
+    } finally {
+      isSyncing.value = false; // 🔥 WAJIB di finally
     }
+
+    ////////////////////////////////////
+    ////////////////////////////////////
+
+    // try {
+    //   final pendingData = await SQLHelper.instance.getPendingVisit();
+
+    //   if (pendingData.isEmpty) {
+    //     stopAutoSync();
+    //     showToast('no pending data on local storage');
+    //     return true;
+    //   }
+
+    //   syncTotal.value = pendingData.length;
+    //   syncCurrent.value = 0;
+    //   showToast('sync started');
+
+    //   for (var item in pendingData) {
+    //     bool isSuccess = false;
+
+    //     final isVisitIn = item.jamOut == null || item.jamOut == '';
+    //     final visitKey = isVisitIn ? item.visitIn : item.visitOut;
+
+    //     try {
+    //       Map<String, dynamic> data;
+
+    //       if (isVisitIn) {
+    //         // ✅ VISIT IN
+    //         final file = File(item.fotoIn ?? '');
+
+    //         if (item.fotoIn == null || !await file.exists()) {
+    //           showToast('Sync failed, check in photo missing.');
+    //           throw Exception('foto_in tidak ada');
+    //         }
+
+    //         data = {
+    //           "status": "add",
+    //           "id": item.id,
+    //           "nama": item.nama,
+    //           "tgl_visit": item.tglVisit,
+    //           "visit_in": item.visitIn,
+    //           "jam_in": item.jamIn,
+    //           "foto_in": file,
+    //           "foto_out": "",
+    //           "lat_in": item.latIn,
+    //           "long_in": item.longIn,
+    //           "device_info": item.deviceInfo,
+    //           "is_rnd": item.isRnd,
+    //         };
+    //       } else {
+    //         // 🔄 VISIT OUT
+    //         final file = File(item.fotoOut ?? '');
+
+    //         if (item.fotoOut == null || !await file.exists()) {
+    //           showToast('Sync failed, check out photo missing.');
+    //           throw Exception('foto_out tidak ada');
+    //         }
+
+    //         data = {
+    //           "status": "update",
+    //           "id": item.id,
+    //           "nama": item.nama,
+    //           "tgl_visit": item.tglVisit,
+    //           "visit_out": item.visitOut,
+    //           "visit_in": item.visitIn,
+    //           "jam_out": item.jamOut,
+    //           "foto_out": file,
+    //           "lat_out": item.latOut,
+    //           "long_out": item.longOut,
+    //           "device_info2": item.deviceInfo2,
+    //         };
+    //       }
+
+    //       final res = await ServiceApi().submitVisit(data, true);
+
+    //       if (res != null && res['success'] == true) {
+    //         isSuccess = true;
+    //       } else {
+    //       print('API RESPONSE: $res');
+    //         throw Exception('API gagal');
+    //       }
+    //     } catch (e) {
+    //       print('SYNC ERROR ID ${item.id}: $e');
+    //       isSuccess = false;
+    //     }
+
+    //     // 🔥 UPDATE STATUS SEKALI SAJA (ANTI KETIMPA)
+    //     await SQLHelper.instance.updateStatusVisit(
+    //       item.id!,
+    //       item.tglVisit!,
+    //       visitKey!,
+    //       isSuccess ? "SUCCESS" : "FAILED",
+    //     );
+
+    //     // 🧹 CLEANUP (TIDAK BOLEH GANGGU STATUS)
+    //     if (isSuccess) {
+    //       try {
+    //         if (isVisitIn) {
+    //           await deleteFileIfExists(item.fotoIn);
+    //         } else {
+    //           await deleteFileIfExists(item.fotoIn);
+    //           await deleteFileIfExists(item.fotoOut);
+    //         }
+    //       } catch (e) {
+    //         print('DELETE FILE ERROR: $e');
+    //       }
+    //     }
+
+    //     syncCurrent.value++;
+    //   }
+
+    //   final remaining = await SQLHelper.instance.getPendingVisit();
+
+    //   if (remaining.isEmpty) {
+    //     await cleanupOrphanFiles(isVisit: true);
+    //     showToast('sync process is complete');
+    //     stopAutoSync();
+
+    //     var paramLimit = {
+    //       "mode": "limit",
+    //       "id_user": idUser.value,
+    //       "tanggal1": initDate1,
+    //       "tanggal2": initDate2,
+    //     };
+
+    //     var paramSingle = {
+    //       "mode": "single",
+    //       "id_user": idUser.value,
+    //       "tgl_visit": realDateServer,
+    //     };
+
+    //     getVisitToday(paramSingle);
+    //     getLimitVisit(paramLimit);
+
+    //     syncTotal.value = 0;
+    //     syncCurrent.value = 0;
+
+    //     return true;
+    //   } else {
+    //     showToast('some data failed, retrying...');
+    //     return false;
+    //   }
+    // } finally {
+    //   isSyncing.value = false;
+    // }
   }
 
-  Future<void> triggerSync({required bool isVisit}) async {
+  Timer? _syncDebounce;
+
+  void triggerSyncSafe({required bool isVisit}) {
+    _syncDebounce?.cancel();
+
+    _syncDebounce = Timer(const Duration(seconds: 1), () {
+      triggerSync(isVisit: isVisit);
+    });
+  }
+
+  void triggerSync({required bool isVisit}) async {
     if (isSyncing.value) return;
     bool isDone;
 
@@ -1852,7 +1839,9 @@ class AbsenController extends GetxController
     // final isDone = await syncAbsen();
 
     if (!isDone) {
-      startAutoSync(isVisit: isVisit); // masih ada pending
+      Future.delayed(const Duration(seconds: 3), () {
+        startAutoSync(isVisit: isVisit);
+      }); // masih ada pending
     }
   }
 
@@ -1922,14 +1911,13 @@ class AbsenController extends GetxController
   Future<List<Absen>> getLimitAbsen(paramLimitAbsen) async {
     isLoading.value = true;
 
+    /// 🔥 ambil data lokal dulu (fallback / cache)
+    var localData = await SQLHelper.instance.getLimitDataAbsen(
+      idUser.value,
+      initDate1,
+      initDate2,
+    );
     try {
-      /// 🔥 ambil data lokal dulu (fallback / cache)
-      final localData = await SQLHelper.instance.getLimitDataAbsen(
-        idUser.value,
-        initDate1,
-        initDate2,
-      );
-
       final online = await isOnline();
 
       /// =========================
@@ -1992,13 +1980,6 @@ class AbsenController extends GetxController
 
       return dataLimitAbsen;
     } catch (e) {
-      /// 🔥 fallback kalau error / timeout
-      final localData = await SQLHelper.instance.getLimitDataAbsen(
-        idUser.value,
-        initDate1,
-        initDate2,
-      );
-
       if (localData.isNotEmpty) {
         dataLimitAbsen.value = localData;
         statsCon.value = 'Connection unstable\nLoad data from local storage';
@@ -2168,13 +2149,14 @@ class AbsenController extends GetxController
       "tanggal1": d1 != "" ? d1 : date1.text,
       "tanggal2": d2 != "" ? d2 : date2.text,
     };
+    // print(data);
     final response = await ServiceApi().getFilteredAbsen(data);
     Get.back();
     dataAllAbsen.value = response;
     isLoading.value = false;
     searchDate.value =
         '${DateFormat("d MMM yyyy", "id_ID").format(DateTime.parse(date1.text))} - ${DateFormat("d MMM yyyy", "id_ID").format(DateTime.parse(date2.text))} ';
-
+    searchAbsen.value = response;
     return dataAllAbsen;
   }
 
@@ -2200,95 +2182,95 @@ class AbsenController extends GetxController
     return dataAllVisit;
   }
 
-  checkForUpdates(status) async {
-    if (status != "onInit") {
-      loadingDialog("Checking for updates...", "");
-    }
+  // checkForUpdates(status) async {
+  //   if (status != "onInit") {
+  //     loadingDialog("Checking for updates...", "");
+  //   }
 
-    try {
-      final readDoc = await http
-          .get(Uri.parse('http://103.156.15.61/update_apk/updateLog.xml'))
-          .timeout(const Duration(seconds: 20));
-      final response = await http
-          .head(
-            Uri.parse(
-              // supportedAbi == 'arm64-v8a'
-              //     ? 'http://103.156.15.61/update apk/absensiApp.arm64v8a.apk'
-              // :
-              'http://103.156.15.61/update_apk/latest.apk',
-            ),
-          )
-          .timeout(const Duration(seconds: 20));
+  //   try {
+  //     final readDoc = await http
+  //         .get(Uri.parse('http://103.156.15.61/update_apk/updateLog.xml'))
+  //         .timeout(const Duration(seconds: 20));
+  //     final response = await http
+  //         .head(
+  //           Uri.parse(
+  //             // supportedAbi == 'arm64-v8a'
+  //             //     ? 'http://103.156.15.61/update apk/absensiApp.arm64v8a.apk'
+  //             // :
+  //             'http://103.156.15.61/update_apk/latest.apk',
+  //           ),
+  //         )
+  //         .timeout(const Duration(seconds: 20));
 
-      Get.back();
-      if (response.statusCode == 200) {
-        //parsing readDoc
-        final document = xml.XmlDocument.parse(readDoc.body);
-        final itemsNode = document.findElements('items').first;
-        final updates = itemsNode.findElements('update');
-        latestVer = itemsNode.findElements('versi').first.innerText;
-        //start looping item on readDoc
-        updateList.clear();
-        for (final listUpdates in updates) {
-          final name = listUpdates.findElements('name').first.innerText;
-          final desc = listUpdates.findElements('desc').first.innerText;
-          final icon = listUpdates.findElements('icon').first.innerText;
-          final color = listUpdates.findElements('color').first.innerText;
+  //     Get.back();
+  //     if (response.statusCode == 200) {
+  //       //parsing readDoc
+  //       final document = xml.XmlDocument.parse(readDoc.body);
+  //       final itemsNode = document.findElements('items').first;
+  //       final updates = itemsNode.findElements('update');
+  //       latestVer = itemsNode.findElements('versi').first.innerText;
+  //       //start looping item on readDoc
+  //       updateList.clear();
+  //       for (final listUpdates in updates) {
+  //         final name = listUpdates.findElements('name').first.innerText;
+  //         final desc = listUpdates.findElements('desc').first.innerText;
+  //         final icon = listUpdates.findElements('icon').first.innerText;
+  //         final color = listUpdates.findElements('color').first.innerText;
 
-          updateList.add({
-            'name': name,
-            'desc': desc,
-            'icon': icon,
-            'color': color,
-          });
-        }
-        //end loop item on readDoc
-        if (compareVersion(latestVer, currVer) > 0) {
-          dialogUpdateApp();
-        } else {
-          // print(compareVersion(latestVer, currVer) > 0);
-          // print(latestVer);
-          // print(currVer);
-          if (status != "onInit") {
-            Get.back(closeOverlays: true);
-            succesDialog(
-              context: Get.context!,
-              pageAbsen: "N",
-              desc: "No system updates",
-              type: DialogType.info,
-              title: 'INFO',
-              btnOkOnPress: () => Get.back(),
-            );
-          }
-        }
-      } else {
-        showToast("No update available");
-        // succesDialog(
-        //   context: Get.context!,
-        //   pageAbsen: "N",
-        //   desc: "No system updates",
-        //   type: DialogType.info,
-        //   title: 'INFO',
-        //   btnOkOnPress: () => Get.back(),
-        // );
-      }
-    } on SocketException catch (e) {
-      Get.back(closeOverlays: true);
-      Get.defaultDialog(
-        title: e.toString(),
-        middleText: 'Check your internet connection',
-        textConfirm: 'Refresh',
-        confirmTextColor: Colors.white,
-        onConfirm: () {
-          checkForUpdates("");
-          Get.back(closeOverlays: true);
-        },
-      );
-    } on TimeoutException catch (_) {
-      Get.back(closeOverlays: true);
-      showToast("The connection to the server has timed out.");
-    }
-  }
+  //         updateList.add({
+  //           'name': name,
+  //           'desc': desc,
+  //           'icon': icon,
+  //           'color': color,
+  //         });
+  //       }
+  //       //end loop item on readDoc
+  //       if (compareVersion(latestVer, currVer) > 0) {
+  //         dialogUpdateApp();
+  //       } else {
+  //         // print(compareVersion(latestVer, currVer) > 0);
+  //         // print(latestVer);
+  //         // print(currVer);
+  //         if (status != "onInit") {
+  //           Get.back(closeOverlays: true);
+  //           succesDialog(
+  //             context: Get.context!,
+  //             pageAbsen: "N",
+  //             desc: "No system updates",
+  //             type: DialogType.info,
+  //             title: 'INFO',
+  //             btnOkOnPress: () => Get.back(),
+  //           );
+  //         }
+  //       }
+  //     } else {
+  //       showToast("No update available");
+  //       // succesDialog(
+  //       //   context: Get.context!,
+  //       //   pageAbsen: "N",
+  //       //   desc: "No system updates",
+  //       //   type: DialogType.info,
+  //       //   title: 'INFO',
+  //       //   btnOkOnPress: () => Get.back(),
+  //       // );
+  //     }
+  //   } on SocketException catch (e) {
+  //     Get.back(closeOverlays: true);
+  //     Get.defaultDialog(
+  //       title: e.toString(),
+  //       middleText: 'Check your internet connection',
+  //       textConfirm: 'Refresh',
+  //       confirmTextColor: Colors.white,
+  //       onConfirm: () {
+  //         checkForUpdates("");
+  //         Get.back(closeOverlays: true);
+  //       },
+  //     );
+  //   } on TimeoutException catch (_) {
+  //     Get.back(closeOverlays: true);
+  //     showToast("The connection to the server has timed out.");
+  //   }
+  // }
 
   Future<List<Visit>> getVisitToday(
     Map<String, dynamic> paramSingleVisit,
@@ -2343,11 +2325,10 @@ class AbsenController extends GetxController
     isLoading.value = true;
 
     /// 🔥 ambil data lokal dulu (biar selalu ada fallback)
-    var tempLimitVisit = await SQLHelper.instance.getVisitToday(
+    var tempLimitVisit = await SQLHelper.instance.getLimitDataVisit(
       idUser.value,
-      realDateServer!,
-      '',
-      0,
+      initDate1,
+      initDate2,
     );
     try {
       // 🔥 CEK REAL CONNECTION (bukan state)
@@ -2412,46 +2393,46 @@ class AbsenController extends GetxController
     }
   }
 
-  resend() async {
-    SharedPreferences pref = await SharedPreferences.getInstance();
-    var dataUserLogin = Data.fromJson(
-      jsonDecode(pref.getString('userDataLogin')!),
-    );
-    // var userID = Data.fromJson(jsonDecode(pref.getString('userDataLogin')!)).id!;
-    idUser.value = dataUserLogin.id!;
-    var paramLimit = {
-      "mode": "limit",
-      "id_user": dataUserLogin.id!,
-      "tanggal1": initDate1,
-      "tanggal2": initDate2,
-    };
+  // resend() async {
+  //   SharedPreferences pref = await SharedPreferences.getInstance();
+  //   var dataUserLogin = Data.fromJson(
+  //     jsonDecode(pref.getString('userDataLogin')!),
+  //   );
+  //   // var userID = Data.fromJson(jsonDecode(pref.getString('userDataLogin')!)).id!;
+  //   idUser.value = dataUserLogin.id!;
+  //   var paramLimit = {
+  //     "mode": "limit",
+  //     "id_user": dataUserLogin.id!,
+  //     "tanggal1": initDate1,
+  //     "tanggal2": initDate2,
+  //   };
 
-    // var paramLimitVisit = {
-    //   "mode": "limit",
-    //   "id_user": dataUserLogin.id!,
-    //   "tanggal1": initDate1,
-    //   "tanggal2": initDate2,
-    // };
+  //   // var paramLimitVisit = {
+  //   //   "mode": "limit",
+  //   //   "id_user": dataUserLogin.id!,
+  //   //   "tanggal1": initDate1,
+  //   //   "tanggal2": initDate2,
+  //   // };
 
-    var paramSingle = {
-      "mode": "single",
-      "id_user": dataUserLogin.id,
-      "tanggal_masuk": realDateServer,
-    };
+  //   var paramSingle = {
+  //     "mode": "single",
+  //     "id_user": dataUserLogin.id,
+  //     "tanggal_masuk": realDateServer,
+  //   };
 
-    var paramSingleVisit = {
-      "mode": "single",
-      "id_user": dataUserLogin.id,
-      "tgl_visit": realDateServer,
-    };
+  //   var paramSingleVisit = {
+  //     "mode": "single",
+  //     "id_user": dataUserLogin.id,
+  //     "tgl_visit": realDateServer,
+  //   };
 
-    return _startDateStream(
-      paramSingle,
-      paramLimit,
-      paramSingleVisit,
-      dataUserLogin,
-    );
-  }
+  //   // return _startDateStream(
+  //   //   paramSingle,
+  //   //   paramLimit,
+  //   //   paramSingleVisit,
+  //   //   dataUserLogin,
+  //   // );
+  // }
 
   //send data to xmor
   sendDataToXmor(
@@ -2641,18 +2622,25 @@ class AbsenController extends GetxController
     // isLoading.value = true;
   }
 
-  void updateCircleFromQr(String qrValue) {
-    final parts = qrValue.split(' ');
-    if (parts.length >= 2) {
-      final latQr = double.parse(parts[0]);
-      final longQr = double.parse(parts[1]);
+  void updateCircleFromQr(double latQr, double longQr) {
+    final newLatLng = LatLng(latQr, longQr);
 
-      final newLatLng = LatLng(latQr, longQr);
-
-      scannedLatLng.value = newLatLng;
-      storeLatLng.value = newLatLng; // 🔥 ini kuncinya
-    }
+    scannedLatLng.value = newLatLng;
+    storeLatLng.value = newLatLng;
   }
+
+  // void updateCircleFromQr(String qrValue) {
+  //   final parts = qrValue.split(' ');
+  //   if (parts.length >= 2) {
+  //     final latQr = double.parse(parts[0]);
+  //     final longQr = double.parse(parts[1]);
+
+  //     final newLatLng = LatLng(latQr, longQr);
+
+  //     scannedLatLng.value = newLatLng;
+  //     storeLatLng.value = newLatLng; // 🔥 ini kuncinya
+  //   }
+  // }
 
   double get distanceKm {
     if (storeLatLng.value == null) return 0;

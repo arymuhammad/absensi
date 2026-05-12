@@ -14,16 +14,16 @@ import '../../../shared/elevated_button.dart';
 import '../../../shared/text_field.dart';
 
 class UptDataAbsen extends StatelessWidget {
-  UptDataAbsen({super.key, required this.data});
+  UptDataAbsen({super.key, required this.data, required this.isInbox});
   final ReqApp data;
+  final bool isInbox;
   final auth = Get.find<LoginController>();
   final adjCtrl = Get.put(AdjustPresenceController());
   final homeC = Get.find<HomeController>();
   @override
   Widget build(BuildContext context) {
-    final dataUser = auth.logUser.value;
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final levelId = dataUser.level;
+    // final levelId = dataUser.level;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -96,23 +96,38 @@ class UptDataAbsen extends StatelessWidget {
         const SizedBox(height: 10),
         Text('Alasan Perubahan Data', style: titleTextStyle),
         Text(data.alasan!, style: subtitleTextStyle),
-        Visibility(
-          visible:
-              data.accept == "" && (['1', '26']).contains(levelId)
-                  ? true
-                  : false,
-          child: SizedBox(
-            height: 45,
-            child: CsTextField(
-              controller: adjCtrl.keteranganApp,
-              label: 'Keterangan',
-              isDark: isDark,
+        Obx(() {
+          final dataUser = auth.logUser.value;
+          return Visibility(
+            visible:
+                data.statusExcep == "pending" &&
+                        data.keterangan == "" &&
+                        ([
+                          '1',
+                          '17',
+                          '18',
+                          '19',
+                          '20',
+                          '39',
+                          '26',
+                          '96',
+                        ]).contains(dataUser.level)
+                    ? true
+                    : false,
+            child: SizedBox(
+              height: 45,
+              child: CsTextField(
+                enabled: true,
+                controller: adjCtrl.keteranganApp,
+                label: 'Keterangan',
+                isDark: isDark,
+              ),
             ),
-          ),
-        ),
+          );
+        }),
         const SizedBox(height: 5),
         Visibility(
-          visible: data.accept == "0" ? true : false,
+          visible: data.statusExcep == "reject" ? true : false,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -122,74 +137,114 @@ class UptDataAbsen extends StatelessWidget {
           ),
         ),
         // const Divider(thickness: 2),
-        Visibility(
-          visible:
-              data.accept == "" && (['1', '26']).contains(levelId)
-                  ? true
-                  : false,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              CsElevatedButton(
-                fontsize: 15,
-                label: 'Accept',
-                color: Colors.greenAccent[700]!,
-                onPressed: () {
-                  var dataUptApp = {
-                    "uid": data.id,
-                    "accept": "1",
-                    "keterangan": adjCtrl.keteranganApp.text,
-                    "id_user": data.idUser,
-                    "tgl_masuk": data.tglMasuk,
-                    "status": data.status,
-                  };
+        Obx(() {
+          final dataUser = auth.logUser.value;
+          return Visibility(
+            visible:
+                data.statusExcep == "pending" &&
+                        ([
+                          '1',
+                          '17',
+                          '18',
+                          '19',
+                          '20',
+                          '39',
+                          '26',
+                          '96',
+                        ]).contains(dataUser.level)
+                    ? true
+                    : false,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                CsElevatedButton(
+                  fontsize: 15,
+                  label: 'Accept',
+                  color: Colors.greenAccent[700]!,
+                  onPressed: () {
+                    final dataUser = auth.logUser.value;
+                    var dataUptApp = {
+                      {
+                            "1": "acc_4",
+                            "17": "acc_4",
+                            "18": "acc_4",
+                            "39": "acc_4",
+                            "96": "acc_3",
+                            "26": "acc_2",
+                            "19": "acc_1",
+                            "20": "acc_1",
+                          }[dataUser.level]!:
+                          "approved",
+                      "uid": data.id,
+                      "level": dataUser.level,
+                      "keterangan":
+                          data.keterangan ?? adjCtrl.keteranganApp.text,
+                      "id_user": data.idUser,
+                      "tgl_masuk": data.tglMasuk,
+                      "status": data.status,
+                    };
 
-                  //////////
-                  var dataUptAbs = {
-                    "status": data.status,
-                    "id_user": data.idUser,
-                    "tgl_masuk": data.tglMasuk,
-                    "tgl_pulang": data.tglPulang,
-                    "jam_absen_masuk": (data.jamAbsenMasuk).to24Hour(),
-                    "foto_masuk": data.fotoMasuk,
-                    "jam_absen_pulang": (data.jamAbsenPulang).to24Hour(),
-                    "foto_pulang": data.fotoPulang,
-                    "lat_out": data.latOut,
-                    "long_out": data.longOut,
-                    "device_info2": data.devInfo,
-                  };
-                  adjCtrl.appAbs(dataUptApp, dataUptAbs);
-                  homeC.reloadPendingAdj(
-                    idUser: dataUser.id!,
-                    level: dataUser.level!,
-                  );
-                  homeC.futurePendAdj.value;
-                },
-              ),
-              CsElevatedButton(
-                fontsize: 15,
-                label: 'Reject',
-                color: Colors.redAccent[700]!,
-                onPressed: () {
-                  var dataUptApp = {
-                    "uid": data.id,
-                    "accept": "0",
-                    "keterangan": adjCtrl.keteranganApp.text,
-                    "id_user": data.idUser,
-                    "tgl_masuk": data.tglMasuk,
-                    "status": data.status,
-                  };
-                  adjCtrl.appAbs(dataUptApp, {});
-                  homeC.reloadPendingAdj(
-                    idUser: dataUser.id!,
-                    level: dataUser.level!,
-                  );
-                  homeC.futurePendAdj.value;
-                },
-              ),
-            ],
-          ),
-        ),
+                    //////////
+                    var dataUptAbs = {
+                      "status": data.status,
+                      "id_user": data.idUser,
+                      "tgl_masuk": data.tglMasuk,
+                      "tgl_pulang": data.tglPulang,
+                      "jam_absen_masuk": (data.jamAbsenMasuk).to24Hour(),
+                      "foto_masuk": data.fotoMasuk,
+                      "jam_absen_pulang": (data.jamAbsenPulang).to24Hour(),
+                      "foto_pulang": data.fotoPulang,
+                      "lat_out": data.latOut,
+                      "long_out": data.longOut,
+                      "device_info2": data.devInfo,
+                    };
+                    adjCtrl.appAbs(dataUptApp, dataUptAbs, isInbox);
+                    homeC.getPendingAdj(
+                      idUser: dataUser.id!,
+                      idCabang: dataUser.kodeCabang!,
+                      level: dataUser.level!,
+                    );
+                  },
+                ),
+                const SizedBox(width: 5),
+                CsElevatedButton(
+                  fontsize: 15,
+                  label: 'Reject',
+                  color: Colors.redAccent[700]!,
+                  onPressed: () {
+                    final dataUser = auth.logUser.value;
+                    var dataUptApp = {
+                      {
+                            "1": "acc_4",
+                            "17": "acc_4",
+                            "18": "acc_4",
+                            "39": "acc_4",
+                            "96": "acc_3",
+                            "26": "acc_2",
+                            "19": "acc_1",
+                            "20": "acc_1",
+                          }[dataUser.level]!:
+                          "reject",
+                      "uid": data.id,
+                      "level": dataUser.level,
+                      "keterangan":
+                          data.keterangan ?? adjCtrl.keteranganApp.text,
+                      "id_user": data.idUser,
+                      "tgl_masuk": data.tglMasuk,
+                      "status": data.status,
+                    };
+                    adjCtrl.appAbs(dataUptApp, {}, isInbox);
+                    homeC.getPendingAdj(
+                      idUser: dataUser.id!,
+                      idCabang: dataUser.kodeCabang!,
+                      level: dataUser.level!,
+                    );
+                  },
+                ),
+              ],
+            ),
+          );
+        }),
       ],
     );
   }

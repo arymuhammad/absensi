@@ -1,11 +1,9 @@
 import 'package:absensi/app/data/helper/app_colors.dart';
 import 'package:absensi/app/data/helper/const.dart';
-import 'package:absensi/app/data/helper/custom_dialog.dart';
 import 'package:absensi/app/data/helper/duration_count.dart';
 import 'package:absensi/app/data/helper/format_waktu.dart';
 import 'package:absensi/app/modules/detail_absen/views/widget/edit_data_absen.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 
 import 'package:get/get.dart';
 import 'package:icons_plus/icons_plus.dart';
@@ -50,7 +48,7 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
     ];
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    print(detailData);
+    // print(detailData);
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(

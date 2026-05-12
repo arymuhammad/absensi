@@ -16,7 +16,11 @@ class ReqApp {
   String? longOut;
   String? devInfo;
   String? status;
-  String? accept;
+  String? statusExcep;
+  String? acc1;
+  String? acc2;
+  String? acc3;
+  String? acc4;
   String? keterangan;
   String? alasan;
   String? namaShift;
@@ -40,7 +44,11 @@ class ReqApp {
     this.longOut,
     this.devInfo,
     this.status,
-    this.accept,
+    this.statusExcep,
+    this.acc1,
+    this.acc2,
+    this.acc3,
+    this.acc4,
     this.keterangan,
     this.alasan,
     this.namaShift,
@@ -62,10 +70,14 @@ class ReqApp {
     fotoMasuk = json['foto_masuk']??'';
     fotoPulang = json['foto_pulang']??'';
     status = json['status']??'';
+    statusExcep = json['status_excep']??'';
     latOut = json['lat_out']??'';
     longOut = json['long_out']??'';
     devInfo = json['device_info2']??'';
-    accept = json['accept']??'';
+    acc1 = json['acc_1']??'';
+    acc2 = json['acc_2']??'';
+    acc3 = json['acc_3']??'';
+    acc4 = json['acc_4']??'';
     keterangan = json['keterangan']??'';
     alasan = json['alasan']??'';
     namaShift = json['nama_shift']??'';

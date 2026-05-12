@@ -2,6 +2,8 @@ import 'package:absensi/app/data/helper/app_colors.dart';
 import 'package:absensi/app/data/helper/const.dart';
 import 'package:absensi/app/modules/add_pegawai/controllers/add_pegawai_controller.dart';
 import 'package:absensi/app/modules/add_pegawai/views/add_pegawai_view.dart';
+import 'package:absensi/app/modules/add_pegawai/views/list_user.dart';
+import 'package:absensi/app/modules/region_area/views/region_area_view.dart';
 import 'package:absensi/app/modules/settings/views/about_view.dart';
 import 'package:absensi/app/modules/settings/views/backup_view.dart';
 import 'package:absensi/app/modules/profil/views/verifikasi_update_password.dart';
@@ -189,11 +191,7 @@ class SettingsView extends GetView<SettingsController> {
 
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(
-                                  builder:
-                                      (_) =>
-                                          BackupView(),
-                                ),
+                                MaterialPageRoute(builder: (_) => BackupView()),
                               );
                             },
                             leading: Container(
@@ -260,13 +258,27 @@ class SettingsView extends GetView<SettingsController> {
                           //       color: subTitleColor),
                           // ),
                           Visibility(
-                            visible: listDataUser.level == "1" ? true : false,
+                            visible:
+                                listDataUser.level == "1"
+                                    //  ||
+                                    //         listDataUser.level == "19" ||
+                                    //         listDataUser.level == "59"
+                                    ? true
+                                    : false,
                             child: ListTile(
                               onTap: () {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (_) => const AddPegawaiView(),
+                                    builder: (_) {
+                                      ctrl.isLoading.value = true;
+                                      ctrl.getUser(
+                                        listDataUser.kodeCabang!,
+                                        listDataUser.parentId!,
+                                      );
+
+                                      return ListUserView();
+                                    },
                                   ),
                                 );
                               },
@@ -281,7 +293,7 @@ class SettingsView extends GetView<SettingsController> {
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: Icon(
-                                  Iconsax.user_add_bold,
+                                  Icons.groups,
                                   color:
                                       isDark
                                           ? Colors.blue
@@ -296,10 +308,64 @@ class SettingsView extends GetView<SettingsController> {
                                 ),
                               ),
                               subtitle: Text(
-                                'Add User',
+                                'Manage all your staff',
                                 style: TextStyle(
                                   color: subTitleColor,
                                   fontSize: 13,
+                                ),
+                              ),
+                              trailing: Icon(
+                                Icons.keyboard_arrow_right_rounded,
+                                color: subTitleColor,
+                              ),
+                            ),
+                          ),
+                          Visibility(
+                            visible: listDataUser.level=="1",
+                            child: ListTile(
+                              onTap: () {
+                                // Get.to(
+                                //   () => AboutView(),
+                                //   transition: Transition.cupertino,
+                                // );
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => RegionAreaView(),
+                                  ),
+                                );
+                              },
+                              leading: Container(
+                                height: 40,
+                                width: 40,
+                                decoration: BoxDecoration(
+                                  color:
+                                      isDark
+                                          ? Colors.blue.withOpacity(0.15)
+                                          : bgContainer,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Icon(
+                                  Icons.map,
+                                  color:
+                                      isDark
+                                          ? Colors.blue
+                                          : AppColors.itemsBackground,
+                                ),
+                              ),
+                              title: const Text(
+                                'Region Area',
+                                style: TextStyle(
+                                  // color: titleColor,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              subtitle: Text(
+                                'Set Region Store for Area Manager',
+                                style: TextStyle(
+                                  color: subTitleColor,
+                                  fontSize: 13,
+                                  overflow: TextOverflow.ellipsis,
                                 ),
                               ),
                               trailing: Icon(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../data/helper/const.dart';
+import '../../data/helper/helper_ui.dart';
 
 class HistoryCard extends StatelessWidget {
   final DateTime date;
@@ -61,7 +62,7 @@ class HistoryCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  _monthName(date).toUpperCase(),
+                  monthName(date).toUpperCase(),
                   style: TextStyle(
                     fontSize: smallScreen ? 11 : 13,
                     color: Colors.white,
@@ -78,7 +79,7 @@ class HistoryCard extends StatelessWidget {
                 ),
                 // const SizedBox(height: 1),
                 Text(
-                  _dayName(date).toUpperCase(),
+                  dayName(date).toUpperCase(),
                   style: TextStyle(
                     fontSize: smallScreen ? 11 : 13,
                     color: Colors.white,
@@ -207,27 +208,5 @@ class HistoryCard extends StatelessWidget {
     );
   }
 
-  static String _dayName(DateTime date) {
-    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-    return days[date.weekday % 7];
-  }
 
-  static String _monthName(DateTime date) {
-    const months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'Mei',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
-    ];
-    if (date.month < 1 || date.month > 12) return '';
-    return months[date.month - 1];
-  }
 }

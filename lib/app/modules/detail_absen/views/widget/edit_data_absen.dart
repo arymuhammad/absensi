@@ -4,6 +4,7 @@ import 'package:absensi/app/data/helper/app_colors.dart';
 import 'package:absensi/app/data/helper/const.dart';
 import 'package:absensi/app/data/helper/custom_dialog.dart';
 import 'package:absensi/app/modules/detail_absen/controllers/detail_absen_controller.dart';
+import 'package:absensi/app/modules/login/controllers/login_controller.dart';
 import 'package:absensi/app/modules/shared/container_main_color.dart';
 import 'package:absensi/app/modules/shared/date_picker.dart';
 import 'package:absensi/app/modules/shared/text_field.dart';
@@ -17,12 +18,16 @@ class EditDataAbsen extends GetView<DetailAbsenController> {
   EditDataAbsen({super.key, required this.data});
   final Map<String, dynamic> data;
   final detailC = Get.put(DetailAbsenController());
+  final auth = Get.find<LoginController>();
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       height: 500,
-      decoration: BoxDecoration(color: isDark?Theme.of(context).cardColor: Colors.grey[300]),
+      decoration: BoxDecoration(
+        color: isDark ? Theme.of(context).cardColor : Colors.grey[300],
+      ),
       child: SingleChildScrollView(
         scrollDirection: Axis.vertical,
         child: Padding(
@@ -222,16 +227,17 @@ class EditDataAbsen extends GetView<DetailAbsenController> {
                   ),
                 ],
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 5),
               SizedBox(
                 height: 50,
                 child: CsTextField(
+                  enabled: true,
                   controller: detailC.alasan,
                   label: 'Reason for data change',
                   isDark: isDark,
                 ),
               ),
-              // const SizedBox(height: 5),
+              const SizedBox(height: 5),
               Center(
                 child: ContainerMainColor(
                   begin: Alignment.topLeft,
@@ -245,11 +251,13 @@ class EditDataAbsen extends GetView<DetailAbsenController> {
                     fontSize: 18,
                     label: 'Request Approval',
                     onPressed: () {
+                      final userData = auth.logUser.value;
                       detailC.submitApproval(
                         data['id_user'],
                         data['nama'],
                         data['kode_cabang'],
                         data['id_shift'],
+                        userData.level!
                       );
                     },
                     backgroundColor: Colors.transparent,

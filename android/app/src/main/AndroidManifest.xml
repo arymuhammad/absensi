@@ -42,7 +42,7 @@
         android:label="URBAN&amp;CO SPOT"
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon" android:networkSecurityConfig="@xml/network_security_config" android:usesCleartextTraffic="true">
-        <provider
+        <!-- <provider
             android:name="sk.fourq.otaupdate.OtaUpdateFileProvider"
             android:authorities="${applicationId}.ota_update_provider"
             android:exported="false"
@@ -50,7 +50,7 @@
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/filepaths" />
-        </provider>
+        </provider> -->
        <!-- <service android:name="com.gdelataillade.alarm.services.NotificationOnKillService" /> -->
         <activity
             android:name=".MainActivity"
@@ -82,8 +82,8 @@
         android:name="com.google.android.gms.ads.APPLICATION_ID"
         android:value="ca-app-pub-9798493008106015~5659520125"/>
 
-        <meta-data
+        <!-- <meta-data
         android:name="com.startapp.sdk.APPLICATION_ID"
-        android:value="207916836" />
+        android:value="207916836" /> -->
     </application>
 </manifest>

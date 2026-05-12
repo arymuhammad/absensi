@@ -7,7 +7,8 @@ import 'package:absensi/app/data/model/cek_absen_model.dart';
 import 'package:absensi/app/data/model/cek_stok_model.dart';
 import 'package:absensi/app/data/model/cek_user_model.dart';
 import 'package:absensi/app/data/model/cek_visit_model.dart';
-import 'package:absensi/app/data/model/leave_model.dart';
+import 'package:absensi/app/data/model/overtime_model.dart';
+import 'package:absensi/app/data/model/req_leave_model.dart';
 import 'package:absensi/app/data/model/level_model.dart';
 import 'package:absensi/app/data/model/notif_model.dart';
 import 'package:absensi/app/data/model/report_sales_model.dart';
@@ -30,6 +31,7 @@ import '../data/model/PayslipStoreModel.dart';
 import '../data/model/absen_model.dart';
 import '../data/model/dept_model.dart';
 import '../data/model/foto_profil_model.dart';
+import '../data/model/leave_model.dart';
 import '../data/model/login_model.dart';
 // import '../data/model/server_api_model.dart';
 import '../data/model/payslip_model.dart';
@@ -62,22 +64,15 @@ class ServiceApi {
           );
 
       SmartDialog.dismiss();
-      switch (response.statusCode) {
-        case 200:
-          final data = json.decode(response.body);
-          return result = Login.fromJson(data);
-        case 400:
-        case 401:
-        case 402:
-        case 404:
-          final result = json.decode(response.body);
-          throw FetchDataException(result["message"]);
-        default:
-          throw FetchDataException('Something went wrong.');
+
+      final body = json.decode(response.body);
+      // ✅ Semua response yang punya body JSON kita return
+      if ([200, 400, 401, 402, 403, 404].contains(response.statusCode)) {
+        return Login.fromJson(body);
       }
-    } on FetchDataException catch (_) {
-      showToast("Username atau Password salah");
-      isLoading.value = false;
+
+      // ❌ selain itu baru dianggap error teknis
+      throw FetchDataException('Server error (${response.statusCode})');
     } on SocketException catch (_) {
       SmartDialog.dismiss();
       Get.defaultDialog(
@@ -94,9 +89,22 @@ class ServiceApi {
         onCancel: () => Get.back(),
         textCancel: 'Tutup',
       );
-      isLoading.value = false;
+      rethrow;
+      // isLoading.value = false;
     }
-    return result;
+    // return result;
+  }
+
+  Future<Map<String, dynamic>> validateQr({
+    required String kode,
+    required String token,
+  }) async {
+    final response = await http.post(
+      Uri.parse('${baseUrl}validate_qr'),
+      body: {'kode': kode, 'token': token},
+    );
+
+    return jsonDecode(response.body);
   }
 
   Future<Data> fetchCurrentUser(data) async {
@@ -108,6 +116,7 @@ class ServiceApi {
 
       // if (response.statusCode == 200) {
       user = Data.fromJson(jsonDecode(response.body)['data']);
+
       // }
     } on TimeoutException catch (e) {
       Get.back();
@@ -175,7 +184,7 @@ class ServiceApi {
     }
   }
 
-  Future<List<ShiftKerja>>getShift() async {
+  Future<List<ShiftKerja>> getShift() async {
     try {
       final response = await http.get(Uri.parse('${baseUrl}get_shift'));
       switch (response.statusCode) {
@@ -192,7 +201,7 @@ class ServiceApi {
     }
   }
 
-  addUpdatePegawai(Map<String, dynamic> data, String mode) async {
+  Future<bool> addUpdatePegawai(Map<String, dynamic> data, String mode) async {
     try {
       var request = http.MultipartRequest(
         'POST',
@@ -251,15 +260,6 @@ class ServiceApi {
                 filename: data["foto"].name,
               ),
             );
-            // String imageFilePath = "name";
-            // PickedFile imageFile = PickedFile(data["foto"]["path"]);
-            // var stream =
-            //     http.ByteStream(DelegatingStream(imageFile.openRead()));
-            // request.files.add(http.MultipartFile(
-            //     "foto", stream, data["foto"]["img"].length,
-            //     filename: "data[foto].name"));
-            // request.files.add(http.MultipartFile.fromBytes('foto', data["foto"],
-            //     filename: "Profile.jpg"));
           } else {
             request.files.add(
               http.MultipartFile(
@@ -286,43 +286,14 @@ class ServiceApi {
       // debugPrint(dataDecode.toString());
 
       if (res.statusCode == 200) {
-        if (mode == "add") {
-          Get.back();
-          succesDialog(
-            context: Get.context!,
-            pageAbsen: "N",
-            desc: "Data berhasil disimpan",
-            type: DialogType.success,
-            title: 'SUKSES',
-            btnOkOnPress: () => Get.back(),
-          );
-        } else {
-          // if (mode == "update") {
-          Get.back();
-          succesDialog(
-            context: Get.context!,
-            pageAbsen: "N",
-            desc: "Data berhasil diperbarui",
-            type: DialogType.success,
-            title: 'SUKSES',
-            btnOkOnPress: () {
-              // Get.back();
-              // Get.back();
-            },
-          );
-          // Future.delayed(const Duration(seconds: 1), () {
-          //   Get.back(closeOverlays: true);
-          //   auth.logout();
-          // });
-          // }
-        }
+        return true;
+      } else {
+        return false;
       }
-    } on TimeoutException catch (e) {
-      Get.back();
-      showToast('$e');
+    } on TimeoutException {
+      return false;
     } catch (e) {
-      Get.back();
-      debugPrint('$e');
+      return false;
     }
   }
 
@@ -408,22 +379,22 @@ class ServiceApi {
 
       await request.send().timeout(const Duration(minutes: 1)).then((value) {
         if (!isSync) {
-        // Get.back();
-        // succesDialog(
-        //   context: Get.context!,
-        //   pageAbsen: "Y",
-        //   desc:
-        //       "Please do not close the application during the attendance data synchronization process.",
-        //   type: DialogType.warning,
-        //   title: 'Warning',
-        //   btnOkOnPress: () {
-        //     auth.selectedMenu(0);
-        //     Future.delayed(const Duration(milliseconds: 300));
-        //     Get.back();
-        //   },
-        // );
-        // } else {
-        showToast('Attendance data sent successfully');
+          // Get.back();
+          // succesDialog(
+          //   context: Get.context!,
+          //   pageAbsen: "Y",
+          //   desc:
+          //       "Please do not close the application during the attendance data synchronization process.",
+          //   type: DialogType.warning,
+          //   title: 'Warning',
+          //   btnOkOnPress: () {
+          //     auth.selectedMenu(0);
+          //     Future.delayed(const Duration(milliseconds: 300));
+          //     Get.back();
+          //   },
+          // );
+          // } else {
+          showToast('Attendance data sent successfully');
         }
       });
       // var responseBytes = await res.stream.toBytes();
@@ -937,28 +908,39 @@ class ServiceApi {
         );
       }
 
-      await request.send().timeout(const Duration(minutes: 1)).then((value) {
-        if (!isSync) {
-        //   Get.back();
-        //   succesDialog(
-        //     context: Get.context!,
-        //     pageAbsen: "Y",
-        //     desc:
-        //         "Harap tidak menutup aplikasi selama proses syncron data absensi",
-        //     type: DialogType.warning,
-        //     title: 'PERINGATAN',
-        //     btnOkOnPress: () {
-        //       auth.selectedMenu(0);
-        //       Future.delayed(const Duration(milliseconds: 300));
-        //       Get.back();
-        //     },
-        //   );
-        // } else {
-        showToast('Data sent successfully');
-        
-        }
-      });
+      // await request.send().timeout(const Duration(minutes: 1)).then((value) {
+      //   if (!isSync) {
+      //     //   Get.back();
+      //     //   succesDialog(
+      //     //     context: Get.context!,
+      //     //     pageAbsen: "Y",
+      //     //     desc:
+      //     //         "Harap tidak menutup aplikasi selama proses syncron data absensi",
+      //     //     type: DialogType.warning,
+      //     //     title: 'PERINGATAN',
+      //     //     btnOkOnPress: () {
+      //     //       auth.selectedMenu(0);
+      //     //       Future.delayed(const Duration(milliseconds: 300));
+      //     //       Get.back();
+      //     //     },
+      //     //   );
+      //     // } else {
+      //     showToast('Data sent successfully');
+      //   }
+      // });
+      final streamedResponse = await request.send().timeout(
+        const Duration(minutes: 1),
+      );
 
+      final response = await http.Response.fromStream(streamedResponse);
+
+      print('STATUS CODE: ${response.statusCode}');
+      print('BODY: ${response.body}');
+      if (response.body.isEmpty) {
+        return {"success": true}; // fallback kalau backend kosong
+      }
+
+      return jsonDecode(response.body);
       // var responseBytes = await res.stream.toBytes();
       // var responseString = utf8.decode(responseBytes);
 
@@ -989,8 +971,9 @@ class ServiceApi {
       //   Get.back();
       //   showToast('Terjadi kesalahan saat mengirim data');
       // } else {
-        showToast('Terjadi kesalahan saat mengirim data');
-        // failedDialog(Get.context, 'ERROR', e.toString());
+      showToast('Terjadi kesalahan saat mengirim data $e');
+      print(e);
+      // failedDialog(Get.context, 'ERROR', e.toString());
       // }
     }
   }
@@ -1124,10 +1107,9 @@ class ServiceApi {
     var param = {"idCabang": idStore, "parentId": parentId};
 
     try {
-      final response = await http.post(
-        Uri.parse('${baseUrl}get_user_cabang'),
-        body: param,
-      );
+      final response = await http
+          .post(Uri.parse('${baseUrl}get_user_cabang'), body: param)
+          .timeout(const Duration(seconds: 10));
       switch (response.statusCode) {
         case 200:
           List<dynamic> result = json.decode(response.body)['data'];
@@ -1145,8 +1127,14 @@ class ServiceApi {
       }
     } on FetchDataException catch (e) {
       // print('error caught: ${e.message}');
+      // Get.back();
       showToast("${e.message}");
+    } on Exception catch (e) {
+      showToast("$e");
     }
+    // finally {
+    //   Get.back();
+    // }
   }
 
   updateAbsen(Map<String, dynamic> data) async {
@@ -1273,15 +1261,20 @@ class ServiceApi {
       Map<String, String> headers = {
         'Content-Type': 'application/json; charset=UTF-8',
       };
+
       var request = http.MultipartRequest(
         'POST',
         Uri.parse('${baseUrl}req_update_data'),
       );
+
       request.headers.addAll(headers);
+
       request.fields['status'] = data["status"];
       request.fields['id_user'] = data["id_user"];
+      request.fields['level'] = data["level"];
       request.fields['nama'] = data["nama"];
       request.fields['alasan'] = data["alasan"];
+
       if (data["status"] == "update_masuk") {
         request.fields['tgl_masuk'] = data["tgl_masuk"];
         request.fields['jam_absen_masuk'] = data["jam_absen_masuk"];
@@ -1312,75 +1305,85 @@ class ServiceApi {
         request.fields['jam_pulang'] = data["jam_pulang"];
       }
 
+      // ================= FILE =================
+
       if (data["status"] == "update_masuk" ||
           data["status"] == "update_masuk_cst") {
         request.files.add(
-          http.MultipartFile(
-            "foto_masuk",
-            File(data["foto_masuk"]).readAsBytes().asStream(),
-            File(data["foto_masuk"]).lengthSync(),
-            filename: File(data["foto_masuk"]).path.split("/").last,
-          ),
+          await http.MultipartFile.fromPath("foto_masuk", data["foto_masuk"]),
         );
       } else if (data["status"] == "update_pulang") {
         request.files.add(
-          http.MultipartFile(
-            "foto_pulang",
-            File(data["foto_pulang"]).readAsBytes().asStream(),
-            File(data["foto_pulang"]).lengthSync(),
-            filename: File(data["foto_pulang"]).path.split("/").last,
-          ),
+          await http.MultipartFile.fromPath("foto_pulang", data["foto_pulang"]),
         );
       } else if (data["status"] == "update_data_absen") {
         request.files.add(
-          http.MultipartFile(
-            "foto_masuk",
-            File(data["foto_masuk"]).readAsBytes().asStream(),
-            File(data["foto_masuk"]).lengthSync(),
-            filename: File(data["foto_masuk"]).path.split("/").last,
-          ),
+          await http.MultipartFile.fromPath("foto_masuk", data["foto_masuk"]),
         );
 
         request.files.add(
-          http.MultipartFile(
-            "foto_pulang",
-            File(data["foto_pulang"]).readAsBytes().asStream(),
-            File(data["foto_pulang"]).lengthSync(),
-            filename: File(data["foto_pulang"]).path.split("/").last,
-          ),
+          await http.MultipartFile.fromPath("foto_pulang", data["foto_pulang"]),
         );
-      } else {}
+      }
 
-      await request.send().timeout(const Duration(minutes: 1)).then((val) {
-        if (val.statusCode == 200) {
-          Get.back();
+      // ================= SEND =================
+
+      final streamedResponse = await request.send().timeout(
+        const Duration(minutes: 1),
+      );
+
+      final response = await http.Response.fromStream(streamedResponse);
+
+      Get.back();
+
+      // ================= SUCCESS =================
+
+      if (response.statusCode == 200) {
+        final res = jsonDecode(response.body);
+
+        if (res['success'] == true) {
           succesDialog(
             context: Get.context!,
             pageAbsen: 'N',
             desc:
-                'Data berhasil dikirim\nMenunggu persetujuan IT untuk perubahan data',
+                res['message'] ??
+                'Waiting for approval from\nSM/ASM -> Area Manager -> Ops -> HR',
             type: DialogType.success,
             title: 'SUKSES',
             btnOkOnPress: () => Get.back(),
           );
         } else {
-          Get.back();
           failedDialog(
             Get.context!,
             'ERROR',
-            '${val.request!.url}\n${val.statusCode} ${val.reasonPhrase}',
+            res['message'] ?? 'Gagal mengirim data',
           );
         }
-      });
-    } on TimeoutException catch (_) {
+      }
+      // ================= ERROR STATUS =================
+      else {
+        failedDialog(
+          Get.context!,
+          'ERROR',
+          '${response.statusCode}\n${response.reasonPhrase}',
+        );
+      }
+    }
+    // ================= TIMEOUT =================
+    on TimeoutException catch (_) {
       Get.back();
+
       failedDialog(
         Get.context!,
         'ERROR',
-        'Waktu koneksi ke server telah habis\nSilahkan coba lagi nanti',
+        'The connection to the server has timed out\nPlease try again later',
       );
-    } on Exception catch (e) {
-      showToast(e.toString());
+    }
+    // ================= ERROR =================
+    catch (e) {
+      Get.back();
+
+      failedDialog(Get.context!, 'ERROR', e.toString());
     }
   }
 
@@ -1389,6 +1392,7 @@ class ServiceApi {
     String? type,
     String? level,
     String? idUser,
+    String? branchCode,
     String? date1,
     String? date2,
   ) async {
@@ -1396,25 +1400,32 @@ class ServiceApi {
       final response = await http
           .get(
             Uri.parse(
-              '${baseUrl}get_reqUptAbs?accept=$accept&type=$type&level=$level&id_user=$idUser&date1=$date1&date2=$date2',
+              '${baseUrl}get_reqUptAbs?accept=$accept&type=$type&level=$level&id_user=$idUser&kode_cabang=$branchCode&date1=$date1&date2=$date2',
             ),
           )
           .timeout(const Duration(minutes: 1));
       // print(
-      //   '${baseUrl}get_reqUptAbs?accept=$accept&type=$type&level=$level&id_user=$idUser&date1=$date1&date2=$date2',
+      //    '${baseUrl}get_reqUptAbs?accept=$accept&type=$type&level=$level&id_user=$idUser&kode_cabang=$branchCode&date1=$date1&date2=$date2'
       // );
+      final res = json.decode(response.body);
       switch (response.statusCode) {
         case 200:
-          List<dynamic> listData = json.decode(response.body)['data'];
-          List<ReqApp> result =
-              listData.map((e) => ReqApp.fromJson(e)).toList();
-          return result;
+          if (res['data'] != null) {
+            List<dynamic> listData = res['data'];
+            List<ReqApp> result =
+                listData.map((e) => ReqApp.fromJson(e)).toList();
+            return result;
+          } else {
+            showToast(res['message']);
+            return <ReqApp>[];
+          }
+
         case 400:
         case 401:
         case 402:
         case 404:
           final result = json.decode(response.body);
-          throw FetchDataException(result["data"]);
+          throw FetchDataException(result["message"]);
         default:
           throw FetchDataException('Something went wrong.');
       }
@@ -1486,12 +1497,17 @@ class ServiceApi {
     }
   }
 
-  leaveAdd(Map<String, dynamic> data) async {
+  reqLeaveAdd(Map<String, dynamic> data) async {
     try {
       Map<String, String> headers = {
         'Content-Type': 'application/json; charset=UTF-8',
       };
-      var request = http.MultipartRequest('POST', Uri.parse('${baseUrl}leave'));
+
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse('${baseUrl}req_leave'),
+      );
+
       request.headers.addAll(headers);
 
       request.fields['type'] = data["type"];
@@ -1511,54 +1527,61 @@ class ServiceApi {
       request.fields['parent_id'] = data["parent_id"];
       request.fields['signature'] = data["signature"];
 
-      File file = data["attach_file"];
+      File? file = data["attach_file"];
 
-      request.files.add(
-        http.MultipartFile(
-          "attach_file",
-          file.readAsBytes().asStream(),
-          file.lengthSync(),
-          filename: file.path.split("/").last,
-        ),
-      );
-      // request.files.add(
-      //   http.MultipartFile(
-      //     "attach_file",
-      //     File(data["attach_file"]).readAsBytes().asStream(),
-      //     File(data["attach_file"]).lengthSync(),
-      //     filename: File(data["attach_file"]).path.split("/").last,
-      //   ),
-      // );
+      if (file != null && await file.exists()) {
+        request.files.add(
+          http.MultipartFile(
+            "attach_file",
+            file.readAsBytes().asStream(),
+            file.lengthSync(),
+            filename: file.path.split("/").last,
+          ),
+        );
+      }
 
-      await request.send().timeout(const Duration(minutes: 1)).then((val) {
-        if (val.statusCode == 200) {
-          Get.back();
-          succesDialog(
-            context: Get.context!,
-            pageAbsen: 'N',
-            desc: 'Pengajuan berhasil dibuat',
-            type: DialogType.success,
-            title: 'SUKSES',
-            btnOkOnPress: () => Get.back(),
-          );
-        } else {
-          Get.back();
-          failedDialog(
-            Get.context!,
-            'ERROR',
-            '${val.request!.url}\n${val.statusCode} ${val.reasonPhrase}',
-          );
+      final response = await request.send().timeout(const Duration(minutes: 1));
+
+      return response.statusCode == 200;
+    } on TimeoutException {
+      return false;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  reqLeave(Map<String, dynamic> param) async {
+    try {
+      final response = await http
+          .post(Uri.parse('${baseUrl}req_leave'), body: param)
+          .timeout(const Duration(minutes: 1));
+
+      if (response.statusCode == 200) {
+        final responseBody = jsonDecode(response.body);
+        final type = param['type'];
+
+        if (type == "" || type == "get_pending_req_leave") {
+          List<dynamic> result = responseBody['data'];
+          List<ReqLeaveModel> data =
+              result.map((e) => ReqLeaveModel.fromJson(e)).toList();
+          return data;
         }
-      });
-    } on TimeoutException catch (_) {
-      Get.back();
-      failedDialog(
-        Get.context!,
-        'ERROR',
-        'Waktu koneksi ke server telah habis\nSilahkan coba lagi nanti',
-      );
-    } on Exception catch (e) {
-      showToast(e.toString());
+
+        if (type == "update") {
+          showToast("Pengajuan berhasil disetujui");
+        } else if (type == "add_leave") {
+          showToast("Pengajuan berhasil dibuat");
+        } else {
+          showToast("Pengajuan berhasil dicancel");
+        }
+      } else {
+        // Bisa juga handle error atau status selain 200 di sini jika perlu
+        showToast("Terjadi kesalahan: Status code ${response.statusCode}");
+      }
+    } catch (e) {
+      // Tangani error jaringan, timeout, atau parsing json
+
+      showToast("Gagal terhubung ke server: $e");
     }
   }
 
@@ -1572,7 +1595,7 @@ class ServiceApi {
         final responseBody = jsonDecode(response.body);
         final type = param['type'];
 
-        if (type == "" || type == "get_pending_req_leave") {
+        if (type == "") {
           List<dynamic> result = responseBody['data'];
           List<LeaveModel> data =
               result.map((e) => LeaveModel.fromJson(e)).toList();
@@ -1582,7 +1605,7 @@ class ServiceApi {
         if (type == "update") {
           showToast("Pengajuan berhasil disetujui");
         } else if (type == "add_leave") {
-          showToast("Pengajuan berhasil dibuat");
+          showToast("Data berhasil dibuat");
         } else {
           showToast("Pengajuan berhasil dicancel");
         }
@@ -1622,6 +1645,7 @@ class ServiceApi {
             body: jsonEncode(param),
           )
           .timeout(const Duration(seconds: 60));
+      // print('${baseUrl}get_notif');
       // print(param);
       if (param['type'] == "summ_month") {
         if (response.statusCode == 200) {
@@ -1634,7 +1658,7 @@ class ServiceApi {
           return notif;
         } else {
           throw Exception(
-            'Failed to load data, status: ${response.statusCode}',
+            'Failed to load doclang data, status: ${response.statusCode}',
           );
         }
       }
@@ -1650,7 +1674,7 @@ class ServiceApi {
           return notif;
         } else {
           throw Exception(
-            'Failed to load data, status: ${response.statusCode}',
+            'Failed to load dobol data, status: ${response.statusCode}',
           );
         }
       }
@@ -1687,10 +1711,57 @@ class ServiceApi {
           );
         }
       } else {
-        throw Exception('Failed to load data, status: ${response.statusCode}');
+        throw Exception(
+          'Failed to load dobleh data, status: ${response.statusCode}',
+        );
       }
     } on Exception catch (e) {
       throw Exception(e.toString());
+    }
+  }
+
+  uptStsUsr(Map<String, String?> data) async {
+    try {
+      return await http
+          .post(Uri.parse('${baseUrl}add_user'), body: data)
+          .timeout(const Duration(seconds: 10));
+    } on Exception catch (e) {
+      Get.back();
+      showToast("$e");
+    }
+    // finally {
+    //   Get.back();
+    // }
+  }
+
+  overtime(Map<String, String> data) async {
+    try {
+      final response = await http
+          .post(Uri.parse('${baseUrl}overtime'), body: data)
+          .timeout(const Duration(seconds: 10));
+
+      final res = json.decode(response.body);
+      // print(res);
+
+      if (response.statusCode == 200) {
+        if (data['type'] == "" || data['type'] == "get_by_id") {
+          if (res['data'] != null) {
+            List<dynamic> listOvr = res['data'];
+            List<OvertimeModel> result =
+                listOvr.map((e) => OvertimeModel.fromJson(e)).toList();
+            return result;
+          } else {
+            showToast(res['message']);
+          }
+        } else {
+          // print(res);
+          return res; // ✅ WAJIB return
+        }
+      } else {
+        return {'success': false};
+      }
+    } catch (e) {
+      return {'success': false, 'error': e.toString()};
     }
   }
 }

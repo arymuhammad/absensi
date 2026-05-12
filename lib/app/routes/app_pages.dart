@@ -21,6 +21,8 @@ import '../modules/ping/bindings/ping_binding.dart';
 import '../modules/ping/views/ping_view.dart';
 import '../modules/profil/bindings/profil_binding.dart';
 import '../modules/profil/views/profil_view.dart';
+import '../modules/region_area/bindings/region_area_binding.dart';
+import '../modules/region_area/views/region_area_view.dart';
 import '../modules/semua_absen/bindings/semua_absen_binding.dart';
 import '../modules/semua_absen/views/semua_absen_view.dart';
 import '../modules/settings/bindings/settings_binding.dart';
@@ -106,8 +108,13 @@ class AppPages {
     ),
     GetPage(
       name: _Paths.OVERTIME,
-      page: () =>  OvertimeView(),
+      page: () => OvertimeView(),
       binding: OvertimeBinding(),
+    ),
+    GetPage(
+      name: _Paths.REGION_AREA,
+      page: () => RegionAreaView(),
+      binding: RegionAreaBinding(),
     ),
   ];
 }
