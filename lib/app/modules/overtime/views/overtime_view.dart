@@ -151,7 +151,7 @@ class OvertimeView extends GetView<OvertimeController> {
                     //||                   ||//
                     //=======================//
                     int getTotalSteps() {
-                      if (item.level == "19" || item.level == "20") {
+                      if (item.level == "19" || item.level == "20"|| item.level == "59") {
                         return 4;
                       }
                       return 5;
@@ -176,7 +176,7 @@ class OvertimeView extends GetView<OvertimeController> {
                     ];
 
                     List<String> getNodeTitles() {
-                      if (item.level == "19" || item.level == "20") {
+                      if (item.level == "19" || item.level == "20"|| item.level == "59") {
                         // Level 19 di parent 3; 3 steps tapi sM seperti contoh kamu
                         return nodeTitles4Steps;
                       } else {

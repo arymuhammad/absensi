@@ -179,7 +179,8 @@ class LeaveView extends GetView<LeaveController> {
                                             if (leave.parentId == "3") {
                                               final skipStore =
                                                   leave.levelId == "19" ||
-                                                  leave.levelId == "20";
+                                                  leave.levelId == "20" ||
+                                                  leave.levelId == "59";
 
                                               if (skipStore) {
                                                 return [
@@ -267,7 +268,8 @@ class LeaveView extends GetView<LeaveController> {
                                             if (leave.parentId == "3") {
                                               final skipStore =
                                                   leave.levelId == "19" ||
-                                                  leave.levelId == "20";
+                                                  leave.levelId == "20" ||
+                                                  leave.levelId == "59";
 
                                               if (skipStore) {
                                                 switch (index) {
@@ -329,7 +331,8 @@ class LeaveView extends GetView<LeaveController> {
                                             if (leave.parentId == "3") {
                                               final skipStore =
                                                   leave.levelId == "19" ||
-                                                  leave.levelId == "20";
+                                                  leave.levelId == "20"||
+                                                  leave.levelId == "59";
 
                                               if (skipStore) {
                                                 // acc2 → acc3 → acc4
@@ -473,7 +476,8 @@ class LeaveView extends GetView<LeaveController> {
                                             if (leave.parentId == "3") {
                                               final skipStore =
                                                   leave.levelId == "19" ||
-                                                  leave.levelId == "20";
+                                                  leave.levelId == "20"||
+                                                  leave.levelId == "59";
 
                                               if (skipStore) {
                                                 if (leave.acc2 == null)

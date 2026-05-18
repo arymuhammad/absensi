@@ -200,40 +200,168 @@ class AddPegawaiController extends GetxController {
   }
 
   Future<bool> addUpdatePegawai(context, String mode, Data dataUser) async {
-    Random random = Random();
-    int randomNumber = random.nextInt(100);
-    final response = await ServiceApi().getUser();
-    cekDataUser.value = response;
+    try {
+      Random random = Random();
+      int randomNumber = random.nextInt(100);
+      final response = await ServiceApi().getUser();
+      cekDataUser.value = response;
 
-    // var lstUser = [];
-    // cekDataUser.map((e) {
-    //   lstUser.add(e.username!);
-    // }).toList();
-    // var lstPhone = [];
-    // cekDataUser.map((e) {
-    //   lstPhone.add(e.notelp!);
-    // }).toList();
-    final isUsrExist = cekDataUser.any(
-      (dt) => dt.username?.trim() == username.text.trim(),
-    );
-    final inputTelp = telp.text.trim();
-    final oldTelp = dataUser.noTelp?.trim() ?? '';
+      // var lstUser = [];
+      // cekDataUser.map((e) {
+      //   lstUser.add(e.username!);
+      // }).toList();
+      // var lstPhone = [];
+      // cekDataUser.map((e) {
+      //   lstPhone.add(e.notelp!);
+      // }).toList();
+      final isUsrExist = cekDataUser.any(
+        (dt) => dt.username?.trim() == username.text.trim(),
+      );
+      final inputTelp = telp.text.trim();
+      final oldTelp = dataUser.noTelp?.trim() ?? '';
 
-    // // hanya validasi kalau user isi field
-    // if (inputTelp.isNotEmpty) {
-    //   final isNumExist = cekDataUser.any(
-    //     (dt) => (dt.notelp ?? '').trim() == inputTelp,
-    //   );
-    // }
-    if (mode == "add") {
-      loadingDialog("Registering user", "Please wait");
-      if (selectedCabang.isNotEmpty &&
-          username.text != "" &&
-          pass.text != "" &&
-          name.text != "" &&
-          telp.text != "" &&
-          selectedCabang.isNotEmpty &&
-          selectedLevel.isNotEmpty) {
+      // // hanya validasi kalau user isi field
+      // if (inputTelp.isNotEmpty) {
+      //   final isNumExist = cekDataUser.any(
+      //     (dt) => (dt.notelp ?? '').trim() == inputTelp,
+      //   );
+      // }
+      if (mode == "add") {
+        loadingDialog("Registering user", "Please wait");
+        if (selectedCabang.isNotEmpty &&
+            username.text != "" &&
+            pass.text != "" &&
+            name.text != "" &&
+            telp.text != "" &&
+            selectedCabang.isNotEmpty &&
+            selectedLevel.isNotEmpty) {
+          if (image != null &&
+                  (image!.name.endsWith("jpg") ||
+                      image!.name.endsWith("jpeg") ||
+                      image!.name.endsWith("png")) ||
+              fileResult != null) {
+            var data = {
+              "status": mode,
+              "id": '${selectedCabang.value}000$randomNumber',
+              "username": username.text,
+              "password": pass.text,
+              "nama": name.text,
+              "no_telp": telp.text,
+              "kode_cabang": selectedCabang.value,
+              "level": selectedLevel.value,
+              "foto":
+                  kIsWeb
+                      ? fileResult!.files.single
+                      : File(image!.path.toString()),
+            };
+
+            if (isUsrExist && isPhoneExist(inputTelp)) {
+              _showWarning(
+                "Username and Phone Number are already registered\nPlease change both",
+              );
+              return false;
+            } else if (isUsrExist) {
+              _showWarning(
+                "Username is already registered\nPlease change it to another username",
+              );
+              return false;
+            } else if (isPhoneExist(inputTelp)) {
+              _showWarning(
+                "This phone number is already registered\nPlease enter another phone number",
+              );
+              return false;
+            } else {
+              // succesDialog(context, "N", "Data berhasil disimpan", DialogType.success, 'SUKSES');
+              final isSuccess = await ServiceApi().addUpdatePegawai(data, mode);
+              if (!isSuccess) {
+                Get.back(); // tutup loading
+                warningDialog(
+                  Get.context!,
+                  "Error",
+                  "Failed to update data. Please try again",
+                );
+                isLoading.value = false;
+                return false;
+              }
+              selectedCabang.value = "";
+              username.clear();
+              store.clear();
+              level.clear();
+              pass.clear();
+              name.clear();
+              telp.clear();
+              selectedLevel.value = "";
+              brandCabang.value = "";
+              // lstUser.clear();
+
+              image = null;
+              return true;
+            }
+          } else {
+            var data = {
+              "status": mode,
+              "id": '${selectedCabang.value}000$randomNumber',
+              "username": username.text,
+              "password": pass.text,
+              "nama": name.text,
+              "no_telp": telp.text,
+              "kode_cabang": selectedCabang.value,
+              "level": selectedLevel.value,
+            };
+
+            if (isUsrExist && isPhoneExist(inputTelp)) {
+              _showWarning(
+                "Username and Phone Number are already registered\nPlease change both",
+              );
+              return false;
+            } else if (isUsrExist) {
+              _showWarning(
+                "Username is already registered\nPlease change it to another username",
+              );
+              return false;
+            } else if (isPhoneExist(inputTelp)) {
+              _showWarning(
+                "This phone number is already registered\nPlease enter another phone number",
+              );
+              return false;
+            } else {
+              final isSuccess = await ServiceApi().addUpdatePegawai(data, mode);
+              if (!isSuccess) {
+                Get.back(); // tutup loading
+                warningDialog(
+                  Get.context!,
+                  "Error",
+                  "Failed to update data. Please try again",
+                );
+                isLoading.value = false;
+                return false;
+              }
+              selectedCabang.value = "";
+              username.clear();
+              store.clear();
+              level.clear();
+              pass.clear();
+              name.clear();
+              telp.clear();
+              selectedLevel.value = "";
+              brandCabang.value = "";
+              // lstUser.clear();
+              image = null;
+              return true;
+            }
+          }
+        } else {
+          Get.back();
+          warningDialog(
+            Get.context!,
+            "Warning",
+            "Please fill in the data in all columns",
+          );
+          return false;
+        }
+      } else {
+        loadingDialog("Updating data", "Please wait");
+
         if (image != null &&
                 (image!.name.endsWith("jpg") ||
                     image!.name.endsWith("jpeg") ||
@@ -241,267 +369,8 @@ class AddPegawaiController extends GetxController {
             fileResult != null) {
           var data = {
             "status": mode,
-            "id": '${selectedCabang.value}000$randomNumber',
-            "username": username.text,
-            "password": pass.text,
-            "nama": name.text,
-            "no_telp": telp.text,
-            "kode_cabang": selectedCabang.value,
-            "level": selectedLevel.value,
-            "foto":
-                kIsWeb
-                    ? fileResult!.files.single
-                    : File(image!.path.toString()),
-          };
-
-          if (isUsrExist && isPhoneExist(inputTelp)) {
-            _showWarning(
-              "Username and Phone Number are already registered\nPlease change both",
-            );
-            return false;
-          } else if (isUsrExist) {
-            _showWarning(
-              "Username is already registered\nPlease change it to another username",
-            );
-            return false;
-          } else if (isPhoneExist(inputTelp)) {
-            _showWarning(
-              "This phone number is already registered\nPlease enter another phone number",
-            );
-            return false;
-          } else {
-            // succesDialog(context, "N", "Data berhasil disimpan", DialogType.success, 'SUKSES');
-            final isSuccess = await ServiceApi().addUpdatePegawai(data, mode);
-            if (!isSuccess) {
-              Get.back(); // tutup loading
-              warningDialog(
-                Get.context!,
-                "Error",
-                "Failed to update data. Please try again",
-              );
-              isLoading.value = false;
-              return false;
-            }
-            selectedCabang.value = "";
-            username.clear();
-            store.clear();
-            level.clear();
-            pass.clear();
-            name.clear();
-            telp.clear();
-            selectedLevel.value = "";
-            brandCabang.value = "";
-            // lstUser.clear();
-
-            image = null;
-            return true;
-          }
-        } else {
-          var data = {
-            "status": mode,
-            "id": '${selectedCabang.value}000$randomNumber',
-            "username": username.text,
-            "password": pass.text,
-            "nama": name.text,
-            "no_telp": telp.text,
-            "kode_cabang": selectedCabang.value,
-            "level": selectedLevel.value,
-          };
-
-          if (isUsrExist && isPhoneExist(inputTelp)) {
-            _showWarning(
-              "Username and Phone Number are already registered\nPlease change both",
-            );
-            return false;
-          } else if (isUsrExist) {
-            _showWarning(
-              "Username is already registered\nPlease change it to another username",
-            );
-            return false;
-          } else if (isPhoneExist(inputTelp)) {
-            _showWarning(
-              "This phone number is already registered\nPlease enter another phone number",
-            );
-            return false;
-          } else {
-            final isSuccess = await ServiceApi().addUpdatePegawai(data, mode);
-            if (!isSuccess) {
-              Get.back(); // tutup loading
-              warningDialog(
-                Get.context!,
-                "Error",
-                "Failed to update data. Please try again",
-              );
-              isLoading.value = false;
-              return false;
-            }
-            selectedCabang.value = "";
-            username.clear();
-            store.clear();
-            level.clear();
-            pass.clear();
-            name.clear();
-            telp.clear();
-            selectedLevel.value = "";
-            brandCabang.value = "";
-            // lstUser.clear();
-            image = null;
-            return true;
-          }
-        }
-      } else {
-        Get.back();
-        warningDialog(
-          Get.context!,
-          "Warning",
-          "Please fill in the data in all columns",
-        );
-        return false;
-      }
-    } else {
-      loadingDialog("Updating data", "Please wait");
-
-      if (image != null &&
-              (image!.name.endsWith("jpg") ||
-                  image!.name.endsWith("jpeg") ||
-                  image!.name.endsWith("png")) ||
-          fileResult != null) {
-        var data = {
-          "status": mode,
-          "id": dataUser.id,
-          "username": dataUser.username,
-          "nama": name.text != "" ? name.text : dataUser.nama,
-          "no_telp": inputTelp.isNotEmpty ? inputTelp : oldTelp,
-          "kode_cabang":
-              selectedCabang.value != ""
-                  ? selectedCabang.value
-                  : dataUser.kodeCabang,
-          "level":
-              selectedLevel.value != "" ? selectedLevel.value : dataUser.level,
-          "foto":
-              kIsWeb ? fileResult!.files.single : File(image!.path.toString()),
-          "created_at": joinDate.text.isNotEmpty ? joinDate.text : null,
-        };
-
-        if (inputTelp.isNotEmpty && isPhoneExist(inputTelp)) {
-          Get.back();
-          warningDialog(
-            Get.context!,
-            "Warning",
-            "This phone number is already registered\nPlease enter another phone number",
-          );
-          isLoading.value = false;
-          return false;
-        } else {
-          final isSuccess = await ServiceApi().addUpdatePegawai(data, mode);
-
-          if (!isSuccess) {
-            Get.back(); // tutup loading
-            warningDialog(
-              Get.context!,
-              "Error",
-              "Failed to update data. Please try again",
-            );
-            isLoading.value = false;
-            return false;
-          }
-          // langsung update sharedpref tanpa harus re login
-          var newUsr = await ServiceApi().fetchCurrentUser({
-            "username": dataUser.username!,
-            "password": dataUser.password!,
-          });
-          if (Get.isRegistered<LoginController>()) {
-            final logC = Get.find<LoginController>();
-
-            // update sharedpreff
-            final prefs = await SharedPreferences.getInstance();
-            await prefs.setString('userDataLogin', jsonEncode(newUsr.toJson()));
-            logC.logUser.value = newUsr;
-
-            logC.refresh();
-          }
-          //start update local db for tbl_user
-          SQLHelper.instance.updateDataUser(
-            {
-              "nama": name.text != "" ? name.text : dataUser.nama,
-              "no_telp": inputTelp.isNotEmpty ? inputTelp : oldTelp,
-              "kode_cabang":
-                  selectedCabang.value != ""
-                      ? selectedCabang.value
-                      : dataUser.kodeCabang,
-              "nama_cabang":
-                  cabangName.value != ""
-                      ? cabangName.value
-                      : dataUser.namaCabang,
-              "lat": newUsr.lat!,
-              "long": newUsr.long!,
-              "area_coverage": newUsr.areaCover!,
-              "level":
-                  selectedLevel.value != ""
-                      ? selectedLevel.value
-                      : dataUser.level,
-              "level_user":
-                  levelName.value != "" ? levelName.value : dataUser.levelUser,
-              "foto": image!.path,
-              "visit": newUsr.visit!,
-              "parent_id": newUsr.parentId!,
-              "cek_stok":
-                  cekStok.value != "" ? cekStok.value : dataUser.cekStok,
-              "created_at":
-                  joinDate.text.isNotEmpty ? joinDate.text : dataUser.createdAt,
-            },
-            dataUser.id!,
-            dataUser.username!,
-          );
-          //end of update
-
-          // Get.back();
-          // dialogMsgScsUpd(
-          //     "Sukses", "Data berhasil disimpan\nSilahkan login ulang");
-          newPhone.value = telp.text;
-
-          var idUser = {"id": dataUser.id};
-          FotoProfil foto = await ServiceApi().getFotoProfil(idUser);
-          SharedPreferences pref = await SharedPreferences.getInstance();
-          await pref.setString("fotoProfil", foto.foto!);
-          // fotoProfil.value = pref.getString("fotoProfil")!;
-          selectedCabang.value = "";
-          cvrArea.value = "";
-          lat.value = "";
-          long.value = "";
-          cabangName.value = "";
-          levelName.value = "";
-          cekStok.value = "";
-          username.clear();
-          store.clear();
-          level.clear();
-          pass.clear();
-          name.clear();
-          telp.clear();
-          joinDate.clear();
-          selectedLevel.value = "";
-          brandCabang.value = "";
-
-          isLoading.value = false;
-          image = null;
-          return true;
-        }
-        // Get.back();
-      } else {
-        // if (lstPhone.contains(telp.text)) {
-        if (inputTelp.isNotEmpty && isPhoneExist(inputTelp)) {
-          Get.back();
-          warningDialog(
-            Get.context!,
-            "Warning",
-            "This phone number is already registered\nPlease enter another phone number",
-          );
-          isLoading.value = false;
-          return false;
-        } else {
-          var data = {
-            "status": mode,
             "id": dataUser.id,
+            "username": dataUser.username,
             "nama": name.text != "" ? name.text : dataUser.nama,
             "no_telp": inputTelp.isNotEmpty ? inputTelp : oldTelp,
             "kode_cabang":
@@ -512,93 +381,257 @@ class AddPegawaiController extends GetxController {
                 selectedLevel.value != ""
                     ? selectedLevel.value
                     : dataUser.level,
+            "foto":
+                kIsWeb
+                    ? fileResult!.files.single
+                    : File(image!.path.toString()),
             "created_at": joinDate.text.isNotEmpty ? joinDate.text : null,
           };
-          // loadingDialog("updating data", "");
-          // print(data);
-          final isSuccess = await ServiceApi().addUpdatePegawai(data, mode);
-          if (!isSuccess) {
-            Get.back(); // tutup loading
+
+          if (inputTelp.isNotEmpty && isPhoneExist(inputTelp)) {
+            Get.back();
             warningDialog(
               Get.context!,
-              "Error",
-              "Failed to update data. Please try again",
+              "Warning",
+              "This phone number is already registered\nPlease enter another phone number",
             );
             isLoading.value = false;
             return false;
-          }
-          // langsung update sharedpref tanpa harus re login
-          var newUsr = await ServiceApi().fetchCurrentUser({
-            "username": dataUser.username!,
-            "password": dataUser.password!,
-          });
-          if (Get.isRegistered<LoginController>()) {
-            final logC = Get.find<LoginController>();
+          } else {
+            final isSuccess = await ServiceApi().addUpdatePegawai(data, mode);
 
-            // update sharedpreff
-            final prefs = await SharedPreferences.getInstance();
-            await prefs.setString('userDataLogin', jsonEncode(newUsr.toJson()));
-            logC.logUser.value = newUsr;
+            if (!isSuccess) {
+              Get.back(); // tutup loading
+              warningDialog(
+                Get.context!,
+                "Error",
+                "Failed to update data. Please try again",
+              );
+              isLoading.value = false;
+              return false;
+            }
+            // langsung update sharedpref tanpa harus re login
+            var newUsr = await ServiceApi().fetchCurrentUser({
+              "username": dataUser.username!,
+              "password": dataUser.password!,
+            });
+            if (Get.isRegistered<LoginController>()) {
+              final logC = Get.find<LoginController>();
 
-            logC.refresh();
+              // update sharedpreff
+              final prefs = await SharedPreferences.getInstance();
+              await prefs.setString(
+                'userDataLogin',
+                jsonEncode(newUsr.toJson()),
+              );
+              logC.logUser.value = newUsr;
+
+              logC.refresh();
+            }
+            //start update local db for tbl_user
+            SQLHelper.instance.updateDataUser(
+              {
+                "nama": name.text != "" ? name.text : dataUser.nama,
+                "no_telp": inputTelp.isNotEmpty ? inputTelp : oldTelp,
+                "kode_cabang":
+                    selectedCabang.value != ""
+                        ? selectedCabang.value
+                        : dataUser.kodeCabang,
+                "nama_cabang":
+                    cabangName.value != ""
+                        ? cabangName.value
+                        : dataUser.namaCabang,
+                "lat": newUsr.lat!,
+                "long": newUsr.long!,
+                "area_coverage": newUsr.areaCover!,
+                "level":
+                    selectedLevel.value != ""
+                        ? selectedLevel.value
+                        : dataUser.level,
+                "level_user":
+                    levelName.value != ""
+                        ? levelName.value
+                        : dataUser.levelUser,
+                "foto": image!.path,
+                "visit": newUsr.visit!,
+                "parent_id": newUsr.parentId!,
+                "cek_stok":
+                    cekStok.value != "" ? cekStok.value : dataUser.cekStok,
+                "created_at":
+                    joinDate.text.isNotEmpty
+                        ? joinDate.text
+                        : dataUser.createdAt,
+              },
+              dataUser.id!,
+              dataUser.username!,
+            );
+            //end of update
+
+            // Get.back();
+            // dialogMsgScsUpd(
+            //     "Sukses", "Data berhasil disimpan\nSilahkan login ulang");
+            newPhone.value = telp.text;
+
+            var idUser = {"id": dataUser.id};
+            FotoProfil foto = await ServiceApi().getFotoProfil(idUser);
+            SharedPreferences pref = await SharedPreferences.getInstance();
+            await pref.setString("fotoProfil", foto.foto!);
+            // fotoProfil.value = pref.getString("fotoProfil")!;
+            selectedCabang.value = "";
+            cvrArea.value = "";
+            lat.value = "";
+            long.value = "";
+            cabangName.value = "";
+            levelName.value = "";
+            cekStok.value = "";
+            username.clear();
+            store.clear();
+            level.clear();
+            pass.clear();
+            name.clear();
+            telp.clear();
+            joinDate.clear();
+            selectedLevel.value = "";
+            brandCabang.value = "";
+
+            isLoading.value = false;
+            image = null;
+            return true;
           }
-          //start update local db for tbl_user
-          SQLHelper.instance.updateDataUser(
-            {
+          // Get.back();
+        } else {
+          // if (lstPhone.contains(telp.text)) {
+          if (inputTelp.isNotEmpty && isPhoneExist(inputTelp)) {
+            Get.back();
+            warningDialog(
+              Get.context!,
+              "Warning",
+              "This phone number is already registered\nPlease enter another phone number",
+            );
+            isLoading.value = false;
+            return false;
+          } else {
+            var data = {
+              "status": mode,
+              "id": dataUser.id,
               "nama": name.text != "" ? name.text : dataUser.nama,
               "no_telp": inputTelp.isNotEmpty ? inputTelp : oldTelp,
               "kode_cabang":
                   selectedCabang.value != ""
                       ? selectedCabang.value
                       : dataUser.kodeCabang,
-              "nama_cabang":
-                  cabangName.value != ""
-                      ? cabangName.value
-                      : dataUser.namaCabang,
-              "lat": newUsr.lat!,
-              "long": newUsr.long!,
-              "area_coverage": newUsr.areaCover!,
               "level":
                   selectedLevel.value != ""
                       ? selectedLevel.value
                       : dataUser.level,
-              "level_user":
-                  levelName.value != "" ? levelName.value : dataUser.levelUser,
-              "visit": newUsr.visit!,
-              "parent_id": newUsr.parentId!,
-              "cek_stok":
-                  cekStok.value != "" ? cekStok.value : dataUser.cekStok,
-              "created_at":
-                  joinDate.text.isNotEmpty ? joinDate.text : newUsr.createdAt,
-            },
-            dataUser.id!,
-            dataUser.username!,
-          );
-          //end of update
+              "created_at": joinDate.text.isNotEmpty ? joinDate.text : null,
+            };
+            // loadingDialog("updating data", "");
+            // print(data);
+            final isSuccess = await ServiceApi().addUpdatePegawai(data, mode);
+            if (!isSuccess) {
+              Get.back(); // tutup loading
+              warningDialog(
+                Get.context!,
+                "Error",
+                "Failed to update data. Please try again",
+              );
+              isLoading.value = false;
+              return false;
+            }
+            // langsung update sharedpref tanpa harus re login
+            var newUsr = await ServiceApi().fetchCurrentUser({
+              "username": dataUser.username!,
+              "password": dataUser.password!,
+            });
+            if (Get.isRegistered<LoginController>()) {
+              final logC = Get.find<LoginController>();
 
-          newPhone.value = telp.text;
-          selectedCabang.value = "";
-          cvrArea.value = "";
-          lat.value = "";
-          long.value = "";
-          cabangName.value = "";
-          levelName.value = "";
-          cekStok.value = "";
-          username.clear();
-          store.clear();
-          level.clear();
-          pass.clear();
-          name.clear();
-          telp.clear();
-          joinDate.clear();
-          selectedLevel.value = "";
-          brandCabang.value = "";
+              // update sharedpreff
+              final prefs = await SharedPreferences.getInstance();
+              await prefs.setString(
+                'userDataLogin',
+                jsonEncode(newUsr.toJson()),
+              );
+              logC.logUser.value = newUsr;
 
-          isLoading.value = false;
-          image = null;
-          return true;
+              logC.refresh();
+            }
+            //start update local db for tbl_user
+            SQLHelper.instance.updateDataUser(
+              {
+                "nama": name.text != "" ? name.text : dataUser.nama,
+                "no_telp": inputTelp.isNotEmpty ? inputTelp : oldTelp,
+                "kode_cabang":
+                    selectedCabang.value != ""
+                        ? selectedCabang.value
+                        : dataUser.kodeCabang,
+                "nama_cabang":
+                    cabangName.value != ""
+                        ? cabangName.value
+                        : dataUser.namaCabang,
+                "lat": newUsr.lat!,
+                "long": newUsr.long!,
+                "area_coverage": newUsr.areaCover!,
+                "level":
+                    selectedLevel.value != ""
+                        ? selectedLevel.value
+                        : dataUser.level,
+                "level_user":
+                    levelName.value != ""
+                        ? levelName.value
+                        : dataUser.levelUser,
+                "visit": newUsr.visit!,
+                "parent_id": newUsr.parentId!,
+                "cek_stok":
+                    cekStok.value != "" ? cekStok.value : dataUser.cekStok,
+                "created_at":
+                    joinDate.text.isNotEmpty ? joinDate.text : newUsr.createdAt,
+              },
+              dataUser.id!,
+              dataUser.username!,
+            );
+            //end of update
+
+            newPhone.value = telp.text;
+            selectedCabang.value = "";
+            cvrArea.value = "";
+            lat.value = "";
+            long.value = "";
+            cabangName.value = "";
+            levelName.value = "";
+            cekStok.value = "";
+            username.clear();
+            store.clear();
+            level.clear();
+            pass.clear();
+            name.clear();
+            telp.clear();
+            joinDate.clear();
+            selectedLevel.value = "";
+            brandCabang.value = "";
+
+            isLoading.value = false;
+            image = null;
+            return true;
+          }
         }
       }
+    } catch (e, stackTrace) {
+      debugPrint("ERROR addUpdatePegawai: $e");
+      debugPrint("STACKTRACE: $stackTrace");
+
+      if (Get.isDialogOpen ?? false) {
+        Get.back();
+      }
+
+      warningDialog(Get.context!, "Error", e.toString());
+
+      isLoading.value = false;
+
+      return false;
+    } finally {
+      isLoading.value = false;
     }
   }
 

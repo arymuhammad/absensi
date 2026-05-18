@@ -5,8 +5,6 @@ import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
-import '../../../data/model/PayslipStoreModel.dart';
-import '../../../data/model/payslip_model.dart';
 
 class PaySlipController extends GetxController {
   var isLoading = true.obs;

@@ -255,9 +255,9 @@ class EditDataAbsen extends GetView<DetailAbsenController> {
                       detailC.submitApproval(
                         data['id_user'],
                         data['nama'],
-                        data['kode_cabang'],
+                        userData.kodeCabang!,
                         data['id_shift'],
-                        userData.level!
+                        userData.level!,
                       );
                     },
                     backgroundColor: Colors.transparent,

@@ -52,7 +52,9 @@ class MainMenu extends StatelessWidget {
                     );
 
                     if ((userData!.parentId == "3" &&
-                            (userData!.level == "19" || userData!.level == "20" || userData!.level == "59" ||
+                            (userData!.level == "19" ||
+                                userData!.level == "20" ||
+                                userData!.level == "59" ||
                                 userData!.level == "26")) ||
                         (userData!.parentId == "4" &&
                             (userData!.level == "1" ||
@@ -67,7 +69,9 @@ class MainMenu extends StatelessWidget {
                             userData!.level == "41") ||
                         (userData!.parentId == "2" &&
                             userData!.level == "10") ||
-                        (userData!.parentId == "1")) {
+                        (userData!.parentId == "1") ||
+                        (userData!.level == "96") ||
+                        (userData!.level == "106")) {
                       homeC.getPendingApproval(
                         idUser: userData!.id!,
                         kodeCabang: userData!.kodeCabang!,
@@ -98,7 +102,11 @@ class MainMenu extends StatelessWidget {
                 children: [
                   Visibility(
                     visible:
-                        ((userData!.parentId == "3" &&  (userData!.level == "19" || userData!.level == "20" || userData!.level == "59" ||  userData!.level == "26")) ||
+                        ((userData!.parentId == "3" &&
+                                    (userData!.level == "19" ||
+                                        userData!.level == "20" ||
+                                        userData!.level == "59" ||
+                                        userData!.level == "26")) ||
                                 (userData!.parentId == "4" &&
                                     (userData!.level == "1" ||
                                         userData!.level == "43")) ||
@@ -114,7 +122,9 @@ class MainMenu extends StatelessWidget {
                                     userData!.level == "41") ||
                                 (userData!.parentId == "2" &&
                                     userData!.level == "10") ||
-                                (userData!.parentId == "1"))
+                                (userData!.parentId == "1") ||
+                                (userData!.level == "96") ||
+                                (userData!.level == "106"))
                             ? true
                             : false,
                     child: Row(

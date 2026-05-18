@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:absensi/app/data/helper/db_helper.dart';
 import 'package:absensi/app/data/helper/custom_dialog.dart';
 import 'package:absensi/app/data/model/login_offline_model.dart';
 import 'package:absensi/app/modules/pay_slip/controllers/pay_slip_controller.dart';
@@ -7,13 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:crypto/crypto.dart';
-import '../../../data/model/foto_profil_model.dart';
-import '../../../data/theme_controller.dart';
-import '../../../routes/app_pages.dart';
 import '../../../services/service_api.dart';
 import '../../../data/model/login_model.dart';
 import '../../absen/controllers/absen_controller.dart';
-import '../views/login_view.dart';
 
 class LoginController extends GetxController with GetTickerProviderStateMixin {
   late TextEditingController email, username, password;

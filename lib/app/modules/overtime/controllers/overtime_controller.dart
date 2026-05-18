@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:absensi/app/data/helper/custom_dialog.dart';
-import 'package:absensi/app/data/helper/db_result.dart';
 import 'package:absensi/app/data/model/overtime_model.dart';
 import 'package:absensi/app/services/service_api.dart';
 import 'package:flutter/material.dart';
@@ -173,9 +172,11 @@ class OvertimeController extends GetxController {
             "18": "acc_4",
             "39": "acc_4",
             "96": "acc_3",
+            "106": "acc_3",
             "26": "acc_2",
             "19": "acc_1",
             "20": "acc_1",
+            "59": "acc_1",
           }[level]!:
           "reject",
       "type": "reject",
@@ -213,9 +214,11 @@ class OvertimeController extends GetxController {
             "18": "acc_4",
             "39": "acc_4",
             "96": "acc_3",
+            "106": "acc_3",
             "26": "acc_2",
             "19": "acc_1",
             "20": "acc_1",
+            "59": "acc_1",
           }[level]!:
           "approve",
       "type": "accept",

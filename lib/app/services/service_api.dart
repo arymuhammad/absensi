@@ -48,7 +48,7 @@ class ServiceApi {
   var isLoading = false.obs;
 
   Future<Login> loginUser(data) async {
-    var result = Login();
+    // var result = Login();
     try {
       loadingWithIcon();
 
@@ -203,6 +203,8 @@ class ServiceApi {
 
   Future<bool> addUpdatePegawai(Map<String, dynamic> data, String mode) async {
     try {
+      // print("DATA KIRIM:");
+      // print(data);
       var request = http.MultipartRequest(
         'POST',
         Uri.parse('${baseUrl}add_user'),
@@ -247,7 +249,10 @@ class ServiceApi {
         request.fields['no_telp'] = data["no_telp"];
         request.fields['kode_cabang'] = data["kode_cabang"];
         request.fields['level'] = data["level"];
-        request.fields['created_at'] = data["created_at"];
+
+        if (data["created_at"] != null) {
+          request.fields['created_at'] = data["created_at"];
+        }
         if (data["foto"] != null) {
           if (kIsWeb) {
             // print(data["foto"]);
@@ -281,6 +286,8 @@ class ServiceApi {
       // debugPrint("response code: ${res.statusCode}");
       // debugPrint("response: $responseString");
 
+      // print("RAW RESPONSE:");
+      // print(responseString);
       // ignore: unused_local_variable
       final dataDecode = jsonDecode(responseString);
       // debugPrint(dataDecode.toString());
@@ -292,7 +299,12 @@ class ServiceApi {
       }
     } on TimeoutException {
       return false;
-    } catch (e) {
+    } catch (e, stacktrace) {
+      print("ERROR API:");
+      print(e);
+
+      print("STACKTRACE:");
+      print(stacktrace);
       return false;
     }
   }

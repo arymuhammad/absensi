@@ -6,17 +6,14 @@ import 'package:absensi/app/data/model/absen_model.dart';
 import 'package:absensi/app/data/model/req_app_model.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../data/helper/db_helper.dart';
-import '../../../data/helper/manual_sse_client.dart';
 import '../../../data/model/cabang_model.dart';
 import '../../../data/model/dept_model.dart';
 import '../../../data/model/login_model.dart';
-import '../../../data/model/notif_model.dart';
 import '../../../data/model/shift_kerja_model.dart';
 import '../../../data/model/user_model.dart';
 import '../../../data/model/users_model.dart';

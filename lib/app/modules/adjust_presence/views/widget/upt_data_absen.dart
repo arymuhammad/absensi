@@ -4,6 +4,7 @@ import 'package:absensi/app/modules/home/controllers/home_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icons_plus/icons_plus.dart';
+import 'package:step_progress/step_progress.dart';
 import 'package:widget_zoom/widget_zoom.dart';
 
 import '../../../../data/helper/const.dart';
@@ -24,6 +25,163 @@ class UptDataAbsen extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     // final levelId = dataUser.level;
+
+    List<String> getNodeTitles(ReqApp data) {
+      final dataUser = auth.logUser.value;
+      // if (leave.parentId == "3") {
+      final skipStore =
+          dataUser.level == "19" ||
+          dataUser.level == "20" ||
+          dataUser.level == "59";
+
+      if (skipStore) {
+        return ['Apply', 'Area Manager', 'Ops', 'HR'];
+      }
+
+      return ['Apply', 'Store Manager', 'Area Manager', 'Ops', 'HR'];
+      // }
+
+      // return ['Apply', 'Store Manager', 'Area Manager', 'HR'];
+    }
+
+    // ================== APPROVAL MAPPING ==================
+    String? getApprovalValue(ReqApp data, int index) {
+      final dataUser = auth.logUser.value;
+      // if (data.parentId == "3") {
+      final skipStore =
+          dataUser.level == "19" ||
+          dataUser.level == "20" ||
+          dataUser.level == "59";
+
+      if (skipStore) {
+        switch (index) {
+          case 1:
+            return data.acc2;
+          case 2:
+            return data.acc3;
+          case 3:
+            return data.acc4;
+          default:
+            return null;
+        }
+      } else {
+        switch (index) {
+          case 1:
+            return data.acc1;
+          case 2:
+            return data.acc2;
+          case 3:
+            return data.acc3;
+          case 4:
+            return data.acc4;
+          default:
+            return null;
+        }
+      }
+    }
+
+    // ================== HELPER ==================
+    bool isEmptyApproval(String? val) {
+      return val == null || val.isEmpty || val == 'null';
+    }
+
+    // ================== COLOR ==================
+    Color getStepColor(ReqApp data, int index) {
+      final val = getApprovalValue(data, index);
+
+      if (index == 0) return Colors.green;
+
+      bool previousApproved = true;
+
+      for (int i = 1; i < index; i++) {
+        final prevVal = getApprovalValue(data, i);
+
+        if (isEmptyApproval(prevVal) || prevVal == 'reject') {
+          previousApproved = false;
+          break;
+        }
+      }
+
+      if (val == 'reject') return red!;
+
+      if (!previousApproved || isEmptyApproval(val)) {
+        return Colors.grey;
+      }
+
+      return Colors.green;
+    }
+
+    // ================== ICON ==================
+    Widget buildStepIcon(ReqApp data, int index) {
+      if (index == 0) {
+        return const Icon(Icons.check, color: Colors.white, size: 18);
+      }
+
+      final val = getApprovalValue(data, index);
+
+      // ❌ reject
+      if (val == 'reject') {
+        return const Icon(Icons.close, color: Colors.white, size: 18);
+      }
+
+      // 🔥 cek step sebelumnya
+      bool previousApproved = true;
+
+      for (int i = 1; i < index; i++) {
+        final prevVal = getApprovalValue(data, i);
+
+        if (isEmptyApproval(prevVal) || prevVal == 'reject') {
+          previousApproved = false;
+          break;
+        }
+      }
+
+      // ⏳ belum waktunya
+      if (!previousApproved) {
+        return const Icon(Icons.hourglass_empty, color: Colors.grey);
+      }
+
+      // ⏳ belum approve
+      if (isEmptyApproval(val)) {
+        return const Icon(Icons.hourglass_empty, color: Colors.grey);
+      }
+
+      // ✅ approved
+      return const Icon(Icons.check, color: Colors.white, size: 18);
+    }
+
+    // ================== CURRENT STEP ==================
+    int getCurrentStep(ReqApp data) {
+      final dataUser = auth.logUser.value;
+      final skipStore =
+          dataUser.level == "19" ||
+          dataUser.level == "20" ||
+          dataUser.level == "59";
+
+      if (skipStore) {
+        if (isEmptyApproval(data.acc2)) return 0;
+        if (isEmptyApproval(data.acc3)) return 1;
+        if (isEmptyApproval(data.acc4)) return 2;
+        return 3;
+      } else {
+        if (isEmptyApproval(data.acc1)) return 0;
+        if (isEmptyApproval(data.acc2)) return 1;
+        if (isEmptyApproval(data.acc3)) return 2;
+        if (isEmptyApproval(data.acc4)) return 3;
+        return 4;
+      }
+    }
+
+    final nodeTitles = getNodeTitles(data);
+    final totalSteps = nodeTitles.length;
+
+    final currentStep = getCurrentStep(data);
+    final safeStep = currentStep >= totalSteps ? totalSteps - 1 : currentStep;
+
+    final controller = StepProgressController(
+      initialStep: safeStep,
+      totalSteps: totalSteps,
+    );
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -109,8 +267,10 @@ class UptDataAbsen extends StatelessWidget {
                           '19',
                           '20',
                           '39',
+                          '59',
                           '26',
                           '96',
+                          '106',
                         ]).contains(dataUser.level)
                     ? true
                     : false,
@@ -136,6 +296,62 @@ class UptDataAbsen extends StatelessWidget {
             ],
           ),
         ),
+        const SizedBox(height: 5),
+        Obx(() {
+          final dataUser = auth.logUser.value;
+
+          return Visibility(
+            visible:
+                !([
+                      '1',
+                      '17',
+                      '18',
+                      '19',
+                      '20',
+                      '39',
+                      '26',
+                      '59',
+                      '96',
+                      '106',
+                    ]).contains(dataUser.level)
+                    ? true
+                    : false,
+            child: StepProgress(
+              totalSteps: totalSteps,
+              controller: controller,
+              padding: const EdgeInsets.all(10),
+              nodeTitles: nodeTitles,
+              nodeIconBuilder: (index, _) {
+                final bgColor = getStepColor(data, index);
+                final icon = buildStepIcon(data, index);
+                return Container(
+                  decoration: BoxDecoration(
+                    color: bgColor,
+                    shape: BoxShape.circle,
+                  ),
+                  // padding: const EdgeInsets.all(6),
+                  child: icon,
+                );
+              },
+              theme: const StepProgressThemeData(
+                lineLabelAlignment: Alignment.bottomCenter,
+                stepLineSpacing: 9,
+                stepLineStyle: StepLineStyle(
+                  lineThickness: 3,
+                  borderRadius: Radius.circular(4),
+                ),
+                defaultForegroundColor: Colors.grey,
+                activeForegroundColor: Colors.green,
+                enableRippleEffect: true,
+                lineLabelStyle: StepLabelStyle(
+                  labelAxisAlignment: CrossAxisAlignment.end,
+                ),
+              ),
+              onStepChanged: (index) {},
+              onStepNodeTapped: (index) {},
+            ),
+          );
+        }),
         // const Divider(thickness: 2),
         Obx(() {
           final dataUser = auth.logUser.value;
@@ -149,8 +365,10 @@ class UptDataAbsen extends StatelessWidget {
                           '19',
                           '20',
                           '39',
+                          '59',
                           '26',
                           '96',
+                          '106',
                         ]).contains(dataUser.level)
                     ? true
                     : false,
@@ -170,9 +388,11 @@ class UptDataAbsen extends StatelessWidget {
                             "18": "acc_4",
                             "39": "acc_4",
                             "96": "acc_3",
+                            "106": "acc_3",
                             "26": "acc_2",
                             "19": "acc_1",
                             "20": "acc_1",
+                            "59": "acc_1",
                           }[dataUser.level]!:
                           "approved",
                       "uid": data.id,
@@ -220,9 +440,11 @@ class UptDataAbsen extends StatelessWidget {
                             "18": "acc_4",
                             "39": "acc_4",
                             "96": "acc_3",
+                            "106": "acc_3",
                             "26": "acc_2",
                             "19": "acc_1",
                             "20": "acc_1",
+                            "59": "acc_1",
                           }[dataUser.level]!:
                           "reject",
                       "uid": data.id,

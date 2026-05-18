@@ -10,7 +10,6 @@ import 'package:widget_zoom/widget_zoom.dart';
 
 import '../../../../data/helper/const.dart';
 import '../../../../data/helper/convert_time.dart';
-import '../../../../data/helper/helper_ui.dart';
 import '../../../../services/service_api.dart';
 import '../../../login/controllers/login_controller.dart';
 import '../../../shared/elevated_button.dart';
@@ -32,7 +31,10 @@ class UptMasukPulang extends StatelessWidget {
     List<String> getNodeTitles(ReqApp data) {
       final dataUser = auth.logUser.value;
       // if (leave.parentId == "3") {
-      final skipStore = dataUser.level == "19" || dataUser.level == "20";
+      final skipStore =
+          dataUser.level == "19" ||
+          dataUser.level == "20" ||
+          dataUser.level == "59";
 
       if (skipStore) {
         return ['Apply', 'Area Manager', 'Ops', 'HR'];
@@ -48,7 +50,10 @@ class UptMasukPulang extends StatelessWidget {
     String? getApprovalValue(ReqApp data, int index) {
       final dataUser = auth.logUser.value;
       // if (data.parentId == "3") {
-      final skipStore = dataUser.level == "19" || dataUser.level == "20";
+      final skipStore =
+          dataUser.level == "19" ||
+          dataUser.level == "20" ||
+          dataUser.level == "59";
 
       if (skipStore) {
         switch (index) {
@@ -211,7 +216,10 @@ class UptMasukPulang extends StatelessWidget {
     // ================== CURRENT STEP ==================
     int getCurrentStep(ReqApp data) {
       final dataUser = auth.logUser.value;
-      final skipStore = dataUser.level == "19" || dataUser.level == "20";
+      final skipStore =
+          dataUser.level == "19" ||
+          dataUser.level == "20" ||
+          dataUser.level == "59";
 
       if (skipStore) {
         if (isEmptyApproval(data.acc2)) return 0;
@@ -317,8 +325,10 @@ class UptMasukPulang extends StatelessWidget {
                           '19',
                           '20',
                           '39',
+                          '59',
                           '26',
                           '96',
+                          '106',
                         ]).contains(dataUser.level)
                     ? true
                     : false,
@@ -362,7 +372,9 @@ class UptMasukPulang extends StatelessWidget {
                       '20',
                       '39',
                       '26',
+                      '59',
                       '96',
+                      '106',
                     ]).contains(dataUser.level)
                     ? true
                     : false,
@@ -415,7 +427,9 @@ class UptMasukPulang extends StatelessWidget {
                           '20',
                           '39',
                           '26',
+                          '59',
                           '96',
+                          '106',
                         ]).contains(dataUser.level)
                     ? true
                     : false,
@@ -435,9 +449,11 @@ class UptMasukPulang extends StatelessWidget {
                             "18": "acc_4",
                             "39": "acc_4",
                             "96": "acc_3",
+                            "106": "acc_3",
                             "26": "acc_2",
                             "19": "acc_1",
                             "20": "acc_1",
+                            "59": "acc_1",
                           }[dataUser.level]!:
                           "approved",
                       "uid": data.id,
@@ -510,9 +526,11 @@ class UptMasukPulang extends StatelessWidget {
                             "18": "acc_4",
                             "39": "acc_4",
                             "96": "acc_3",
+                            "106": "acc_3",
                             "26": "acc_2",
                             "19": "acc_1",
                             "20": "acc_1",
+                            "59": "acc_1",
                           }[dataUser.level]!:
                           "reject",
                       "uid": data.id,

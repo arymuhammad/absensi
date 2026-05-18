@@ -176,11 +176,15 @@ class ProfilView extends GetView<ProfilController> {
                       Text(listDataUser.id!, style: subtitleTextStyle),
                       Text(' - ', style: subtitleTextStyle),
                       Text(listDataUser.levelUser!, style: subtitleTextStyle),
+                    ],
+                  ),
+
                       Visibility(
                         visible: listDataUser.idRegion! != "",
                         child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text(' - ', style: subtitleTextStyle),
+                            // Text(' - ', style: subtitleTextStyle),
                             Text(
                               listDataUser.idRegion!,
                               style: subtitleTextStyle,
@@ -188,9 +192,6 @@ class ProfilView extends GetView<ProfilController> {
                           ],
                         ),
                       ),
-                    ],
-                  ),
-
                   const SizedBox(height: 8),
 
                   /// MAIN LIST

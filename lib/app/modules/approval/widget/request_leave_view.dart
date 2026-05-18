@@ -376,7 +376,10 @@ class RequestLeaveView extends GetView<LeaveController> {
                                   'File terlampir',
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
-                                InkWell(
+                               leave.attachFile == null ||
+                                                      leave.attachFile!.isEmpty
+                                                  ? const Text('-')
+                                                  : InkWell(
                                   onTap: () {
                                     showDialog(
                                       context: context,
@@ -417,8 +420,8 @@ class RequestLeaveView extends GetView<LeaveController> {
                                       color: red!,
                                       fontsize: 15,
                                       onPressed:
-                                          status == "approved" ||
-                                                  status == "rejected"
+                                          status.isNotEmpty ||
+                                                  status == "reject"
                                               ? null
                                               : () {
                                                 final userData =
@@ -460,8 +463,8 @@ class RequestLeaveView extends GetView<LeaveController> {
                                       color: AppColors.contentColorGreenAccent,
                                       fontsize: 15,
                                       onPressed:
-                                          status == "approved" ||
-                                                  status == "rejected"
+                                          status.isNotEmpty ||
+                                                  status == "reject"
                                               ? null
                                               : () {
                                                 final userData =

@@ -1,7 +1,6 @@
 import 'package:absensi/app/data/helper/app_colors.dart';
 import 'package:absensi/app/data/helper/const.dart';
 import 'package:absensi/app/modules/add_pegawai/controllers/add_pegawai_controller.dart';
-import 'package:absensi/app/modules/add_pegawai/views/add_pegawai_view.dart';
 import 'package:absensi/app/modules/add_pegawai/views/list_user.dart';
 import 'package:absensi/app/modules/region_area/views/region_area_view.dart';
 import 'package:absensi/app/modules/settings/views/about_view.dart';
