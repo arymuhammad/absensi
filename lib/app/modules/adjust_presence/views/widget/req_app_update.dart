@@ -345,10 +345,10 @@ class ReqAppUpdate extends GetView {
                                 excData.status == "update_masuk" ||
                                         excData.status == "update_masuk_cst" ||
                                         excData.status == "update_pulang"
-                                    ? UptMasukPulang(data: excData, isInbox:false)
+                                    ? UptMasukPulang(data: excData, isInbox:isInbox)
                                     : excData.status == "update_data_absen"
-                                    ? UptDataAbsen(data: excData, isInbox: false,)
-                                    : UptShift(data: excData, isInbox:false),
+                                    ? UptDataAbsen(data: excData, isInbox: isInbox,)
+                                    : UptShift(data: excData, isInbox:isInbox),
                               ],
                             );
                           }),

@@ -312,24 +312,26 @@ class UptMasukPulang extends StatelessWidget {
         Text('Alasan Perubahan Data', style: titleTextStyle),
         Text(data.alasan!, style: subtitleTextStyle),
         const SizedBox(height: 10),
-        Obx(() {
-          final dataUser = auth.logUser.value;
-          return Visibility(
-            visible:
-                data.statusExcep == "pending" &&
-                        data.keterangan == "" &&
-                        ([
-                          '1',
-                          '17',
-                          '18',
-                          '19',
-                          '20',
-                          '39',
-                          '59',
-                          '26',
-                          '96',
-                          '106',
-                        ]).contains(dataUser.level)
+        // Obx(() {
+        //   final dataUser = auth.logUser.value;
+        //   return
+          
+           Visibility(
+            visible:!isInbox
+                // data.statusExcep == "pending" &&
+                //         data.keterangan == "" &&
+                //         ([
+                //           '1',
+                //           '17',
+                //           '18',
+                //           '19',
+                //           '20',
+                //           '39',
+                //           '59',
+                //           '26',
+                //           '96',
+                //           '106',
+                //         ]).contains(dataUser.level)
                     ? true
                     : false,
             child: SizedBox(
@@ -341,8 +343,8 @@ class UptMasukPulang extends StatelessWidget {
                 isDark: isDark,
               ),
             ),
-          );
-        }),
+          ),
+        // }),
         const SizedBox(height: 5),
         Visibility(
           visible: data.statusExcep == "reject" ? true : false,
@@ -359,23 +361,24 @@ class UptMasukPulang extends StatelessWidget {
         //   thickness: 2,
         // ),
         const SizedBox(height: 5),
-        Obx(() {
-          final dataUser = auth.logUser.value;
+        // Obx(() {
+        //   final dataUser = auth.logUser.value;
 
-          return Visibility(
-            visible:
-                !([
-                      '1',
-                      '17',
-                      '18',
-                      '19',
-                      '20',
-                      '39',
-                      '26',
-                      '59',
-                      '96',
-                      '106',
-                    ]).contains(dataUser.level)
+        //   return 
+          Visibility(
+            visible:isInbox
+                // !([
+                //       '1',
+                //       '17',
+                //       '18',
+                //       '19',
+                //       '20',
+                //       '39',
+                //       '26',
+                //       '59',
+                //       '96',
+                //       '106',
+                //     ]).contains(dataUser.level)
                     ? true
                     : false,
             child: StepProgress(
@@ -412,25 +415,27 @@ class UptMasukPulang extends StatelessWidget {
               onStepChanged: (index) {},
               onStepNodeTapped: (index) {},
             ),
-          );
-        }),
-        Obx(() {
-          final dataUser = auth.logUser.value;
-          return Visibility(
-            visible:
-                data.statusExcep == "pending" &&
-                        ([
-                          '1',
-                          '17',
-                          '18',
-                          '19',
-                          '20',
-                          '39',
-                          '26',
-                          '59',
-                          '96',
-                          '106',
-                        ]).contains(dataUser.level)
+          ),
+        // }),
+        // Obx(() {
+        //   final dataUser = auth.logUser.value;
+        //   return 
+          
+          Visibility(
+            visible: !isInbox
+                // data.statusExcep == "pending" &&
+                //         ([
+                //           '1',
+                //           '17',
+                //           '18',
+                //           '19',
+                //           '20',
+                //           '39',
+                //           '26',
+                //           '59',
+                //           '96',
+                //           '106',
+                //         ]).contains(dataUser.level)
                     ? true
                     : false,
             child: Row(
@@ -554,8 +559,8 @@ class UptMasukPulang extends StatelessWidget {
                 ),
               ],
             ),
-          );
-        }),
+          ),
+        // }),
       ],
     );
   }

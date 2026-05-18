@@ -243,7 +243,7 @@ loadingWithIcon() {
         (_) => Stack(
           alignment: Alignment.center,
           children: [
-            Image.asset('assets/image/selfie.png', height: 50, width: 50),
+            Image.asset('assets/image/icon.png', height: 50, width: 50),
             // Lottie.asset('assets/image/loader.json', repeat: true)
             RotationTransition(
               alignment: Alignment.center,
