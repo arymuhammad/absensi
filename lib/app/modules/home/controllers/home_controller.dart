@@ -299,6 +299,7 @@ class HomeController extends GetxController
       NotifModel res = await ServiceApi().getNotif(data);
 
       pendingAdjCount.value = res.totalNotif ?? 0;
+      // print(pendingAdjCount.value);
       totalNotif.value = pendingAdjCount.value + pendingAppCount.value;
     } catch (e) {
       isErrorAdj.value = true;
