@@ -1,7 +1,7 @@
 name: absensi
 version: 2.3.50+44
 publish_to: none
-description: URBAN&CO SPOT
+description: URBAN&CO Spot
 environment: 
   sdk: 3.7.2
 
@@ -79,20 +79,21 @@ dev_dependencies:
 
 flutter_launcher_icons: 
   android: launcher_icon
-  image_path: assets/image/selfie.png
+  image_path: assets/image/icon.png
   web: 
-    image_path: assets/image/selfie.png
+    image_path: assets/image/icon.png
     background_color: '#hexcode'
     theme_color: '#hexcode'
     generate: true
   windows: 
-    image_path: assets/image/selfie.png
+    image_path: assets/image/icon.png
     generate: true
     icon_size: 48
   macos: 
-    image_path: assets/image/selfie.png
+    image_path: assets/image/icon.png
     generate: true
   ios: true
+  remove_alpha_ios: true
   min_sdk_android: 21
 
 flutter: 
