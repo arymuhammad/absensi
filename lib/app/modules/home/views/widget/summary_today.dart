@@ -231,6 +231,7 @@ class SummaryToday extends StatelessWidget {
                                       height: 40,
                                       decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(10),
+                                        // color: AppColors.contentColorGreenAccent
                                         image: const DecorationImage(
                                           image: AssetImage(
                                             'assets/image/bg_btn_ci.png',

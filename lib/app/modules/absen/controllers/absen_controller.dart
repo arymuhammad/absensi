@@ -684,104 +684,143 @@ class AbsenController extends GetxController
       bool serviceEnabled;
       LocationPermission permission;
 
-      // Test if location services are enabled.
+      /// =========================
+      /// CHECK GPS SERVICE
+      /// =========================
       serviceEnabled = await Geolocator.isLocationServiceEnabled();
+
       if (!serviceEnabled) {
-        showToast("Lokasi belum diaktifkan");
         stopLoading();
+        showToast("Location disabled");
         return Future.error('Location disabled.');
       }
 
+      /// =========================
+      /// CHECK PERMISSION
+      /// =========================
       permission = await Geolocator.checkPermission();
+
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
-        if (permission == LocationPermission.denied) {
-          isLoading.value = false;
-          isEnabled.value = false;
-          showToast("Permission denied");
-          // Get.back();
-          stopLoading();
-          return Future.error('Permission denied');
-        }
       }
-      // await Future.delayed(const Duration(milliseconds: 400));
 
-      if (permission == LocationPermission.deniedForever) {
-        // Permissions are denied forever, handle appropriately.
+      if (permission == LocationPermission.denied) {
+        stopLoading();
         isLoading.value = false;
         isEnabled.value = false;
-        showToast("Permission denied forever");
-        // Get.back();
+
+        showToast("Permission denied");
+        return Future.error('Permission denied');
+      }
+
+      if (permission == LocationPermission.deniedForever) {
         stopLoading();
+        isLoading.value = false;
+        isEnabled.value = false;
+
+        showToast("Permission denied forever");
         return Future.error('Permission denied forever');
       }
 
-      // When we reach here, permissions are granted and we can
-      // continue accessing the position of the device.
-      // Pakai last known position dulu
-      // Position? lastKnown = await Geolocator.getLastKnownPosition();
-      // if (lastKnown != null) {
-      //   lokasi.value =
-      //       "Posisi sementara: (${lastKnown.latitude}, ${lastKnown.longitude})";
-      // }
-
+      /// =========================
+      /// LAST KNOWN POSITION
+      /// =========================
       /// 🔥 1. coba ambil last known dulu (CEPAT)
       Position? lastKnown = await Geolocator.getLastKnownPosition();
 
       /// 🔥 2. coba ambil GPS real (TAPI ADA LIMIT)
       try {
+        /// =========================
+        /// GPS WARMUP
+        /// =========================
+        await Geolocator.getPositionStream(
+              locationSettings: const LocationSettings(
+                accuracy: LocationAccuracy.bestForNavigation,
+                distanceFilter: 0,
+              ),
+            )
+            .where((p) {
+              // print("warming accuracy: ${p.accuracy}");
+
+              /// terima kalau sudah lumayan bagus
+              return p.accuracy <= 50;
+            })
+            .first
+            .timeout(const Duration(seconds: 15));
+
+        /// =========================
+        /// GET FINAL POSITION
+        /// =========================
         final fresh = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.high,
+          desiredAccuracy: LocationAccuracy.bestForNavigation,
           timeLimit: const Duration(seconds: 20),
         );
 
-        if (fresh.isMocked) {
+        // print("FINAL accuracy: ${fresh.accuracy}");
+
+        /// =========================
+        /// VALIDATE ACCURACY
+        /// =========================
+        if (fresh.accuracy > 50) {
+          stopLoading();
+
           isLoading.value = false;
           isEnabled.value = false;
+
+          showToast("GPS not accurate enough");
+          return Future.error("GPS not accurate enough");
+        }
+
+        /// =========================
+        /// FAKE GPS DETECTION
+        /// =========================
+        if (fresh.isMocked) {
+          stopLoading();
+
+          isLoading.value = false;
+          isEnabled.value = false;
+
           failedDialog(Get.context, 'Warning', 'Fake GPS detected');
-          throw Exception("Fake GPS detected");
+          return Future.error("Fake GPS detected");
         }
         stopLoading();
         return fresh;
-      } catch (_) {
-        /// 🔥 fallback ke last known
+      } catch (e) {
+        // print("GPS ERROR: $e");
+
+        /// =========================
+        /// FALLBACK LAST KNOWN
+        /// =========================
+        // if (lastKnown != null) {
+        //   return lastKnown;
+        // }
         if (lastKnown != null) {
-          return lastKnown;
+          final age = DateTime.now().difference(lastKnown.timestamp);
+
+          if (age.inSeconds < 30 && lastKnown.accuracy <= 70) {
+            stopLoading();
+
+            return lastKnown;
+          }
         }
         rethrow;
       }
-
-      // Position loc = await Geolocator.getCurrentPosition(
-      //   desiredAccuracy: LocationAccuracy.high,
-      //   timeLimit: const Duration(seconds: 20),
-      //   // forceAndroidLocationManager: true
-      //   //
-      // );
-      // // print(loc.latitude);
-      // // print(loc.longitude);
-      // if (loc.isMocked) {
-      //   isLoading.value = false;
-      //   isEnabled.value = false;
-      //   failedDialog(
-      //     Get.context,
-      //     'Warning',
-      //     'You have been detected using\nfake location',
-      //   );
-      //   // Get.back();
-      // }
-      // stopLoading();
-      // return loc;
     } on TimeoutException {
+      stopLoading();
+
       isLoading.value = false;
       isEnabled.value = false;
-      // Get.back(); // Tutup loading
+
       showToast("Failed to get location, please try again.");
-      // Get.back();
-      stopLoading();
+
       return Future.error('Timeout while getting location');
     } catch (e) {
-      showToast("Failed to get location");
       stopLoading();
+
+      isLoading.value = false;
+      isEnabled.value = false;
+
+      showToast("Failed to get location");
       return Future.error(e);
     }
   }

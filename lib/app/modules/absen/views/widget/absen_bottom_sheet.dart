@@ -173,58 +173,93 @@ class AbsenBottomSheet extends StatelessWidget {
 
                 return Container(
                   decoration: BoxDecoration(
-                    gradient: AppColors.mainGradient(
-                      context: context,
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
+                    gradient:
+                        enabled
+                            ? AppColors.mainGradient(
+                              context: context,
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            )
+                            : LinearGradient(
+                              colors: [
+                                Colors.grey.shade500,
+                                Colors.grey.shade600,
+                              ],
+                            ),
                     borderRadius: BorderRadius.circular(30),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.blueAccent.withOpacity(
-                          enabled ? 0.4 : 0.2,
-                        ),
+                        color:
+                            enabled
+                                ? Colors.blueAccent.withOpacity(0.4)
+                                : Colors.black.withOpacity(0.1),
                         blurRadius: 8,
                         offset: const Offset(0, 4),
                       ),
                     ],
                   ),
-                  child: SliderButton(
-                    backgroundColor: Colors.transparent,
-                    buttonSize: 35,
-                    buttonColor:
-                        enabled ? AppColors.contentColorWhite : Colors.grey,
-                    alignLabel: Alignment.center,
-                    baseColor: enabled ? AppColors.borderColor : Colors.grey,
-                    height: 45,
-                    shimmer: enabled,
-                    action: () async {
-                      final result = await controller.executeAction(data);
+                  child: IgnorePointer(
+                    ignoring: !enabled,
+                    child: SliderButton(
+                      backgroundColor: Colors.transparent,
+                      buttonSize: 35,
+                      buttonColor:
+                          enabled
+                              ? AppColors.contentColorWhite
+                              : Colors.grey.shade400,
+                      alignLabel: Alignment.center,
+                      baseColor:
+                          enabled
+                              ? AppColors.borderColor
+                              : Colors.grey.shade700,
+                      height: 45,
+                      shimmer: enabled,
+                      action: () async {
+                        /// BLOCK ACTION
+                        // if (!enabled) {
+                        //   if (controller.distanceStore.value >
+                        //       num.parse(data.areaCover!)) {
+                        //     showToast(
+                        //       "Outside area (${(controller.distanceStore.value / 1000).toStringAsFixed(2)} Km)",
+                        //     );
+                        //   } else if (controller.isTimeUntrusted.value) {
+                        //     showToast("Invalid device time");
+                        //   } else if (controller.isAppLocked.value) {
+                        //     showToast("Application locked");
+                        //   } else {
+                        //     showToast("Unable to continue");
+                        //   }
 
-                      if (!result.success) {
-                        showToast(result.message);
+                        //   return false;
+                        // }
+
+                        final result = await controller.executeAction(data);
+
+                        if (!result.success) {
+                          showToast(result.message);
+                          return false;
+                        }
+
+                        showToast(result.message); // optional success message
                         return false;
-                      }
-
-                      showToast(result.message); // optional success message
-                      return false;
-                    },
-                    label: Text(
-                      data.visit == "1"
-                          ? 'Swipe to Visit'
-                          : 'Swipe to ${controller.stsAbsenSelected.value}',
-                      style: const TextStyle(
-                        color: AppColors.contentColorWhite,
-                        fontWeight: FontWeight.w500,
-                        fontSize: 16,
+                      },
+                      label: Text(
+                        data.visit == "1"
+                            ? 'Swipe to Visit'
+                            : 'Swipe to ${controller.stsAbsenSelected.value}',
+                        style: const TextStyle(
+                          color: AppColors.contentColorWhite,
+                          fontWeight: FontWeight.w500,
+                          fontSize: 16,
+                        ),
+                        textAlign: TextAlign.center,
                       ),
-                      textAlign: TextAlign.center,
-                    ),
-                    icon: Icon(
-                      controller.stsAbsenSelected.value.contains("Break")
-                          ? Iconsax.coffee_bold
-                          : Icons.double_arrow_rounded,
-                      color: AppColors.itemsBackground,
+                      icon: Icon(
+                        controller.stsAbsenSelected.value.contains("Break")
+                            ? Iconsax.coffee_bold
+                            : Icons.double_arrow_rounded,
+                        color: AppColors.itemsBackground,
+                      ),
                     ),
                   ),
                 );
