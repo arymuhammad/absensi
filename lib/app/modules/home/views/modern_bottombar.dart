@@ -16,6 +16,14 @@ class ModernBottomBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final double bottomSafe = MediaQuery.of(context).padding.bottom;
+    final width = MediaQuery.of(context).size.width;
+
+    /// FAB responsive
+    final fabSize = (width * 0.17).clamp(58.0, 70.0);
+
+    /// tinggi navbar
+    const navBarHeight = 70.0;
+
     return Stack(
       alignment: Alignment.bottomCenter,
       clipBehavior: Clip.none, // ✅ penting
@@ -60,14 +68,14 @@ class ModernBottomBar extends StatelessWidget {
 
         // ===== FLOATING CENTER BUTTON =====
         Positioned(
-          bottom: 30 / 2, // ✅ ikut naik sedikit
+          bottom: bottomSafe + (navBarHeight / 2) - (fabSize / 2) + 8,
           child: GestureDetector(
-            behavior: HitTestBehavior.opaque, // 🔥 penting
+            behavior: HitTestBehavior.opaque,
             onTap: () => onTap(2),
             child: Container(
-              width: 65,
-              height: 65,
-              alignment: Alignment.center, // biar center bener
+              width: fabSize,
+              height: fabSize,
+              alignment: Alignment.center,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: AppColors.mainGradient(
@@ -78,7 +86,7 @@ class ModernBottomBar extends StatelessWidget {
                 boxShadow: [
                   BoxShadow(
                     color: Colors.blueAccent.withOpacity(0.6),
-                    blurRadius: 5,
+                    blurRadius: 8,
                     spreadRadius: 1,
                   ),
                 ],
