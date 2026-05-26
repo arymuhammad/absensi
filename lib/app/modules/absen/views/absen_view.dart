@@ -4,8 +4,6 @@ import 'package:absensi/app/data/model/login_model.dart';
 import 'package:absensi/app/modules/absen/views/widget/map_section_view.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_map/flutter_map.dart';
-import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 import 'package:get/get.dart';
 import 'package:latlong2/latlong.dart';
 // import 'package:path/path.dart';
