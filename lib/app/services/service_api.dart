@@ -331,10 +331,10 @@ class ServiceApi {
     try {
       var request = http.MultipartRequest('POST', Uri.parse('${baseUrl}absen'));
 
-      // request.headers.addAll(headers);
       request.fields['status'] = data["status"];
       request.fields['id'] = data["id"];
       request.fields['nama'] = data["nama"];
+
       if (data["status"] == "add") {
         request.fields['tanggal_masuk'] = data["tanggal_masuk"];
         request.fields['kode_cabang'] = data["kode_cabang"];
@@ -345,99 +345,100 @@ class ServiceApi {
         request.fields['lat_masuk'] = data["lat_masuk"];
         request.fields['long_masuk'] = data["long_masuk"];
         request.fields['device_info'] = data["device_info"];
-        // request.fields['foto_masuk'] = data["foto_masuk"];
+
+        request.files.add(
+          await http.MultipartFile.fromPath(
+            "foto_masuk",
+            data["foto_masuk"].path,
+          ),
+        );
       } else {
         request.fields['tanggal_masuk'] = data["tanggal_masuk"];
         request.fields['tanggal_pulang'] = data["tanggal_pulang"];
         request.fields['jam_absen_pulang'] = data["jam_absen_pulang"];
         request.fields['lat_pulang'] = data["lat_pulang"];
         request.fields['long_pulang'] = data["long_pulang"];
-        // request.fields['foto_pulang'] = data["foto_pulang"];
         request.fields['device_info2'] = data["device_info2"];
-      }
 
-      if (data["status"] == "add") {
-        // if (kIsWeb) {
-        //   // print(data["foto_masuk"]);
-        //   request.files.add(http.MultipartFile("foto_masuk",
-        //       data["foto_masuk"].readStream, data["foto_masuk"].size,
-        //       filename: data["foto_masuk"].name));
-        // } else {
         request.files.add(
-          http.MultipartFile(
-            "foto_masuk",
-            data["foto_masuk"].readAsBytes().asStream(),
-            data["foto_masuk"].lengthSync(),
-            filename: data["foto_masuk"].path.split("/").last,
+          await http.MultipartFile.fromPath(
+            "foto_pulang",
+            data["foto_pulang"].path,
           ),
         );
-        // }
-      } else {
-        // if (kIsWeb) {
-        //   request.files.add(http.MultipartFile("foto_pulang",
-        //       data["foto_pulang"].readStream, data["foto_pulang"].size,
-        //       filename: data["foto_pulang"].name));
-        // } else {
-        request.files.add(
-          http.MultipartFile(
-            'foto_pulang',
-            data["foto_pulang"].readAsBytes().asStream(),
-            data["foto_pulang"].lengthSync(),
-            filename: data["foto_pulang"].path.split("/").last,
-          ),
-        );
-        // }
       }
 
-      await request.send().timeout(const Duration(minutes: 1)).then((value) {
-        if (!isSync) {
-          // Get.back();
-          // succesDialog(
-          //   context: Get.context!,
-          //   pageAbsen: "Y",
-          //   desc:
-          //       "Please do not close the application during the attendance data synchronization process.",
-          //   type: DialogType.warning,
-          //   title: 'Warning',
-          //   btnOkOnPress: () {
-          //     auth.selectedMenu(0);
-          //     Future.delayed(const Duration(milliseconds: 300));
-          //     Get.back();
-          //   },
-          // );
-          // } else {
-          showToast('Attendance data sent successfully');
-        }
-      });
-      // var responseBytes = await res.stream.toBytes();
-      // var responseString = utf8.decode(responseBytes);
+      /// =========================
+      /// 🚀 SEND REQUEST
+      /// =========================
+      final streamedResponse = await request.send().timeout(
+        const Duration(minutes: 1),
+      );
 
-      //debug
-      // debugPrint("response code: ${res.statusCode}");
-      // debugPrint("response: $responseString");
+      /// =========================
+      /// 📥 READ RESPONSE
+      /// =========================
+      final response = await http.Response.fromStream(streamedResponse);
 
-      // final dataDecode = jsonDecode(responseString);
-      // debugPrint(dataDecode.toString());
+      print("STATUS CODE: ${response.statusCode}");
+      print("BODY: ${response.body}");
+
+      /// =========================
+      /// ❌ HTTP ERROR
+      /// =========================
+      if (response.statusCode != 200) {
+        throw Exception("HTTP ${response.statusCode}: ${response.body}");
+      }
+
+      /// =========================
+      /// ✅ PARSE JSON
+      /// =========================
+      final decoded = jsonDecode(response.body);
+
+      /// =========================
+      /// ✅ SUCCESS UI
+      /// =========================
+      if (!isSync) {
+        showToast('Attendance data sent successfully');
+      }
+
+      return decoded;
     } on SocketException {
       if (!isSync) {
-        Get.back();
+        if (Get.isDialogOpen ?? false) {
+          Get.back();
+        }
+
         failedDialog(
           Get.context,
           'ERROR',
           'No internet connection\nPlease try again',
         );
       }
+
+      return {"success": false, "message": "No internet connection"};
     } on TimeoutException {
-      Get.back();
-      failedDialog(Get.context, 'ERROR', 'Time out. Please try again.');
-    } catch (e) {
       if (!isSync) {
-        Get.back();
-        showToast('An error occurred while sending data');
-      } else {
-        showToast('An error occurred while sending data\n$e');
-        // failedDialog(Get.context, 'ERROR', e.toString());
+        if (Get.isDialogOpen ?? false) {
+          Get.back();
+        }
+
+        failedDialog(Get.context, 'ERROR', 'Time out. Please try again.');
       }
+
+      return {"success": false, "message": "Timeout"};
+    } catch (e) {
+      print("SUBMIT ABSEN ERROR: $e");
+
+      if (!isSync) {
+        if (Get.isDialogOpen ?? false) {
+          Get.back();
+        }
+
+        showToast('An error occurred while sending data');
+      }
+
+      return {"success": false, "message": e.toString()};
     }
   }
 
@@ -875,11 +876,21 @@ class ServiceApi {
 
   submitVisit(Map<String, dynamic> data, bool isSync) async {
     try {
-      var request = http.MultipartRequest('POST', Uri.parse('${baseUrl}visit'));
-      // request.headers.addAll(headers);
+      final request = http.MultipartRequest(
+        'POST',
+        Uri.parse('${baseUrl}visit'),
+      );
+
+      /// =========================
+      /// 📝 COMMON FIELDS
+      /// =========================
       request.fields['status'] = data["status"];
       request.fields['id'] = data["id"];
       request.fields['nama'] = data["nama"];
+
+      /// =========================
+      /// ✅ VISIT IN
+      /// =========================
       if (data["status"] == "add") {
         request.fields['tgl_visit'] = data["tgl_visit"];
         request.fields['visit_in'] = data["visit_in"];
@@ -887,9 +898,16 @@ class ServiceApi {
         request.fields['lat_in'] = data["lat_in"];
         request.fields['long_in'] = data["long_in"];
         request.fields['device_info'] = data["device_info"];
-        request.fields['is_rnd'] = data["is_rnd"];
-        // request.fields['foto_in'] = data["foto_in"];
-      } else {
+        request.fields['is_rnd'] = data["is_rnd"]?.toString() ?? "0";
+
+        request.files.add(
+          await http.MultipartFile.fromPath('foto_in', data["foto_in"].path),
+        );
+      }
+      /// =========================
+      /// 🔄 VISIT OUT
+      /// =========================
+      else {
         request.fields['visit_in'] = data["visit_in"];
         request.fields['tgl_visit'] = data["tgl_visit"];
         request.fields['visit_out'] = data["visit_out"];
@@ -897,96 +915,89 @@ class ServiceApi {
         request.fields['lat_out'] = data["lat_out"];
         request.fields['long_out'] = data["long_out"];
         request.fields['device_info2'] = data["device_info2"];
-        // request.fields['foto_out'] = data["foto_out"];
-      }
 
-      if (data["status"] == "add") {
         request.files.add(
-          http.MultipartFile(
-            'foto_in',
-            data["foto_in"].readAsBytes().asStream(),
-            data["foto_in"].lengthSync(),
-            filename: data["foto_in"].path.split("/").last,
-          ),
-        );
-      } else {
-        request.files.add(
-          http.MultipartFile(
-            'foto_out',
-            data["foto_out"].readAsBytes().asStream(),
-            data["foto_out"].lengthSync(),
-            filename: data["foto_out"].path.split("/").last,
-          ),
+          await http.MultipartFile.fromPath('foto_out', data["foto_out"].path),
         );
       }
 
-      // await request.send().timeout(const Duration(minutes: 1)).then((value) {
-      //   if (!isSync) {
-      //     //   Get.back();
-      //     //   succesDialog(
-      //     //     context: Get.context!,
-      //     //     pageAbsen: "Y",
-      //     //     desc:
-      //     //         "Harap tidak menutup aplikasi selama proses syncron data absensi",
-      //     //     type: DialogType.warning,
-      //     //     title: 'PERINGATAN',
-      //     //     btnOkOnPress: () {
-      //     //       auth.selectedMenu(0);
-      //     //       Future.delayed(const Duration(milliseconds: 300));
-      //     //       Get.back();
-      //     //     },
-      //     //   );
-      //     // } else {
-      //     showToast('Data sent successfully');
-      //   }
-      // });
+      /// =========================
+      /// 🚀 SEND REQUEST
+      /// =========================
       final streamedResponse = await request.send().timeout(
         const Duration(minutes: 1),
       );
 
       final response = await http.Response.fromStream(streamedResponse);
 
-      print('STATUS CODE: ${response.statusCode}');
-      print('BODY: ${response.body}');
-      if (response.body.isEmpty) {
-        return {"success": true}; // fallback kalau backend kosong
+      print("========== VISIT RESPONSE ==========");
+      print("STATUS CODE: ${response.statusCode}");
+      print("BODY: ${response.body}");
+      print("====================================");
+
+      /// =========================
+      /// ❌ HTTP ERROR
+      /// =========================
+      if (response.statusCode != 200) {
+        throw Exception("HTTP ${response.statusCode}: ${response.body}");
       }
 
-      return jsonDecode(response.body);
-      // var responseBytes = await res.stream.toBytes();
-      // var responseString = utf8.decode(responseBytes);
+      /// =========================
+      /// ⚠️ EMPTY RESPONSE
+      /// =========================
+      if (response.body.trim().isEmpty) {
+        return {"success": true};
+      }
 
-      //debug
-      // debugPrint("response code: ${res.statusCode}");
-      // debugPrint("response: $responseString");
+      /// =========================
+      /// ✅ PARSE JSON
+      /// =========================
+      final decoded = jsonDecode(response.body);
 
-      // final dataDecode = jsonDecode(responseString);
-      // debugPrint(dataDecode.toString());
+      /// =========================
+      /// ✅ SUCCESS TOAST
+      /// =========================
+      if (!isSync) {
+        showToast('Visit data sent successfully');
+      }
+
+      return decoded;
     } on SocketException {
       if (!isSync) {
-        Get.back();
+        if (Get.isDialogOpen ?? false) {
+          Get.back();
+        }
+
         failedDialog(
           Get.context,
           'ERROR',
-          'Tidak ada koneksi internet\nHarap mencoba kembali',
+          'No internet connection\nPlease try again',
         );
       }
+
+      return {"success": false, "message": "No internet connection"};
     } on TimeoutException {
-      Get.back();
-      failedDialog(
-        Get.context,
-        'ERROR',
-        'Waktu habis. Silahkan mencoba kembali',
-      );
+      if (!isSync) {
+        if (Get.isDialogOpen ?? false) {
+          Get.back();
+        }
+
+        failedDialog(Get.context, 'ERROR', 'Time out. Please try again.');
+      }
+
+      return {"success": false, "message": "Timeout"};
     } catch (e) {
-      // if (!isSync) {
-      //   Get.back();
-      //   showToast('Terjadi kesalahan saat mengirim data');
-      // } else {
-      showToast('Terjadi kesalahan saat mengirim data $e');
-      print(e);
-      // failedDialog(Get.context, 'ERROR', e.toString());
-      // }
+      print("SUBMIT VISIT ERROR: $e");
+
+      if (!isSync) {
+        if (Get.isDialogOpen ?? false) {
+          Get.back();
+        }
+
+        showToast('Failed to send visit data');
+      }
+
+      return {"success": false, "message": e.toString()};
     }
   }
 

@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:absensi/app/data/helper/db_result.dart';
 import 'package:absensi/app/data/helper/time_service.dart';
 import 'package:absensi/app/data/model/absen_model.dart';
 import 'package:absensi/app/data/model/login_model.dart';
@@ -14,7 +15,11 @@ import '../../../../services/service_api.dart';
 final absC = Get.find<AbsenController>();
 final homeC = Get.find<HomeController>();
 
-Future<void> checkOut(Data dataUser, double latitude, double longitude) async {
+Future<DbResult> checkOut(
+  Data dataUser,
+  double latitude,
+  double longitude,
+) async {
   bool checkoutSucceeded = false;
   bool isLoadingShown = false;
 
@@ -45,12 +50,12 @@ Future<void> checkOut(Data dataUser, double latitude, double longitude) async {
       if (absC.cekAbsen.value.total == "0") {
         _resetState();
         Get.back();
-        failedDialog(
-          Get.context,
-          "Warning",
-          "Check in data not found\nPlease check in first",
-        );
-        return;
+        // failedDialog(
+        //   Get.context,
+        //   "Warning",
+        //   "Check in data not found\nPlease check in first",
+        // );
+        return DbResult(success: false, message: "Check in data not found");
       }
     } else {
       // =======================
@@ -64,12 +69,12 @@ Future<void> checkOut(Data dataUser, double latitude, double longitude) async {
       if (localCheck.isEmpty || localCheck.first.jamAbsenMasuk == null) {
         _resetState();
         Get.back();
-        failedDialog(
-          Get.context,
-          "Warning",
-          "Check in data not found (offline)",
-        );
-        return;
+        // failedDialog(
+        //   Get.context,
+        //   "Warning",
+        //   "Check in data not found (offline)",
+        // );
+        return DbResult(success: false, message: "Check in data not found");
       }
     }
 
@@ -77,12 +82,12 @@ Future<void> checkOut(Data dataUser, double latitude, double longitude) async {
     // 📷 FOTO
     // =======================
     await absC.uploadFotoAbsen(isVisit: false);
-    Get.back();
+    // Get.back();
 
     if (absC.image == null) {
       _resetState();
-      failedDialog(Get.context, "Warning", "Check out was cancelled");
-      return;
+      // failedDialog(Get.context, "Warning", "Check out was cancelled");
+      return DbResult(success: false, message: "Check out was cancelled");
     }
 
     // =======================
@@ -125,33 +130,29 @@ Future<void> checkOut(Data dataUser, double latitude, double longitude) async {
       );
 
       // Get.back();
-      if (res.success) {
-        // =======================
-        // ✅ CHECKOUT LOGIS BERHASIL
-        // =======================
-        checkoutSucceeded = true;
+      if (!res.success) {
+        // showToast(res.message);
+        return DbResult(success: false, message: res.message);
+
+        // atau triggerSync()
+      } else {
         // showToast("Update succeed");
         // =======================
         // 🚀 SERVER / SYNC
         // =======================
         // Sync akan handle online/offline sendiri
         absC.triggerSync(isVisit: false);
-
-        // atau triggerSync()
-      } else {
-        showToast(res.message);
-        return;
       }
     } else {
       if (!online) {
-        failedDialog(Get.context, "Warning", "Data not available offline");
-        return;
+        // failedDialog(Get.context, "Warning", "Data not available offline");
+        return DbResult(success: false, message: "Data not available offline");
       }
 
       // ✅ gunakan hasil cek awal (jangan panggil lagi)
       if (absC.cekAbsen.value.total == "0") {
-        failedDialog(Get.context, "Warning", "Check in not found");
-        return;
+        // failedDialog(Get.context, "Warning", "Check in not found");
+        return DbResult(success: false, message: "Check in not found");
       }
 
       // ✅ langsung submit ke server
@@ -197,20 +198,22 @@ Future<void> checkOut(Data dataUser, double latitude, double longitude) async {
     // =======================
     // 🔥 XMOR (OPTIONAL ONLINE)
     // =======================
-    if (online) {
-      absC.sendDataToXmor(
-        dataUser.id!,
-        "clock_out",
-        nowFull,
-        absC.cekAbsen.value.idShift ?? "",
-        latitude.toString(),
-        longitude.toString(),
-        absC.lokasi.value,
-        dataUser.namaCabang!,
-        dataUser.kodeCabang!,
-        absC.devInfo.value,
-      );
-    }
+    try {
+      if (online) {
+        absC.sendDataToXmor(
+          dataUser.id!,
+          "clock_out",
+          nowFull,
+          absC.cekAbsen.value.idShift ?? "",
+          latitude.toString(),
+          longitude.toString(),
+          absC.lokasi.value,
+          dataUser.namaCabang!,
+          dataUser.kodeCabang!,
+          absC.devInfo.value,
+        );
+      }
+    } catch (_) {}
 
     // =======================
     // 🔄 REFRESH
@@ -229,8 +232,13 @@ Future<void> checkOut(Data dataUser, double latitude, double longitude) async {
     });
 
     homeC.getSummAttPerMonth(dataUser.id!);
+    // =======================
+    // ✅ CHECKOUT LOGIS BERHASIL
+    // =======================
+    checkoutSucceeded = true;
     // absC.startTimer(10);
     // absC.resend();
+    return DbResult(success: true, message: "Check out success");
   } finally {
     // 🔥 TUTUP LOADING DI SINI
     if (isLoadingShown && (Get.isDialogOpen ?? false)) {

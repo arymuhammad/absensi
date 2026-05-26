@@ -26,6 +26,7 @@ class AbsenBottomSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     final data = auth.logUser.value;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeOut,
@@ -60,24 +61,22 @@ class AbsenBottomSheet extends StatelessWidget {
             ),
 
             /// STATUS
-            Obx(
-              () => Row(
+            Obx(() {
+              final isOutside =
+                  controller.distanceStore.value > num.parse(data.areaCover!);
+
+              final isRnD =
+                  controller.optVisitSelected.value ==
+                  "Research and Development";
+              return Row(
                 children: [
                   Icon(
-                    controller.distanceStore.value > num.parse(data.areaCover!)
-                        ? Icons.error
-                        : Icons.check_circle,
-                    color:
-                        controller.distanceStore.value >
-                                num.parse(data.areaCover!)
-                            ? Colors.red
-                            : Colors.green,
+                    isOutside && !isRnD ? Icons.error : Icons.check_circle,
+                    color: (isOutside && !isRnD) ? Colors.red : Colors.green,
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    controller.distanceStore.value > num.parse(data.areaCover!)
-                        ? "Outside area"
-                        : "Inside area",
+                    (isOutside && !isRnD) ? "Outside area" : "Inside area",
                     style: titleTextStyle.copyWith(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -85,40 +84,47 @@ class AbsenBottomSheet extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                 ],
-              ),
-            ),
+              );
+            }),
 
             const SizedBox(height: 3),
 
             /// DISTANCE INFO
-            Obx(
-              () => Visibility(
-                visible:
-                    controller.distanceStore.value > num.parse(data.areaCover!),
+            Obx(() {
+              final isOutside =
+                  controller.distanceStore.value > num.parse(data.areaCover!);
+
+              final isRnD =
+                  controller.optVisitSelected.value ==
+                  "Research and Development";
+
+              return Visibility(
+                visible: isOutside && !isRnD,
                 child: Column(
                   children: [
                     Text(
                       controller.locNote.value,
                       style: TextStyle(
-                        color:
-                            controller.distanceStore.value >
-                                    num.parse(data.areaCover!)
-                                ? red
-                                : green,
+                        color: (isOutside && !isRnD) ? red : green,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
                     const SizedBox(height: 5),
                   ],
                 ),
-              ),
-            ),
+              );
+            }),
 
             /// REFRESH BUTTON
-            Obx(
-              () => Visibility(
-                visible:
-                    controller.distanceStore.value > num.parse(data.areaCover!),
+            Obx(() {
+              final isOutside =
+                  controller.distanceStore.value > num.parse(data.areaCover!);
+
+              final isRnD =
+                  controller.optVisitSelected.value ==
+                  "Research and Development";
+              return Visibility(
+                visible: isOutside && !isRnD,
                 child: Row(
                   children: [
                     Expanded(
@@ -140,8 +146,8 @@ class AbsenBottomSheet extends StatelessWidget {
                     ),
                   ],
                 ),
-              ),
-            ),
+              );
+            }),
 
             const SizedBox(height: 5),
 
@@ -166,8 +172,18 @@ class AbsenBottomSheet extends StatelessWidget {
             Align(
               alignment: Alignment.bottomCenter,
               child: Obx(() {
+                final canBypassArea =
+                    controller.optVisitSelected.value ==
+                    "Research and Development";
+                final isOutside =
+                    controller.distanceStore.value > num.parse(data.areaCover!);
+
+                final locationValid =
+                    canBypassArea
+                        ? true
+                        : (!isOutside && controller.isEnabled.value);
                 final enabled =
-                    controller.isEnabled.value &&
+                    locationValid &&
                     !controller.isTimeUntrusted.value &&
                     !controller.isAppLocked.value;
 

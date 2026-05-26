@@ -118,7 +118,7 @@ class OvertimeController extends GetxController {
     await getListOvertime(idUser: id, level: level, type: "get_by_id", status: "");
   }
 
-  List<OvertimeModel> get filteredList {
+  List<OvertimeModel> get  filteredList {
     return listOvt.where((e) {
       /// 🔹 FILTER STATUS
       if (selectedStatus.value != 'all') {

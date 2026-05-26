@@ -39,39 +39,49 @@ class AbsenUseCase {
         }
 
         if (sts == "Check In") {
-          await visitIn(
+          final result = await visitIn(
             dataUser: data,
             latitude: controller.latFromGps.value,
             longitude: controller.longFromGps.value,
           );
+          if (!result.success) {
+            return result;
+          }
         } else {
-          await visitOut(
+          final result = await visitOut(
             dataUser: data,
             latitude: controller.latFromGps.value,
             longitude: controller.longFromGps.value,
           );
+          if (!result.success) {
+            return result;
+          }
         }
       }
-
       /// ================= ABSEN =================
       else {
         if (sts == "Check In" && controller.selectedShift.isEmpty) {
-          return DbResult.error(
-              "Please select absence shift first");
+          return DbResult.error("Please select absence shift first");
         }
 
         if (sts == "Check In") {
-          await checkIn(
+          final result = await checkIn(
             data,
             controller.latFromGps.value,
             controller.longFromGps.value,
           );
+          if (!result.success) {
+            return result;
+          }
         } else {
-          await checkOut(
+          final result = await checkOut(
             data,
             controller.latFromGps.value,
             controller.longFromGps.value,
           );
+          if (!result.success) {
+            return result;
+          }
         }
       }
 

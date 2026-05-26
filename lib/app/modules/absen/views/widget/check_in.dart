@@ -1,4 +1,5 @@
 // import 'dart:io';
+import 'package:absensi/app/data/helper/db_result.dart';
 import 'package:absensi/app/data/helper/time_service.dart';
 import 'package:absensi/app/modules/absen/controllers/absen_controller.dart';
 import 'package:absensi/app/modules/home/controllers/home_controller.dart';
@@ -15,9 +16,13 @@ import '../../../../data/model/login_model.dart';
 final absC = Get.find<AbsenController>();
 final homeC = Get.find<HomeController>();
 
-checkIn(Data dataUser, double latitude, double longitude) async {
+Future<DbResult> checkIn(
+  Data dataUser,
+  double latitude,
+  double longitude,
+) async {
   /// 🔒 LOCK biar ga double klik
-  if (absC.isLoading.value) return;
+  if (absC.isLoading.value) return DbResult(success: false, message: "unknown");
   absC.isLoading.value = true;
   try {
     final selectedShift = absC.selectedShift.value;
@@ -25,7 +30,7 @@ checkIn(Data dataUser, double latitude, double longitude) async {
     // ✅ VALIDASI 1: kosong / 0
     if (selectedShift.isEmpty || selectedShift == "0") {
       failedDialog(Get.context, "Error", "Shift tidak valid");
-      return;
+      return DbResult(success: false, message: "Shift tidak valid");
     }
 
     // ✅ VALIDASI 2: harus ada di list shift
@@ -33,7 +38,7 @@ checkIn(Data dataUser, double latitude, double longitude) async {
 
     if (!isValidShift) {
       failedDialog(Get.context, "Error", "Shift tidak ditemukan");
-      return;
+      return DbResult(success: false, message: "Shift tidak ditemukan");
     }
 
     final selectedCabang =
@@ -80,15 +85,15 @@ checkIn(Data dataUser, double latitude, double longitude) async {
     // 🚫 BLOCK JIKA SUDAH ABSEN
     // ===============================
     if (sudahAbsen) {
-      succesDialog(
-        context: Get.context!,
-        pageAbsen: "N",
-        desc: "You have checked in today",
-        type: DialogType.info,
-        title: 'INFO',
-        btnOkOnPress: () => Get.back(),
-      );
-      return;
+      // succesDialog(
+      //   context: Get.context!,
+      //   pageAbsen: "N",
+      //   desc: "You have checked in today",
+      //   type: DialogType.info,
+      //   title: 'INFO',
+      //   btnOkOnPress: () => Get.back(),
+      // );
+      return DbResult(success: false, message: "You have checked in today");
     }
     // if (absC.cekAbsen.value.total != "0") {
     //   // _resetForm();
@@ -108,12 +113,12 @@ checkIn(Data dataUser, double latitude, double longitude) async {
     // 4️⃣ FOTO WAJIB
     // ===============================
     await absC.uploadFotoAbsen(isVisit: false);
-    Get.back();
+    // Get.back();
 
     if (absC.image == null) {
       // _resetForm();
-      failedDialog(Get.context, "Warning", "Check in was cancelled");
-      return;
+      // failedDialog(Get.context, "Warning", "Check in was cancelled");
+      return DbResult(success: false, message: "Check in was cancelled");
     }
     final imagePath = absC.image!.path;
 
@@ -202,8 +207,13 @@ checkIn(Data dataUser, double latitude, double longitude) async {
         statusSync: "PENDING",
       ),
     );
-    Get.back(); // tutup loading
-    if (res.success) {
+    if (Get.isDialogOpen ?? false) {
+      Get.back();
+    } // tutup loading
+    if (!res.success) {
+      // showToast(res.message);
+      return DbResult(success: false, message: res.message);
+    } else {
       // ===============================
       // 9️⃣ KIRIM KE SERVER
       // ===============================
@@ -224,8 +234,6 @@ checkIn(Data dataUser, double latitude, double longitude) async {
           Get.back();
         },
       );
-    } else {
-      showToast(res.message);
     }
     // ===============================
     // 🔥 10. KIRIM KE XMOR
@@ -262,8 +270,10 @@ checkIn(Data dataUser, double latitude, double longitude) async {
     homeC.getSummAttPerMonth(dataUser.id!);
     // absC.startTimer(10);
     // absC.resend();
+    return DbResult(success: true, message: "Check in success");
   } catch (e) {
     failedDialog(Get.context, "Error", e.toString());
+    return DbResult(success: false, message: e.toString());
   } finally {
     _resetForm();
     absC.isLoading.value = false;

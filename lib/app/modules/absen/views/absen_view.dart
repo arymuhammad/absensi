@@ -1,6 +1,7 @@
 import 'package:absensi/app/data/helper/app_colors.dart';
 import 'package:absensi/app/data/helper/custom_dialog.dart';
 import 'package:absensi/app/data/model/login_model.dart';
+import 'package:absensi/app/modules/absen/views/widget/map_section_view.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -8,6 +9,7 @@ import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 import 'package:get/get.dart';
 import 'package:latlong2/latlong.dart';
 // import 'package:path/path.dart';
+import '../../../data/helper/loading_platform.dart';
 import '../../login/controllers/login_controller.dart';
 import '../controllers/absen_controller.dart';
 import 'widget/absen_bottom_sheet.dart';
@@ -62,10 +64,64 @@ class AbsenView extends GetView<AbsenController> {
           ),
         ),
         body: Obx(() {
-          final userPoint = LatLng(
-            absenC.latFromGps.value,
-            absenC.longFromGps.value,
-          );
+          final dataUsr = auth.logUser.value;
+          final lat = absenC.latFromGps.value;
+          final lng = absenC.longFromGps.value;
+
+          final gpsReady =
+              lat != 0 &&
+              lng != 0 &&
+              lat >= -90 &&
+              lat <= 90 &&
+              lng >= -180 &&
+              lng <= 180;
+
+          if (!gpsReady) {
+            /// masih loading GPS
+            if (absenC.isGpsLoading.value) {
+              return Center(child: platFormDevice());
+            }
+
+            /// GPS gagal
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.location_off, size: 60, color: Colors.red),
+
+                  const SizedBox(height: 12),
+
+                  Text(
+                    absenC.gpsError.value.isEmpty
+                        ? "Failed to get GPS"
+                        : absenC.gpsError.value,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  ElevatedButton(
+                    onPressed: () async {
+                      absenC.isGpsLoading.value = true;
+
+                      try {
+                        final pos = await absenC.determinePosition();
+
+                        absenC.latFromGps.value = pos.latitude;
+                        absenC.longFromGps.value = pos.longitude;
+                      } catch (_) {}
+                    },
+                    child: const Text("Retry GPS"),
+                  ),
+                ],
+              ),
+            );
+          }
+          final userPoint = LatLng(lat, lng);
           // print("isOffline: ${absenC.isOffline.value}");
           // print("storeLatLng: ${absenC.storeLatLng.value}");
           final storeLatLng = absenC.storeLatLng.value;
@@ -78,9 +134,9 @@ class AbsenView extends GetView<AbsenController> {
               children: [
                 Positioned.fill(child: _offlineView(isDark)),
 
-                _buildBottomSheet(data),
+                _buildBottomSheet(dataUsr),
 
-                _buildFAB(h, padding, context, isDark, data),
+                _buildFAB(h, padding, context, isDark, dataUsr),
 
                 _buildOnlineIndicator(),
 
@@ -115,8 +171,8 @@ class AbsenView extends GetView<AbsenController> {
                         onPressed: () {
                           // await controller.initTime(); // 🔥 retry
                           absenC.storeLatLng.value = LatLng(
-                            double.parse(data.lat!),
-                            double.parse(data.long!),
+                            double.parse(dataUsr.lat!),
+                            double.parse(dataUsr.long!),
                           );
                           // print(storeLatLng);
                         },
@@ -134,7 +190,7 @@ class AbsenView extends GetView<AbsenController> {
 
           final storePoint =
               absenC.storeLatLng.value ??
-              LatLng(double.parse(data.lat!), double.parse(data.long!));
+              LatLng(double.parse(dataUsr.lat!), double.parse(dataUsr.long!));
           final animatedPoint = interpolate(
             userPoint,
             storePoint,
@@ -147,104 +203,16 @@ class AbsenView extends GetView<AbsenController> {
           return Stack(
             children: [
               Positioned.fill(
-                child: FlutterMap(
-                  mapController: absenC.mapController,
-                  options: MapOptions(
-                    initialZoom: 17,
-                    maxZoom: 19,
-                    minZoom: 5,
-                    onPositionChanged: (position, _) {
-                      if (position.zoom != null) {
-                        absenC.currentZoom.value = position.zoom!;
-                      }
-
-                      bottomSheetController.animateTo(
-                        0.15,
-                        duration: const Duration(milliseconds: 250),
-                        curve: Curves.easeOut,
-                      );
-                    },
-                    onMapReady: () {
-                      absenC.isMapReady.value = true;
-                    },
-                  ),
-                  children: [
-                    TileLayer(
-                      urlTemplate:
-                          'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                      subdomains: const ['a', 'b', 'c', 'd'],
-                      userAgentPackageName: 'com.absensi.urbanco',
-                      maxNativeZoom: 19,
-                      tileSize: 256,
-                      retinaMode: true,
-                    ),
-
-                    CircleLayer(
-                      circles: [
-                        CircleMarker(
-                          point: storePoint,
-                          radius: 30,
-                          borderStrokeWidth: 2,
-                          color:
-                              absenC.isInsideRadius.value
-                                  ? Colors.green.withOpacity(0.2)
-                                  : Colors.red.withOpacity(0.2),
-                          borderColor:
-                              absenC.isInsideRadius.value
-                                  ? Colors.green
-                                  : Colors.red,
-                        ),
-                      ],
-                    ),
-
-                    PolylineLayer(
-                      polylines: [
-                        Polyline(
-                          points: [userPoint, storePoint],
-                          strokeWidth: 6,
-                          color: Colors.black.withOpacity(0.25),
-                        ),
-                      ],
-                    ),
-
-                    PolylineLayer(
-                      polylines: [
-                        Polyline(
-                          points: [userPoint, animatedPoint],
-                          strokeWidth: 3,
-                          color:
-                              absenC.isInsideRadius.value
-                                  ? Colors.green
-                                  : Colors.red,
-                        ),
-                      ],
-                    ),
-
-                    CurrentLocationLayer(
-                      alignDirectionOnUpdate: AlignOnUpdate.never,
-                      style: const LocationMarkerStyle(
-                        showAccuracyCircle: false,
-                        marker: Icon(
-                          Icons.location_on,
-                          color: Color(0xFFEA4335),
-                          size: 42,
-                          shadows: [
-                            Shadow(
-                              color: Colors.black38,
-                              blurRadius: 6,
-                              offset: Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        markerSize: Size(42, 42),
-                      ),
-                    ),
-                  ],
+                child: MapSectionView(
+                  controller: controller,
+                  userPoint: userPoint,
+                  storePoint: storePoint,
+                  animatedPoint: animatedPoint,
                 ),
               ),
 
-              _buildBottomSheet(data),
-              _buildFAB(h, padding, context, isDark, data),
+              _buildBottomSheet(dataUsr),
+              _buildFAB(h, padding, context, isDark, dataUsr),
               _buildOnlineIndicator(),
               _buildSyncIndicator(),
 

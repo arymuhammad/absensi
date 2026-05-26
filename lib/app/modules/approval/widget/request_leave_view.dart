@@ -376,40 +376,43 @@ class RequestLeaveView extends GetView<LeaveController> {
                                   'File terlampir',
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
-                               leave.attachFile == null ||
-                                                      leave.attachFile!.isEmpty
-                                                  ? const Text('-')
-                                                  : InkWell(
-                                  onTap: () {
-                                    showDialog(
-                                      context: context,
-                                      builder: (context) {
-                                        return Dialog(
-                                          backgroundColor: Colors.black,
-                                          insetPadding: const EdgeInsets.all(0),
-                                          child: GestureDetector(
-                                            onTap:
-                                                () =>
-                                                    Navigator.of(context).pop(),
-                                            child: PhotoView(
-                                              imageProvider: NetworkImage(
-                                                '${ServiceApi().baseUrl}${leave.attachFile!}',
-                                              ),
-                                              backgroundDecoration:
-                                                  const BoxDecoration(
-                                                    color: Colors.black,
+                                leave.attachFile == null ||
+                                        leave.attachFile!.isEmpty
+                                    ? const Text('-')
+                                    : InkWell(
+                                      onTap: () {
+                                        showDialog(
+                                          context: context,
+                                          builder: (context) {
+                                            return Dialog(
+                                              backgroundColor: Colors.black,
+                                              insetPadding:
+                                                  const EdgeInsets.all(0),
+                                              child: GestureDetector(
+                                                onTap:
+                                                    () =>
+                                                        Navigator.of(
+                                                          context,
+                                                        ).pop(),
+                                                child: PhotoView(
+                                                  imageProvider: NetworkImage(
+                                                    '${ServiceApi().baseUrl}${leave.attachFile!}',
                                                   ),
-                                            ),
-                                          ),
+                                                  backgroundDecoration:
+                                                      const BoxDecoration(
+                                                        color: Colors.black,
+                                                      ),
+                                                ),
+                                              ),
+                                            );
+                                          },
                                         );
                                       },
-                                    );
-                                  },
-                                  child: const Text(
-                                    'show file',
-                                    style: TextStyle(color: Colors.blue),
-                                  ),
-                                ),
+                                      child: const Text(
+                                        'show file',
+                                        style: TextStyle(color: Colors.blue),
+                                      ),
+                                    ),
                                 const SizedBox(height: 10),
 
                                 Row(
@@ -420,8 +423,8 @@ class RequestLeaveView extends GetView<LeaveController> {
                                       color: red!,
                                       fontsize: 15,
                                       onPressed:
-                                          status.isNotEmpty ||
-                                                  status == "reject"
+                                          status == "approved" ||
+                                                  status == "rejected"
                                               ? null
                                               : () {
                                                 final userData =
@@ -463,8 +466,8 @@ class RequestLeaveView extends GetView<LeaveController> {
                                       color: AppColors.contentColorGreenAccent,
                                       fontsize: 15,
                                       onPressed:
-                                          status.isNotEmpty ||
-                                                  status == "reject"
+                                          status == "approved" ||
+                                                  status == "rejected"
                                               ? null
                                               : () {
                                                 final userData =

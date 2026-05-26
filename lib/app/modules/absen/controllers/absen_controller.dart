@@ -184,6 +184,9 @@ class AbsenController extends GetxController
   var visit = "".obs;
   var isAnimReady = false.obs;
   final AbsenUseCase useCase = AbsenUseCase();
+  final isSheetAnimating = false.obs;
+  var isGpsLoading = true.obs;
+  var gpsError = ''.obs;
 
   // bool _hasTriggeredInitialSync = false;
   // bool _isHandlingReconnect = false;
@@ -680,9 +683,22 @@ class AbsenController extends GetxController
   }
 
   Future<Position> determinePosition() async {
+    return Future.any([
+      _determinePositionInternal(),
+      Future.delayed(
+        const Duration(seconds: 35),
+        () => throw TimeoutException("GPS timeout"),
+      ),
+    ]);
+  }
+
+  Future<Position> _determinePositionInternal() async {
     try {
       bool serviceEnabled;
       LocationPermission permission;
+
+      isGpsLoading.value = true;
+      gpsError.value = '';
 
       /// =========================
       /// CHECK GPS SERVICE
@@ -691,6 +707,9 @@ class AbsenController extends GetxController
 
       if (!serviceEnabled) {
         stopLoading();
+        gpsError.value = "Location disabled";
+        isGpsLoading.value = false;
+
         showToast("Location disabled");
         return Future.error('Location disabled.');
       }
@@ -709,6 +728,9 @@ class AbsenController extends GetxController
         isLoading.value = false;
         isEnabled.value = false;
 
+        gpsError.value = "Permission denied";
+        isGpsLoading.value = false;
+
         showToast("Permission denied");
         return Future.error('Permission denied');
       }
@@ -717,6 +739,9 @@ class AbsenController extends GetxController
         stopLoading();
         isLoading.value = false;
         isEnabled.value = false;
+
+        gpsError.value = "Permission denied forever";
+        isGpsLoading.value = false;
 
         showToast("Permission denied forever");
         return Future.error('Permission denied forever');
@@ -740,9 +765,10 @@ class AbsenController extends GetxController
               ),
             )
             .where((p) {
-              // print("warming accuracy: ${p.accuracy}");
-
               /// terima kalau sudah lumayan bagus
+              if (Platform.isIOS) {
+                return p.accuracy <= 100;
+              }
               return p.accuracy <= 50;
             })
             .first
@@ -761,11 +787,17 @@ class AbsenController extends GetxController
         /// =========================
         /// VALIDATE ACCURACY
         /// =========================
-        if (fresh.accuracy > 50) {
+
+        final maxAccuracy = Platform.isIOS ? 100.0 : 50.0;
+
+        if (fresh.accuracy > maxAccuracy) {
           stopLoading();
 
           isLoading.value = false;
           isEnabled.value = false;
+
+          gpsError.value = "GPS not accurate enough";
+          isGpsLoading.value = false;
 
           showToast("GPS not accurate enough");
           return Future.error("GPS not accurate enough");
@@ -780,10 +812,15 @@ class AbsenController extends GetxController
           isLoading.value = false;
           isEnabled.value = false;
 
+          gpsError.value = "Fake GPS detected";
+          isGpsLoading.value = false;
+
           failedDialog(Get.context, 'Warning', 'Fake GPS detected');
           return Future.error("Fake GPS detected");
         }
         stopLoading();
+        isGpsLoading.value = false;
+        gpsError.value = '';
         return fresh;
       } catch (e) {
         // print("GPS ERROR: $e");
@@ -794,11 +831,18 @@ class AbsenController extends GetxController
         // if (lastKnown != null) {
         //   return lastKnown;
         // }
+
+        final maxLastKnownAccuracy = Platform.isIOS ? 150.0 : 70.0;
+
         if (lastKnown != null) {
           final age = DateTime.now().difference(lastKnown.timestamp);
 
-          if (age.inSeconds < 30 && lastKnown.accuracy <= 70) {
+          if (age.inSeconds < 30 &&
+              lastKnown.accuracy <= maxLastKnownAccuracy) {
             stopLoading();
+
+            isGpsLoading.value = false;
+            gpsError.value = '';
 
             return lastKnown;
           }
@@ -811,6 +855,9 @@ class AbsenController extends GetxController
       isLoading.value = false;
       isEnabled.value = false;
 
+      gpsError.value = "Location timeout";
+      isGpsLoading.value = false;
+
       showToast("Failed to get location, please try again.");
 
       return Future.error('Timeout while getting location');
@@ -819,6 +866,9 @@ class AbsenController extends GetxController
 
       isLoading.value = false;
       isEnabled.value = false;
+
+      gpsError.value = "Failed to get location";
+      isGpsLoading.value = false;
 
       showToast("Failed to get location");
       return Future.error(e);
@@ -1271,7 +1321,10 @@ class AbsenController extends GetxController
   }
 
   Future<void> uploadFotoAbsen({required bool isVisit}) async {
-    image = await picker.pickImage(
+    /// 🔥 RESET DULU
+    image = null;
+
+    final pickedImage = await picker.pickImage(
       source: ImageSource.camera,
       imageQuality: 80,
       maxHeight: 600,
@@ -1285,12 +1338,15 @@ class AbsenController extends GetxController
     // } else {
     //   return;
     // }
-
-    if (image == null) return;
+    /// USER CANCEL CAMERA
+    if (pickedImage == null) {
+      update();
+      return;
+    }
     try {
       // 🔥 pindahkan ke storage permanent
       final savedPath = await saveImage(
-        image!.path,
+        pickedImage.path,
         isVisit ? 'visit' : 'absen',
       );
 
@@ -1302,6 +1358,7 @@ class AbsenController extends GetxController
 
       update();
     } catch (e) {
+      image = null;
       showToast("Gagal menyimpan foto");
     }
   }
@@ -1404,45 +1461,78 @@ class AbsenController extends GetxController
   }
 
   Future<bool> syncAbsen() async {
-    if (!await isOnline()) return true;
+    /// =========================
+    /// 🌐 INTERNET CHECK
+    /// =========================
+    final online = await isOnline();
+
+    if (!online) {
+      // print("SYNC SKIPPED: offline");
+      return false;
+    }
+
+    /// =========================
+    /// 🔒 PREVENT DOUBLE SYNC
+    /// =========================
+    if (isSyncing.value) return false;
 
     isSyncing.value = true;
 
     try {
+      /// =========================
+      /// 📦 GET PENDING ONLY
+      /// =========================
       final pendingData = await SQLHelper.instance.getPendingAbsen();
 
       if (pendingData.isEmpty) {
         stopAutoSync();
-        showToast('no pending data on local storage');
+
+        syncTotal.value = 0;
+        syncCurrent.value = 0;
+
+        // showToast('No pending data');
+
         return true;
       }
 
+      /// =========================
+      /// 📊 INIT PROGRESS
+      /// =========================
       syncTotal.value = pendingData.length;
       syncCurrent.value = 0;
-      showToast('sync started');
 
-      for (var item in pendingData) {
+      showToast('Sync started');
+
+      /// =========================
+      /// 🔄 LOOP DATA
+      /// =========================
+      for (final item in pendingData) {
         try {
           Map<String, dynamic> data;
-          // =========================
-          // 🔥 CEK JENIS (MASUK / PULANG)
-          // =========================
-          if (item.jamAbsenPulang == null || item.jamAbsenPulang == '') {
-            // =========================
-            // ✅ INSERT (CHECK-IN)
-            // =========================
-            final file = File(item.fotoMasuk!);
 
-            if (!await file.exists()) {
-              showToast('Sync failed, check in photo missing.');
-              await SQLHelper.instance.updateStatusAbsen(
-                item.idUser!,
-                item.tanggalMasuk!,
-                "FAILED",
-              );
-              continue; // ⛔ skip item ini
+          final isCheckInOnly =
+              item.jamAbsenPulang == null ||
+              item.jamAbsenPulang.toString().isEmpty;
+
+          /// =========================
+          /// 📷 FILE VALIDATION
+          /// =========================
+          if (isCheckInOnly) {
+            final fotoMasuk = item.fotoMasuk;
+
+            if (fotoMasuk == null || fotoMasuk.isEmpty) {
+              throw Exception("Check in photo path missing");
             }
 
+            final file = File(fotoMasuk);
+
+            if (!await file.exists()) {
+              throw Exception("Check in photo missing");
+            }
+
+            /// =========================
+            /// ✅ CHECK-IN DATA
+            /// =========================
             data = {
               "status": "add",
               "id": item.idUser,
@@ -1453,150 +1543,228 @@ class AbsenController extends GetxController
               "jam_masuk": item.jamMasuk,
               "jam_pulang": item.jamPulang,
               "jam_absen_masuk": item.jamAbsenMasuk,
-              "foto_masuk": File(item.fotoMasuk!),
+              "foto_masuk": file,
               "lat_masuk": item.latMasuk,
               "long_masuk": item.longMasuk,
               "device_info": item.devInfo,
             };
           } else {
-            // =========================
-            // 🔄 UPDATE (CHECK-OUT)
-            // =========================
-            final file = File(item.fotoPulang!);
+            final fotoPulang = item.fotoPulang;
 
-            if (!await file.exists()) {
-              showToast('Sync failed, check out photo missing.');
-              await SQLHelper.instance.updateStatusAbsen(
-                item.idUser!,
-                item.tanggalMasuk!,
-                "FAILED",
-              );
-              continue; // ⛔ skip item ini
+            if (fotoPulang == null || fotoPulang.isEmpty) {
+              throw Exception("Check out photo path missing");
             }
 
+            final file = File(fotoPulang);
+
+            if (!await file.exists()) {
+              throw Exception("Check out photo missing");
+            }
+
+            /// =========================
+            /// 🔄 CHECK-OUT DATA
+            /// =========================
             data = {
               "status": "update",
               "id": item.idUser,
               "tanggal_masuk": item.tanggalMasuk,
-              "tanggal_pulang":
-                  item.tanggalPulang, // atau field khusus kalau ada
+              "tanggal_pulang": item.tanggalPulang,
               "nama": item.nama,
               "jam_absen_pulang": item.jamAbsenPulang,
-              "foto_pulang": File(item.fotoPulang!),
+              "foto_pulang": file,
               "lat_pulang": item.latPulang,
               "long_pulang": item.longPulang,
               "device_info2": item.devInfo2,
             };
           }
-          final res = await ServiceApi().submitAbsen(data, true);
-          if (res != null && res['success'] == true) {
-            await SQLHelper.instance.updateStatusAbsen(
-              item.idUser!,
-              item.tanggalMasuk!,
-              "SUCCESS",
-            );
-            // stopAutoSync();
 
-            // =========================
-            // 🧹 HAPUS FILE FOTO
-            // =========================
-            if (item.jamAbsenPulang == null || item.jamAbsenPulang == '') {
-              // hanya hapus foto masuk kalau ini memang data check-in saja
-              await deleteFileIfExists(item.fotoMasuk);
-            } else {
-              // kalau sudah check-out → hapus dua-duanya
-              await deleteFileIfExists(item.fotoMasuk);
-              await deleteFileIfExists(item.fotoPulang);
+          /// =========================
+          /// 🚀 API REQUEST
+          /// =========================
+          final res = await ServiceApi().submitAbsen(data, true);
+
+          /// =========================
+          /// ✅ RESPONSE VALIDATION
+          /// =========================
+          bool success = false;
+
+          if (res != null) {
+            if (res['success'] == true ||
+                res['success'] == "true" ||
+                res['status'] == true ||
+                res['status'] == "true") {
+              success = true;
             }
-          } else {
-            throw Exception('API gagal');
           }
-        } catch (e) {
+
+          if (!success) {
+            throw Exception("API rejected sync");
+          }
+
+          /// =========================
+          /// ✅ UPDATE STATUS SUCCESS
+          /// =========================
+          await SQLHelper.instance.updateStatusAbsen(
+            item.idUser!,
+            item.tanggalMasuk!,
+            "SUCCESS",
+          );
+
+          /// =========================
+          /// 🧹 DELETE FILES
+          /// =========================
+          await deleteFileIfExists(item.fotoMasuk);
+
+          if (!isCheckInOnly) {
+            await deleteFileIfExists(item.fotoPulang);
+          }
+
+          // print("SYNC SUCCESS: ${item.idUser}");
+        } catch (e, s) {
+          // print("SYNC ERROR: $e");
+          // print(s);
+
+          /// =========================
+          /// ❌ MARK FAILED
+          /// =========================
           await SQLHelper.instance.updateStatusAbsen(
             item.idUser!,
             item.tanggalMasuk!,
             "FAILED",
           );
+        } finally {
+          /// =========================
+          /// 📊 UPDATE PROGRESS
+          /// =========================
+          syncCurrent.value++;
         }
-        // 🔥 update progress tiap item
-        syncCurrent.value++;
       }
-      // 🔥 cek ulang setelah loop
+
+      /// =========================
+      /// 🔁 RECHECK PENDING
+      /// =========================
       final remaining = await SQLHelper.instance.getPendingAbsen();
+
       if (remaining.isEmpty) {
+        /// =========================
+        /// 🧹 CLEANUP
+        /// =========================
         await cleanupOrphanFiles(isVisit: false);
-        showToast('sync process is complete');
+
         stopAutoSync();
-        var paramLimit = {
+
+        showToast('Sync completed');
+
+        /// =========================
+        /// 🔄 REFRESH UI
+        /// =========================
+        final paramLimit = {
           "mode": "limit",
           "id_user": idUser.value,
           "tanggal1": initDate1,
           "tanggal2": initDate2,
         };
 
-        var paramSingle = {
+        final paramSingle = {
           "mode": "single",
           "id_user": idUser.value,
           "tanggal_masuk": realDateServer,
         };
-        getAbsenToday(paramSingle);
-        getLimitAbsen(paramLimit);
-        isSyncing.value = false;
+
+        await getAbsenToday(paramSingle);
+        await getLimitAbsen(paramLimit);
+
         syncTotal.value = 0;
         syncCurrent.value = 0;
+
         return true;
-      } else {
-        showToast('some data failed, retrying...');
-        return false;
       }
+
+      /// =========================
+      /// ⚠️ SOME FAILED
+      /// =========================
+      showToast('Some data failed to sync');
+
+      return false;
     } finally {
-      isSyncing.value = false; // 🔥 WAJIB di finally
+      /// =========================
+      /// 🔓 RELEASE LOCK
+      /// =========================
+      isSyncing.value = false;
     }
   }
 
   Future<bool> syncVisit() async {
-    if (!await isOnline()) return false;
+    /// =========================
+    /// 🌐 INTERNET CHECK
+    /// =========================
+    final online = await isOnline();
+
+    if (!online) {
+      return false;
+    }
+
+    /// =========================
+    /// 🔒 PREVENT DOUBLE SYNC
+    /// =========================
+    if (isSyncing.value) return false;
 
     isSyncing.value = true;
 
     try {
+      /// =========================
+      /// 📦 GET PENDING ONLY
+      /// =========================
       final pendingData = await SQLHelper.instance.getPendingVisit();
 
       if (pendingData.isEmpty) {
         stopAutoSync();
-        showToast('no pending data on local storage');
+
+        syncTotal.value = 0;
+        syncCurrent.value = 0;
+
         return true;
       }
 
+      /// =========================
+      /// 📊 INIT PROGRESS
+      /// =========================
       syncTotal.value = pendingData.length;
       syncCurrent.value = 0;
-      showToast('sync started');
 
-      for (var item in pendingData) {
+      showToast('Sync started');
+
+      /// =========================
+      /// 🔄 LOOP
+      /// =========================
+      for (final item in pendingData) {
         try {
           Map<String, dynamic> data;
-          final isVisitIn = item.jamOut == null || item.jamOut == '';
-          final visitKey = isVisitIn ? item.visitIn : item.visitOut;
-          // =========================
-          // 🔥 CEK JENIS (MASUK / PULANG)
-          // =========================
-          if (isVisitIn) {
-            // =========================
-            // ✅ INSERT (CHECK-IN)
-            // =========================
-            final file = File(item.fotoIn!);
 
-            if (!await file.exists()) {
-              showToast('Sync failed, check in photo missing.');
-              await SQLHelper.instance.updateStatusVisit(
-                item.id!,
-                item.tglVisit!,
-                item.visitIn!,
-                "FAILED",
-              );
-              continue; // ⛔ skip item ini
+          final isVisitIn =
+              item.jamOut == null || item.jamOut.toString().isEmpty;
+
+          final visitKey = isVisitIn ? item.visitIn : item.visitOut;
+
+          /// =========================
+          /// 📷 VALIDATE FILE
+          /// =========================
+          if (isVisitIn) {
+            final fotoIn = item.fotoIn;
+
+            if (fotoIn == null || fotoIn.isEmpty) {
+              throw Exception("Visit in photo path missing");
             }
 
+            final file = File(fotoIn);
+
+            if (!await file.exists()) {
+              throw Exception("Visit in photo missing");
+            }
+
+            /// =========================
+            /// ✅ VISIT IN
+            /// =========================
             data = {
               "status": "add",
               "id": item.id,
@@ -1609,32 +1777,31 @@ class AbsenController extends GetxController
               "lat_in": item.latIn,
               "long_in": item.longIn,
               "device_info": item.deviceInfo,
-              "is_rnd": item.isRnd,
+              "is_rnd": item.isRnd ?? "0",
             };
           } else {
-            // =========================
-            // 🔄 UPDATE (CHECK-OUT)
-            // =========================
-            final file = File(item.fotoOut!);
+            final fotoOut = item.fotoOut;
 
-            if (!await file.exists()) {
-              showToast('Sync failed, check out photo missing.');
-              await SQLHelper.instance.updateStatusVisit(
-                item.id!,
-                item.tglVisit!,
-                item.visitOut!,
-                "FAILED",
-              );
-              continue; // ⛔ skip item ini
+            if (fotoOut == null || fotoOut.isEmpty) {
+              throw Exception("Visit out photo path missing");
             }
 
+            final file = File(fotoOut);
+
+            if (!await file.exists()) {
+              throw Exception("Visit out photo missing");
+            }
+
+            /// =========================
+            /// 🔄 VISIT OUT
+            /// =========================
             data = {
               "status": "update",
               "id": item.id,
               "nama": item.nama,
               "tgl_visit": item.tglVisit,
-              "visit_out": item.visitOut,
               "visit_in": item.visitIn,
+              "visit_out": item.visitOut,
               "jam_out": item.jamOut,
               "foto_out": file,
               "lat_out": item.latOut,
@@ -1642,218 +1809,133 @@ class AbsenController extends GetxController
               "device_info2": item.deviceInfo2,
             };
           }
-          final res = await ServiceApi().submitVisit(data, true);
-          if (res != null && res['success'] == true) {
-            await SQLHelper.instance.updateStatusVisit(
-              item.id!,
-              item.tglVisit!,
-              visitKey!,
-              "SUCCESS",
-            );
-            // stopAutoSync();
 
-            // =========================
-            // 🧹 HAPUS FILE FOTO
-            // =========================
-            if (isVisitIn) {
-              // hanya hapus foto masuk kalau ini memang data check-in saja
-              await deleteFileIfExists(item.fotoIn);
-            } else {
-              // kalau sudah check-out → hapus dua-duanya
-              await deleteFileIfExists(item.fotoIn);
+          /// =========================
+          /// 🚀 SEND API
+          /// =========================
+          final res = await ServiceApi().submitVisit(data, true);
+
+          // print("========== SYNC VISIT RESPONSE ==========");
+          // print(res);
+          // print("=========================================");
+
+          /// =========================
+          /// ✅ VALIDATE RESPONSE
+          /// =========================
+          bool success = false;
+
+          if (res != null) {
+            if (res['success'] == true ||
+                res['success'] == "true" ||
+                res['status'] == true ||
+                res['status'] == "true") {
+              success = true;
+            }
+          }
+
+          if (!success) {
+            throw Exception("API rejected sync");
+          }
+
+          /// =========================
+          /// ✅ UPDATE SUCCESS
+          /// =========================
+          await SQLHelper.instance.updateStatusVisit(
+            item.id!,
+            item.tglVisit!,
+            visitKey!,
+            "SUCCESS",
+          );
+
+          /// =========================
+          /// 🧹 DELETE FILES
+          /// =========================
+          try {
+            await deleteFileIfExists(item.fotoIn);
+
+            if (!isVisitIn) {
               await deleteFileIfExists(item.fotoOut);
             }
-          } else {
-            throw Exception('API gagal');
+          } catch (e) {
+            // print("DELETE FILE ERROR: $e");
           }
-        } catch (e) {
+
+          // print("SYNC SUCCESS: ${item.id}");
+        } catch (e, s) {
+          // print("========== SYNC VISIT ERROR ==========");
+          // print(e);
+          // print(s);
+          // print("======================================");
+
+          /// =========================
+          /// ❌ UPDATE FAILED
+          /// =========================
           await SQLHelper.instance.updateStatusVisit(
             item.id!,
             item.tglVisit!,
             item.visitIn!,
             "FAILED",
           );
+        } finally {
+          /// =========================
+          /// 📊 UPDATE PROGRESS
+          /// =========================
+          syncCurrent.value++;
         }
-        // 🔥 update progress tiap item
-        syncCurrent.value++;
       }
-      // 🔥 cek ulang setelah loop
+
+      /// =========================
+      /// 🔁 RECHECK PENDING
+      /// =========================
       final remaining = await SQLHelper.instance.getPendingVisit();
+
       if (remaining.isEmpty) {
+        /// =========================
+        /// 🧹 CLEANUP
+        /// =========================
         await cleanupOrphanFiles(isVisit: true);
-        showToast('sync process is complete');
+
         stopAutoSync();
-        var paramLimit = {
+
+        showToast('Sync completed');
+
+        /// =========================
+        /// 🔄 REFRESH UI
+        /// =========================
+        final paramLimit = {
           "mode": "limit",
           "id_user": idUser.value,
           "tanggal1": initDate1,
           "tanggal2": initDate2,
         };
 
-        var paramSingle = {
+        final paramSingle = {
           "mode": "single",
           "id_user": idUser.value,
           "tgl_visit": realDateServer,
         };
 
-        getVisitToday(paramSingle);
-        getLimitVisit(paramLimit);
-        isSyncing.value = false;
+        await getVisitToday(paramSingle);
+        await getLimitVisit(paramLimit);
+
         syncTotal.value = 0;
         syncCurrent.value = 0;
+
         return true;
-      } else {
-        showToast('some data failed, retrying...');
-        return false;
       }
+
+      /// =========================
+      /// ⚠️ SOME FAILED
+      /// =========================
+      showToast('Some data failed to sync');
+
+      return false;
     } finally {
-      isSyncing.value = false; // 🔥 WAJIB di finally
+      /// =========================
+      /// 🔓 RELEASE LOCK
+      /// =========================
+      isSyncing.value = false;
     }
-
-    ////////////////////////////////////
-    ////////////////////////////////////
-
-    // try {
-    //   final pendingData = await SQLHelper.instance.getPendingVisit();
-
-    //   if (pendingData.isEmpty) {
-    //     stopAutoSync();
-    //     showToast('no pending data on local storage');
-    //     return true;
-    //   }
-
-    //   syncTotal.value = pendingData.length;
-    //   syncCurrent.value = 0;
-    //   showToast('sync started');
-
-    //   for (var item in pendingData) {
-    //     bool isSuccess = false;
-
-    //     final isVisitIn = item.jamOut == null || item.jamOut == '';
-    //     final visitKey = isVisitIn ? item.visitIn : item.visitOut;
-
-    //     try {
-    //       Map<String, dynamic> data;
-
-    //       if (isVisitIn) {
-    //         // ✅ VISIT IN
-    //         final file = File(item.fotoIn ?? '');
-
-    //         if (item.fotoIn == null || !await file.exists()) {
-    //           showToast('Sync failed, check in photo missing.');
-    //           throw Exception('foto_in tidak ada');
-    //         }
-
-    //         data = {
-    //           "status": "add",
-    //           "id": item.id,
-    //           "nama": item.nama,
-    //           "tgl_visit": item.tglVisit,
-    //           "visit_in": item.visitIn,
-    //           "jam_in": item.jamIn,
-    //           "foto_in": file,
-    //           "foto_out": "",
-    //           "lat_in": item.latIn,
-    //           "long_in": item.longIn,
-    //           "device_info": item.deviceInfo,
-    //           "is_rnd": item.isRnd,
-    //         };
-    //       } else {
-    //         // 🔄 VISIT OUT
-    //         final file = File(item.fotoOut ?? '');
-
-    //         if (item.fotoOut == null || !await file.exists()) {
-    //           showToast('Sync failed, check out photo missing.');
-    //           throw Exception('foto_out tidak ada');
-    //         }
-
-    //         data = {
-    //           "status": "update",
-    //           "id": item.id,
-    //           "nama": item.nama,
-    //           "tgl_visit": item.tglVisit,
-    //           "visit_out": item.visitOut,
-    //           "visit_in": item.visitIn,
-    //           "jam_out": item.jamOut,
-    //           "foto_out": file,
-    //           "lat_out": item.latOut,
-    //           "long_out": item.longOut,
-    //           "device_info2": item.deviceInfo2,
-    //         };
-    //       }
-
-    //       final res = await ServiceApi().submitVisit(data, true);
-
-    //       if (res != null && res['success'] == true) {
-    //         isSuccess = true;
-    //       } else {
-    //       print('API RESPONSE: $res');
-    //         throw Exception('API gagal');
-    //       }
-    //     } catch (e) {
-    //       print('SYNC ERROR ID ${item.id}: $e');
-    //       isSuccess = false;
-    //     }
-
-    //     // 🔥 UPDATE STATUS SEKALI SAJA (ANTI KETIMPA)
-    //     await SQLHelper.instance.updateStatusVisit(
-    //       item.id!,
-    //       item.tglVisit!,
-    //       visitKey!,
-    //       isSuccess ? "SUCCESS" : "FAILED",
-    //     );
-
-    //     // 🧹 CLEANUP (TIDAK BOLEH GANGGU STATUS)
-    //     if (isSuccess) {
-    //       try {
-    //         if (isVisitIn) {
-    //           await deleteFileIfExists(item.fotoIn);
-    //         } else {
-    //           await deleteFileIfExists(item.fotoIn);
-    //           await deleteFileIfExists(item.fotoOut);
-    //         }
-    //       } catch (e) {
-    //         print('DELETE FILE ERROR: $e');
-    //       }
-    //     }
-
-    //     syncCurrent.value++;
-    //   }
-
-    //   final remaining = await SQLHelper.instance.getPendingVisit();
-
-    //   if (remaining.isEmpty) {
-    //     await cleanupOrphanFiles(isVisit: true);
-    //     showToast('sync process is complete');
-    //     stopAutoSync();
-
-    //     var paramLimit = {
-    //       "mode": "limit",
-    //       "id_user": idUser.value,
-    //       "tanggal1": initDate1,
-    //       "tanggal2": initDate2,
-    //     };
-
-    //     var paramSingle = {
-    //       "mode": "single",
-    //       "id_user": idUser.value,
-    //       "tgl_visit": realDateServer,
-    //     };
-
-    //     getVisitToday(paramSingle);
-    //     getLimitVisit(paramLimit);
-
-    //     syncTotal.value = 0;
-    //     syncCurrent.value = 0;
-
-    //     return true;
-    //   } else {
-    //     showToast('some data failed, retrying...');
-    //     return false;
-    //   }
-    // } finally {
-    //   isSyncing.value = false;
-    // }
   }
 
   Timer? _syncDebounce;

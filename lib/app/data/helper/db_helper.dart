@@ -30,7 +30,7 @@ class SQLHelper {
     // print('db location : ' + dbPath);
     return await openDatabase(
       path,
-      version: 4,
+      version: 5,
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
     );
@@ -235,6 +235,46 @@ class SQLHelper {
 
       await db.execute("DROP TABLE tbl_visit_area_old");
     }
+
+    if (oldVersion < 5) {
+      await db.transaction((txn) async {
+        await txn.execute("DROP TABLE IF EXISTS tbl_visit_area_old");
+
+        await txn.execute(
+          "ALTER TABLE tbl_visit_area RENAME TO tbl_visit_area_old",
+        );
+
+        await txn.execute("""
+      CREATE TABLE tbl_visit_area(
+        id_user TEXT,
+        nama TEXT,
+        tgl_visit DATE,
+        visit_in TEXT,
+        jam_in TEXT,
+        visit_out TEXT,
+        jam_out TEXT,
+        foto_in TEXT,
+        lat_in TEXT,
+        long_in TEXT,
+        foto_out TEXT,
+        lat_out TEXT,
+        long_out TEXT,
+        device_info TEXT,
+        device_info2 TEXT,
+        is_rnd TEXT DEFAULT '0',
+        status_sync TEXT DEFAULT 'PENDING',
+        UNIQUE (id_user, tgl_visit, visit_in)
+      )
+    """);
+
+        await txn.execute("""
+      INSERT OR IGNORE INTO tbl_visit_area
+      SELECT * FROM tbl_visit_area_old
+    """);
+
+        await txn.execute("DROP TABLE tbl_visit_area_old");
+      });
+    }
   }
 
   Future<List<LoginOffline>> loginUserOffline(
@@ -318,7 +358,7 @@ class SQLHelper {
     String status,
   ) async {
     final db = await instance.database;
-    // final result = 
+    // final result =
     await db.update(
       'tbl_visit_area',
       {"status_sync": status},

@@ -15,7 +15,8 @@ Widget buildVisit({
 }) {
   return Column(
     children: [
-      SizedBox(height: 40,
+      SizedBox(
+        height: 40,
         child: DropdownButtonFormField<String>(
           decoration: InputDecoration(
             fillColor: isDark ? Theme.of(context).canvasColor : Colors.white,
@@ -54,7 +55,9 @@ Widget buildVisit({
                   : controller.stsAbsenSelected.value,
           items:
               controller.stsAbsen
-                  .map((e) => DropdownMenuItem<String>(value: e, child: Text(e)))
+                  .map(
+                    (e) => DropdownMenuItem<String>(value: e, child: Text(e)),
+                  )
                   .toList(),
           onChanged: (val) {
             if (val != null) {
@@ -71,7 +74,8 @@ Widget buildVisit({
             height: 40,
             child: DropdownButtonFormField(
               decoration: InputDecoration(
-                fillColor: isDark ? Theme.of(context).canvasColor : Colors.white,
+                fillColor:
+                    isDark ? Theme.of(context).canvasColor : Colors.white,
                 filled: true,
                 // isDense: true, // 🔑 biar tinggi tetap rapih
                 contentPadding: const EdgeInsets.all(5),
@@ -99,6 +103,9 @@ Widget buildVisit({
                   controller.optVisitSelected.value = val;
                   // controller.getLoc(data);
                 }
+                if (val == "Research and Development") {
+                  controller.isEnabled.value = true;
+                }
               },
             ),
           ),
@@ -111,11 +118,13 @@ Widget buildVisit({
               controller.optVisitSelected.value == "Research and Development"
                   ? true
                   : false,
-          child: SizedBox(height: 40,
+          child: SizedBox(
+            height: 40,
             child: TextField(
               controller: controller.rndLoc,
               decoration: InputDecoration(
-                fillColor: isDark ? Theme.of(context).canvasColor : Colors.white,
+                fillColor:
+                    isDark ? Theme.of(context).canvasColor : Colors.white,
                 filled: true,
                 // isDense: true, // 🔑 biar tinggi tetap rapih
                 contentPadding: const EdgeInsets.all(5),
@@ -165,81 +174,6 @@ Widget buildVisit({
                     ? null
                     : controller.selectedCabangVisit.value,
           ),
-
-          // FutureBuilder(
-          //   future: absC.getCabang(),
-          //   builder: (context, snapshot) {
-          //     if (snapshot.hasData) {
-          //       var dataCabang = snapshot.data!;
-          //       // Pastikan tidak ada duplikat (optional)
-          //       var uniqueCabang = <Cabang>[];
-          //       var seenKode = <String>{};
-          //       for (var cabang in dataCabang) {
-          //         if (!seenKode.contains(cabang.kodeCabang)) {
-          //           uniqueCabang.add(cabang);
-          //           seenKode.add(cabang.kodeCabang!);
-          //         }
-          //       }
-          //       // Validasi value dropdown dengan list dataCabang
-          //       final hasValueInItems = uniqueCabang.any(
-          //         (e) => e.kodeCabang == absC.selectedCabangVisit.value,
-          //       );
-          //       final dropdownValue =
-          //           hasValueInItems ? absC.selectedCabangVisit.value : null;
-
-          //       return DropdownButtonFormField(
-          //         decoration: InputDecoration(
-          //           fillColor: Colors.white,
-          //         filled: true,
-          //         isDense: true, // 🔑 biar tinggi tetap rapih
-          //         contentPadding: const EdgeInsets.all(5),
-          //         border: OutlineInputBorder(
-          //           borderRadius: BorderRadius.circular(10),
-          //           borderSide: BorderSide.none,
-          //         ),
-          //         enabledBorder: OutlineInputBorder(
-          //           borderRadius: BorderRadius.circular(10),
-          //           borderSide: BorderSide.none,
-          //         ),
-          //         focusedBorder: OutlineInputBorder(
-          //           borderRadius: BorderRadius.circular(10),
-          //           borderSide: BorderSide.none,
-          //         ),
-          //           hintText: data!.namaCabang,
-          //         ),
-          //         value: dropdownValue,
-          //         onChanged: (val) async{
-          //           if (val == null) return;
-          //           absC.selectedCabangVisit.value = val;
-
-          //           for (var cabang in uniqueCabang) {
-          //             if (cabang.kodeCabang == val) {
-          //               absC.lat.value = cabang.lat!;
-          //               absC.long.value = cabang.long!;
-          //               break;
-          //             }
-          //           }
-          //           absC.isLoading.value = true;
-          //           // loadingDialog('verify your location', '');
-          //           await absC.getLoc(data);
-          //           // Get.back();
-          //         },
-          //         items:
-          //             uniqueCabang
-          //                 .map(
-          //                   (e) => DropdownMenuItem(
-          //                     value: e.kodeCabang,
-          //                     child: Text(e.namaCabang.toString()),
-          //                   ),
-          //                 )
-          //                 .toList(),
-          //       );
-          //     } else if (snapshot.hasError) {
-          //       return Text('${snapshot.error}');
-          //     }
-          //     return const CupertinoActivityIndicator();
-          //   },
-          // ),
         );
       }),
     ],

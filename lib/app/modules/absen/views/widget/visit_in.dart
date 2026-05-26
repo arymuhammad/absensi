@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:absensi/app/data/helper/db_result.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -11,7 +12,7 @@ import '../../../../services/service_api.dart';
 import '../../controllers/absen_controller.dart';
 
 final absC = Get.find<AbsenController>();
-visitIn({
+Future<DbResult> visitIn({
   required Data dataUser,
   required double latitude,
   required double longitude,
@@ -71,7 +72,7 @@ visitIn({
         title: 'INFO',
         btnOkOnPress: () => Get.back(),
       );
-      return;
+      return DbResult(success: false, message: "You have checked in today");
     }
 
     // =======================
@@ -82,7 +83,7 @@ visitIn({
 
     if (absC.image == null) {
       failedDialog(Get.context, "Warning", "Check in was cancelled");
-      return;
+      return DbResult(success: false, message: "Check in cancelled");
     }
 
     loadingDialog("Sending data...", "");
@@ -133,7 +134,7 @@ visitIn({
     if (!res.success) {
       Get.back(); // ❗ tutup loading
       showToast(res.message);
-      return;
+      return DbResult(success: false, message: res.message);
     }
 
     insertSuccess = true;
@@ -194,9 +195,13 @@ visitIn({
         Get.back();
       },
     );
+
+    return DbResult(success: true, message: "Check in success");
   } catch (e) {
     Get.back(); // ❗ pastikan loading ketutup
-    showToast("Error: ${e.toString()}");
+    // showToast("Error: ${e.toString()}");
+    // rethrow;
+    return DbResult(success: false, message: e.toString());
   } finally {
     if (insertSuccess) {
       _resetVisitState();

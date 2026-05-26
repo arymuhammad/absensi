@@ -6,12 +6,13 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import '../../../../data/helper/custom_dialog.dart';
 import '../../../../data/helper/db_helper.dart';
+import '../../../../data/helper/db_result.dart';
 import '../../../../data/helper/time_service.dart';
 import '../../../../services/service_api.dart';
 import '../../controllers/absen_controller.dart';
 
 final absC = Get.find<AbsenController>();
-visitOut({
+Future<DbResult> visitOut({
   required Data dataUser,
   required double latitude,
   required double longitude,
@@ -70,7 +71,11 @@ visitOut({
         "Warning",
         "Check In data not found\n\nMake sure the Checkout name/location\nis the same as the Check In name/location",
       );
-      return;
+      return DbResult(
+        success: false,
+        message:
+            "Check In data not found\n\nMake sure the Checkout name/location\nis the same as the Check In name/location",
+      );
     }
 
     // =======================
@@ -80,7 +85,7 @@ visitOut({
 
     if (absC.image == null) {
       failedDialog(Get.context, "Warning", "Check out was cancelled");
-      return;
+      return DbResult(success: false, message: "Check in cancelled");
     }
 
     await Future.delayed(const Duration(milliseconds: 200));
@@ -124,7 +129,7 @@ visitOut({
     if (!res.success) {
       Get.back(); // ❗ tutup loading
       showToast(res.message);
-      return;
+      return DbResult(success: false, message: res.message);
     }
 
     updateSuccess = true;
@@ -184,9 +189,12 @@ visitOut({
         Get.back();
       },
     );
+
+    return DbResult(success: true, message: "Check in success");
   } catch (e) {
     Get.back(); // ❗ jaga-jaga kalau error di tengah
-    showToast("Error: ${e.toString()}");
+    // showToast("Error: ${e.toString()}");
+    return DbResult(success: false, message: e.toString());
   } finally {
     if (updateSuccess) {
       // =======================
