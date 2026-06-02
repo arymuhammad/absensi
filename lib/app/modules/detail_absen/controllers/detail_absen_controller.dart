@@ -157,6 +157,7 @@ class DetailAbsenController extends GetxController {
               "alasan": alasan.text,
             };
             loadingDialog("Mengirim data...", "");
+            // print(data);
             await ServiceApi().reqUpdateAbs(data);
           }
 
@@ -169,6 +170,7 @@ class DetailAbsenController extends GetxController {
           //   Get.find<AdController>().showInterstitialAd(() {});
           // });
           jamAbsenMasuk.clear();
+          alasan.clear();
           image == null;
         }
       }
@@ -219,6 +221,7 @@ class DetailAbsenController extends GetxController {
             // });
             tglPulang.clear();
             jamAbsenPulang.clear();
+            alasan.clear();
             image2 == null;
           }
         }
@@ -276,6 +279,7 @@ class DetailAbsenController extends GetxController {
             tglPulang.clear();
             jamAbsenMasuk.clear();
             jamAbsenMasuk.clear();
+            alasan.clear();
             image == null;
             image2 == null;
           }

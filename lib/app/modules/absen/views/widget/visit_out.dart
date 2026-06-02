@@ -126,6 +126,13 @@ Future<DbResult> visitOut({
       visitLocation,
     );
 
+    absC.updateSyncVisitStatusRealtime(
+      id: dataUser.id!,
+      tglVisit: dateNow,
+      visitIn: visitLocation,
+      status: "PENDING",
+    );
+
     if (!res.success) {
       Get.back(); // ❗ tutup loading
       showToast(res.message);
@@ -145,6 +152,12 @@ Future<DbResult> visitOut({
           dateNow,
           visitLocation,
           "SUCCESS",
+        );
+        absC.updateSyncVisitStatusRealtime(
+          id: dataUser.id!,
+          tglVisit: dateNow,
+          visitIn: visitLocation,
+          status: "SUCCESS",
         );
       } catch (_) {
         absC.triggerSync(isVisit: true);
@@ -206,6 +219,7 @@ Future<DbResult> visitOut({
       absC.optVisitSelected.value = "";
       absC.stsAbsenSelected.value = "";
       absC.rndLoc.clear();
+      absC.isQrValidated.value = false;
     }
   }
 }

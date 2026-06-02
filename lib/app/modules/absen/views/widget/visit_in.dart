@@ -131,6 +131,13 @@ Future<DbResult> visitIn({
         statusSync: "PENDING",
       ),
     );
+
+    absC.updateSyncVisitStatusRealtime(
+      id: dataUser.id!,
+      tglVisit: dateNow,
+      visitIn: visitLocation,
+      status: "PENDING",
+    );
     if (!res.success) {
       Get.back(); // ❗ tutup loading
       showToast(res.message);
@@ -150,6 +157,13 @@ Future<DbResult> visitIn({
           dateNow,
           visitLocation,
           "SUCCESS",
+        );
+
+        absC.updateSyncVisitStatusRealtime(
+          id: dataUser.id!,
+          tglVisit: dateNow,
+          visitIn: visitLocation,
+          status: "SUCCESS",
         );
       } catch (_) {
         absC.triggerSync(isVisit: true);
@@ -219,4 +233,5 @@ void _resetVisitState() {
   absC.rndLoc.clear();
   absC.lat.value = "";
   absC.long.value = "";
+  absC.isQrValidated.value = false;
 }

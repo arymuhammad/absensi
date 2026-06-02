@@ -129,6 +129,12 @@ Future<DbResult> checkOut(
         targetDate,
       );
 
+      absC.updateSyncStatusRealtime(
+        idUser: dataUser.id!,
+        tanggalMasuk: targetDate,
+        status: "PENDING",
+      );
+
       // Get.back();
       if (!res.success) {
         // showToast(res.message);
@@ -172,6 +178,12 @@ Future<DbResult> checkOut(
           devInfo2: absC.devInfo.value,
           statusSync: "SUCCESS",
         ),
+      );
+
+      absC.updateSyncStatusRealtime(
+        idUser: dataUser.id!,
+        tanggalMasuk: targetDate,
+        status: "SUCCESS",
       );
 
       checkoutSucceeded = true;
@@ -275,4 +287,5 @@ void _resetState() {
   absC.selectedCabang.value = "";
   absC.lat.value = "";
   absC.long.value = "";
+  absC.isQrValidated.value = false;
 }

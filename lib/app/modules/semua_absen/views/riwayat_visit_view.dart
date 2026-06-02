@@ -276,6 +276,7 @@ class RiwayatVisitView extends GetView {
                           location: safe(item.namaCabang),
                           stsM: '',
                           stsP: '',
+                          statusSync: safe(item.statusSync),
                         ),
                       ),
                     );

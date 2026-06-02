@@ -19,7 +19,7 @@ class SettingsController extends GetxController {
   void onInit() async {
     super.onInit();
     final readDoc = await http
-        .get(Uri.parse('http://103.156.15.61/update apk/changeLog.xml'))
+        .get(Uri.parse('http://103.156.15.61/update_apk/changeLog.xml'))
         .timeout(const Duration(seconds: 20));
     parseChangelogXml(readDoc.body);
   }

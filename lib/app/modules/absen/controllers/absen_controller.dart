@@ -26,6 +26,7 @@ import 'package:path/path.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:table_calendar/table_calendar.dart';
 import '../../../data/helper/db_result.dart';
+import '../../../data/helper/error_logger.dart';
 import '../../../data/helper/loading_progress.dart';
 import '../../../data/helper/time_service.dart';
 import '../../../data/model/login_model.dart';
@@ -187,6 +188,7 @@ class AbsenController extends GetxController
   final isSheetAnimating = false.obs;
   var isGpsLoading = true.obs;
   var gpsError = ''.obs;
+  final isQrValidated = false.obs;
 
   // bool _hasTriggeredInitialSync = false;
   // bool _isHandlingReconnect = false;
@@ -604,7 +606,7 @@ class AbsenController extends GetxController
   }
 
   getLoc(Data? dataUser) async {
-    startLoading(seconds: 20);
+    startLoading(seconds: 30);
     Position position;
     try {
       position = await determinePosition();
@@ -764,23 +766,32 @@ class AbsenController extends GetxController
                 distanceFilter: 0,
               ),
             )
-            .where((p) {
-              /// terima kalau sudah lumayan bagus
-              if (Platform.isIOS) {
-                return p.accuracy <= 100;
-              }
-              return p.accuracy <= 50;
-            })
+            // .where((p) {
+            //   /// terima kalau sudah lumayan bagus
+            //   if (Platform.isIOS) {
+            //     return p.accuracy <= 100;
+            //   }
+            //   return p.accuracy <= 50;
+            // })
+            // .first
+            .where((p) => p.accuracy <= 100)
             .first
-            .timeout(const Duration(seconds: 15));
+            .timeout(const Duration(seconds: 30));
 
         /// =========================
         /// GET FINAL POSITION
         /// =========================
         final fresh = await Geolocator.getCurrentPosition(
           desiredAccuracy: LocationAccuracy.bestForNavigation,
-          timeLimit: const Duration(seconds: 20),
+          timeLimit: const Duration(seconds: 30),
         );
+
+        // print("ACCURACY=${fresh.accuracy}");
+        // print("ALTITUDE=${fresh.altitude}");
+        // print("SPEED=${fresh.speed}");
+        // print("HEADING=${fresh.heading}");
+
+        // print(await Geolocator.getLocationAccuracy());
 
         // print("FINAL accuracy: ${fresh.accuracy}");
 
@@ -788,7 +799,8 @@ class AbsenController extends GetxController
         /// VALIDATE ACCURACY
         /// =========================
 
-        final maxAccuracy = Platform.isIOS ? 100.0 : 50.0;
+        // final maxAccuracy = Platform.isIOS ? 100.0 : 50.0;
+        const maxAccuracy = 100.0;
 
         if (fresh.accuracy > maxAccuracy) {
           stopLoading();
@@ -799,7 +811,7 @@ class AbsenController extends GetxController
           gpsError.value = "GPS not accurate enough";
           isGpsLoading.value = false;
 
-          showToast("GPS not accurate enough");
+          showToast("GPS not accurate enough (${fresh.accuracy.toStringAsFixed(0)}m)");
           return Future.error("GPS not accurate enough");
         }
 
@@ -832,7 +844,7 @@ class AbsenController extends GetxController
         //   return lastKnown;
         // }
 
-        final maxLastKnownAccuracy = Platform.isIOS ? 150.0 : 70.0;
+        final maxLastKnownAccuracy = Platform.isIOS ? 150.0 : 80.0;
 
         if (lastKnown != null) {
           final age = DateTime.now().difference(lastKnown.timestamp);
@@ -849,7 +861,7 @@ class AbsenController extends GetxController
         }
         rethrow;
       }
-    } on TimeoutException {
+    } on TimeoutException catch (e, s) {
       stopLoading();
 
       isLoading.value = false;
@@ -857,6 +869,15 @@ class AbsenController extends GetxController
 
       gpsError.value = "Location timeout";
       isGpsLoading.value = false;
+
+      await ErrorLogger.save('''
+TIMEOUT ERROR
+
+$e
+
+STACK:
+$s
+''', '');
 
       showToast("Failed to get location, please try again.");
 
@@ -888,6 +909,7 @@ class AbsenController extends GetxController
   scanQrLoc(Data? dataUser) async {
     // String barcodeScanRes;
     // Platform messages may fail, so we use a try/catch PlatformException.
+    isQrValidated.value = false;
     try {
       // barcodeScanRes.value = await FlutterBarcodeScanner.scanBarcode(
       //   '#ff6666',
@@ -922,6 +944,7 @@ class AbsenController extends GetxController
         selectedCabangVisit.value = "";
         isLoading.value = false;
         isEnabled.value = false;
+        isQrValidated.value = false;
         distanceStore.value = 0.0;
         barcodeScanRes.value = "";
         lokasi.value = "Unknown, please try again";
@@ -948,6 +971,7 @@ class AbsenController extends GetxController
         final split = barcodeScanRes.value.split('|');
 
         if (split.length < 2) {
+          isQrValidated.value = false;
           showToast("QR tidak valid");
           return;
         }
@@ -967,6 +991,7 @@ class AbsenController extends GetxController
         stopLoading();
 
         if (!qrRes['success']) {
+          isQrValidated.value = false;
           showToast('QR tidak valid');
           return;
         }
@@ -990,6 +1015,7 @@ class AbsenController extends GetxController
           stopLoading();
         } catch (e) {
           // Get.back();
+          isQrValidated.value = false;
           stopLoading();
           showToast('Failed to get location! Make sure GPS is active.');
           // ScaffoldMessenger.of(Get.context!).showSnackBar(
@@ -1021,6 +1047,8 @@ class AbsenController extends GetxController
         if (distanceMeter <= allowedRadius) {
           // dataUser!.visit == "1"
           // ?
+          isQrValidated.value = true;
+
           if (dataUser!.visit == "1") {
             selectedCabangVisit.value = kodeCabang;
           } else {
@@ -1039,6 +1067,7 @@ class AbsenController extends GetxController
           );
           isLoading.value = false;
           isEnabled.value = true;
+          distanceStore.value = distanceMeter;
           locNote.value = "You are in the radius area";
           showToast(
             'Location validation successful. You are within the QR code area.',
@@ -1055,6 +1084,7 @@ class AbsenController extends GetxController
           barcodeScanRes.value = "";
           isLoading.value = false;
           isEnabled.value = false;
+          isQrValidated.value = false;
           locNote.value =
               "You are outside the QR area (${(distanceMeter / 1000).toStringAsFixed(2)} Km)";
           distanceStore.value = distanceMeter;
@@ -1068,6 +1098,7 @@ class AbsenController extends GetxController
         }
       }
     } on PlatformException {
+      isQrValidated.value = false;
       barcodeScanRes.value = 'Failed to get platform version.';
     }
   }
@@ -1426,9 +1457,9 @@ class AbsenController extends GetxController
         }
       }
 
-      showToast('Cleanup selesai');
+      // showToast('Cleanup selesai'); //hapus foto setelah sync berhasil
     } catch (e) {
-      print('Cleanup error: $e');
+      showToast('Cleanup error: $e');
     }
   }
 
@@ -1610,6 +1641,12 @@ class AbsenController extends GetxController
             "SUCCESS",
           );
 
+          updateSyncStatusRealtime(
+            idUser: item.idUser!,
+            tanggalMasuk: item.tanggalMasuk!,
+            status: "SUCCESS",
+          );
+
           /// =========================
           /// 🧹 DELETE FILES
           /// =========================
@@ -1631,6 +1668,12 @@ class AbsenController extends GetxController
             item.idUser!,
             item.tanggalMasuk!,
             "FAILED",
+          );
+
+          updateSyncStatusRealtime(
+            idUser: item.idUser!,
+            tanggalMasuk: item.tanggalMasuk!,
+            status: "FAILED",
           );
         } finally {
           /// =========================
@@ -1658,21 +1701,25 @@ class AbsenController extends GetxController
         /// =========================
         /// 🔄 REFRESH UI
         /// =========================
-        final paramLimit = {
-          "mode": "limit",
-          "id_user": idUser.value,
-          "tanggal1": initDate1,
-          "tanggal2": initDate2,
-        };
 
         final paramSingle = {
           "mode": "single",
           "id_user": idUser.value,
           "tanggal_masuk": realDateServer,
         };
-
         await getAbsenToday(paramSingle);
-        await getLimitAbsen(paramLimit);
+
+        /// 🔥 IMPORTANT
+        /// jangan reload history list lagi
+        dataLimitAbsen.refresh();
+
+        // final paramLimit = {
+        //   "mode": "limit",
+        //   "id_user": idUser.value,
+        //   "tanggal1": initDate1,
+        //   "tanggal2": initDate2,
+        // };
+        // await getLimitAbsen(paramLimit);
 
         syncTotal.value = 0;
         syncCurrent.value = 0;
@@ -1683,7 +1730,15 @@ class AbsenController extends GetxController
       /// =========================
       /// ⚠️ SOME FAILED
       /// =========================
-      showToast('Some data failed to sync');
+      // showToast('Some data failed to sync');
+      final failedCount =
+          remaining.where((e) {
+            return e.statusSync == 'FAILED';
+          }).length;
+
+      if (failedCount > 0) {
+        showToast('$failedCount data failed to sync');
+      }
 
       return false;
     } finally {
@@ -1692,6 +1747,23 @@ class AbsenController extends GetxController
       /// =========================
       isSyncing.value = false;
     }
+  }
+
+  void updateSyncStatusRealtime({
+    required String idUser,
+    required String tanggalMasuk,
+    required String status,
+  }) {
+    final index = dataLimitAbsen.indexWhere(
+      (e) => e.idUser == idUser && e.tanggalMasuk == tanggalMasuk,
+    );
+
+    if (index == -1) return;
+
+    dataLimitAbsen[index].statusSync = status;
+
+    /// 🔥 trigger UI realtime
+    dataLimitAbsen.refresh();
   }
 
   Future<bool> syncVisit() async {
@@ -1847,6 +1919,13 @@ class AbsenController extends GetxController
             "SUCCESS",
           );
 
+          updateSyncVisitStatusRealtime(
+            id: item.id!,
+            tglVisit: item.tglVisit!,
+            visitIn: item.visitIn!,
+            status: "SUCCESS",
+          );
+
           /// =========================
           /// 🧹 DELETE FILES
           /// =========================
@@ -1876,6 +1955,13 @@ class AbsenController extends GetxController
             item.visitIn!,
             "FAILED",
           );
+
+          updateSyncVisitStatusRealtime(
+            id: item.id!,
+            tglVisit: item.tglVisit!,
+            visitIn: item.visitIn!,
+            status: "FAILED",
+          );
         } finally {
           /// =========================
           /// 📊 UPDATE PROGRESS
@@ -1902,21 +1988,25 @@ class AbsenController extends GetxController
         /// =========================
         /// 🔄 REFRESH UI
         /// =========================
-        final paramLimit = {
-          "mode": "limit",
-          "id_user": idUser.value,
-          "tanggal1": initDate1,
-          "tanggal2": initDate2,
-        };
 
         final paramSingle = {
           "mode": "single",
           "id_user": idUser.value,
           "tgl_visit": realDateServer,
         };
-
         await getVisitToday(paramSingle);
-        await getLimitVisit(paramLimit);
+
+        // final paramLimit = {
+        //   "mode": "limit",
+        //   "id_user": idUser.value,
+        //   "tanggal1": initDate1,
+        //   "tanggal2": initDate2,
+        // };
+        // await getLimitVisit(paramLimit);
+
+        /// 🔥 IMPORTANT
+        /// jangan reload history list lagi
+        dataLimitVisit.refresh();
 
         syncTotal.value = 0;
         syncCurrent.value = 0;
@@ -1927,7 +2017,16 @@ class AbsenController extends GetxController
       /// =========================
       /// ⚠️ SOME FAILED
       /// =========================
-      showToast('Some data failed to sync');
+      // showToast('Some data failed to sync');
+
+      final failedCount =
+          remaining.where((e) {
+            return e.statusSync == 'FAILED';
+          }).length;
+
+      if (failedCount > 0) {
+        showToast('$failedCount data failed to sync');
+      }
 
       return false;
     } finally {
@@ -1936,6 +2035,24 @@ class AbsenController extends GetxController
       /// =========================
       isSyncing.value = false;
     }
+  }
+
+  void updateSyncVisitStatusRealtime({
+    required String id,
+    required String tglVisit,
+    required String visitIn,
+    required String status,
+  }) {
+    final index = dataLimitVisit.indexWhere(
+      (e) => e.id == id && e.tglVisit == tglVisit && e.visitIn == visitIn,
+    );
+
+    if (index == -1) return;
+
+    dataLimitVisit[index].statusSync = status;
+
+    /// 🔥 trigger UI realtime
+    dataLimitVisit.refresh();
   }
 
   Timer? _syncDebounce;
@@ -2032,12 +2149,21 @@ class AbsenController extends GetxController
   Future<List<Absen>> getLimitAbsen(paramLimitAbsen) async {
     isLoading.value = true;
 
-    /// 🔥 ambil data lokal dulu (fallback / cache)
+    /// =========================
+    /// 📦 LOAD LOCAL DATA
+    /// =========================
     var localData = await SQLHelper.instance.getLimitDataAbsen(
       idUser.value,
       initDate1,
       initDate2,
     );
+
+    localData =
+        localData.map((e) {
+          e.isLocal = true;
+          return e;
+        }).toList();
+
     try {
       final online = await isOnline();
 
@@ -2047,71 +2173,118 @@ class AbsenController extends GetxController
       if (!online) {
         if (localData.isNotEmpty) {
           dataLimitAbsen.value = localData;
+
           statsCon.value = 'Offline mode\nData loaded from local storage';
         } else {
           dataLimitAbsen.clear();
+
           statsCon.value = 'Offline & no local data';
         }
+
         return dataLimitAbsen;
       }
 
       /// =========================
       /// 🟢 ONLINE MODE
       /// =========================
-      final response = await ServiceApi()
+      var response = await ServiceApi()
           .getAbsen(paramLimitAbsen)
           .timeout(const Duration(seconds: 10));
 
+      response =
+          response.map((e) {
+            e.isLocal = false;
+            return e;
+          }).toList();
+
       /// =========================
-      /// 🔥 LOGIC SYNC (LOCAL vs SERVER)
+      /// 🔥 MERGE SERVER + LOCAL
       /// =========================
-      if (localData.isNotEmpty) {
-        final localDate = DateTime.parse(localData.first.tanggalMasuk!);
-        final serverDate =
-            response.isNotEmpty
-                ? DateTime.parse(response.first.tanggalMasuk!)
-                : null;
+      final merged = <Absen>[];
 
-        final useLocal =
-            response.isEmpty ||
-            (serverDate != null && serverDate.isBefore(localDate)) ||
-            (serverDate != null &&
-                serverDate.isAtSameMomentAs(localDate) &&
-                response.first.jamAbsenPulang == "" &&
-                localData.first.jamAbsenPulang != "");
+      /// ✅ SERVER = SOURCE UTAMA
+      merged.addAll(response);
 
-        if (useLocal) {
-          dataLimitAbsen.value = localData;
-          statsCon.value =
-              'Wait for a stable internet connection\nThis data saved on local storage';
+      /// =========================
+      /// 🔑 SERVER UNIQUE KEYS
+      /// =========================
+      final serverKeys =
+          response.map((e) {
+            return '${e.idUser}_'
+                '${e.tanggalMasuk}_'
+                '${e.jamAbsenMasuk}_'
+                '${e.jamAbsenPulang}';
+          }).toSet();
 
-          /// optional: merge data server
-          if (response.isNotEmpty) {
-            dataLimitAbsen.addAll(response);
-          }
-        } else {
-          dataLimitAbsen.value = response;
-          statsCon.value = "";
+      /// =========================
+      /// ➕ TAMBAHKAN LOCAL
+      /// JIKA BELUM ADA DI SERVER
+      /// =========================
+      for (final local in localData) {
+        final localKey =
+            '${local.idUser}_'
+            '${local.tanggalMasuk}_'
+            '${local.jamAbsenMasuk}_'
+            '${local.jamAbsenPulang}';
+
+        final existsInServer = serverKeys.contains(localKey);
+
+        if (!existsInServer) {
+          merged.add(local);
         }
+      }
+
+      /// =========================
+      /// 📅 SORT TERBARU
+      /// =========================
+      merged.sort((a, b) {
+        final aDate = DateTime.parse(
+          '${a.tanggalMasuk} '
+          '${a.jamAbsenMasuk}',
+        );
+
+        final bDate = DateTime.parse(
+          '${b.tanggalMasuk} '
+          '${b.jamAbsenMasuk}',
+        );
+
+        return bDate.compareTo(aDate);
+      });
+
+      /// =========================
+      /// ✅ ASSIGN FINAL DATA
+      /// =========================
+      dataLimitAbsen.value = merged;
+
+      /// =========================
+      /// ℹ️ STATUS INFO
+      /// =========================
+      if (localData.isNotEmpty && merged.any((e) => e.isLocal == true)) {
+        statsCon.value = 'Some data loaded from local storage';
       } else {
-        /// tidak ada data lokal
-        dataLimitAbsen.value = response;
-        statsCon.value = "";
+        statsCon.value = '';
       }
 
       return dataLimitAbsen;
     } catch (e) {
+      /// =========================
+      /// ⚠️ FALLBACK LOCAL
+      /// =========================
       if (localData.isNotEmpty) {
         dataLimitAbsen.value = localData;
+
         statsCon.value = 'Connection unstable\nLoad data from local storage';
       } else {
         dataLimitAbsen.clear();
+
         statsCon.value = 'Failed to load data';
       }
 
       return dataLimitAbsen;
     } finally {
-      /// 🔥 hanya 1x di sini
+      /// =========================
+      /// 🔚 FINISH LOADING
+      /// =========================
       isLoading.value = false;
     }
   }
@@ -2132,6 +2305,12 @@ class AbsenController extends GetxController
       d1.isNotEmpty ? d1 : initDate1,
       d2.isNotEmpty ? d2 : initDate2,
     );
+
+    localData =
+        localData.map((e) {
+          e.isLocal = false;
+          return e;
+        }).toList();
 
     final online = await isOnline();
 
@@ -2155,6 +2334,11 @@ class AbsenController extends GetxController
 
     try {
       response = await ServiceApi().getAbsen(param);
+      response =
+          response.map((e) {
+            e.isLocal = false;
+            return e;
+          }).toList();
     } catch (e) {
       /// 🔥 fallback kalau error API
       dataAllAbsen.value = localData;
@@ -2194,6 +2378,12 @@ class AbsenController extends GetxController
       d2.isNotEmpty ? d2 : initDate2,
     );
 
+    localData =
+        localData.map((e) {
+          e.isLocal = false;
+          return e;
+        }).toList();
+
     final online = await isOnline();
 
     /// =========================
@@ -2216,6 +2406,11 @@ class AbsenController extends GetxController
 
     try {
       response = await ServiceApi().getVisit(param);
+      response =
+          response.map((e) {
+            e.isLocal = false;
+            return e;
+          }).toList();
     } catch (e) {
       /// 🔥 fallback kalau error API
       dataAllVisit.value = localData;
@@ -2442,72 +2637,137 @@ class AbsenController extends GetxController
     return dataVisit;
   }
 
-  getLimitVisit(Map<String, dynamic> paramLimitVisit) async {
+  Future<List<Visit>> getLimitVisit(
+    Map<String, dynamic> paramLimitVisit,
+  ) async {
     isLoading.value = true;
 
-    /// 🔥 ambil data lokal dulu (biar selalu ada fallback)
-    var tempLimitVisit = await SQLHelper.instance.getLimitDataVisit(
+    /// =========================
+    /// 📦 LOAD LOCAL DATA
+    /// =========================
+    var localData = await SQLHelper.instance.getLimitDataVisit(
       idUser.value,
       initDate1,
       initDate2,
     );
+
+    localData =
+        localData.map((e) {
+          e.isLocal = true;
+          return e;
+        }).toList();
+
     try {
-      // 🔥 CEK REAL CONNECTION (bukan state)
+      /// =========================
+      /// 🌐 CHECK CONNECTION
+      /// =========================
       final online = await isReallyOnline();
 
       /// =========================
       /// 🔴 OFFLINE MODE
       /// =========================
       if (!online) {
-        dataLimitVisit.value = tempLimitVisit;
-        statsCon.value = 'Offline mode\nLoad data from local storage';
-        isLoading.value = false;
+        if (localData.isNotEmpty) {
+          dataLimitVisit.value = localData;
+
+          statsCon.value = 'Offline mode\nLoad data from local storage';
+        } else {
+          dataLimitVisit.clear();
+
+          statsCon.value = 'Offline & no local data';
+        }
+
         return dataLimitVisit;
       }
 
       /// =========================
       /// 🟢 ONLINE MODE
       /// =========================
-      final response = await ServiceApi().getLimitVisit(paramLimitVisit);
-      dataLimitVisit.clear();
+      var response = await ServiceApi().getLimitVisit(paramLimitVisit);
 
-      // =========================
-      /// 🔥 LOGIC ASLI (TIDAK DIUBAH)
+      response =
+          response.map((e) {
+            e.isLocal = false;
+            return e;
+          }).toList();
+
       /// =========================
-      if (tempLimitVisit.isNotEmpty) {
-        if (response.isEmpty ||
-            response.isNotEmpty &&
-                DateTime.parse(
-                  response.first.tglVisit!,
-                ).isBefore(DateTime.parse(tempLimitVisit.first.tglVisit!)) ||
-            response.isNotEmpty &&
-                DateTime.parse(response.first.tglVisit!).isAtSameMomentAs(
-                  DateTime.parse(tempLimitVisit.first.tglVisit!),
-                ) &&
-                response.first.jamOut! == "" &&
-                tempLimitVisit.first.jamOut! != "" ||
-            response.isNotEmpty &&
-                DateTime.parse(response.first.tglVisit!).isAtSameMomentAs(
-                  DateTime.parse(tempLimitVisit.first.tglVisit!),
-                ) &&
-                response.first.visitIn != tempLimitVisit.first.visitIn) {
-          dataLimitVisit.value = tempLimitVisit;
-          statsCon.value =
-              'Wait for a stable internet connection\nThis data saved on local storage';
-          dataLimitVisit.addAll(response);
-        } else {
-          statsCon.value = "";
-          dataLimitVisit.value = response;
+      /// 🔥 MERGE SERVER + LOCAL
+      /// =========================
+      final merged = <Visit>[];
+
+      /// ✅ SERVER = SOURCE UTAMA
+      merged.addAll(response);
+
+      /// =========================
+      /// 🔑 SERVER UNIQUE KEYS
+      /// =========================
+      final serverKeys =
+          response.map((e) {
+            return '${e.id}_'
+                '${e.tglVisit}_'
+                '${e.visitIn}_'
+                '${e.visitOut}';
+          }).toSet();
+
+      /// =========================
+      /// ➕ TAMBAHKAN LOCAL
+      /// JIKA BELUM ADA DI SERVER
+      /// =========================
+      for (final local in localData) {
+        final localKey =
+            '${local.id}_'
+            '${local.tglVisit}_'
+            '${local.visitIn}_'
+            '${local.visitOut}';
+
+        final existsInServer = serverKeys.contains(localKey);
+
+        if (!existsInServer) {
+          merged.add(local);
         }
-      } else {
-        statsCon.value = "";
-        dataLimitVisit.value = response;
       }
+
+      /// =========================
+      /// 📅 SORT TERBARU
+      /// =========================
+      merged.sort((a, b) {
+        final aDate = DateTime.parse('${a.tglVisit} ${a.jamIn}');
+
+        final bDate = DateTime.parse('${b.tglVisit} ${b.jamIn}');
+
+        return bDate.compareTo(aDate);
+      });
+
+      /// =========================
+      /// ✅ ASSIGN FINAL DATA
+      /// =========================
+      dataLimitVisit.value = merged;
+
+      /// =========================
+      /// ℹ️ STATUS INFO
+      /// =========================
+      if (localData.isNotEmpty && merged.any((e) => e.isLocal == true)) {
+        statsCon.value = 'Some data loaded from local storage';
+      } else {
+        statsCon.value = '';
+      }
+
       return dataLimitVisit;
     } catch (e) {
-      /// 🔥 kalau error API → fallback ke lokal
-      dataLimitVisit.value = tempLimitVisit;
-      statsCon.value = 'Connection unstable\nLoad data from local storage';
+      /// =========================
+      /// ⚠️ FALLBACK LOCAL
+      /// =========================
+      if (localData.isNotEmpty) {
+        dataLimitVisit.value = localData;
+
+        statsCon.value = 'Connection unstable\nLoad data from local storage';
+      } else {
+        dataLimitVisit.clear();
+
+        statsCon.value = 'Failed to load data';
+      }
+
       return dataLimitVisit;
     } finally {
       isLoading.value = false;
@@ -2787,5 +3047,12 @@ class AbsenController extends GetxController
       allowedRadius: double.parse(dataUser.areaCover!),
       force: true,
     );
+  }
+
+  bool canBypassArea(Data data) {
+    final isVisit = data.visit == "1";
+
+    return (isVisit && optVisitSelected.value == "Research and Development") ||
+        isQrValidated.value;
   }
 }

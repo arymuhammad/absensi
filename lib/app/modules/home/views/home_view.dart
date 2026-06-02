@@ -15,10 +15,10 @@ import '../controllers/home_controller.dart';
 class HomeView extends GetView<HomeController> {
   HomeView({super.key});
   final auth = Get.find<LoginController>();
-  final absenC = Get.put(AbsenController());
+  final absenC = Get.find<AbsenController>();
   final adjCtrl = Get.put(AdjustPresenceController());
   final leaveC = Get.put(LeaveController());
-  final greetingC = Get.put(HomeController());
+  final greetingC = Get.find<HomeController>();
 
   @override
   Widget build(BuildContext context) {
@@ -36,6 +36,14 @@ class HomeView extends GetView<HomeController> {
             padding: const EdgeInsets.only(left: 15.0, top: 45.0, right: 15.0),
             child: Obx(() {
               final listDataUser = auth.logUser.value;
+              final firstName =
+                  (listDataUser.nama ?? '')
+                      .trim()
+                      .split(RegExp(r'\s+'))
+                      .where((e) => e.isNotEmpty)
+                      .firstOrNull ??
+                  'User';
+
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -45,7 +53,7 @@ class HomeView extends GetView<HomeController> {
                       Row(
                         children: [
                           Text(
-                            '${greetingC.greeting.value}${listDataUser.nama!.split(' ')[0]}',
+                            '${greetingC.greeting.value}$firstName',
                             style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 16,
@@ -89,8 +97,8 @@ class HomeView extends GetView<HomeController> {
                               child: RoundedImage(
                                 height: 60,
                                 width: 60,
-                                foto: listDataUser.foto!,
-                                name: listDataUser.nama!,
+                                foto: listDataUser.foto ?? '',
+                                name: listDataUser.nama ?? '-',
                                 headerProfile: true,
                               ),
                             ),
@@ -100,15 +108,16 @@ class HomeView extends GetView<HomeController> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                listDataUser.levelUser!.capitalize!,
+                                (listDataUser.levelUser ?? '-').capitalize ??
+                                    '-',
                                 style: subtitleTextStyle.copyWith(
                                   color: Colors.white,
                                   fontSize: 16,
                                 ),
                               ),
                               Text(
-                                listDataUser.namaCabang!.capitalize!,
-
+                                (listDataUser.namaCabang ?? '-').capitalize ??
+                                    '-',
                                 softWrap: true,
                                 style: const TextStyle(
                                   fontSize: 16,

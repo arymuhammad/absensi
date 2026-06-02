@@ -85,14 +85,14 @@ Future<DbResult> checkIn(
     // 🚫 BLOCK JIKA SUDAH ABSEN
     // ===============================
     if (sudahAbsen) {
-      // succesDialog(
-      //   context: Get.context!,
-      //   pageAbsen: "N",
-      //   desc: "You have checked in today",
-      //   type: DialogType.info,
-      //   title: 'INFO',
-      //   btnOkOnPress: () => Get.back(),
-      // );
+      succesDialog(
+        context: Get.context!,
+        pageAbsen: "N",
+        desc: "You have checked in today",
+        type: DialogType.info,
+        title: 'INFO',
+        btnOkOnPress: () => Get.back(),
+      );
       return DbResult(success: false, message: "You have checked in today");
     }
     // if (absC.cekAbsen.value.total != "0") {
@@ -207,6 +207,12 @@ Future<DbResult> checkIn(
         statusSync: "PENDING",
       ),
     );
+    absC.updateSyncStatusRealtime(
+      idUser: dataUser.id!,
+      tanggalMasuk: todayDate,
+      status: "PENDING",
+    );
+
     if (Get.isDialogOpen ?? false) {
       Get.back();
     } // tutup loading
@@ -286,4 +292,5 @@ void _resetForm() {
   absC.selectedCabang.value = "";
   absC.lat.value = "";
   absC.long.value = "";
+  absC.isQrValidated.value = false;
 }

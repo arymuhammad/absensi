@@ -205,6 +205,7 @@ class SummaryAbsen extends GetView {
                                         ? 'Overtime'
                                         : 'Extra Time';
                                 //
+                                // print('STATUS SYNC ${d.statusSync}');
                                 return InkWell(
                                   onTap: () {
                                     var detailData = {
@@ -264,6 +265,8 @@ class SummaryAbsen extends GetView {
                                     isValid: d.jamAbsenMasuk != null,
                                     stsM: stsMasuk,
                                     stsP: stsPulang,
+                                    isLocal: d.isLocal!,
+                                    statusSync: safe(d.statusSync),
                                   ),
                                 );
                               },

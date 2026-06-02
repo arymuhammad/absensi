@@ -24,9 +24,8 @@ class AbsenBottomSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final data = auth.logUser.value;
     final isDark = Theme.of(context).brightness == Brightness.dark;
-
+    final data = auth.logUser.value;
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeOut,
@@ -62,21 +61,24 @@ class AbsenBottomSheet extends StatelessWidget {
 
             /// STATUS
             Obx(() {
+              final data = auth.logUser.value;
+
               final isOutside =
                   controller.distanceStore.value > num.parse(data.areaCover!);
 
-              final isRnD =
-                  controller.optVisitSelected.value ==
-                  "Research and Development";
+              final bypass = controller.canBypassArea(data);
+              // final isRnD =
+              //     controller.optVisitSelected.value ==
+              //     "Research and Development";
               return Row(
                 children: [
                   Icon(
-                    isOutside && !isRnD ? Icons.error : Icons.check_circle,
-                    color: (isOutside && !isRnD) ? Colors.red : Colors.green,
+                    isOutside && !bypass ? Icons.error : Icons.check_circle,
+                    color: (isOutside && !bypass) ? Colors.red : Colors.green,
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    (isOutside && !isRnD) ? "Outside area" : "Inside area",
+                    (isOutside && !bypass) ? "Outside area" : "Inside area",
                     style: titleTextStyle.copyWith(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -91,21 +93,24 @@ class AbsenBottomSheet extends StatelessWidget {
 
             /// DISTANCE INFO
             Obx(() {
+              final data = auth.logUser.value;
+
               final isOutside =
                   controller.distanceStore.value > num.parse(data.areaCover!);
 
-              final isRnD =
-                  controller.optVisitSelected.value ==
-                  "Research and Development";
+              final bypass = controller.canBypassArea(data);
+              // final isRnD =
+              //     controller.optVisitSelected.value ==
+              //     "Research and Development";
 
               return Visibility(
-                visible: isOutside && !isRnD,
+                visible: isOutside && !bypass,
                 child: Column(
                   children: [
                     Text(
                       controller.locNote.value,
                       style: TextStyle(
-                        color: (isOutside && !isRnD) ? red : green,
+                        color: (isOutside && !bypass) ? red : green,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -117,14 +122,16 @@ class AbsenBottomSheet extends StatelessWidget {
 
             /// REFRESH BUTTON
             Obx(() {
+              final data = auth.logUser.value;
               final isOutside =
                   controller.distanceStore.value > num.parse(data.areaCover!);
 
-              final isRnD =
-                  controller.optVisitSelected.value ==
-                  "Research and Development";
+              final bypass = controller.canBypassArea(data);
+              // final isRnD =
+              //     controller.optVisitSelected.value ==
+              //     "Research and Development";
               return Visibility(
-                visible: isOutside && !isRnD,
+                visible: isOutside && !bypass,
                 child: Row(
                   children: [
                     Expanded(
@@ -172,20 +179,33 @@ class AbsenBottomSheet extends StatelessWidget {
             Align(
               alignment: Alignment.bottomCenter,
               child: Obx(() {
-                final canBypassArea =
-                    controller.optVisitSelected.value ==
-                    "Research and Development";
+                final bypass = controller.canBypassArea(data);
+
+                // final canBypassArea =
+                //     controller.optVisitSelected.value ==
+                //     "Research and Development";
                 final isOutside =
                     controller.distanceStore.value > num.parse(data.areaCover!);
 
                 final locationValid =
-                    canBypassArea
-                        ? true
+                    bypass
+                        ? controller.isEnabled.value
                         : (!isOutside && controller.isEnabled.value);
                 final enabled =
                     locationValid &&
                     !controller.isTimeUntrusted.value &&
                     !controller.isAppLocked.value;
+
+//                 print('''
+// distanceStore : ${controller.distanceStore.value}
+// areaCover     : ${data.areaCover}
+// isQrValidated : ${controller.isQrValidated.value}
+// isEnabled     : ${controller.isEnabled.value}
+// bypass        : $bypass
+// isOutside     : $isOutside
+// locationValid : $locationValid
+// enabled       : $enabled
+// ''');
 
                 return Container(
                   decoration: BoxDecoration(

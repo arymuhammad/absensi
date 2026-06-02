@@ -12,6 +12,8 @@ class HistoryCard extends StatelessWidget {
   final String stsM;
   final String stsP;
   final bool isValid;
+  final bool isLocal;
+  final String statusSync;
 
   const HistoryCard({
     super.key,
@@ -22,7 +24,9 @@ class HistoryCard extends StatelessWidget {
     required this.location,
     required this.stsM,
     required this.stsP,
+    required this.statusSync,
     this.isValid = true,
+    this.isLocal = false,
   });
 
   @override
@@ -30,6 +34,9 @@ class HistoryCard extends StatelessWidget {
     final screenWidth = MediaQuery.of(context).size.width;
     final boxWidth = (screenWidth * 0.16).clamp(52.0, 70.0);
     final smallScreen = screenWidth < 360;
+    final hasSyncStatus =
+        isLocal && statusSync.isNotEmpty && statusSync != "SUCCESS";
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
@@ -48,6 +55,7 @@ class HistoryCard extends StatelessWidget {
           // ================= DATE BOX =================
           Container(
             width: boxWidth,
+            height: hasSyncStatus ? 102 : 80,
             padding: const EdgeInsets.symmetric(vertical: 14),
             decoration: const BoxDecoration(
               // color: Color(0xFF1E293B),
@@ -96,6 +104,42 @@ class HistoryCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // /// ================= LOCAL BADGE =================
+                  // if (isLocalData)
+                  //   Container(
+                  //     margin: const EdgeInsets.only(bottom: 8),
+                  //     padding: const EdgeInsets.symmetric(
+                  //       horizontal: 10,
+                  //       vertical: 4,
+                  //     ),
+                  //     decoration: BoxDecoration(
+                  //       color: Colors.orange.withOpacity(.15),
+                  //       borderRadius: BorderRadius.circular(20),
+                  //       border: Border.all(
+                  //         color: Colors.orange.withOpacity(.5),
+                  //       ),
+                  //     ),
+                  //     child: const Row(
+                  //       mainAxisSize: MainAxisSize.min,
+                  //       children: [
+                  //         Icon(
+                  //           Icons.cloud_off_rounded,
+                  //           size: 14,
+                  //           color: Colors.orange,
+                  //         ),
+                  //         SizedBox(width: 4),
+                  //         Text(
+                  //           'Local Data',
+                  //           style: TextStyle(
+                  //             fontSize: 12,
+                  //             fontWeight: FontWeight.w600,
+                  //             color: Colors.orange,
+                  //           ),
+                  //         ),
+                  //       ],
+                  //     ),
+                  //   ),
+
                   // STATUS + TIME
                   Row(
                     children: [
@@ -133,8 +177,7 @@ class HistoryCard extends StatelessWidget {
                     ],
                   ),
 
-                  const SizedBox(height: 8),
-
+                  const SizedBox(height: 3),
                   // LOCATION
                   Row(
                     children: [
@@ -160,6 +203,14 @@ class HistoryCard extends StatelessWidget {
                       ),
                     ],
                   ),
+                  const SizedBox(height: 3),
+                  if (isLocal &&
+                      statusSync.isNotEmpty &&
+                      statusSync != "SUCCESS")
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 2),
+                      child: _syncStatusBadge(statusSync),
+                    ),
                 ],
               ),
             ),
@@ -208,5 +259,66 @@ class HistoryCard extends StatelessWidget {
     );
   }
 
+  static Widget _syncStatusBadge(String status) {
+    Color color;
+    String text;
 
+    switch (status.toUpperCase()) {
+      case "PENDING":
+        color = Colors.orange;
+        text = "Pending Sync";
+        break;
+
+      case "FAILED":
+        color = Colors.red;
+        text = "Failed Sync";
+        break;
+
+      case "SUCCESS":
+        color = Colors.green;
+        text = "Synced";
+        break;
+
+      default:
+        color = Colors.grey;
+        text = status;
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withOpacity(.12),
+        borderRadius: BorderRadius.circular(30),
+        border: Border.all(color: color.withOpacity(.4)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Container(
+          //   width: 8,
+          //   height: 8,
+          //   decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+          // ),
+          Icon(
+            status == "SUCCESS"
+                ? Icons.cloud_done_rounded
+                : status == "FAILED"
+                ? Icons.cloud_off_rounded
+                : Icons.cloud_sync_rounded,
+            size: 14,
+            color: color,
+          ),
+          const SizedBox(width: 6),
+          Text(
+            text,
+            style: TextStyle(
+              color: color,
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }

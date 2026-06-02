@@ -174,6 +174,7 @@ class SummaryAbsenArea extends GetView {
                                     location: safe(data.namaCabang),
                                     stsM: '',
                                     stsP: '',
+                                    statusSync: safe(data.statusSync),
                                   ),
                                 );
                               },

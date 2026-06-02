@@ -113,6 +113,7 @@ class ReqPresenceExcepView extends StatelessWidget {
                             onChanged: (val) {
                               // adjCtrl.isLoading.value = true;
                               adjCtrl.selectedStatus.value = val;
+                              // print(adjCtrl.selectedStatus.value);
                               // adjCtrl.getReqAppUpt(
                               //     val,
                               //     adjCtrl.selectedType.value,
@@ -277,7 +278,8 @@ class ReqPresenceExcepView extends StatelessWidget {
                                 // adjCtrl.selectedType.value = val;
                                 await adjCtrl.getReqAppUpt(
                                   adjCtrl.selectedStatus.value,
-                                  adjCtrl.selectedType.value,
+                                  // adjCtrl.selectedType.value,
+                                  'approval',
                                   userData.level,
                                   userData.id,
                                   userData.kodeCabang,

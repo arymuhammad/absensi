@@ -248,7 +248,7 @@ class UptMasukPulang extends StatelessWidget {
     // final leaveStats = getStepStatus(data);
     // print(data.statusExcep);
     // final color = getStatusColor(leaveStats);
-
+    // print(isInbox);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -312,38 +312,39 @@ class UptMasukPulang extends StatelessWidget {
         Text('Alasan Perubahan Data', style: titleTextStyle),
         Text(data.alasan!, style: subtitleTextStyle),
         const SizedBox(height: 10),
+
         // Obx(() {
         //   final dataUser = auth.logUser.value;
         //   return
-          
-           Visibility(
-            visible:!isInbox
-                // data.statusExcep == "pending" &&
-                //         data.keterangan == "" &&
-                //         ([
-                //           '1',
-                //           '17',
-                //           '18',
-                //           '19',
-                //           '20',
-                //           '39',
-                //           '59',
-                //           '26',
-                //           '96',
-                //           '106',
-                //         ]).contains(dataUser.level)
-                    ? true
-                    : false,
-            child: SizedBox(
-              height: 45,
-              child: CsTextField(
-                enabled: true,
-                controller: adjCtrl.keteranganApp,
-                label: 'Keterangan',
-                isDark: isDark,
-              ),
+        Visibility(
+          visible:
+              !isInbox && data.statusExcep == "pending"
+                  // data.statusExcep == "pending" &&
+                  //         data.keterangan == "" &&
+                  //         ([
+                  //           '1',
+                  //           '17',
+                  //           '18',
+                  //           '19',
+                  //           '20',
+                  //           '39',
+                  //           '59',
+                  //           '26',
+                  //           '96',
+                  //           '106',
+                  //         ]).contains(dataUser.level)
+                  ? true
+                  : false,
+          child: SizedBox(
+            height: 45,
+            child: CsTextField(
+              enabled: true,
+              controller: adjCtrl.keteranganApp,
+              label: 'Keterangan',
+              isDark: isDark,
             ),
           ),
+        ),
         // }),
         const SizedBox(height: 5),
         Visibility(
@@ -364,202 +365,202 @@ class UptMasukPulang extends StatelessWidget {
         // Obx(() {
         //   final dataUser = auth.logUser.value;
 
-        //   return 
-          Visibility(
-            visible:isInbox
-                // !([
-                //       '1',
-                //       '17',
-                //       '18',
-                //       '19',
-                //       '20',
-                //       '39',
-                //       '26',
-                //       '59',
-                //       '96',
-                //       '106',
-                //     ]).contains(dataUser.level)
-                    ? true
-                    : false,
-            child: StepProgress(
-              totalSteps: totalSteps,
-              controller: controller,
-              padding: const EdgeInsets.all(10),
-              nodeTitles: nodeTitles,
-              nodeIconBuilder: (index, _) {
-                final bgColor = getStepColor(data, index);
-                final icon = buildStepIcon(data, index);
-                return Container(
-                  decoration: BoxDecoration(
-                    color: bgColor,
-                    shape: BoxShape.circle,
-                  ),
-                  // padding: const EdgeInsets.all(6),
-                  child: icon,
-                );
-              },
-              theme: const StepProgressThemeData(
-                lineLabelAlignment: Alignment.bottomCenter,
-                stepLineSpacing: 9,
-                stepLineStyle: StepLineStyle(
-                  lineThickness: 3,
-                  borderRadius: Radius.circular(4),
+        //   return
+        Visibility(
+          visible:
+              isInbox
+                  // !([
+                  //       '1',
+                  //       '17',
+                  //       '18',
+                  //       '19',
+                  //       '20',
+                  //       '39',
+                  //       '26',
+                  //       '59',
+                  //       '96',
+                  //       '106',
+                  //     ]).contains(dataUser.level)
+                  ? true
+                  : false,
+          child: StepProgress(
+            totalSteps: totalSteps,
+            controller: controller,
+            padding: const EdgeInsets.all(10),
+            nodeTitles: nodeTitles,
+            nodeIconBuilder: (index, _) {
+              final bgColor = getStepColor(data, index);
+              final icon = buildStepIcon(data, index);
+              return Container(
+                decoration: BoxDecoration(
+                  color: bgColor,
+                  shape: BoxShape.circle,
                 ),
-                defaultForegroundColor: Colors.grey,
-                activeForegroundColor: Colors.green,
-                enableRippleEffect: true,
-                lineLabelStyle: StepLabelStyle(
-                  labelAxisAlignment: CrossAxisAlignment.end,
-                ),
+                // padding: const EdgeInsets.all(6),
+                child: icon,
+              );
+            },
+            theme: const StepProgressThemeData(
+              lineLabelAlignment: Alignment.bottomCenter,
+              stepLineSpacing: 9,
+              stepLineStyle: StepLineStyle(
+                lineThickness: 3,
+                borderRadius: Radius.circular(4),
               ),
-              onStepChanged: (index) {},
-              onStepNodeTapped: (index) {},
+              defaultForegroundColor: Colors.grey,
+              activeForegroundColor: Colors.green,
+              enableRippleEffect: true,
+              lineLabelStyle: StepLabelStyle(
+                labelAxisAlignment: CrossAxisAlignment.end,
+              ),
             ),
+            onStepChanged: (index) {},
+            onStepNodeTapped: (index) {},
           ),
+        ),
+
         // }),
         // Obx(() {
         //   final dataUser = auth.logUser.value;
-        //   return 
-          
-          Visibility(
-            visible: !isInbox
-                // data.statusExcep == "pending" &&
-                //         ([
-                //           '1',
-                //           '17',
-                //           '18',
-                //           '19',
-                //           '20',
-                //           '39',
-                //           '26',
-                //           '59',
-                //           '96',
-                //           '106',
-                //         ]).contains(dataUser.level)
-                    ? true
-                    : false,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                CsElevatedButton(
-                  fontsize: 15,
-                  label: 'Accept',
-                  color: Colors.greenAccent[700]!,
-                  onPressed: () {
-                    final dataUser = auth.logUser.value;
-                    var dataUptApp = {
-                      {
-                            "1": "acc_4",
-                            "17": "acc_4",
-                            "18": "acc_4",
-                            "39": "acc_4",
-                            "96": "acc_3",
-                            "106": "acc_3",
-                            "26": "acc_2",
-                            "19": "acc_1",
-                            "20": "acc_1",
-                            "59": "acc_1",
-                          }[dataUser.level]!:
-                          "approved",
-                      "uid": data.id,
-                      "level": dataUser.level,
-                      "keterangan":
-                          data.keterangan ?? adjCtrl.keteranganApp.text,
-                      "id_user": data.idUser,
-                      "tgl_masuk": data.tglMasuk,
-                      "status": data.status,
-                    };
-                    /////////
-                    var keyJamAbsen = "";
-                    var keyFotoAbsen = "";
-                    if (data.status == "update_masuk" ||
-                        data.status == "update_masuk_cst") {
-                      keyJamAbsen = "jam_absen_masuk";
-                      keyFotoAbsen = "foto_masuk";
-                    } else {
-                      keyJamAbsen = "jam_absen_pulang";
-                      keyFotoAbsen = "foto_pulang";
-                    }
-                    //////////
-                    var dataUptAbs = {
-                      "status": data.status,
-                      "id_user": data.idUser,
-                      "tgl_masuk": data.tglMasuk,
-                      keyJamAbsen:
-                          (data.status == "update_masuk" ||
-                                      data.status == "update_masuk_cst"
-                                  ? data.jamAbsenMasuk
-                                  : data.jamAbsenPulang)
-                              .to24Hour(),
-                      keyFotoAbsen:
-                          data.status == "update_masuk" ||
-                                  data.status == "update_masuk_cst"
-                              ? data.fotoMasuk
-                              : data.fotoPulang,
-                      "tgl_pulang": data.tglPulang,
-                      "lat_out": data.latOut,
-                      "long_out": data.longOut,
-                      "device_info2": data.devInfo,
-                      // 🔥 tambahan khusus
-                      if (data.status == "update_masuk_cst") ...{
-                        "jam_masuk": data.jamMasuk,
-                        "jam_pulang": data.jamPulang,
-                      },
-                    };
-                    adjCtrl.appAbs(dataUptApp, dataUptAbs, isInbox);
-                    homeC.getPendingAdj(
-                      idUser: dataUser.id!,
-                      idCabang: dataUser.kodeCabang!,
-                      level: dataUser.level!,
-                    );
+        //   return
+        Visibility(
+          visible:
+              !isInbox && data.statusExcep == "pending"
+                  // data.statusExcep == "pending" &&
+                  //         ([
+                  //           '1',
+                  //           '17',
+                  //           '18',
+                  //           '19',
+                  //           '20',
+                  //           '39',
+                  //           '26',
+                  //           '59',
+                  //           '96',
+                  //           '106',
+                  //         ]).contains(dataUser.level)
+                  ? true
+                  : false,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              CsElevatedButton(
+                fontsize: 15,
+                label: 'Accept',
+                color: Colors.greenAccent[700]!,
+                onPressed: () {
+                  final dataUser = auth.logUser.value;
+                  var dataUptApp = {
+                    {
+                          "1": "acc_4",
+                          "17": "acc_4",
+                          "18": "acc_4",
+                          "39": "acc_4",
+                          "96": "acc_3",
+                          "106": "acc_3",
+                          "26": "acc_2",
+                          "19": "acc_1",
+                          "20": "acc_1",
+                          "59": "acc_1",
+                        }[dataUser.level]!:
+                        "approved",
+                    "uid": data.id,
+                    "level": dataUser.level,
+                    "keterangan": data.keterangan ?? adjCtrl.keteranganApp.text,
+                    "id_user": data.idUser,
+                    "tgl_masuk": data.tglMasuk,
+                    "status": data.status,
+                  };
+                  /////////
+                  var keyJamAbsen = "";
+                  var keyFotoAbsen = "";
+                  if (data.status == "update_masuk" ||
+                      data.status == "update_masuk_cst") {
+                    keyJamAbsen = "jam_absen_masuk";
+                    keyFotoAbsen = "foto_masuk";
+                  } else {
+                    keyJamAbsen = "jam_absen_pulang";
+                    keyFotoAbsen = "foto_pulang";
+                  }
+                  //////////
+                  var dataUptAbs = {
+                    "status": data.status,
+                    "id_user": data.idUser,
+                    "tgl_masuk": data.tglMasuk,
+                    keyJamAbsen:
+                        (data.status == "update_masuk" ||
+                                    data.status == "update_masuk_cst"
+                                ? data.jamAbsenMasuk
+                                : data.jamAbsenPulang)
+                            .to24Hour(),
+                    keyFotoAbsen:
+                        data.status == "update_masuk" ||
+                                data.status == "update_masuk_cst"
+                            ? data.fotoMasuk
+                            : data.fotoPulang,
+                    "tgl_pulang": data.tglPulang,
+                    "lat_out": data.latOut,
+                    "long_out": data.longOut,
+                    "device_info2": data.devInfo,
+                    // 🔥 tambahan khusus
+                    if (data.status == "update_masuk_cst") ...{
+                      "jam_masuk": data.jamMasuk,
+                      "jam_pulang": data.jamPulang,
+                    },
+                  };
+                  adjCtrl.appAbs(dataUptApp, dataUptAbs, isInbox);
+                  homeC.getPendingAdj(
+                    idUser: dataUser.id!,
+                    idCabang: dataUser.kodeCabang!,
+                    level: dataUser.level!,
+                  );
 
-                    // ignore: invalid_use_of_protected_member
-                    homeC.refresh();
-                  },
-                ),
-                const SizedBox(width: 5),
-                CsElevatedButton(
-                  fontsize: 15,
-                  label: 'Reject',
-                  color: Colors.redAccent[700]!,
-                  onPressed: () {
-                    final dataUser = auth.logUser.value;
-                    var dataUptApp = {
-                      {
-                            "1": "acc_4",
-                            "17": "acc_4",
-                            "18": "acc_4",
-                            "39": "acc_4",
-                            "96": "acc_3",
-                            "106": "acc_3",
-                            "26": "acc_2",
-                            "19": "acc_1",
-                            "20": "acc_1",
-                            "59": "acc_1",
-                          }[dataUser.level]!:
-                          "reject",
-                      "uid": data.id,
-                      "level": dataUser.level,
-                      "keterangan":
-                          data.keterangan ?? adjCtrl.keteranganApp.text,
-                      "id_user": data.idUser,
-                      "tgl_masuk": data.tglMasuk,
-                      "status": data.status,
-                    };
-                    adjCtrl.appAbs(dataUptApp, {}, isInbox);
-                    homeC.getPendingAdj(
-                      idUser: dataUser.id!,
-                      idCabang: dataUser.kodeCabang!,
-                      level: dataUser.level!,
-                    );
+                  // ignore: invalid_use_of_protected_member
+                  homeC.refresh();
+                },
+              ),
+              const SizedBox(width: 5),
+              CsElevatedButton(
+                fontsize: 15,
+                label: 'Reject',
+                color: Colors.redAccent[700]!,
+                onPressed: () {
+                  final dataUser = auth.logUser.value;
+                  var dataUptApp = {
+                    {
+                          "1": "acc_4",
+                          "17": "acc_4",
+                          "18": "acc_4",
+                          "39": "acc_4",
+                          "96": "acc_3",
+                          "106": "acc_3",
+                          "26": "acc_2",
+                          "19": "acc_1",
+                          "20": "acc_1",
+                          "59": "acc_1",
+                        }[dataUser.level]!:
+                        "reject",
+                    "uid": data.id,
+                    "level": dataUser.level,
+                    "keterangan": data.keterangan ?? adjCtrl.keteranganApp.text,
+                    "id_user": data.idUser,
+                    "tgl_masuk": data.tglMasuk,
+                    "status": data.status,
+                  };
+                  adjCtrl.appAbs(dataUptApp, {}, isInbox);
+                  homeC.getPendingAdj(
+                    idUser: dataUser.id!,
+                    idCabang: dataUser.kodeCabang!,
+                    level: dataUser.level!,
+                  );
 
-                    // ignore: invalid_use_of_protected_member
-                    homeC.refresh();
-                  },
-                ),
-              ],
-            ),
+                  // ignore: invalid_use_of_protected_member
+                  homeC.refresh();
+                },
+              ),
+            ],
           ),
+        ),
         // }),
       ],
     );

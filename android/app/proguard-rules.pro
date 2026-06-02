@@ -1,0 +1,6 @@
+-dontwarn j$.util.concurrent.ConcurrentHashMap$TreeBin
+-dontwarn j$.util.concurrent.ConcurrentHashMap
+-dontwarn j$.util.concurrent.ConcurrentHashMap$CounterCell
+-dontwarn j$.util.IntSummaryStatistics
+-dontwarn j$.util.LongSummaryStatistics
+-dontwarn j$.util.DoubleSummaryStatistics

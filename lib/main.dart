@@ -1,6 +1,9 @@
+import 'dart:ui';
+
 import 'package:absensi/app/data/helper/app_colors.dart';
 import 'package:absensi/app/modules/login/controllers/login_controller.dart';
 import 'package:absensi/splash.dart';
+import 'package:flutter/foundation.dart';
 
 // import 'package:alarm/alarm.dart';
 import 'package:flutter/material.dart';
@@ -10,6 +13,8 @@ import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:month_year_picker/month_year_picker.dart';
+import 'app/data/helper/custom_dialog.dart';
+import 'app/data/helper/error_logger.dart';
 import 'app/data/theme_controller.dart';
 import 'app/routes/app_pages.dart';
 
@@ -30,6 +35,87 @@ void main() async {
       systemNavigationBarDividerColor: Colors.transparent,
     ),
   );
+
+  FlutterError.onError = (FlutterErrorDetails details) {
+    Future.microtask(() {
+      ErrorLogger.save('''
+        TYPE: FLUTTER_FRAMEWORK
+
+        TIME:
+        ${DateTime.now()}
+
+        EXCEPTION:
+        ${details.exceptionAsString()}
+
+        LIBRARY:
+        ${details.library}
+
+        CONTEXT:
+        ${details.context}
+
+        STACK:
+        ${details.stack}
+        ''', '');
+    });
+
+    FlutterError.presentError(details);
+  };
+
+  PlatformDispatcher.instance.onError = (error, stack) {
+    Future.microtask(() {
+      ErrorLogger.save('''
+        TYPE: PLATFORM_ERROR
+
+        TIME:
+        ${DateTime.now()}
+
+        ERROR:
+        $error
+
+        STACK:
+        $stack
+        ''', '');
+    });
+
+    return true;
+  };
+
+  ErrorWidget.builder = (details) {
+    Future.microtask(() {
+      ErrorLogger.save('''
+        TYPE: ERROR_WIDGET
+
+        TIME:
+        ${DateTime.now()}
+
+        EXCEPTION:
+        ${details.exceptionAsString()}
+
+        LIBRARY:
+        ${details.library}
+
+        CONTEXT:
+        ${details.context}
+
+        STACK:
+        ${details.stack}
+        ''', '');
+    });
+
+    return Material(
+      color: Colors.red,
+      child: Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Text(
+            details.exceptionAsString(),
+            textAlign: TextAlign.center,
+            style: const TextStyle(color: Colors.white),
+          ),
+        ),
+      ),
+    );
+  };
 
   await initializeDateFormatting('id_ID', "");
 

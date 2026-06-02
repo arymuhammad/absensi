@@ -380,8 +380,8 @@ class ServiceApi {
       /// =========================
       final response = await http.Response.fromStream(streamedResponse);
 
-      print("STATUS CODE: ${response.statusCode}");
-      print("BODY: ${response.body}");
+      // print("STATUS CODE: ${response.statusCode}");
+      // print("BODY: ${response.body}");
 
       /// =========================
       /// ❌ HTTP ERROR
@@ -930,10 +930,10 @@ class ServiceApi {
 
       final response = await http.Response.fromStream(streamedResponse);
 
-      print("========== VISIT RESPONSE ==========");
-      print("STATUS CODE: ${response.statusCode}");
-      print("BODY: ${response.body}");
-      print("====================================");
+      // print("========== VISIT RESPONSE ==========");
+      // print("STATUS CODE: ${response.statusCode}");
+      // print("BODY: ${response.body}");
+      // print("====================================");
 
       /// =========================
       /// ❌ HTTP ERROR
@@ -1281,19 +1281,20 @@ class ServiceApi {
 
   reqUpdateAbs(Map<String, dynamic> data) async {
     try {
-      Map<String, String> headers = {
-        'Content-Type': 'application/json; charset=UTF-8',
-      };
+      // Map<String, String> headers = {
+      //   'Content-Type': 'application/json; charset=UTF-8',
+      // };
 
       var request = http.MultipartRequest(
         'POST',
         Uri.parse('${baseUrl}req_update_data'),
       );
 
-      request.headers.addAll(headers);
+      // request.headers.addAll(headers);
 
       request.fields['status'] = data["status"];
       request.fields['id_user'] = data["id_user"];
+      request.fields['kode_cabang'] = data["kode_cabang"];
       request.fields['level'] = data["level"];
       request.fields['nama'] = data["nama"];
       request.fields['alasan'] = data["alasan"];
@@ -1348,6 +1349,7 @@ class ServiceApi {
           await http.MultipartFile.fromPath("foto_pulang", data["foto_pulang"]),
         );
       }
+      
 
       // ================= SEND =================
 
@@ -1428,7 +1430,7 @@ class ServiceApi {
           )
           .timeout(const Duration(minutes: 1));
       // print(
-      //    '${baseUrl}get_reqUptAbs?accept=$accept&type=$type&level=$level&id_user=$idUser&kode_cabang=$branchCode&date1=$date1&date2=$date2'
+      //   '${baseUrl}get_reqUptAbs?accept=$accept&type=$type&level=$level&id_user=$idUser&kode_cabang=$branchCode&date1=$date1&date2=$date2',
       // );
       final res = json.decode(response.body);
       switch (response.statusCode) {

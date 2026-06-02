@@ -11,6 +11,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icons_plus/icons_plus.dart';
 // import '../../alarm/views/alarm_view.dart';
+import '../../../data/helper/custom_dialog.dart';
+import '../../../data/helper/error_logger.dart';
 import '../../../data/theme_controller.dart';
 import '../../../data/theme_switcher.dart';
 import '../../login/controllers/login_controller.dart';
@@ -258,10 +260,10 @@ class SettingsView extends GetView<SettingsController> {
                           // ),
                           Visibility(
                             visible:
-                                listDataUser.level == "1"
-                                    //  ||
-                                    //         listDataUser.level == "19" ||
-                                    //         listDataUser.level == "59"
+                                listDataUser.level == "1" ||
+                                        listDataUser.level == "19" ||
+                                        listDataUser.level == "20" ||
+                                        listDataUser.level == "59"
                                     ? true
                                     : false,
                             child: ListTile(
@@ -320,7 +322,7 @@ class SettingsView extends GetView<SettingsController> {
                             ),
                           ),
                           Visibility(
-                            visible: listDataUser.level=="1",
+                            visible: listDataUser.level == "1",
                             child: ListTile(
                               onTap: () {
                                 // Get.to(
@@ -471,6 +473,47 @@ class SettingsView extends GetView<SettingsController> {
                               Icons.keyboard_arrow_right_rounded,
                               color: subTitleColor,
                             ),
+                          ),
+                          ListTile(
+                            leading: Container(
+                              height: 40,
+                              width: 40,
+                              decoration: BoxDecoration(
+                                color:
+                                    isDark
+                                        ? Colors.blue.withOpacity(0.15)
+                                        : bgContainer,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Icon(
+                                Icons.bug_report,
+                                color:
+                                    isDark
+                                        ? Colors.blue
+                                        : AppColors.itemsBackground,
+                              ),
+                            ),
+                            title: const Text(
+                              'Send Error Log',
+                              style: TextStyle(
+                                // color: titleColor,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                             subtitle: Text(
+                              'bug report',
+                              style: TextStyle(
+                                color: subTitleColor,
+                                fontSize: 13,
+                              ),
+                            ),
+                            onTap: () async {
+                              try {
+                                await ErrorLogger.shareLog();
+                              } catch (e) {
+                                showToast(e.toString());
+                              }
+                            },
                           ),
                           // ListTile(
                           //   onTap: () async {

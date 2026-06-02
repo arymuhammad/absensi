@@ -68,6 +68,7 @@ class RegionAreaController extends GetxController {
 
       if (res['success']) {
         regions.value = List<Map<String, dynamic>>.from(res['data']);
+        // print(regions);
       }
     } catch (e) {
       Get.snackbar(
@@ -189,7 +190,6 @@ class RegionAreaController extends GetxController {
                   label: "SAVE",
                   color: Colors.transparent,
                   fontsize: 16,
-                  
                 ),
               ),
             ),

@@ -11,6 +11,7 @@ import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../data/helper/const.dart';
+import '../../../data/helper/loading_platform.dart';
 import '../../home/controllers/home_controller.dart';
 
 class AboutView extends GetView {
@@ -88,18 +89,8 @@ class AboutView extends GetView {
                     Obx(
                       () =>
                           setC.isLoading.value
-                              ? const Center(
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text('Loading data...  '),
-                                    SizedBox(
-                                      height: 15,
-                                      width: 15,
-                                      child: CircularProgressIndicator(),
-                                    ),
-                                  ],
-                                ),
+                              ? Center(
+                                child: platFormDevice(),
                               )
                               : Expanded(
                                 child: buildChangelog(setC.changelog, setC),

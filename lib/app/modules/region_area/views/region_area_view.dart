@@ -67,7 +67,7 @@ class RegionAreaView extends StatelessWidget {
               itemCount: ctrl.regions.length,
               itemBuilder: (context, index) {
                 final data = ctrl.regions[index];
-            
+                // print(data['store_name']);
                 return Card(
                   // margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                   child: ListTile(
@@ -76,7 +76,7 @@ class RegionAreaView extends StatelessWidget {
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                     subtitle: Text(
-                      data['store'] ?? '-',
+                      data['store_name'] ?? '-',
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),

@@ -20,6 +20,7 @@ class Absen {
   String? devInfo;
   String? devInfo2;
   String? statusSync;
+  bool? isLocal;
 
   Absen({
     this.idUser,
@@ -43,6 +44,7 @@ class Absen {
     this.devInfo,
     this.devInfo2,
     this.statusSync,
+    this.isLocal,
   });
 
   Absen.fromJson(Map<String, dynamic> json) {
@@ -66,6 +68,7 @@ class Absen {
     namaShift = json['nama_shift'];
     devInfo = json['device_info'];
     devInfo2 = json['device_info2'];
+    statusSync = json['status_sync'];
   }
 
   Map<String, dynamic> toJson() {

@@ -77,7 +77,7 @@ class ReqAppUserView extends GetView {
               child: FloatingActionButton(
                 backgroundColor: Colors.transparent,
                 onPressed: () {
-                  dialogSearchData(context, isDark, userData);
+                  dialogSearchData(context, isDark, userData, isInbox);
                 },
                 child: Icon(
                   Icons.manage_search_outlined,
@@ -89,7 +89,12 @@ class ReqAppUserView extends GetView {
     );
   }
 
-  dialogSearchData(BuildContext context, bool isDark, Data userData) {
+  dialogSearchData(
+    BuildContext context,
+    bool isDark,
+    Data userData,
+    bool isInbox,
+  ) {
     Get.bottomSheet(
       backgroundColor: isDark ? Colors.black : Colors.white,
       SingleChildScrollView(
@@ -118,67 +123,69 @@ class ReqAppUserView extends GetView {
                 ),
                 const Divider(),
                 Obx(
-                  () => Row(
-                    children: [
-                      Expanded(
-                        child: CsDropDown(
-                          value:
-                              adjCtrl.selectedStatus.isNotEmpty
-                                  ? adjCtrl.selectedStatus.value
-                                  : null,
-                          items:
-                              adjCtrl.statusReqApp.map((e) {
-                                return DropdownMenuItem(
-                                  value: e.entries.first.key,
-                                  child: Text(e.entries.first.value),
-                                );
-                              }).toList(),
-                          onChanged: (val) {
-                            // adjCtrl.isLoading.value = true;
-                            adjCtrl.selectedStatus.value = val;
-                            // adjCtrl.getReqAppUpt(
-                            //     val,
-                            //     adjCtrl.selectedType.value,
-                            //     userData!.level,
-                            //     userData!.id,
-                            //     adjCtrl.initDate,
-                            //     adjCtrl.lastDate);
-                          },
-                          label: 'Status',
-                          isDark: isDark,
-                        ),
-                      ),
-                      const SizedBox(width: 5),
-                      Expanded(
-                        child: CsDropDown(
-                          value:
-                              adjCtrl.selectedType.isNotEmpty
-                                  ? adjCtrl.selectedType.value
-                                  : null,
-                          items:
-                              adjCtrl.typeReqApp.map((e) {
-                                return DropdownMenuItem(
-                                  value: e.entries.first.key,
-                                  child: Text(e.entries.first.value),
-                                );
-                              }).toList(),
-                          onChanged: (val) {
-                            // adjCtrl.isLoading.value = true;
-                            adjCtrl.selectedType.value = val;
-                            // adjCtrl.getReqAppUpt(
-                            //     adjCtrl.selectedStatus.value,
-                            //     val,
-                            //     userData!.level,
-                            //     userData!.id,
-                            //     adjCtrl.initDate,
-                            //     adjCtrl.lastDate);
-                          },
-                          label: 'Kategori',
-                          isDark: isDark,
-                        ),
-                      ),
-                    ],
+                  () =>
+                  //  Row(
+                  //   children: [
+                  // Expanded(
+                  //   child:
+                  CsDropDown(
+                    value:
+                        adjCtrl.selectedStatus.isNotEmpty
+                            ? adjCtrl.selectedStatus.value
+                            : null,
+                    items:
+                        adjCtrl.statusReqApp.map((e) {
+                          return DropdownMenuItem(
+                            value: e.entries.first.key,
+                            child: Text(e.entries.first.value),
+                          );
+                        }).toList(),
+                    onChanged: (val) {
+                      // adjCtrl.isLoading.value = true;
+                      adjCtrl.selectedStatus.value = val;
+                      // adjCtrl.getReqAppUpt(
+                      //     val,
+                      //     adjCtrl.selectedType.value,
+                      //     userData!.level,
+                      //     userData!.id,
+                      //     adjCtrl.initDate,
+                      //     adjCtrl.lastDate);
+                    },
+                    label: 'Status',
+                    isDark: isDark,
                   ),
+                  // ),
+                  // const SizedBox(width: 5),
+                  // Expanded(
+                  //   child: CsDropDown(
+                  //     value:
+                  //         adjCtrl.selectedType.isNotEmpty
+                  //             ? adjCtrl.selectedType.value
+                  //             : null,
+                  //     items:
+                  //         adjCtrl.typeReqApp.map((e) {
+                  //           return DropdownMenuItem(
+                  //             value: e.entries.first.key,
+                  //             child: Text(e.entries.first.value),
+                  //           );
+                  //         }).toList(),
+                  //     onChanged: (val) {
+                  //       // adjCtrl.isLoading.value = true;
+                  //       adjCtrl.selectedType.value = val;
+                  //       // adjCtrl.getReqAppUpt(
+                  //       //     adjCtrl.selectedStatus.value,
+                  //       //     val,
+                  //       //     userData!.level,
+                  //       //     userData!.id,
+                  //       //     adjCtrl.initDate,
+                  //       //     adjCtrl.lastDate);
+                  //     },
+                  //     label: 'Kategori',
+                  //     isDark: isDark,
+                  //   ),
+                  // ),
+                  //   ],
+                  // ),
                 ),
                 const SizedBox(height: 5),
                 Row(
@@ -289,7 +296,8 @@ class ReqAppUserView extends GetView {
                                 // adjCtrl.selectedType.value = val;
                                 await adjCtrl.getReqAppUpt(
                                   adjCtrl.selectedStatus.value,
-                                  adjCtrl.selectedType.value,
+                                  // adjCtrl.selectedType.value,
+                                  isInbox ? 'inbox' : 'approval',
                                   userData.level,
                                   userData.id,
                                   userData.kodeCabang,

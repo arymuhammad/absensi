@@ -373,6 +373,8 @@ class SemuaAbsenView extends GetView {
                           location: safe(item.namaCabang),
                           stsM: stsMasuk,
                           stsP: stsPulang,
+                          isLocal: item.isLocal!,
+                          statusSync: safe(item.statusSync),
                         ),
                       ),
                     );

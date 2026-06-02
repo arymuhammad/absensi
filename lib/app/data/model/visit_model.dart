@@ -17,6 +17,7 @@ class Visit {
   late String? deviceInfo2;
   late String? isRnd;
   String? statusSync;
+  bool? isLocal;
 
   Visit({
     this.id,
@@ -37,6 +38,7 @@ class Visit {
     this.deviceInfo2,
     this.isRnd,
     this.statusSync,
+    this.isLocal,
   });
 
   Visit.fromJson(Map<String, dynamic> json) {
@@ -57,6 +59,8 @@ class Visit {
     deviceInfo = json['device_info'];
     deviceInfo2 = json['device_info2'];
     isRnd = json['is_rnd'];
+    statusSync = json['status_sync'];
+    
   }
 
   Map<String, Object?> toJson() {
