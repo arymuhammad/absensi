@@ -52,7 +52,7 @@ class SettingsView extends GetView<SettingsController> {
                 borderRadius: BorderRadius.circular(20),
               ),
               child: SizedBox(
-                height: 450,
+                height: Get.height - 200,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -500,7 +500,7 @@ class SettingsView extends GetView<SettingsController> {
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                             subtitle: Text(
+                            subtitle: Text(
                               'bug report',
                               style: TextStyle(
                                 color: subTitleColor,
