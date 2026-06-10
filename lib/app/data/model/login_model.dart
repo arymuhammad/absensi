@@ -43,6 +43,11 @@ class Data {
   String? createdAt;
   String? parentId;
   String? namaParent;
+  String? ktp;
+  String? kk;
+  String? npwp;
+  String? vaksin;
+  String? sertifikat;
 
   Data({
     this.id,
@@ -66,30 +71,40 @@ class Data {
     this.createdAt,
     this.parentId,
     this.namaParent,
+    this.ktp,
+    this.kk,
+    this.npwp,
+    this.vaksin,
+    this.sertifikat,
   });
 
   Data.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    nama = json['nama'];
-    username = json['username'];
-    password = json['password'];
-    kodeCabang = json['kode_cabang'];
-    namaCabang = json['nama_cabang'];
+    id = json['id'] ?? '';
+    nama = json['nama'] ?? '';
+    username = json['username'] ?? '';
+    password = json['password'] ?? '';
+    kodeCabang = json['kode_cabang'] ?? '';
+    namaCabang = json['nama_cabang'] ?? '';
     nik = json['nik'] ?? '';
-    lat = json['lat'];
-    long = json['long'];
+    lat = json['lat'] ?? '';
+    long = json['long'] ?? '';
     foto = json['foto'] ?? '';
-    noTelp = json['no_telp'];
-    level = json['level'];
-    levelUser = json['level_user'];
-    areaCover = json['area_coverage'];
-    visit = json['visit'];
-    cekStok = json['cek_stok'];
+    noTelp = json['no_telp'] ?? '';
+    level = json['level'] ?? '';
+    levelUser = json['level_user'] ?? '';
+    areaCover = json['area_coverage'] ?? '';
+    visit = json['visit'] ?? '';
+    cekStok = json['cek_stok'] ?? '';
     idRegion = json['id_region'] ?? '';
-    leaveBalance = json['leave_balance'];
+    leaveBalance = json['leave_balance'] ?? '';
     createdAt = json['created_at'] ?? '';
     parentId = json['parent_id'] ?? '';
     namaParent = json['nama_parent'] ?? '';
+    ktp = json['ktp'] ?? '';
+    kk = json['kk'] ?? '';
+    npwp = json['npwp'] ?? '';
+    vaksin = json['vaksin'] ?? '';
+    sertifikat = json['sertifikat'] ?? '';
   }
 
   Map<String, dynamic> toJson() {
@@ -115,6 +130,11 @@ class Data {
     data['created_at'] = createdAt;
     data['parent_id'] = parentId;
     data['nama_parent'] = namaParent;
+    data['ktp'] = ktp;
+    data['kk'] = kk;
+    data['npwp'] = npwp;
+    data['vaksin'] = vaksin;
+    data['sertifikat'] = sertifikat;
     return data;
   }
 }

@@ -77,7 +77,7 @@ class SummaryAbsenArea extends GetView {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Padding(
-                        padding: const EdgeInsets.only(left: 10.0, top: 10),
+                        padding: const EdgeInsets.fromLTRB(2,5,0,0),
                         child: Text(
                           'Visit History',
                           style: titleTextStyle.copyWith(fontSize: 15),
@@ -174,6 +174,7 @@ class SummaryAbsenArea extends GetView {
                                     location: safe(data.namaCabang),
                                     stsM: '',
                                     stsP: '',
+                                    isLocal: data.isLocal!,
                                     statusSync: safe(data.statusSync),
                                   ),
                                 );

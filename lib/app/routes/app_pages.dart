@@ -9,6 +9,8 @@ import '../modules/detail_absen/bindings/detail_absen_binding.dart';
 import '../modules/detail_absen/views/detail_absen_view.dart';
 import '../modules/home/bindings/home_binding.dart';
 import '../modules/home/views/home_view.dart';
+import '../modules/izin/bindings/izin_binding.dart';
+import '../modules/izin/views/izin_view.dart';
 import '../modules/leave/bindings/leave_binding.dart';
 import '../modules/leave/views/leave_view.dart';
 import '../modules/login/bindings/login_binding.dart';
@@ -116,5 +118,6 @@ class AppPages {
       page: () => RegionAreaView(),
       binding: RegionAreaBinding(),
     ),
+    GetPage(name: _Paths.IZIN, page: () => IzinView(), binding: IzinBinding()),
   ];
 }

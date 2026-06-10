@@ -30,7 +30,7 @@ class SQLHelper {
     // print('db location : ' + dbPath);
     return await openDatabase(
       path,
-      version: 5,
+      version: 6,
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
     );
@@ -58,8 +58,13 @@ class SQLHelper {
         leave_balance TEXT,
         created_at TEXT,
         parent_id TEXT,
-        nama_parent TEXT
-      )
+        nama_parent TEXT,
+        ktp TEXT,
+        kk TEXT,
+        npwp TEXT,
+        vaksin TEXT,
+        sertifikat TEXT
+            )
       """);
     await db.execute("""CREATE TABLE IF NOT EXISTS tbl_cabang(
         id INTEGER PRIMARY KEY NOT NULL,
@@ -274,6 +279,20 @@ class SQLHelper {
 
         await txn.execute("DROP TABLE tbl_visit_area_old");
       });
+    }
+
+    if (oldVersion < 6) {
+      final columns = await db.rawQuery("PRAGMA table_info(tbl_user)");
+
+      final existingColumns = columns.map((e) => e['name'].toString()).toSet();
+
+      const newColumns = ['ktp', 'kk', 'npwp', 'vaksin', 'sertifikat'];
+
+      for (final column in newColumns) {
+        if (!existingColumns.contains(column)) {
+          await db.execute("ALTER TABLE tbl_user ADD COLUMN $column TEXT");
+        }
+      }
     }
   }
 

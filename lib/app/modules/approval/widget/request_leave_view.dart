@@ -171,7 +171,7 @@ class RequestLeaveView extends GetView<LeaveController> {
                                     ],
                                   ),
                                   Text(
-                                    leave.namaCabang!,
+                                    leave.namaCabang?.capitalize ?? '-',
                                     style: subtitleTextStyle.copyWith(
                                       fontSize: 14,
                                     ),
@@ -236,7 +236,8 @@ class RequestLeaveView extends GetView<LeaveController> {
                                         ),
                                       ),
                                       TextSpan(
-                                        text: '${leave.nama}\n',
+                                        text:
+                                            '${leave.nama?.capitalize ?? '-'}\n',
                                         style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                           color:
@@ -255,7 +256,8 @@ class RequestLeaveView extends GetView<LeaveController> {
                                         ),
                                       ),
                                       TextSpan(
-                                        text: '${leave.namaLevel}\n\n',
+                                        text:
+                                            '${leave.namaLevel?.capitalize ?? '-'}\n\n',
                                         style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                           color:

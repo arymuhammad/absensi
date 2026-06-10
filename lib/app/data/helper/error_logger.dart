@@ -9,9 +9,9 @@ class ErrorLogger {
 
       final file = File('${dir.path}/error_log.txt');
 
-      const maxLogSize = 10 * 1024 * 1024; // 10 MB
+      const maxLogSize = 5 * 1024 * 1024; // 5 MB
 
-      // Reset jika lebih dari 10 MB
+      // Reset jika lebih dari 5 MB
       if (await file.exists()) {
         final size = await file.length();
 
@@ -22,18 +22,18 @@ class ErrorLogger {
 
       final log = '''
 
-=========================
-${DateTime.now()}
+        =========================
+        ${DateTime.now()}
 
-ERROR:
-$error
+        ERROR:
+        $error
 
-STACK:
-$stack
+        STACK:
+        $stack
 
-=========================
+        =========================
 
-''';
+        ''';
 
       await file.writeAsString(log, mode: FileMode.append);
     } catch (_) {}
@@ -52,12 +52,16 @@ $stack
       throw Exception('Log file not found');
     }
 
-    await SharePlus.instance.share(
+    final result = await SharePlus.instance.share(
       ShareParams(
         files: [XFile(file.path)],
         text: 'Error Log Aplikasi',
         subject: 'Error Log',
       ),
     );
+
+    if (result.status == ShareResultStatus.success) {
+      await file.writeAsString('', flush: true);
+    }
   }
 }

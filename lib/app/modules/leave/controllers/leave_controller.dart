@@ -15,6 +15,7 @@ import 'package:signature/signature.dart';
 import 'package:step_progress/step_progress.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../data/helper/error_logger.dart';
 import '../../../data/model/leave_model.dart';
 
 class LeaveController extends GetxController {
@@ -119,6 +120,24 @@ class LeaveController extends GetxController {
     return listLeaveReq;
   }
 
+  String? normalizePhone(String phone) {
+    // Hapus semua karakter selain angka
+    String cleaned = phone.replaceAll(RegExp(r'[^0-9]'), '');
+
+    if (cleaned.startsWith('0')) {
+      cleaned = '62${cleaned.substring(1)}';
+    } else if (!cleaned.startsWith('62')) {
+      return null; // format tidak valid
+    }
+
+    // Minimal 10 digit
+    if (cleaned.length < 11) {
+      return null;
+    }
+
+    return cleaned;
+  }
+
   submitLeaveReq({
     required String idUser,
     required String level,
@@ -152,6 +171,13 @@ class LeaveController extends GetxController {
       return;
     }
 
+    final phoneNumb = normalizePhone(telp);
+
+    if (phoneNumb == null) {
+      showToast("Nomor telepon tidak valid");
+      return;
+    }
+
     final String base64SignImage = base64Encode(signatureBytes);
 
     final Map<String, dynamic> data = {
@@ -172,7 +198,7 @@ class LeaveController extends GetxController {
 
       "alasan_cuti": alasanCuti,
       "alamat_cuti": alamatCuti,
-      "phone": telp,
+      "phone": phoneNumb,
 
       // "user_pengganti": userPengganti,
       // "level_user_pengganti": levelUserPengganti,
@@ -311,6 +337,43 @@ class LeaveController extends GetxController {
       "username": dataUser.username!,
       "password": dataUser.password!,
     });
+
+    if (newUser == null) {
+      await ErrorLogger.save('REFRESH USER GAGAL - NULL RESPONSE', '');
+      return;
+    }
+
+    if ((newUser.id ?? '').isEmpty) {
+      await ErrorLogger.save(
+        'REFRESH USER GAGAL - DATA KOSONG',
+        jsonEncode(newUser.toJson()),
+      );
+      return;
+    }
+
+    if (newUser.lat == null ||
+        newUser.long == null ||
+        newUser.areaCover == null) {
+      await ErrorLogger.save(
+        'REFRESH USER GAGAL - FIELD WAJIB NULL',
+        jsonEncode(newUser.toJson()),
+      );
+
+      return;
+    }
+
+    await ErrorLogger.save('''
+      REFRESH USER
+
+      ID       : ${newUser.id}
+      USERNAME : ${newUser.username}
+      LAT      : ${newUser.lat}
+      LONG     : ${newUser.long}
+
+      RAW:
+      ${jsonEncode(newUser.toJson())}
+''', '');
+
     if (Get.isRegistered<LoginController>()) {
       final logC = Get.find<LoginController>();
       logC.logUser.update((val) {

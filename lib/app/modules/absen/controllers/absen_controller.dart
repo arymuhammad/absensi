@@ -272,7 +272,18 @@ class AbsenController extends GetxController
 
   Future<Data> _loadUser() async {
     final pref = await SharedPreferences.getInstance();
-    return Data.fromJson(jsonDecode(pref.getString('userDataLogin')!));
+    final raw = pref.getString('userDataLogin');
+    await ErrorLogger.save('''
+    TYPE: LOAD_USER
+
+    TIME:
+    ${DateTime.now()}
+
+    RAW_DATA:
+    $raw
+        ''', '');
+
+    return Data.fromJson(jsonDecode(raw!));
   }
 
   Future<void> _initBasic(Data user) async {
@@ -372,11 +383,40 @@ class AbsenController extends GetxController
     });
 
     ever(isOffline, (offline) {
-      if (!offline) {
-        storeLatLng.value = LatLng(
-          double.parse(user.lat!),
-          double.parse(user.long!),
-        );
+      try {
+        if (!offline) {
+          storeLatLng.value = LatLng(
+            double.parse(user.lat!),
+            double.parse(user.long!),
+          );
+        }
+      } catch (e, s) {
+        ErrorLogger.save('''
+          TYPE: NULL_DATA
+
+          TIME:
+          ${DateTime.now()}
+
+          USER_ID:
+          ${user.id}
+
+          USERNAME:
+          ${user.username}
+
+          LAT:
+          ${user.lat}
+
+          LONG:
+          ${user.long}
+
+          IS_OFFLINE:
+          $offline
+
+          ERROR:
+          $e
+      ''', s.toString());
+
+        rethrow;
       }
     });
   }
@@ -811,7 +851,9 @@ class AbsenController extends GetxController
           gpsError.value = "GPS not accurate enough";
           isGpsLoading.value = false;
 
-          showToast("GPS not accurate enough (${fresh.accuracy.toStringAsFixed(0)}m)");
+          showToast(
+            "GPS not accurate enough (${fresh.accuracy.toStringAsFixed(0)}m)",
+          );
           return Future.error("GPS not accurate enough");
         }
 
@@ -2854,6 +2896,43 @@ $s
       "username": dataUser.username!,
       "password": dataUser.password!,
     });
+    
+    if (newUser == null) {
+      await ErrorLogger.save('REFRESH USER GAGAL - NULL RESPONSE', '');
+      return;
+    }
+
+    if ((newUser.id ?? '').isEmpty) {
+      await ErrorLogger.save(
+        'REFRESH USER GAGAL - DATA KOSONG',
+        jsonEncode(newUser.toJson()),
+      );
+      return;
+    }
+
+    if (newUser.lat == null ||
+        newUser.long == null ||
+        newUser.areaCover == null) {
+      await ErrorLogger.save(
+        'REFRESH USER GAGAL - FIELD WAJIB NULL',
+        jsonEncode(newUser.toJson()),
+      );
+
+      return;
+    }
+
+    await ErrorLogger.save('''
+      REFRESH USER
+
+      ID       : ${newUser.id}
+      USERNAME : ${newUser.username}
+      LAT      : ${newUser.lat}
+      LONG     : ${newUser.long}
+
+      RAW:
+      ${jsonEncode(newUser.toJson())}
+''', '');
+
     if (Get.isRegistered<LoginController>()) {
       final logC = Get.find<LoginController>();
       logC.logUser.value = newUser;

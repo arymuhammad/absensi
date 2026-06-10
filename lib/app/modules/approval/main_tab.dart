@@ -1,5 +1,7 @@
 import 'package:absensi/app/modules/adjust_presence/controllers/adjust_presence_controller.dart';
+import 'package:absensi/app/modules/approval/widget/req_perm_view.dart';
 import 'package:absensi/app/modules/home/controllers/home_controller.dart';
+import 'package:absensi/app/modules/izin/controllers/izin_controller.dart';
 import 'package:absensi/app/modules/leave/controllers/leave_controller.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -19,11 +21,13 @@ class MainTab extends StatelessWidget {
   final leaveC = Get.find<LeaveController>();
   final ctrl = Get.find<HomeController>();
   final overtimeC = Get.find<OvertimeController>();
+  final permC = Get.find<IzinController>();
   final adjC = Get.find<AdjustPresenceController>();
   final pages = [
     RequestLeaveView(),
     ReqOvertimeView(),
     ReqAppUserView(isInbox: false),
+    ReqPermView(),
   ];
 
   @override
@@ -64,7 +68,7 @@ class MainTab extends StatelessWidget {
                       0: Padding(
                         padding: EdgeInsets.symmetric(
                           vertical: 8,
-                          horizontal: 16,
+                          horizontal: 8,
                         ),
                         child: Text(
                           'Leave',
@@ -77,7 +81,7 @@ class MainTab extends StatelessWidget {
                       1: Padding(
                         padding: EdgeInsets.symmetric(
                           vertical: 8,
-                          horizontal: 16,
+                          horizontal: 8,
                         ),
                         child: Text(
                           'Overtime',
@@ -90,10 +94,23 @@ class MainTab extends StatelessWidget {
                       2: Padding(
                         padding: EdgeInsets.symmetric(
                           vertical: 8,
-                          horizontal: 16,
+                          horizontal: 8,
                         ),
                         child: Text(
                           'Presence',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            color: CupertinoColors.label,
+                          ),
+                        ),
+                      ),
+                      3: Padding(
+                        padding: EdgeInsets.symmetric(
+                          vertical: 8,
+                          horizontal: 8,
+                        ),
+                        child: Text(
+                          'Permission',
                           style: TextStyle(
                             fontWeight: FontWeight.w600,
                             color: CupertinoColors.label,
@@ -144,6 +161,19 @@ class MainTab extends StatelessWidget {
                               adjC.lastDate,
                             );
                             break;
+                          case 3:
+                            permC.isLoading.value = true;
+                            await permC.getPermissionList(
+                              type: "get_pending_req_permission",
+                              idUser: userData.id!,
+                              parentId: userData.parentId!,
+                              level: userData.level!,
+                              status: "",
+                              date1: permC.initDate,
+                              date2: permC.endDate,
+                            );
+
+                            break;
                         }
                       } finally {
                         ctrl.isTabLoading.value = false;
@@ -179,6 +209,8 @@ class MainTab extends StatelessWidget {
                     return ReqOvertimeView();
                   case 2:
                     return ReqPresenceExcepView();
+                  case 3:
+                    return ReqPermView();
                   default:
                     return const SizedBox();
                 }

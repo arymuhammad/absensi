@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:absensi/app/data/helper/db_result.dart';
 import 'package:absensi/app/data/helper/time_service.dart';
-import 'package:absensi/app/data/model/absen_model.dart';
+// import 'package:absensi/app/data/model/absen_model.dart';
 import 'package:absensi/app/data/model/login_model.dart';
 import 'package:absensi/app/modules/absen/controllers/absen_controller.dart';
 import 'package:absensi/app/modules/home/controllers/home_controller.dart';
@@ -162,23 +162,51 @@ Future<DbResult> checkOut(
       }
 
       // ✅ langsung submit ke server
-      await ServiceApi().submitAbsen(data, false);
+      final res = await ServiceApi().submitAbsen(data, false);
+      if (res == null || res['success'] != true) {
+        return DbResult(success: false, message: "Checkout failed");
+      }
+
+      final response = await ServiceApi().getAbsen({
+        "mode": "single",
+        "id_user": dataUser.id,
+        "tanggal_masuk": targetDate,
+      });
+
+      if (response.isEmpty) {
+        return DbResult(
+          success: false,
+          message: "Failed to reload attendance data",
+        );
+      }
+
+      // if (response.isNotEmpty) {
+      response.first.statusSync = "SUCCESS";
+
+      final insertRes = await SQLHelper.instance.insertDataAbsen(
+        response.first,
+      );
+
+      if (!insertRes.success && insertRes.message != "Duplicate data") {
+        return insertRes;
+      }
+      // }
 
       // ✅ penting: recreate local data biar konsisten
-      await SQLHelper.instance.insertDataAbsen(
-        Absen(
-          idUser: dataUser.id,
-          tanggalMasuk: targetDate,
-          tanggalPulang: today,
-          nama: dataUser.nama,
-          jamAbsenPulang: nowTime,
-          fotoPulang: absC.image!.path,
-          latPulang: latitude.toString(),
-          longPulang: longitude.toString(),
-          devInfo2: absC.devInfo.value,
-          statusSync: "SUCCESS",
-        ),
-      );
+      // await SQLHelper.instance.insertDataAbsen(
+      //   Absen(
+      //     idUser: dataUser.id,
+      //     tanggalMasuk: targetDate,
+      //     tanggalPulang: today,
+      //     nama: dataUser.nama,
+      //     jamAbsenPulang: nowTime,
+      //     fotoPulang: absC.image!.path,
+      //     latPulang: latitude.toString(),
+      //     longPulang: longitude.toString(),
+      //     devInfo2: absC.devInfo.value,
+      //     statusSync: "SUCCESS",
+      //   ),
+      // );
 
       absC.updateSyncStatusRealtime(
         idUser: dataUser.id!,
@@ -186,7 +214,7 @@ Future<DbResult> checkOut(
         status: "SUCCESS",
       );
 
-      checkoutSucceeded = true;
+      // checkoutSucceeded = true;
     }
 
     // =======================
@@ -233,7 +261,7 @@ Future<DbResult> checkOut(
     absC.getAbsenToday({
       "mode": "single",
       "id_user": dataUser.id,
-      "tanggal_masuk": today,
+      "tanggal_masuk": targetDate,
     });
 
     absC.getLimitAbsen({

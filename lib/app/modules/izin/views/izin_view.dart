@@ -1,27 +1,32 @@
 import 'dart:async';
 
-import 'package:absensi/app/data/helper/custom_dialog.dart';
-import 'package:absensi/app/data/model/overtime_model.dart';
-import 'package:absensi/app/modules/login/controllers/login_controller.dart';
-import 'package:absensi/app/modules/overtime/views/widget/add_overtime.dart';
-import 'package:absensi/app/modules/shared/container_main_color.dart';
-import 'package:absensi/app/services/service_api.dart';
 import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:photo_view/photo_view.dart';
 import 'package:step_progress/step_progress.dart';
+
 import '../../../data/helper/app_colors.dart';
 import '../../../data/helper/const.dart';
-import '../../../data/helper/loading_platform.dart';
-import '../controllers/overtime_controller.dart';
+import '../../../data/helper/custom_dialog.dart';
 import '../../../data/helper/helper_ui.dart';
-import 'widget/overtime_tab.dart';
+import '../../../data/helper/loading_platform.dart';
+import '../../../data/model/permission_model.dart';
+import '../../../services/service_api.dart';
+import '../../login/controllers/login_controller.dart';
+import '../../shared/container_main_color.dart';
+import '../../shared/text_field.dart';
+import '../controllers/izin_controller.dart';
+import 'widget/permission_add.dart';
+import 'widget/permission_tab.dart';
 
-class OvertimeView extends GetView<OvertimeController> {
-  OvertimeView({super.key});
-  final ctrl = Get.put(OvertimeController());
+class IzinView extends GetView<IzinController> {
+  IzinView({super.key});
+
+  final ctrl = Get.put(IzinController());
   final auth = Get.find<LoginController>();
   final Rxn<DateTimeRange> pickedRange = Rxn<DateTimeRange>();
   final Rx<DateTime> pickedMonth = DateTime.now().obs;
@@ -35,7 +40,7 @@ class OvertimeView extends GetView<OvertimeController> {
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text('Overtime Request'),
+            const Text('Izin'),
             GestureDetector(
               onTap: () async {
                 final range = await showDateRangePicker(
@@ -80,10 +85,11 @@ class OvertimeView extends GetView<OvertimeController> {
                 if (range != null) {
                   final userData = auth.logUser.value;
                   loadingDialog("memuat data...", "");
-                  await ctrl.getListOvertime(
+                  await ctrl.getPermissionList(
+                    parentId: userData.parentId!,
                     idUser: userData.id!,
                     level: userData.level!,
-                    type: "get_by_id",
+                    type: "",
                     status: "",
                     date1: DateFormat('yyyy-MM-dd').format(range.start),
                     date2: DateFormat('yyyy-MM-dd').format(range.end),
@@ -112,17 +118,18 @@ class OvertimeView extends GetView<OvertimeController> {
         onRefresh: () async {
           final userData = auth.logUser.value;
           ctrl.isLoading.value = true;
-          await ctrl.getListOvertime(
+          await ctrl.getPermissionList(
+            parentId: userData.parentId!,
             idUser: userData.id!,
             level: userData.level!,
-            type: "get_by_id",
+            type: "",
             status: "",
           );
           showToast('Page Refreshed');
         },
         child: Column(
           children: [
-            OvertimeTab(selected: ctrl.selectedStatus),
+            PermissionTab(selected: ctrl.selectedStatus),
             searchField(isDark, ctrl),
             Expanded(
               child: Obx(() {
@@ -138,14 +145,25 @@ class OvertimeView extends GetView<OvertimeController> {
                   itemCount: list.length,
                   itemBuilder: (context, index) {
                     final item = list[index];
-                    final date = DateTime.parse(item.initDate!);
+                    final date = DateTime.parse(item.tanggalMulai!);
                     final status = item.status ?? 'pending';
                     final color = getStatusColor(status);
 
-                    final duration = getDuration(
-                      item.start ?? '',
-                      item.end ?? '',
-                    );
+                    String getLastNote() {
+                      if ((item.noteAcc4 ?? '').isNotEmpty) {
+                        return item.noteAcc4!;
+                      }
+                      if ((item.noteAcc3 ?? '').isNotEmpty) {
+                        return item.noteAcc3!;
+                      }
+                      if ((item.noteAcc2 ?? '').isNotEmpty) {
+                        return item.noteAcc2!;
+                      }
+                      if ((item.noteAcc1 ?? '').isNotEmpty) {
+                        return item.noteAcc1!;
+                      }
+                      return '-';
+                    }
 
                     //=======================//
                     //||                   ||//
@@ -189,7 +207,7 @@ class OvertimeView extends GetView<OvertimeController> {
                       }
                     }
 
-                    int getCurrentStep(OvertimeModel ovr, int totalSteps) {
+                    int getCurrentStep(PermissionModel ovr, int totalSteps) {
                       int step = 0;
 
                       if (totalSteps == 5) {
@@ -353,24 +371,14 @@ class OvertimeView extends GetView<OvertimeController> {
                                       CircleAvatar(
                                         radius: 22,
                                         backgroundColor: color.withOpacity(.2),
-                                        backgroundImage:
-                                            item.photo != null &&
-                                                    item.photo!.isNotEmpty
-                                                ? NetworkImage(
-                                                  '${ServiceApi().baseUrl}${item.photo}',
-                                                )
-                                                : null,
-                                        child:
-                                            item.photo == null ||
-                                                    item.photo!.isEmpty
-                                                ? Text(
-                                                  item.name![0],
-                                                  style: TextStyle(
-                                                    color: color,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                )
-                                                : null,
+
+                                        child: Text(
+                                          item.nama![0],
+                                          style: TextStyle(
+                                            color: color,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
                                       ),
                                       const SizedBox(height: 5),
                                       Column(
@@ -406,98 +414,193 @@ class OvertimeView extends GetView<OvertimeController> {
                                       children: [
                                         /// 🔸 NAME + STATUS
                                         Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           mainAxisAlignment:
                                               MainAxisAlignment.spaceBetween,
                                           children: [
-                                            Text(
-                                              item.name ?? '-',
-                                              style: const TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 15,
-                                              ),
+                                            Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  item.nama ?? '-',
+                                                  style: const TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 15,
+                                                  ),
+                                                ),
+
+                                                const SizedBox(height: 5),
+
+                                                /// 🔸 STORE LOC
+                                                Row(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    const Icon(
+                                                      Icons
+                                                          .store_mall_directory_rounded,
+                                                      size: 14,
+                                                      color: Colors.grey,
+                                                    ),
+                                                    const SizedBox(width: 4),
+                                                    Text(
+                                                      item.namaCabang ?? '',
+                                                      style: TextStyle(
+                                                        fontSize: 12,
+                                                        color: Colors.grey[600],
+                                                      ),
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                    ),
+                                                  ],
+                                                ),
+                                                const SizedBox(height: 5),
+
+                                                Text(
+                                                  item.alasan ?? '-',
+                                                  maxLines: 1,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  style: const TextStyle(
+                                                    fontSize: 12,
+                                                    color: Colors.grey,
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 5),
+                                                InkWell(
+                                                  onTap: () {
+                                                    showDialog(
+                                                      context: context,
+                                                      builder: (context) {
+                                                        return Dialog(
+                                                          backgroundColor:
+                                                              Colors.black,
+                                                          insetPadding:
+                                                              const EdgeInsets.all(
+                                                                0,
+                                                              ),
+                                                          child: GestureDetector(
+                                                            onTap:
+                                                                () =>
+                                                                    Navigator.of(
+                                                                      context,
+                                                                    ).pop(),
+                                                            child: PhotoView(
+                                                              imageProvider:
+                                                                  NetworkImage(
+                                                                    '${ServiceApi().baseUrl}${item.lampiran!}',
+                                                                  ),
+                                                              backgroundDecoration:
+                                                                  const BoxDecoration(
+                                                                    color:
+                                                                        Colors
+                                                                            .black,
+                                                                  ),
+                                                            ),
+                                                          ),
+                                                        );
+                                                      },
+                                                    );
+                                                  },
+                                                  child: const Text(
+                                                    'show file',
+                                                    style: TextStyle(
+                                                      color: Colors.blue,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
                                             ),
 
-                                            Container(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                    horizontal: 10,
-                                                    vertical: 4,
+                                            Column(
+                                              children: [
+                                                Container(
+                                                  padding:
+                                                      const EdgeInsets.symmetric(
+                                                        horizontal: 10,
+                                                        vertical: 4,
+                                                      ),
+                                                  decoration: BoxDecoration(
+                                                    color: color.withOpacity(
+                                                      .1,
+                                                    ),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          20,
+                                                        ),
                                                   ),
-                                              decoration: BoxDecoration(
-                                                color: color.withOpacity(.1),
-                                                borderRadius:
-                                                    BorderRadius.circular(20),
-                                              ),
-                                              child: Text(
-                                                status.toUpperCase(),
+                                                  child: Text(
+                                                    status.toUpperCase(),
+                                                    style: TextStyle(
+                                                      color: color,
+                                                      fontSize: 10,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                ),
+
+                                                IconButton(
+                                                  onPressed: () {
+                                                    final userData =
+                                                        auth.logUser.value;
+                                                    ctrl.delete(
+                                                      item.id,
+                                                      userData.id!,
+                                                      userData.parentId!,
+                                                      userData.level!,
+                                                    );
+                                                  },
+                                                  icon: Icon(
+                                                    Icons.delete,
+                                                    color: red,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+
+                                        // const SizedBox(height: 5),
+                                        const SizedBox(height: 5),
+                                        Visibility(
+                                          visible: item.status != "pending",
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              const Divider(),
+                                              const SizedBox(height: 5),
+                                              const Text(
+                                                'Note',
                                                 style: TextStyle(
-                                                  color: color,
-                                                  fontSize: 10,
                                                   fontWeight: FontWeight.bold,
                                                 ),
                                               ),
-                                            ),
-                                          ],
-                                        ),
-
-                                        const SizedBox(height: 5),
-
-                                        /// 🔸 STORE LOC
-                                        Row(
-                                          children: [
-                                            const Icon(
-                                              Icons
-                                                  .store_mall_directory_rounded,
-                                              size: 14,
-                                              color: Colors.grey,
-                                            ),
-                                            const SizedBox(width: 4),
-                                            Text(
-                                              item.branchName!,
-                                              style: TextStyle(
-                                                fontSize: 12,
-                                                color: Colors.grey[600],
+                                              Text(
+                                                getLastNote().capitalize ?? '-',
+                                                style: const TextStyle(
+                                                  fontStyle: FontStyle.italic,
+                                                ),
                                               ),
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                          ],
-                                        ),
-
-                                        const SizedBox(height: 5),
-
-                                        /// 🔸 TIME
-                                        Row(
-                                          children: [
-                                            const Icon(
-                                              Icons.access_time,
-                                              size: 14,
-                                              color: Colors.grey,
-                                            ),
-                                            const SizedBox(width: 4),
-                                            Text('${item.start} - ${item.end}'),
-                                          ],
-                                        ),
-
-                                        const SizedBox(height: 4),
-
-                                        /// 🔸 DURATION
-                                        Text(
-                                          'Durasi: $duration',
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            color: Colors.grey[600],
+                                            ],
                                           ),
                                         ),
-                                        const SizedBox(height: 4),
-                                        Text(
-                                          item.remark ?? '-',
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                          style: const TextStyle(
-                                            fontSize: 12,
-                                            color: Colors.grey,
+                                        Visibility(
+                                          visible: item.status == "pending",
+                                          child: SizedBox(
+                                            height: 40,
+                                            child: CsTextField(
+                                              enabled: true,
+                                              controller: ctrl.note,
+                                              label: 'Note',
+                                              isDark: isDark,
+                                            ),
                                           ),
                                         ),
+                                        const SizedBox(height: 10),
                                       ],
                                     ),
                                   ),
@@ -562,11 +665,11 @@ class OvertimeView extends GetView<OvertimeController> {
         child: FloatingActionButton(
           onPressed: () {
             final userData = auth.logUser.value;
-            addOvertime(context, ctrl, userData);
+            permissionAdd(context, ctrl, userData);
           },
           backgroundColor: Colors.transparent,
           child: Icon(
-            Icons.pending_actions,
+            Icons.health_and_safety_rounded,
             color: isDark ? Colors.blue : Colors.white,
           ),
         ),
@@ -575,7 +678,7 @@ class OvertimeView extends GetView<OvertimeController> {
   }
 }
 
-Widget searchField(bool isDark, OvertimeController ctrl) {
+Widget searchField(bool isDark, IzinController ctrl) {
   return Padding(
     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
     child: CupertinoTextField(

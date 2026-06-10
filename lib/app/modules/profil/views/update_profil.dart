@@ -493,6 +493,77 @@ class UpdateProfil extends GetView {
                                   },
                                 ),
                               ),
+
+                              const SizedBox(height: 20),
+
+                              const Align(
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  "Required Documents",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+
+                              const SizedBox(height: 10),
+
+                              _buildAttachmentTile(
+                                title: "KTP",
+                                icon: Icons.badge_outlined,
+                                color: AppColors.contentColorBlue,
+                                fileName: ctr.ktpFileName,
+                                onPressed: () => ctr.pickKtp(),
+                              ),
+
+                              _buildAttachmentTile(
+                                title: "Kartu Keluarga",
+                                icon: Icons.groups_outlined,
+                                color: AppColors.contentColorCyan,
+                                fileName: ctr.kkFileName,
+                                onPressed: () => ctr.pickKk(),
+                              ),
+
+                              _buildAttachmentTile(
+                                title: "NPWP",
+                                icon: Icons.receipt_long_outlined,
+                                color: AppColors.contentColorOrange,
+                                fileName: ctr.npwpFileName,
+                                onPressed: () => ctr.pickNpwp(),
+                              ),
+
+                              _buildAttachmentTile(
+                                title: "Sertifikat Vaksin Covid",
+                                icon: Icons.health_and_safety_outlined,
+                                color: AppColors.contentColorGreenAccent,
+                                fileName: ctr.vaksinFileName,
+                                onPressed: () => ctr.pickSertCovid(),
+                              ),
+
+                              const SizedBox(height: 20),
+
+                              const Align(
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  "Additional Documents",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+
+                              const SizedBox(height: 10),
+
+                              _buildAttachmentTile(
+                                title: "Sertifikat Pelatihan",
+                                icon: Icons.workspace_premium_outlined,
+                                color: AppColors.contentColorPurple,
+                                fileName: ctr.sertifikatFileName,
+                                onPressed: () => ctr.pickSertPel(),
+                              ),
+
                               const SizedBox(height: 10),
                               Padding(
                                 padding: const EdgeInsets.symmetric(
@@ -531,7 +602,9 @@ class UpdateProfil extends GetView {
                                           title: 'SUKSES',
                                           btnOkOnPress: () {
                                             // Get.back(); // tutup dialog
-                                            Navigator.pop(context); // balik ke halaman profile
+                                            Navigator.pop(
+                                              context,
+                                            ); // balik ke halaman profile
                                           },
                                         );
                                       }
@@ -580,6 +653,47 @@ class UpdateProfil extends GetView {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildAttachmentTile({
+    required String title,
+    required IconData icon,
+    required Color color,
+    required RxString fileName,
+    Function()? onPressed,
+  }) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 10),
+      elevation: 1,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: ListTile(
+        leading: Icon(icon, color: color),
+        title: Text(title),
+        subtitle: Obx(
+          () => Text(
+            fileName.value.isEmpty ? "Belum ada file" : fileName.value,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+        trailing: ContainerMainColor(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          radius: 10,
+          child: SizedBox(
+            height: 35,
+            child: ElevatedButton.icon(
+              onPressed: onPressed,
+              icon: const Icon(Icons.upload_file, size: 18),
+              label: const Text("Browse"),
+              style: const ButtonStyle(
+                backgroundColor: WidgetStatePropertyAll(Colors.transparent),
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }

@@ -310,7 +310,7 @@ class UptMasukPulang extends StatelessWidget {
         ),
         const SizedBox(height: 10),
         Text('Alasan Perubahan Data', style: titleTextStyle),
-        Text(data.alasan!, style: subtitleTextStyle),
+        Text(data.alasan?.capitalizeFirst ?? '-', style: subtitleTextStyle),
         const SizedBox(height: 10),
 
         // Obx(() {

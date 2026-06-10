@@ -8,6 +8,7 @@ import 'package:absensi/app/data/model/cek_stok_model.dart';
 import 'package:absensi/app/data/model/cek_user_model.dart';
 import 'package:absensi/app/data/model/cek_visit_model.dart';
 import 'package:absensi/app/data/model/overtime_model.dart';
+import 'package:absensi/app/data/model/permission_model.dart';
 import 'package:absensi/app/data/model/req_leave_model.dart';
 import 'package:absensi/app/data/model/level_model.dart';
 import 'package:absensi/app/data/model/notif_model.dart';
@@ -46,6 +47,8 @@ class ServiceApi {
   // var baseUrlPath = BASEURL.PATH; // dev
 
   var isLoading = false.obs;
+  String lastMessage = '';
+  String lastType = '';
 
   Future<Login> loginUser(data) async {
     // var result = Login();
@@ -107,26 +110,27 @@ class ServiceApi {
     return jsonDecode(response.body);
   }
 
-  Future<Data> fetchCurrentUser(data) async {
-    var user = Data();
+  Future<Data?> fetchCurrentUser(data) async {
+    // var user = Data();
     try {
       final response = await http
           .post(Uri.parse('${baseUrl}auth'), body: data)
-          .timeout(const Duration(seconds: 10));
+          .timeout(const Duration(minutes: 1));
 
       // if (response.statusCode == 200) {
-      user = Data.fromJson(jsonDecode(response.body)['data']);
+      return Data.fromJson(jsonDecode(response.body)['data']);
 
       // }
-    } on TimeoutException catch (e) {
-      Get.back();
-      showToast('$e');
+      // } on TimeoutException catch (e) {
+      //   Get.back();
+      //   showToast('$e');
       // }
     } catch (_) {
       Get.back();
       showToast('No Internet Connection, Try Again');
+      return null;
     }
-    return user;
+    // return user;
   }
 
   getBrandCabang() async {
@@ -249,6 +253,54 @@ class ServiceApi {
         request.fields['no_telp'] = data["no_telp"];
         request.fields['kode_cabang'] = data["kode_cabang"];
         request.fields['level'] = data["level"];
+        if (data["ktp"] != null) {
+          request.files.add(
+            await http.MultipartFile.fromPath(
+              'ktp',
+              data["ktp"].path,
+              filename: data["ktp"].name,
+            ),
+          );
+        }
+        if (data["kk"] != null) {
+          request.files.add(
+            await http.MultipartFile.fromPath(
+              "kk",
+              data["kk"].path,
+              filename: data["kk"].name,
+            ),
+          );
+        }
+
+        if (data["npwp"] != null) {
+          request.files.add(
+            await http.MultipartFile.fromPath(
+              "npwp",
+              data["npwp"].path,
+              filename: data["npwp"].name,
+            ),
+          );
+        }
+
+        if (data["vaksin"] != null) {
+          request.files.add(
+            await http.MultipartFile.fromPath(
+              "vaksin",
+              data["vaksin"].path,
+              filename: data["vaksin"].name,
+            ),
+          );
+        }
+
+        if (data["sertifikat"] != null) {
+          request.files.add(
+            await http.MultipartFile.fromPath(
+              "sertifikat",
+              data["sertifikat"].path,
+              filename: data["sertifikat"].name,
+            ),
+          );
+        }
 
         if (data["created_at"] != null) {
           request.fields['created_at'] = data["created_at"];
@@ -289,41 +341,54 @@ class ServiceApi {
       // print("RAW RESPONSE:");
       // print(responseString);
       // ignore: unused_local_variable
+      print("RAW RESPONSE:");
+      print(responseString);
       final dataDecode = jsonDecode(responseString);
+      lastMessage = dataDecode['message'] ?? '';
+      lastType = dataDecode['type'] ?? '';
       // debugPrint(dataDecode.toString());
 
       if (res.statusCode == 200) {
-        return true;
-      } else {
-        return false;
+        return dataDecode['success'] == true;
       }
+      return false;
     } on TimeoutException {
+      lastMessage = "Request timeout";
       return false;
     } catch (e, stacktrace) {
-      print("ERROR API:");
-      print(e);
+      // print("ERROR API:");
+      // print(e);
 
-      print("STACKTRACE:");
+      // print("STACKTRACE:");
       print(stacktrace);
+      lastMessage = e.toString();
       return false;
     }
   }
 
-  deleteAbsVst(Map<String, dynamic> data) async {
+  Future<bool> deleteAbsVst(Map<String, dynamic> data) async {
     try {
       final response = await http
           .post(Uri.parse('${baseUrl}delete_abs_vst'), body: data)
           .timeout(const Duration(minutes: 3));
-      if (response.statusCode == 200) {
-        showToast('Data berhasil di hapus');
-        Get.back();
+      if (response.statusCode != 200) {
+        showToast('Data gagal di hapus');
+        return false;
       }
-    } on TimeoutException catch (_) {
+      final result = jsonDecode(response.body);
+
+      if (result['success'] == true) {
+        showToast(result['message']);
+        return true;
+      }
+      showToast(result['message'] ?? 'Data gagal di hapus');
+      return false;
+    } on TimeoutException {
       showToast('Waktu koneksi ke server habis\nData gagal di hapus');
-      Get.back();
-    } on Exception catch (_) {
+      return false;
+    } catch (e) {
       showToast('Data gagal di hapus');
-      Get.back();
+      return false;
     }
   }
 
@@ -1349,7 +1414,6 @@ class ServiceApi {
           await http.MultipartFile.fromPath("foto_pulang", data["foto_pulang"]),
         );
       }
-      
 
       // ================= SEND =================
 
@@ -1774,6 +1838,82 @@ class ServiceApi {
             List<dynamic> listOvr = res['data'];
             List<OvertimeModel> result =
                 listOvr.map((e) => OvertimeModel.fromJson(e)).toList();
+            return result;
+          } else {
+            showToast(res['message']);
+          }
+        } else {
+          // print(res);
+          return res; // ✅ WAJIB return
+        }
+      } else {
+        return {'success': false};
+      }
+    } catch (e) {
+      return {'success': false, 'error': e.toString()};
+    }
+  }
+
+  permissionAdd(Map<String, dynamic> data) async {
+    try {
+      Map<String, String> headers = {
+        'Content-Type': 'application/json; charset=UTF-8',
+      };
+
+      var request = http.MultipartRequest('POST', Uri.parse('${baseUrl}perm'));
+
+      request.headers.addAll(headers);
+
+      request.fields['type'] = data["type"];
+      request.fields['id'] = data["id"];
+      request.fields['branch_code'] = data["branch_code"];
+      request.fields['name'] = data["name"];
+      request.fields['level'] = data["level"];
+      request.fields['init_date'] = data["init_date"];
+      request.fields['end_date'] = data["end_date"];
+      request.fields['remark'] = data["remark"];
+
+      File? file = data["attach"];
+
+      if (file != null && await file.exists()) {
+        request.files.add(
+          http.MultipartFile(
+            "attach",
+            file.readAsBytes().asStream(),
+            file.lengthSync(),
+            filename: file.path.split("/").last,
+          ),
+        );
+      }
+
+      final streamedResponse = await request.send();
+
+      final response = await http.Response.fromStream(streamedResponse);
+
+      return jsonDecode(response.body);
+    } on TimeoutException {
+      return false;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  permission(Map<String, String> data) async {
+    try {
+      final response = await http
+          .post(Uri.parse('${baseUrl}perm'), body: data)
+          .timeout(const Duration(seconds: 10));
+
+      final res = json.decode(response.body);
+      // print(res);
+
+      if (response.statusCode == 200) {
+        if (data['type'] == "" ||
+            data['type'] == "get_pending_req_permission") {
+          if (res['data'] != null) {
+            List<dynamic> listPrm = res['data'];
+            List<PermissionModel> result =
+                listPrm.map((e) => PermissionModel.fromJson(e)).toList();
             return result;
           } else {
             showToast(res['message']);

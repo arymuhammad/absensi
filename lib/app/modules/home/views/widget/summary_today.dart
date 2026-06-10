@@ -82,7 +82,7 @@ class SummaryToday extends StatelessWidget {
         //   ),
         // ),
         Padding(
-          padding: const EdgeInsets.fromLTRB(0, 1, 0, 0),
+          padding: const EdgeInsets.fromLTRB(2, 0, 2, 0),
           child: Card(
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
@@ -118,7 +118,7 @@ class SummaryToday extends StatelessWidget {
                                 dataVisit: absenC.dataVisit,
                                 isIn: true,
                                 visit: listDataUser!.visit!,
-                                isDark: isDark
+                                isDark: isDark,
                               ),
                             ),
                             // ),
@@ -138,7 +138,7 @@ class SummaryToday extends StatelessWidget {
                                 dataVisit: absenC.dataVisit,
                                 isIn: false,
                                 visit: listDataUser!.visit!,
-                                isDark: isDark
+                                isDark: isDark,
                               ),
                             ),
                             // ),
@@ -147,65 +147,46 @@ class SummaryToday extends StatelessWidget {
                         : Container(
                           height: 130, // tambahin dikit biar napas
                           width: Get.mediaQuery.size.width,
-                          margin: const EdgeInsets.all(8),
+                          margin: const EdgeInsets.fromLTRB(12, 8, 12, 8),
                           decoration: BoxDecoration(
                             color: Theme.of(context).cardColor,
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          child: Stack(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               /// IMAGE KANAN
-                              Positioned(
-                                right: 5,
-                                top: 0,
-                                bottom: 40, // stop sebelum button
-                                child: Image.asset(
-                                  'assets/image/bg_sts_home.png',
-                                  width: 85,
-                                  fit: BoxFit.contain,
-                                ),
-                              ),
+                              // Positioned(
+                              //   right: 5,
+                              //   top: 0,
+                              //   bottom: 40, // stop sebelum button
+                              //   child: Image.asset(
+                              //     'assets/image/bg_sts_home.png',
+                              //     width: 85,
+                              //     fit: BoxFit.contain,
+                              //   ),
+                              // ),
 
                               /// TEXT
-                              Padding(
-                                padding: const EdgeInsets.fromLTRB(
-                                  12,
-                                  12,
-                                  12,
-                                  48,
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      "Today's status",
-                                      style: titleTextStyle.copyWith(
-                                        fontSize: 18,
-                                      ),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    "Today's status",
+                                    style: titleTextStyle.copyWith(
+                                      fontSize: 15,
                                     ),
-                                    const SizedBox(height: 6),
-                                    Text(
-                                      "Haven't Checked In yet",
-                                      style: titleTextStyle.copyWith(
-                                        fontSize: 20,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-
-                              /// ✅ BUTTON FIX DI BOTTOM
-                              Align(
-                                alignment: Alignment.bottomCenter,
-                                child: Padding(
-                                  padding: const EdgeInsets.fromLTRB(
-                                    12,
-                                    0,
-                                    12,
-                                    0,
                                   ),
-                                  child: GestureDetector(
+                                  const SizedBox(height: 6),
+                                  Text(
+                                    "Haven't Checked In yet",
+                                    style: titleTextStyle.copyWith(
+                                      fontSize: 20,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 6),
+                                  GestureDetector(
                                     onTap: () async {
                                       logC.selectedMenu(2);
                                       // 🔑 VALIDASI STATUS ABSEN TERKINI (DB / SERVER)
@@ -231,27 +212,110 @@ class SummaryToday extends StatelessWidget {
                                       height: 40,
                                       decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(10),
-                                        // color: AppColors.contentColorGreenAccent
-                                        image: const DecorationImage(
-                                          image: AssetImage(
-                                            'assets/image/bg_btn_ci.png',
-                                          ),
-                                          fit: BoxFit.cover,
+                                        gradient: const LinearGradient(
+                                          begin: Alignment.centerLeft,
+                                          end: Alignment.centerRight,
+                                          colors: [
+                                            Color(0xFF1B2541),
+                                            Color(0xFF3949AB),
+                                          ],
                                         ),
+                                        // color: AppColors.contentColorGreenAccent
+                                        // image: const DecorationImage(
+                                        //   image: AssetImage(
+                                        //     'assets/image/bg_btn_ci.png',
+                                        //   ),
+                                        //   fit: BoxFit.cover,
+                                        // ),
                                       ),
                                       alignment: Alignment.center,
-                                      child: const Text(
-                                        'CHECK IN NOW',
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 16,
+                                      child: const Padding(
+                                        padding: EdgeInsets.all(8.0),
+                                        child: Row(
+                                          children: [
+                                            Icon(
+                                              Icons.qr_code_scanner_rounded,
+                                              color: Colors.white,
+                                            ),
+                                            SizedBox(width: 5),
+                                            Text(
+                                              'CHECK IN NOW',
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 15,
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       ),
                                     ),
                                   ),
-                                ),
+                                ],
                               ),
+                              Image.asset(
+                                'assets/image/bg_sts_home.png',
+                                width: 90,
+                                fit: BoxFit.contain,
+                              ),
+
+                              /// ✅ BUTTON FIX DI BOTTOM
+                              // Align(
+                              //   alignment: Alignment.bottomCenter,
+                              //   child: Padding(
+                              //     padding: const EdgeInsets.fromLTRB(
+                              //       12,
+                              //       0,
+                              //       12,
+                              //       0,
+                              //     ),
+                              //     child: GestureDetector(
+                              //       onTap: () async {
+                              //         logC.selectedMenu(2);
+                              //         // 🔑 VALIDASI STATUS ABSEN TERKINI (DB / SERVER)
+                              //         await absenC.refreshAbsen(listDataUser!);
+
+                              //         // ⛔ Jika masih wajib checkout, jangan lanjut ambil lokasi
+                              //         if (absenC.mustCheckoutYesterday.value) {
+                              //           showToast(
+                              //             'You must Check Out yesterday first',
+                              //           );
+                              //           return;
+                              //         }
+
+                              //         // 📍 BARU ambil lokasi
+                              //         // loadingDialog(
+                              //         //   'Finding your location',
+                              //         //   '',
+                              //         // );
+                              //         await absenC.getLoc(listDataUser);
+                              //         // Get.back();
+                              //       },
+                              //       child: Container(
+                              //         height: 40,
+                              //         decoration: BoxDecoration(
+                              //           borderRadius: BorderRadius.circular(10),
+                              //           // color: AppColors.contentColorGreenAccent
+                              //           image: const DecorationImage(
+                              //             image: AssetImage(
+                              //               'assets/image/bg_btn_ci.png',
+                              //             ),
+                              //             fit: BoxFit.cover,
+                              //           ),
+                              //         ),
+                              //         alignment: Alignment.center,
+                              //         child: const Text(
+                              //           'CHECK IN NOW',
+                              //           style: TextStyle(
+                              //             color: Colors.white,
+                              //             fontWeight: FontWeight.bold,
+                              //             fontSize: 16,
+                              //           ),
+                              //         ),
+                              //       ),
+                              //     ),
+                              //   ),
+                              // ),
                             ],
                           ),
                         ),
@@ -542,7 +606,7 @@ Widget _buildTimeCard({
   List<Visit>? dataVisit,
   required bool isIn,
   required String visit,
-  required bool isDark
+  required bool isDark,
 }) {
   // Pilih list yang dipakai: jika data kosong atau null, pakai dataVisit
   // Tentukan data yang akan dipakai berdasarkan nilai visit
@@ -637,7 +701,7 @@ Widget _buildTimeCard({
                                       )
                                       ? green
                                       : yellow)
-                                  :isDark
+                                  : isDark
                                   ? Theme.of(context).cardColor
                                   : Colors.white),
                     ),

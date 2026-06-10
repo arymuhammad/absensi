@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:math' as math;
 
@@ -16,6 +17,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
 import '../../../data/helper/duration_count.dart';
+import '../../../data/helper/error_logger.dart';
 import '../../login/controllers/login_controller.dart';
 import '../../shared/history_card.dart';
 import '../../shared/history_card_shimmer.dart';
@@ -41,6 +43,17 @@ class SummaryAbsen extends GetView {
               onRefresh: () async {
                 final online = await absenC.isOnline();
                 if (online) {
+                  await ErrorLogger.save('''
+                  SUMMARY REFRESH
+
+                  ID          : ${userData.id}
+                  KODE_CABANG : ${userData.kodeCabang}
+                  LEVEL       : ${userData.level}
+
+                  RAW:
+                  ${jsonEncode(userData.toJson())}
+                  ''', ''); //save error to log
+
                   homeC.getPendingAdj(
                     idUser: userData.id!,
                     idCabang: userData.kodeCabang!,
@@ -100,7 +113,7 @@ class SummaryAbsen extends GetView {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Padding(
-                        padding: const EdgeInsets.only(left: 10.0, top: 15),
+                        padding: const EdgeInsets.fromLTRB(2, 5, 0, 0),
                         child: Text(
                           'Attendance History',
                           style: titleTextStyle.copyWith(fontSize: 15),

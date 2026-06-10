@@ -22,6 +22,7 @@ abstract class Routes {
   static const PING = _Paths.PING;
   static const OVERTIME = _Paths.OVERTIME;
   static const REGION_AREA = _Paths.REGION_AREA;
+  static const IZIN = _Paths.IZIN;
 }
 
 abstract class _Paths {
@@ -45,4 +46,5 @@ abstract class _Paths {
   static const PING = '/ping';
   static const OVERTIME = '/overtime';
   static const REGION_AREA = '/region-area';
+  static const IZIN = '/izin';
 }

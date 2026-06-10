@@ -253,38 +253,39 @@ class UptDataAbsen extends StatelessWidget {
         ),
         const SizedBox(height: 10),
         Text('Alasan Perubahan Data', style: titleTextStyle),
-        Text(data.alasan!, style: subtitleTextStyle),
+        Text(data.alasan?.capitalizeFirst ?? '-', style: subtitleTextStyle),
         // Obx(() {
         //   final dataUser = auth.logUser.value;
-        //   return 
-          Visibility(
-            visible:!isInbox
-                // data.statusExcep == "pending" &&
-                //         data.keterangan == "" &&
-                //         ([
-                //           '1',
-                //           '17',
-                //           '18',
-                //           '19',
-                //           '20',
-                //           '39',
-                //           '59',
-                //           '26',
-                //           '96',
-                //           '106',
-                //         ]).contains(dataUser.level)
-                    ? true
-                    : false,
-            child: SizedBox(
-              height: 45,
-              child: CsTextField(
-                enabled: true,
-                controller: adjCtrl.keteranganApp,
-                label: 'Keterangan',
-                isDark: isDark,
-              ),
+        //   return
+        Visibility(
+          visible:
+              !isInbox
+                  // data.statusExcep == "pending" &&
+                  //         data.keterangan == "" &&
+                  //         ([
+                  //           '1',
+                  //           '17',
+                  //           '18',
+                  //           '19',
+                  //           '20',
+                  //           '39',
+                  //           '59',
+                  //           '26',
+                  //           '96',
+                  //           '106',
+                  //         ]).contains(dataUser.level)
+                  ? true
+                  : false,
+          child: SizedBox(
+            height: 45,
+            child: CsTextField(
+              enabled: true,
+              controller: adjCtrl.keteranganApp,
+              label: 'Keterangan',
+              isDark: isDark,
             ),
           ),
+        ),
         // }),
         const SizedBox(height: 5),
         Visibility(

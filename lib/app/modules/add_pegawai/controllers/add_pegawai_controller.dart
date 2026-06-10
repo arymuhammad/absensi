@@ -22,6 +22,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../data/helper/custom_dialog.dart';
+import '../../../data/helper/error_logger.dart';
 import '../../../data/model/cabang_model.dart';
 import '../../../data/model/cek_user_model.dart';
 import '../../../data/model/foto_profil_model.dart';
@@ -100,6 +101,24 @@ class AddPegawaiController extends GetxController {
           )
           .toString();
   // var supportedAbi = "";
+
+  RxString ktpPath = ''.obs;
+  RxString kkPath = ''.obs;
+  RxString vaksinPath = ''.obs;
+  RxString npwpPath = ''.obs;
+  RxString sertifikatPath = ''.obs;
+
+  RxString ktpFileName = ''.obs;
+  RxString kkFileName = ''.obs;
+  RxString vaksinFileName = ''.obs;
+  RxString npwpFileName = ''.obs;
+  RxString sertifikatFileName = ''.obs;
+
+  PlatformFile? ktpFile;
+  PlatformFile? kkFile;
+  PlatformFile? vaksinFile;
+  PlatformFile? npwpFile;
+  PlatformFile? sertifikatFile;
 
   @override
   void onInit() async {
@@ -199,6 +218,76 @@ class AddPegawaiController extends GetxController {
     }
   }
 
+  Future<void> pickKtp() async {
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['jpg', 'jpeg', 'png', 'pdf'],
+    );
+
+    if (result != null) {
+      ktpFile = result.files.single;
+      ktpPath.value = ktpFile?.path ?? '';
+      ktpFileName.value = ktpFile?.name ?? '';
+      update();
+    }
+  }
+
+  Future<void> pickKk() async {
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['jpg', 'jpeg', 'png', 'pdf'],
+    );
+
+    if (result != null) {
+      kkFile = result.files.single;
+      kkPath.value = kkFile?.path ?? '';
+      kkFileName.value = kkFile?.name ?? '';
+      update();
+    }
+  }
+
+  Future<void> pickNpwp() async {
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['jpg', 'jpeg', 'png', 'pdf'],
+    );
+
+    if (result != null) {
+      npwpFile = result.files.single;
+      npwpPath.value = npwpFile?.path ?? '';
+      npwpFileName.value = npwpFile?.name ?? '';
+      update();
+    }
+  }
+
+  Future<void> pickSertCovid() async {
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['jpg', 'jpeg', 'png', 'pdf'],
+    );
+
+    if (result != null) {
+      vaksinFile = result.files.single;
+      vaksinPath.value = vaksinFile?.path ?? '';
+      vaksinFileName.value = vaksinFile?.name ?? '';
+      update();
+    }
+  }
+
+  Future<void> pickSertPel() async {
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['jpg', 'jpeg', 'png', 'pdf'],
+    );
+
+    if (result != null) {
+      sertifikatFile = result.files.single;
+      sertifikatPath.value = sertifikatFile?.path ?? '';
+      sertifikatFileName.value = sertifikatFile?.name ?? '';
+      update();
+    }
+  }
+
   Future<bool> addUpdatePegawai(context, String mode, Data dataUser) async {
     try {
       Random random = Random();
@@ -272,13 +361,16 @@ class AddPegawaiController extends GetxController {
               return false;
             } else {
               // succesDialog(context, "N", "Data berhasil disimpan", DialogType.success, 'SUKSES');
-              final isSuccess = await ServiceApi().addUpdatePegawai(data, mode);
+              final api = ServiceApi();
+              final isSuccess = await api.addUpdatePegawai(data, mode);
               if (!isSuccess) {
                 Get.back(); // tutup loading
-                warningDialog(
+                failedDialog(
                   Get.context!,
                   "Error",
-                  "Failed to update data. Please try again",
+                  api.lastMessage.isNotEmpty
+                      ? api.lastMessage
+                      : "Failed to register data",
                 );
                 isLoading.value = false;
                 return false;
@@ -325,13 +417,16 @@ class AddPegawaiController extends GetxController {
               );
               return false;
             } else {
-              final isSuccess = await ServiceApi().addUpdatePegawai(data, mode);
+              final api = ServiceApi();
+              final isSuccess = await api.addUpdatePegawai(data, mode);
               if (!isSuccess) {
                 Get.back(); // tutup loading
-                warningDialog(
+                failedDialog(
                   Get.context!,
                   "Error",
-                  "Failed to update data. Please try again",
+                  api.lastMessage.isNotEmpty
+                      ? api.lastMessage
+                      : "Failed to register data",
                 );
                 isLoading.value = false;
                 return false;
@@ -385,6 +480,11 @@ class AddPegawaiController extends GetxController {
                 kIsWeb
                     ? fileResult!.files.single
                     : File(image!.path.toString()),
+            "ktp": ktpFile,
+            "kk": kkFile,
+            "npwp": npwpFile,
+            "vaksin": vaksinFile,
+            "sertifikat": sertifikatFile,
             "created_at": joinDate.text.isNotEmpty ? joinDate.text : null,
           };
 
@@ -398,14 +498,21 @@ class AddPegawaiController extends GetxController {
             isLoading.value = false;
             return false;
           } else {
-            final isSuccess = await ServiceApi().addUpdatePegawai(data, mode);
-
+            final api = ServiceApi();
+            final isSuccess = await api.addUpdatePegawai(data, mode);
             if (!isSuccess) {
               Get.back(); // tutup loading
-              warningDialog(
+
+              if (api.lastType == 'document') {
+                clearDocumentFiles();
+              }
+
+              failedDialog(
                 Get.context!,
                 "Error",
-                "Failed to update data. Please try again",
+                api.lastMessage.isNotEmpty
+                    ? api.lastMessage
+                    : "Failed to update data",
               );
               isLoading.value = false;
               return false;
@@ -415,6 +522,42 @@ class AddPegawaiController extends GetxController {
               "username": dataUser.username!,
               "password": dataUser.password!,
             });
+            if (newUsr == null) {
+              await ErrorLogger.save('REFRESH USER GAGAL - NULL RESPONSE', '');
+              return false;
+            }
+
+            if ((newUsr.id ?? '').isEmpty) {
+              await ErrorLogger.save(
+                'REFRESH USER GAGAL - DATA KOSONG',
+                jsonEncode(newUsr.toJson()),
+              );
+              return false;
+            }
+
+            if (newUsr.lat == null ||
+                newUsr.long == null ||
+                newUsr.areaCover == null) {
+              await ErrorLogger.save(
+                'REFRESH USER GAGAL - FIELD WAJIB NULL',
+                jsonEncode(newUsr.toJson()),
+              );
+
+              return false;
+            }
+
+            await ErrorLogger.save('''
+      REFRESH USER
+
+      ID       : ${newUsr.id}
+      USERNAME : ${newUsr.username}
+      LAT      : ${newUsr.lat}
+      LONG     : ${newUsr.long}
+
+      RAW:
+      ${jsonEncode(newUsr.toJson())}
+''', '');
+
             if (Get.isRegistered<LoginController>()) {
               final logC = Get.find<LoginController>();
 
@@ -496,6 +639,8 @@ class AddPegawaiController extends GetxController {
 
             isLoading.value = false;
             image = null;
+
+            clearDocumentFiles();
             return true;
           }
           // Get.back();
@@ -514,6 +659,7 @@ class AddPegawaiController extends GetxController {
             var data = {
               "status": mode,
               "id": dataUser.id,
+              "username": dataUser.username,
               "nama": name.text != "" ? name.text : dataUser.nama,
               "no_telp": inputTelp.isNotEmpty ? inputTelp : oldTelp,
               "kode_cabang":
@@ -524,26 +670,74 @@ class AddPegawaiController extends GetxController {
                   selectedLevel.value != ""
                       ? selectedLevel.value
                       : dataUser.level,
+              "ktp": ktpFile,
+              "kk": kkFile,
+              "npwp": npwpFile,
+              "vaksin": vaksinFile,
+              "sertifikat": sertifikatFile,
               "created_at": joinDate.text.isNotEmpty ? joinDate.text : null,
             };
             // loadingDialog("updating data", "");
             // print(data);
-            final isSuccess = await ServiceApi().addUpdatePegawai(data, mode);
+            final api = ServiceApi();
+            final isSuccess = await api.addUpdatePegawai(data, mode);
             if (!isSuccess) {
               Get.back(); // tutup loading
-              warningDialog(
+              if (api.lastType == 'document') {
+                clearDocumentFiles();
+              }
+
+              failedDialog(
                 Get.context!,
                 "Error",
-                "Failed to update data. Please try again",
+                api.lastMessage.isNotEmpty
+                    ? api.lastMessage
+                    : "Failed to update data",
               );
               isLoading.value = false;
               return false;
             }
             // langsung update sharedpref tanpa harus re login
-            var newUsr = await ServiceApi().fetchCurrentUser({
+            final newUsr = await ServiceApi().fetchCurrentUser({
               "username": dataUser.username!,
               "password": dataUser.password!,
             });
+            if (newUsr == null) {
+              await ErrorLogger.save('REFRESH USER GAGAL - NULL RESPONSE', '');
+              return false;
+            }
+
+            if ((newUsr.id ?? '').isEmpty) {
+              await ErrorLogger.save(
+                'REFRESH USER GAGAL - DATA KOSONG',
+                jsonEncode(newUsr.toJson()),
+              );
+              return false;
+            }
+
+            if (newUsr.lat == null ||
+                newUsr.long == null ||
+                newUsr.areaCover == null) {
+              await ErrorLogger.save(
+                'REFRESH USER GAGAL - FIELD WAJIB NULL',
+                jsonEncode(newUsr.toJson()),
+              );
+
+              return false;
+            }
+
+            await ErrorLogger.save('''
+      REFRESH USER
+
+      ID       : ${newUsr.id}
+      USERNAME : ${newUsr.username}
+      LAT      : ${newUsr.lat}
+      LONG     : ${newUsr.long}
+
+      RAW:
+      ${jsonEncode(newUsr.toJson())}
+''', '');
+
             if (Get.isRegistered<LoginController>()) {
               final logC = Get.find<LoginController>();
 
@@ -613,6 +807,7 @@ class AddPegawaiController extends GetxController {
 
             isLoading.value = false;
             image = null;
+            clearDocumentFiles();
             return true;
           }
         }
@@ -625,7 +820,7 @@ class AddPegawaiController extends GetxController {
         Get.back();
       }
 
-      warningDialog(Get.context!, "Error", e.toString());
+      failedDialog(Get.context!, "Error", e.toString());
 
       isLoading.value = false;
 
@@ -633,6 +828,20 @@ class AddPegawaiController extends GetxController {
     } finally {
       isLoading.value = false;
     }
+  }
+
+  void clearDocumentFiles() {
+    ktpFile = null;
+    kkFile = null;
+    npwpFile = null;
+    vaksinFile = null;
+    sertifikatFile = null;
+
+    ktpFileName.value = '';
+    kkFileName.value = '';
+    npwpFileName.value = '';
+    vaksinFileName.value = '';
+    sertifikatFileName.value = '';
   }
 
   bool isPhoneExist(String inputTelp) {
@@ -745,10 +954,44 @@ class AddPegawaiController extends GetxController {
     // print(data);
     await ServiceApi().genEmpId(data);
     // isLoading.value = false;
-    var newUsr = await ServiceApi().fetchCurrentUser({
+    final newUsr = await ServiceApi().fetchCurrentUser({
       "username": userData.username!,
       "password": userData.password!,
     });
+    if (newUsr == null) {
+      await ErrorLogger.save('REFRESH USER GAGAL - NULL RESPONSE', '');
+      return;
+    }
+
+    if ((newUsr.id ?? '').isEmpty) {
+      await ErrorLogger.save(
+        'REFRESH USER GAGAL - DATA KOSONG',
+        jsonEncode(newUsr.toJson()),
+      );
+      return;
+    }
+
+    if (newUsr.lat == null || newUsr.long == null || newUsr.areaCover == null) {
+      await ErrorLogger.save(
+        'REFRESH USER GAGAL - FIELD WAJIB NULL',
+        jsonEncode(newUsr.toJson()),
+      );
+
+      return;
+    }
+
+    await ErrorLogger.save('''
+      REFRESH USER
+
+      ID       : ${newUsr.id}
+      USERNAME : ${newUsr.username}
+      LAT      : ${newUsr.lat}
+      LONG     : ${newUsr.long}
+
+      RAW:
+      ${jsonEncode(newUsr.toJson())}
+''', '');
+
     if (Get.isRegistered<LoginController>()) {
       final logC = Get.find<LoginController>();
 
@@ -793,10 +1036,47 @@ class AddPegawaiController extends GetxController {
   }
 
   Future<void> getLastUserData({required Data dataUser}) async {
-    var newUser = await ServiceApi().fetchCurrentUser({
+    final newUser = await ServiceApi().fetchCurrentUser({
       "username": dataUser.username!,
       "password": dataUser.password!,
     });
+
+    if (newUser == null) {
+      await ErrorLogger.save('REFRESH USER GAGAL - NULL RESPONSE', '');
+      return;
+    }
+
+    if ((newUser.id ?? '').isEmpty) {
+      await ErrorLogger.save(
+        'REFRESH USER GAGAL - DATA KOSONG',
+        jsonEncode(newUser.toJson()),
+      );
+      return;
+    }
+
+    if (newUser.lat == null ||
+        newUser.long == null ||
+        newUser.areaCover == null) {
+      await ErrorLogger.save(
+        'REFRESH USER GAGAL - FIELD WAJIB NULL',
+        jsonEncode(newUser.toJson()),
+      );
+
+      return;
+    }
+
+    await ErrorLogger.save('''
+      REFRESH USER
+
+      ID       : ${newUser.id}
+      USERNAME : ${newUser.username}
+      LAT      : ${newUser.lat}
+      LONG     : ${newUser.long}
+
+      RAW:
+      ${jsonEncode(newUser.toJson())}
+''', '');
+
     if (Get.isRegistered<LoginController>()) {
       final logC = Get.find<LoginController>();
       logC.logUser.value = newUser;

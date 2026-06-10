@@ -1,4 +1,3 @@
-
 import 'package:absensi/app/data/helper/app_colors.dart';
 import 'package:absensi/app/data/model/login_model.dart';
 import 'package:absensi/app/modules/home/controllers/home_controller.dart';
@@ -19,7 +18,7 @@ class SummaryPerMonth extends StatelessWidget {
     final userData = auth.logUser.value;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.fromLTRB(2, 5, 2, 0),
       child: Column(
         children: [
           Row(
@@ -72,7 +71,7 @@ class SummaryPerMonth extends StatelessWidget {
 // }
 
 _buildAbsen(Data userData, HomeController homeC, bool isDark) {
-   return Obx(() => genSummaryAbsen(homeC, isDark));
+  return Obx(() => genSummaryAbsen(homeC, isDark));
 }
 
 Widget genSummaryAbsen(HomeController homeC, bool isDark) {
@@ -104,32 +103,52 @@ Widget genSummaryAbsen(HomeController homeC, bool isDark) {
     mainAxisAlignment: MainAxisAlignment.spaceBetween,
     children: [
       Expanded(
-        child: _buildBox(
-          title: 'Present',
+        // child: _buildBox(
+        //   title: 'Present',
+        //   icon: Icons.supervised_user_circle_rounded,
+        //   color: AppColors.contentColorBlue,
+        //   value: homeC.hadir.value.toString(),
+        //   isLeft: true,
+        //   isDark: isDark,
+        // ),
+        child: CardSummPermonth(
           icon: Icons.supervised_user_circle_rounded,
           color: AppColors.contentColorBlue,
-          value: homeC.hadir.value.toString(),
-          isLeft: true,
-          isDark: isDark
+          total: homeC.hadir.value.toString(),
+          title: 'Present',
         ),
       ),
       Expanded(
-        child: _buildBox(
-          title: 'On Time',
+        child:
+        // _buildBox(
+        //   title: 'On Time',
+        //   icon: Icons.check_circle_rounded,
+        //   color: green!,
+        //   value: homeC.tepatWaktu.value.toString(),
+        //   isDark: isDark,
+        // ),
+        CardSummPermonth(
           icon: Icons.check_circle_rounded,
           color: green!,
-          value: homeC.tepatWaktu.value.toString(),
-          isDark: isDark
+          total: homeC.tepatWaktu.value.toString(),
+          title: 'On Time',
         ),
       ),
       Expanded(
-        child: _buildBox(
-          title: 'Late',
+        child:
+        //  _buildBox(
+        //   title: 'Late',
+        //   icon: Icons.warning_rounded,
+        //   color: red!,
+        //   value: homeC.telat.value.toString(),
+        //   isRight: true,
+        //   isDark: isDark,
+        // ),
+        CardSummPermonth(
           icon: Icons.warning_rounded,
           color: red!,
-          value: homeC.telat.value.toString(),
-          isRight: true,
-          isDark: isDark
+          total: homeC.telat.value.toString(),
+          title: 'Late',
         ),
       ),
     ],
@@ -165,14 +184,20 @@ Widget _buildBox({
               const SizedBox(width: 5),
               Text(
                 title,
-                style: titleTextStyle.copyWith(fontSize: 15, color: color,),
+                style: titleTextStyle.copyWith(fontSize: 15, color: color),
               ),
             ],
           ),
           const SizedBox(height: 2),
           Row(
             children: [
-              Text(value, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),),
+              Text(
+                value,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               const SizedBox(width: 5),
               const Text(
                 'Day',
@@ -184,6 +209,59 @@ Widget _buildBox({
       ),
     ),
   );
+}
+
+class CardSummPermonth extends StatelessWidget {
+  const CardSummPermonth({
+    super.key,
+    required this.icon,
+    required this.color,
+    required this.total,
+    required this.title,
+  });
+
+  final IconData icon;
+  final Color color;
+  final String total;
+  final String title;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 8,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(icon, color: color, size: 35),
+            const SizedBox(width: 5),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  total,
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: color,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 _buildVisit() {}

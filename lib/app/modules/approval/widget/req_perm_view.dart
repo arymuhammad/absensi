@@ -2,24 +2,26 @@ import 'dart:io';
 import 'dart:math' as math;
 
 import 'package:absensi/app/data/helper/const.dart';
-import 'package:absensi/app/modules/approval/widget/bottom_search_overtime.dart';
+import 'package:absensi/app/modules/approval/widget/bottom_search_perm.dart';
+import 'package:absensi/app/modules/izin/controllers/izin_controller.dart';
 import 'package:absensi/app/modules/login/controllers/login_controller.dart';
 import 'package:absensi/app/modules/shared/elevated_button.dart';
+import 'package:absensi/app/modules/shared/text_field.dart';
 import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:photo_view/photo_view.dart';
 
 import '../../../data/helper/app_colors.dart';
 import '../../../data/helper/helper_ui.dart';
 import '../../../data/helper/loading_platform.dart';
 import '../../../services/service_api.dart';
-import '../../overtime/controllers/overtime_controller.dart';
 import '../../shared/container_main_color.dart';
 
-class ReqOvertimeView extends StatelessWidget {
-  ReqOvertimeView({super.key});
-  final ctrl = Get.find<OvertimeController>();
+class ReqPermView extends StatelessWidget {
+  ReqPermView({super.key});
+  final ctrl = Get.find<IzinController>();
   final auth = Get.find<LoginController>();
 
   @override
@@ -30,10 +32,11 @@ class ReqOvertimeView extends StatelessWidget {
       body: CustomMaterialIndicator(
         onRefresh: () async {
           final userData = auth.logUser.value;
-          await ctrl.getListOvertime(
+          await ctrl.getPermissionList(
             idUser: userData.id!,
+            parentId: userData.parentId!,
             level: userData.level!,
-            type: "",
+            type: "get_pending_req_permission",
             status: "pending",
           );
         },
@@ -70,7 +73,7 @@ class ReqOvertimeView extends StatelessWidget {
                     SizedBox(height: MediaQuery.of(context).size.height * 0.3),
                     const Icon(Icons.inbox, size: 50, color: Colors.grey),
                     const SizedBox(height: 10),
-                    const Center(child: Text('No overtime request')),
+                    const Center(child: Text('No Permission request')),
                   ],
                 ),
               ),
@@ -84,14 +87,25 @@ class ReqOvertimeView extends StatelessWidget {
                 physics: const AlwaysScrollableScrollPhysics(),
                 itemBuilder: (context, index) {
                   final item = list[index];
-                  final date = DateTime.parse(item.initDate!);
+                  final date = DateTime.parse(item.tanggalMulai!);
                   final status = item.status ?? 'pending';
                   final color = getStatusColor(status);
 
-                  final duration = getDuration(
-                    item.start ?? '',
-                    item.end ?? '',
-                  );
+                  String getLastNote() {
+                    if ((item.noteAcc4 ?? '').isNotEmpty) {
+                      return item.noteAcc4!;
+                    }
+                    if ((item.noteAcc3 ?? '').isNotEmpty) {
+                      return item.noteAcc3!;
+                    }
+                    if ((item.noteAcc2 ?? '').isNotEmpty) {
+                      return item.noteAcc2!;
+                    }
+                    if ((item.noteAcc1 ?? '').isNotEmpty) {
+                      return item.noteAcc1!;
+                    }
+                    return '-';
+                  }
 
                   //==================================
                   return TweenAnimationBuilder(
@@ -118,6 +132,7 @@ class ReqOvertimeView extends StatelessWidget {
                       child: Padding(
                         padding: const EdgeInsets.all(14),
                         child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -128,24 +143,20 @@ class ReqOvertimeView extends StatelessWidget {
                                     CircleAvatar(
                                       radius: 22,
                                       backgroundColor: color.withOpacity(.2),
-                                      backgroundImage:
-                                          item.photo != null &&
-                                                  item.photo!.isNotEmpty
-                                              ? NetworkImage(
-                                                '${ServiceApi().baseUrl}${item.photo}',
-                                              )
-                                              : null,
-                                      child:
-                                          item.photo == null ||
-                                                  item.photo!.isEmpty
-                                              ? Text(
-                                                item.name![0],
-                                                style: TextStyle(
-                                                  color: color,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              )
-                                              : null,
+                                      // backgroundImage:
+                                      //     item.photo != null &&
+                                      //             item.photo!.isNotEmpty
+                                      //         ? NetworkImage(
+                                      //           '${ServiceApi().baseUrl}${item.photo}',
+                                      //         )
+                                      //         : null,
+                                      child: Text(
+                                        item.nama![0],
+                                        style: TextStyle(
+                                          color: color,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
                                     ),
                                     const SizedBox(height: 5),
                                     Column(
@@ -171,7 +182,7 @@ class ReqOvertimeView extends StatelessWidget {
                                   ],
                                 ),
 
-                                const SizedBox(width: 5),
+                                const SizedBox(width: 12),
 
                                 /// 🔹 CONTENT
                                 Expanded(
@@ -185,7 +196,7 @@ class ReqOvertimeView extends StatelessWidget {
                                             MainAxisAlignment.spaceBetween,
                                         children: [
                                           Text(
-                                            item.name?.capitalize ?? '-',
+                                            item.nama?.capitalize ?? '-',
                                             style: const TextStyle(
                                               fontWeight: FontWeight.bold,
                                               fontSize: 15,
@@ -226,7 +237,7 @@ class ReqOvertimeView extends StatelessWidget {
                                           ),
                                           const SizedBox(width: 4),
                                           Text(
-                                            item.branchName?.capitalize ?? '-',
+                                            item.namaCabang?.capitalize ?? '',
                                             style: TextStyle(
                                               fontSize: 12,
                                               color: Colors.grey[600],
@@ -238,37 +249,49 @@ class ReqOvertimeView extends StatelessWidget {
 
                                       const SizedBox(height: 5),
 
-                                      /// 🔸 TIME
-                                      Row(
-                                        children: [
-                                          const Icon(
-                                            Icons.access_time,
-                                            size: 14,
-                                            color: Colors.grey,
-                                          ),
-                                          const SizedBox(width: 4),
-                                          Text('${item.start} - ${item.end}'),
-                                        ],
-                                      ),
-
-                                      const SizedBox(height: 4),
-
-                                      /// 🔸 DURATION
                                       Text(
-                                        'Durasi: $duration',
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          color: Colors.grey[600],
-                                        ),
-                                      ),
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        item.remark?.capitalize ?? '-',
+                                        item.alasan?.capitalizeFirst ?? '-',
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
                                         style: const TextStyle(
                                           fontSize: 12,
                                           color: Colors.grey,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 5),
+
+                                      InkWell(
+                                        onTap: () {
+                                          showDialog(
+                                            context: context,
+                                            builder: (context) {
+                                              return Dialog(
+                                                backgroundColor: Colors.black,
+                                                insetPadding:
+                                                    const EdgeInsets.all(0),
+                                                child: GestureDetector(
+                                                  onTap:
+                                                      () =>
+                                                          Navigator.of(
+                                                            context,
+                                                          ).pop(),
+                                                  child: PhotoView(
+                                                    imageProvider: NetworkImage(
+                                                      '${ServiceApi().baseUrl}${item.lampiran!}',
+                                                    ),
+                                                    backgroundDecoration:
+                                                        const BoxDecoration(
+                                                          color: Colors.black,
+                                                        ),
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                          );
+                                        },
+                                        child: const Text(
+                                          'show file',
+                                          style: TextStyle(color: Colors.blue),
                                         ),
                                       ),
                                     ],
@@ -277,6 +300,41 @@ class ReqOvertimeView extends StatelessWidget {
                               ],
                             ),
                             const SizedBox(height: 5),
+                            Visibility(
+                              visible: item.status != "pending",
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Divider(),
+                                  const SizedBox(height: 5),
+                                  const Text(
+                                    'Note',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  Text(
+                                    getLastNote().capitalize ?? '-',
+                                    style: const TextStyle(
+                                      fontStyle: FontStyle.italic,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Visibility(
+                              visible: item.status == "pending",
+                              child: SizedBox(
+                                height: 40,
+                                child: CsTextField(
+                                  enabled: true,
+                                  controller: ctrl.note,
+                                  label: 'Note',
+                                  isDark: isDark,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 10),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: [
@@ -287,11 +345,13 @@ class ReqOvertimeView extends StatelessWidget {
                                   onPressed: () {
                                     final userData = auth.logUser.value;
                                     ctrl.reject(
+                                      parentId: userData.parentId!,
                                       level: userData.level!,
                                       idUser: userData.id!,
-                                      idOvt: item.id!,
-                                      date1: item.initDate!,
-                                      date2: item.endDate!,
+                                      idPerm: item.id!,
+                                      date1: item.tanggalMulai!,
+                                      date2: item.tanggalSelesai!,
+                                      noted: ctrl.note.text,
                                     );
                                   },
                                 ),
@@ -303,11 +363,13 @@ class ReqOvertimeView extends StatelessWidget {
                                   onPressed: () {
                                     final userData = auth.logUser.value;
                                     ctrl.accept(
+                                      parentId: userData.parentId!,
                                       level: userData.level!,
                                       idUser: userData.id!,
-                                      idOvt: item.id!,
-                                      date1: item.initDate!,
-                                      date2: item.endDate!,
+                                      idPerm: item.id!,
+                                      date1: item.tanggalMulai!,
+                                      date2: item.tanggalSelesai!,
+                                      noted: ctrl.note.text,
                                     );
                                   },
                                 ),
@@ -334,7 +396,7 @@ class ReqOvertimeView extends StatelessWidget {
                 backgroundColor: Colors.transparent,
                 onPressed: () {
                   final userData = auth.logUser.value;
-                  bottomSearchOvertime(context, isDark, userData, ctrl);
+                  bottomSearchPerm(context, isDark, userData, ctrl);
                 },
                 child: Icon(
                   Icons.manage_search_outlined,

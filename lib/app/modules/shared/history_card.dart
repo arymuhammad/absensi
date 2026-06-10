@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 import '../../data/helper/const.dart';
 import '../../data/helper/helper_ui.dart';
@@ -38,7 +39,7 @@ class HistoryCard extends StatelessWidget {
         isLocal && statusSync.isNotEmpty && statusSync != "SUCCESS";
 
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      margin: const EdgeInsets.symmetric(horizontal: 2, vertical: 6),
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(14),
@@ -55,7 +56,7 @@ class HistoryCard extends StatelessWidget {
           // ================= DATE BOX =================
           Container(
             width: boxWidth,
-            height: hasSyncStatus ? 102 : 80,
+            height: hasSyncStatus ? 102 : 82,
             padding: const EdgeInsets.symmetric(vertical: 14),
             decoration: const BoxDecoration(
               // color: Color(0xFF1E293B),
@@ -189,7 +190,7 @@ class HistoryCard extends StatelessWidget {
                       const SizedBox(width: 4),
                       Expanded(
                         child: Text(
-                          location,
+                          location.capitalize!,
                           style: TextStyle(
                             fontSize: 13,
                             color:

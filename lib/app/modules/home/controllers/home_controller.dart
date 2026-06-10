@@ -34,11 +34,17 @@ class HomeController extends GetxController
   var hadir = 0.obs;
   var tepatWaktu = 0.obs;
   var telat = 0.obs;
+  var pendingPrmCount = 0.obs;
+  var pendingOvrCount = 0.obs;
   var pendingAppCount = 0.obs;
   var pendingAdjCount = 0.obs;
   var isLoadingSumm = true.obs;
   var isLoadingAdj = true.obs;
   var isLoadingPending = true.obs;
+  var isLoadingOvr = true.obs;
+  var isLoadingPrm = true.obs;
+  var isErrorPrm = false.obs;
+  var isErrorOvr = false.obs;
   var isErrorPending = false.obs;
   var isErrorSumm = false.obs;
   var isErrorAdj = false.obs;
@@ -121,7 +127,7 @@ class HomeController extends GetxController
           }
         }
       } catch (e) {
-        print("Update check failed: $e");
+        // print("Update check failed: $e");
       }
     }
 
@@ -164,6 +170,20 @@ class HomeController extends GetxController
         idUser: dataUserLogin.id!,
         idCabang: dataUserLogin.kodeCabang!,
         level: dataUserLogin.level!,
+      );
+
+      getPendingOvr(
+        idUser: dataUserLogin.id!,
+        kodeCabang: dataUserLogin.kodeCabang!,
+        level: dataUserLogin.level!,
+        parentId: dataUserLogin.parentId!,
+      );
+
+      getPendingPrm(
+        idUser: dataUserLogin.id!,
+        kodeCabang: dataUserLogin.kodeCabang!,
+        level: dataUserLogin.level!,
+        parentId: dataUserLogin.parentId!,
       );
     }
 
@@ -249,6 +269,72 @@ class HomeController extends GetxController
     }
   }
 
+  Future<void> getPendingPrm({
+    required String idUser,
+    required String kodeCabang,
+    required String level,
+    required String parentId,
+  }) async {
+    var data = {
+      "type": "permission",
+      "id_user": idUser,
+      "kode_cabang": kodeCabang,
+      "level": level,
+      "parent_id": parentId,
+    };
+    try {
+      isLoadingPrm.value = true;
+      isErrorPrm.value = false;
+
+      NotifModel res = await ServiceApi().getNotif(data);
+
+      pendingPrmCount.value = res.totalPrm ?? 0;
+      // print(pendingPrmCount.value);
+      totalNotif.value =
+          pendingAdjCount.value +
+          pendingAppCount.value +
+          pendingOvrCount.value +
+          pendingPrmCount.value;
+    } catch (e) {
+      isErrorPrm.value = true;
+    } finally {
+      isLoadingPrm.value = false;
+    }
+  }
+
+  Future<void> getPendingOvr({
+    required String idUser,
+    required String kodeCabang,
+    required String level,
+    required String parentId,
+  }) async {
+    var data = {
+      "type": "overtime",
+      "id_user": idUser,
+      "kode_cabang": kodeCabang,
+      "level": level,
+      "parent_id": parentId,
+    };
+    try {
+      isLoadingOvr.value = true;
+      isErrorOvr.value = false;
+
+      NotifModel res = await ServiceApi().getNotif(data);
+
+      pendingOvrCount.value = res.totalOvr ?? 0;
+      // print(pendingOvrCount.value);
+      totalNotif.value =
+            pendingAdjCount.value +
+          pendingAppCount.value +
+          pendingOvrCount.value +
+          pendingPrmCount.value;
+    } catch (e) {
+      isErrorOvr.value = true;
+    } finally {
+      isLoadingOvr.value = false;
+    }
+  }
+
   Future<void> getPendingApproval({
     required String idUser,
     required String kodeCabang,
@@ -270,7 +356,11 @@ class HomeController extends GetxController
 
       pendingAppCount.value = res.totalRequest ?? 0;
       // print(pendingAppCount.value);
-      totalNotif.value = pendingAdjCount.value + pendingAppCount.value;
+      totalNotif.value =
+           pendingAdjCount.value +
+          pendingAppCount.value +
+          pendingOvrCount.value +
+          pendingPrmCount.value;
     } catch (e) {
       isErrorPending.value = true;
     } finally {
@@ -300,7 +390,11 @@ class HomeController extends GetxController
 
       pendingAdjCount.value = res.totalNotif ?? 0;
       // print(pendingAdjCount.value);
-      totalNotif.value = pendingAdjCount.value + pendingAppCount.value;
+      totalNotif.value =
+           pendingAdjCount.value +
+          pendingAppCount.value +
+          pendingOvrCount.value +
+          pendingPrmCount.value;
     } catch (e) {
       isErrorAdj.value = true;
     } finally {

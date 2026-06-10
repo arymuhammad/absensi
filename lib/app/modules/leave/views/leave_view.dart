@@ -58,7 +58,7 @@ class LeaveView extends GetView<LeaveController> {
                   return const Center(child: CircularProgressIndicator());
                 },
               );
-
+              leaveC.getLeaveList();
               await leaveC.leaveBalanceCheck(userData);
 
               if (dialogContext != null) {
@@ -331,7 +331,7 @@ class LeaveView extends GetView<LeaveController> {
                                             if (leave.parentId == "3") {
                                               final skipStore =
                                                   leave.levelId == "19" ||
-                                                  leave.levelId == "20"||
+                                                  leave.levelId == "20" ||
                                                   leave.levelId == "59";
 
                                               if (skipStore) {
@@ -476,7 +476,7 @@ class LeaveView extends GetView<LeaveController> {
                                             if (leave.parentId == "3") {
                                               final skipStore =
                                                   leave.levelId == "19" ||
-                                                  leave.levelId == "20"||
+                                                  leave.levelId == "20" ||
                                                   leave.levelId == "59";
 
                                               if (skipStore) {
@@ -643,7 +643,7 @@ class LeaveView extends GetView<LeaveController> {
                                                     ),
                                                     TextSpan(
                                                       text:
-                                                          '${leave.nama!.capitalize}\n',
+                                                          '${leave.nama?.capitalize ?? '-'}\n',
                                                       style: const TextStyle(
                                                         fontWeight:
                                                             FontWeight.bold,
@@ -654,7 +654,7 @@ class LeaveView extends GetView<LeaveController> {
                                                     ),
                                                     TextSpan(
                                                       text:
-                                                          '${leave.namaLevel!.capitalize}\n\n',
+                                                          '${leave.namaLevel?.capitalize ?? '-'}\n\n',
                                                       style: const TextStyle(
                                                         fontWeight:
                                                             FontWeight.bold,
@@ -729,7 +729,10 @@ class LeaveView extends GetView<LeaveController> {
                                                   fontWeight: FontWeight.bold,
                                                 ),
                                               ),
-                                              Text(leave.alasan!),
+                                              Text(
+                                                leave.alasan?.capitalizeFirst ??
+                                                    '-',
+                                              ),
                                               const SizedBox(height: 10),
                                               const Text(
                                                 'Alamat selama cuti:',
@@ -737,7 +740,10 @@ class LeaveView extends GetView<LeaveController> {
                                                   fontWeight: FontWeight.bold,
                                                 ),
                                               ),
-                                              Text(leave.alamat!),
+                                              Text(
+                                                leave.alamat?.capitalizeFirst ??
+                                                    '-',
+                                              ),
                                               const SizedBox(height: 10),
                                               const Text(
                                                 'Telp / WhatsApp aktif:',

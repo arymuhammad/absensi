@@ -39,6 +39,7 @@ Future<DbResult> visitOut({
     // ✅ ONLINE → CEK SERVER
     // ===============================
     if (online) {
+      loadingDialog("Checking data", "");
       await absC.cekDataVisit("masuk", dataUser.id!, dateNow, visitLocation);
 
       if (absC.cekVisit.value.total != "0") {
@@ -49,6 +50,7 @@ Future<DbResult> visitOut({
     // ⚠️ OFFLINE → CEK LOCAL
     // ===============================
     else {
+      loadingDialog("Checking data", "");
       final localData = await SQLHelper.instance.getVisitToday(
         dataUser.id!,
         dateNow,
@@ -65,17 +67,13 @@ Future<DbResult> visitOut({
     // 🚫 BLOCK JIKA TIDAK ADA CHECKIN
     // ===============================
     if (!adaVisit) {
-      Get.back();
+      closeLoading();
       failedDialog(
         Get.context,
         "Warning",
         "Check In data not found\n\nMake sure the Checkout name/location\nis the same as the Check In name/location",
       );
-      return DbResult(
-        success: false,
-        message:
-            "Check In data not found\n\nMake sure the Checkout name/location\nis the same as the Check In name/location",
-      );
+      return DbResult(success: false, message: "Check out failed");
     }
 
     // =======================
@@ -84,11 +82,13 @@ Future<DbResult> visitOut({
     await absC.uploadFotoAbsen(isVisit: true);
 
     if (absC.image == null) {
+      closeLoading();
       failedDialog(Get.context, "Warning", "Check out was cancelled");
       return DbResult(success: false, message: "Check in cancelled");
     }
 
     await Future.delayed(const Duration(milliseconds: 200));
+    closeLoading();
     loadingDialog("Sending data...", "");
 
     var data = {
@@ -111,59 +111,130 @@ Future<DbResult> visitOut({
     // =======================
     // 💾 SQLITE UPDATE (WAJIB)
     // =======================
-    final res = await SQLHelper.instance.updateDataVisit(
-      {
-        "visit_out": visitLocation,
-        "jam_out": timeNow,
-        "foto_out": absC.image!.path,
-        "lat_out": latitude.toString(),
-        "long_out": longitude.toString(),
-        "device_info2": absC.devInfo.value,
-        "status_sync": "PENDING", // 🔥 WAJIB
-      },
+
+    final localVisit = await SQLHelper.instance.getVisitToday(
       dataUser.id!,
       dateNow,
       visitLocation,
+      1,
     );
 
-    absC.updateSyncVisitStatusRealtime(
-      id: dataUser.id!,
-      tglVisit: dateNow,
-      visitIn: visitLocation,
-      status: "PENDING",
-    );
+    if (localVisit.isNotEmpty) {
+      final res = await SQLHelper.instance.updateDataVisit(
+        {
+          "visit_out": visitLocation,
+          "jam_out": timeNow,
+          "foto_out": absC.image!.path,
+          "lat_out": latitude.toString(),
+          "long_out": longitude.toString(),
+          "device_info2": absC.devInfo.value,
+          "status_sync": "PENDING", // 🔥 WAJIB
+        },
+        dataUser.id!,
+        dateNow,
+        visitLocation,
+      );
 
-    if (!res.success) {
-      Get.back(); // ❗ tutup loading
-      showToast(res.message);
-      return DbResult(success: false, message: res.message);
-    }
+      absC.updateSyncVisitStatusRealtime(
+        id: dataUser.id!,
+        tglVisit: dateNow,
+        visitIn: visitLocation,
+        status: "PENDING",
+      );
 
-    updateSuccess = true;
+      if (!res.success) {
+        closeLoading(); // ❗ tutup loading
+        showToast(res.message);
+        return DbResult(success: false, message: res.message);
+      }
 
-    // =======================
-    // 🚀 SERVER / SYNC
-    // =======================
-    if (online) {
-      try {
-        await ServiceApi().submitVisit(data, false);
-        await SQLHelper.instance.updateStatusVisit(
-          dataUser.id!,
-          dateNow,
-          visitLocation,
-          "SUCCESS",
-        );
-        absC.updateSyncVisitStatusRealtime(
-          id: dataUser.id!,
-          tglVisit: dateNow,
-          visitIn: visitLocation,
-          status: "SUCCESS",
-        );
-      } catch (_) {
+      updateSuccess = true;
+
+      // =======================
+      // 🚀 SERVER / SYNC
+      // =======================
+      if (online) {
+        try {
+          final submitRes = await ServiceApi().submitVisit(data, false);
+
+          if (submitRes == null || submitRes['success'] != true) {
+            absC.triggerSync(isVisit: true);
+
+            // return DbResult(
+            //   success: false,
+            //   message: submitRes?['message'] ?? "Visit out failed",
+            // );
+          } else {
+            await SQLHelper.instance.updateStatusVisit(
+              dataUser.id!,
+              dateNow,
+              visitLocation,
+              "SUCCESS",
+            );
+            absC.updateSyncVisitStatusRealtime(
+              id: dataUser.id!,
+              tglVisit: dateNow,
+              visitIn: visitLocation,
+              status: "SUCCESS",
+            );
+          }
+        } catch (_) {
+          absC.triggerSync(isVisit: true);
+        }
+      } else {
         absC.triggerSync(isVisit: true);
       }
+      ///////
     } else {
-      absC.triggerSync(isVisit: true);
+      // =======================
+      // LOCAL HILANG, SERVER MASIH ADA
+      // =======================
+
+      if (!online) {
+        closeLoading();
+
+        return DbResult(
+          success: false,
+          message: "Visit data not available offline",
+        );
+      }
+
+      final submitRes = await ServiceApi().submitVisit(data, false);
+
+      if (submitRes == null || submitRes['success'] != true) {
+        closeLoading();
+
+        return DbResult(
+          success: false,
+          message: submitRes?['message'] ?? "Visit out failed",
+        );
+      }
+
+      final response = await ServiceApi().getVisit({
+        "mode": "single",
+        "id_user": dataUser.id,
+        "tgl_visit": dateNow,
+      });
+
+      if (response.isEmpty) {
+        closeLoading();
+
+        return DbResult(success: false, message: "Failed to reload visit data");
+      }
+
+      response.first.statusSync = "SUCCESS";
+
+      final insertRes = await SQLHelper.instance.insertDataVisit(
+        response.first,
+      );
+
+      if (!insertRes.success && insertRes.message != "Duplicate data") {
+        closeLoading();
+
+        return insertRes;
+      }
+
+      updateSuccess = true;
     }
 
     // =======================
@@ -185,7 +256,7 @@ Future<DbResult> visitOut({
     // absC.startTimer(10);
     // absC.resend();
 
-    Get.back(); // ✅ tutup loading
+    closeLoading(); // ✅ tutup loading
     // =======================
     // ✅ UI SUCCESS (TIDAK BLOCK LOGIC)
     // =======================
@@ -203,9 +274,9 @@ Future<DbResult> visitOut({
       },
     );
 
-    return DbResult(success: true, message: "Check in success");
+    return DbResult(success: true, message: "Check out success");
   } catch (e) {
-    Get.back(); // ❗ jaga-jaga kalau error di tengah
+    closeLoading(); // ❗ jaga-jaga kalau error di tengah
     // showToast("Error: ${e.toString()}");
     return DbResult(success: false, message: e.toString());
   } finally {

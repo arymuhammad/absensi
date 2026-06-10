@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icons_plus/icons_plus.dart';
@@ -137,6 +136,7 @@ class LeaveAddSheet extends StatelessWidget {
 
                           onChanged: (val) {
                             leaveC.selectedLeave.value = val;
+                            // print(leaveC.selectedLeave.value);
 
                             final selected = data.firstWhere(
                               (e) => e.name == val,
@@ -170,54 +170,67 @@ class LeaveAddSheet extends StatelessWidget {
                       const SizedBox(height: 10),
 
                       /// 🔹 TABLE
-                      DataTable(
-                        border: TableBorder.all(),
-                        headingRowHeight: 30,
-                        columns: const [
-                          DataColumn(label: Text('Saldo Cuti')),
-                          DataColumn(label: Text('Diambil')),
-                          DataColumn(label: Text('Sisa Cuti')),
-                        ],
-                        rows: [
-                          DataRow(
-                            cells: [
-                              DataCell(Text(userData!.leaveBalance!)),
-                              DataCell(
-                                SizedBox(
-                                  height: 40,
-                                  width: 65,
-                                  child: Obx(
-                                    () => CsTextField(
-                                      enabled:
-                                          leaveC.selectedLeaveType.value !=
-                                          "Lainnya",
-                                      controller: leaveC.amtTkn,
-                                      keyboardType: TextInputType.number,
-                                      maxLines: 1,
-                                      onChanged: (val) {
-                                        leaveC.remainingOff(
-                                          userData!.leaveBalance!,
-                                          val,
-                                        );
-                                      },
-                                      label: '',
-                                      isDark: isDark,
-                                    ),
+                      Obx(
+                        () => Visibility(
+                          visible:
+                              leaveC.selectedLeave.value != "Replacement Off",
+                          child: Column(
+                            children: [
+                              DataTable(
+                                border: TableBorder.all(),
+                                headingRowHeight: 30,
+                                columns: const [
+                                  DataColumn(label: Text('Saldo Cuti')),
+                                  DataColumn(label: Text('Diambil')),
+                                  DataColumn(label: Text('Sisa Cuti')),
+                                ],
+                                rows: [
+                                  DataRow(
+                                    cells: [
+                                      DataCell(Text(userData!.leaveBalance!)),
+                                      DataCell(
+                                        SizedBox(
+                                          height: 40,
+                                          width: 65,
+                                          child: Obx(
+                                            () => CsTextField(
+                                              enabled:
+                                                  leaveC
+                                                      .selectedLeaveType
+                                                      .value !=
+                                                  "Lainnya",
+                                              controller: leaveC.amtTkn,
+                                              keyboardType:
+                                                  TextInputType.number,
+                                              maxLines: 1,
+                                              onChanged: (val) {
+                                                leaveC.remainingOff(
+                                                  userData!.leaveBalance!,
+                                                  val,
+                                                );
+                                              },
+                                              label: '',
+                                              isDark: isDark,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      DataCell(
+                                        Obx(
+                                          () => Text(
+                                            leaveC.remainDays.value.toString(),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                ),
+                                ],
                               ),
-                              DataCell(
-                                Obx(
-                                  () =>
-                                      Text(leaveC.remainDays.value.toString()),
-                                ),
-                              ),
+                              const SizedBox(height: 10),
                             ],
                           ),
-                        ],
+                        ),
                       ),
-
-                      const SizedBox(height: 10),
 
                       CsTextField(
                         enabled: true,
@@ -259,7 +272,9 @@ class LeaveAddSheet extends StatelessWidget {
                       //attach file
                       Obx(
                         () => Visibility(
-                          visible: leaveC.selectedLeaveType.value == "Lainnya",
+                          visible:
+                              leaveC.selectedLeaveType.value == "Lainnya" &&
+                              leaveC.selectedLeave.value != "Replacement Off",
                           child: Align(
                             alignment: Alignment.topLeft,
                             child: InkWell(
@@ -311,6 +326,30 @@ class LeaveAddSheet extends StatelessWidget {
 
                       const SizedBox(height: 10),
 
+                      Obx(
+                        () => Visibility(
+                          visible:
+                              leaveC.selectedLeave.value == "Replacement Off",
+                          child: const Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Note',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                              Align(
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  '*Replacement Off tidak akan mengurangi saldo cuti',
+                                  style: TextStyle(fontStyle: FontStyle.italic),
+                                ),
+                              ),
+                              SizedBox(height: 10),
+                            ],
+                          ),
+                        ),
+                      ),
+
                       /// 🔹 SIGN BUTTON
                       Obx(() {
                         final int totalLeave =
@@ -334,7 +373,9 @@ class LeaveAddSheet extends StatelessWidget {
                                   : () {
                                     if (leaveC.image == null &&
                                         leaveC.selectedLeaveType.value ==
-                                            "Lainnya") {
+                                            "Lainnya" &&
+                                        leaveC.selectedLeave.value !=
+                                            "Replacement Off") {
                                       showToast('Upload file pendukung');
                                     } else {
                                       openDialogSign(context);
@@ -382,6 +423,25 @@ class LeaveAddSheet extends StatelessWidget {
                     if (leaveC.datePick1.text.isEmpty ||
                         leaveC.datePick2.text.isEmpty) {
                       showToast("Tanggal kosong");
+                      return;
+                    }
+
+                    if (leaveC.reasonLeave.text.isEmpty) {
+                      showToast("Harap isi alasan cuti");
+                      return;
+                    }
+                    if (leaveC.addrLeave.text.isEmpty) {
+                      showToast("Harap isi alamat selama cuti");
+                      return;
+                    }
+
+                    if (leaveC.phone.text.isEmpty) {
+                      showToast("Harap isi no whatsapp aktif");
+                      return;
+                    }
+                   
+                    if (leaveC.ctrSign.isEmpty) {
+                      showToast("Harap buat tanda tangan dahulu");
                       return;
                     }
 

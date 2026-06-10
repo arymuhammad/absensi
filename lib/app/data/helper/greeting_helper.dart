@@ -9,13 +9,13 @@ class GreetingHelper {
     final hour = serverTime.hour;
 
     if (hour >= 4 && hour < 11) {
-      return 'Selamat pagi, ';
+      return 'Good morning, ';
     } else if (hour >= 11 && hour < 15) {
-      return 'Selamat siang, ';
+      return 'Good afternoon, ';
     } else if (hour >= 15 && hour < 18) {
-      return 'Selamat sore, ';
+      return 'Good afternoon, ';
     } else {
-      return 'Selamat malam, ';
+      return 'Good night, ';
     }
   } catch (e) {
     // fallback kalau gagal ambil waktu

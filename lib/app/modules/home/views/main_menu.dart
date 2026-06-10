@@ -2,6 +2,8 @@ import 'package:absensi/app/modules/absen/controllers/absen_controller.dart';
 import 'package:absensi/app/modules/adjust_presence/controllers/adjust_presence_controller.dart';
 import 'package:absensi/app/modules/approval/main_tab.dart';
 import 'package:absensi/app/modules/home/controllers/home_controller.dart';
+import 'package:absensi/app/modules/izin/controllers/izin_controller.dart';
+import 'package:absensi/app/modules/izin/views/izin_view.dart';
 import 'package:absensi/app/modules/leave/views/leave_view.dart';
 import 'package:absensi/app/modules/overtime/views/overtime_view.dart';
 import 'package:flutter/material.dart';
@@ -27,304 +29,425 @@ class MainMenu extends StatelessWidget {
   final homeC = Get.find<HomeController>();
   final payC = Get.put(PaySlipController());
   final ovrC = Get.put(OvertimeController());
+  final prmC = Get.put(IzinController());
   // final logC = Get.find<LoginController>();
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(8.0, 8, 8.0, 0),
-      child: SizedBox(
-        width: Get.mediaQuery.size.width,
-        // decoration: BoxDecoration(
-        //     borderRadius: BorderRadius.circular(15), color: Colors.white),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text('Main Menu', style: titleTextStyle.copyWith(fontSize: 15)),
-                InkWell(
-                  onTap: () {
+      padding: const EdgeInsets.fromLTRB(2, 0, 2, 0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Main Menu',
+                style: titleTextStyle.copyWith(
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              TextButton.icon(
+                onPressed: () {
+                  if ((userData!.parentId == "3" &&
+                          (userData!.level == "19" ||
+                              userData!.level == "20" ||
+                              userData!.level == "59" ||
+                              userData!.level == "26")) ||
+                      (userData!.parentId == "4" &&
+                          (userData!.level == "1" ||
+                              userData!.level == "43")) ||
+                      (userData!.parentId == "5" && userData!.level == "77") ||
+                      (userData!.parentId == "7" && userData!.level == "23") ||
+                      (userData!.parentId == "8" && userData!.level == "18") ||
+                      (userData!.parentId == "9" && userData!.level == "41") ||
+                      (userData!.parentId == "2" && userData!.level == "10") ||
+                      (userData!.parentId == "1") ||
+                      (userData!.level == "96") ||
+                      (userData!.level == "106")) {
                     homeC.getPendingAdj(
                       idUser: userData!.id!,
                       idCabang: userData!.kodeCabang!,
                       level: userData!.level!,
                     );
 
-                    if ((userData!.parentId == "3" &&
-                            (userData!.level == "19" ||
-                                userData!.level == "20" ||
-                                userData!.level == "59" ||
-                                userData!.level == "26")) ||
-                        (userData!.parentId == "4" &&
-                            (userData!.level == "1" ||
-                                userData!.level == "43")) ||
-                        (userData!.parentId == "5" &&
-                            userData!.level == "77") ||
-                        (userData!.parentId == "7" &&
-                            userData!.level == "23") ||
-                        (userData!.parentId == "8" &&
-                            userData!.level == "18") ||
-                        (userData!.parentId == "9" &&
-                            userData!.level == "41") ||
-                        (userData!.parentId == "2" &&
-                            userData!.level == "10") ||
-                        (userData!.parentId == "1") ||
-                        (userData!.level == "96") ||
-                        (userData!.level == "106")) {
-                      homeC.getPendingApproval(
-                        idUser: userData!.id!,
-                        kodeCabang: userData!.kodeCabang!,
-                        level: userData!.level!,
-                        parentId: userData!.parentId!,
-                      );
-                    }
+                    homeC.getPendingApproval(
+                      idUser: userData!.id!,
+                      kodeCabang: userData!.kodeCabang!,
+                      level: userData!.level!,
+                      parentId: userData!.parentId!,
+                    );
+
+                    homeC.getPendingOvr(
+                      idUser: userData!.id!,
+                      kodeCabang: userData!.kodeCabang!,
+                      level: userData!.level!,
+                      parentId: userData!.parentId!,
+                    );
+
+                    homeC.getPendingPrm(
+                      idUser: userData!.id!,
+                      kodeCabang: userData!.kodeCabang!,
+                      level: userData!.level!,
+                      parentId: userData!.parentId!,
+                    );
+                  }
+                },
+                icon: const Icon(Icons.refresh_rounded, size: 18),
+                label: const Text('Refresh'),
+              ),
+            ],
+          ),
+
+          // const SizedBox(height: 5),
+          GridView.count(
+            padding: EdgeInsets.zero,
+            crossAxisCount: 3,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            crossAxisSpacing: 5,
+            mainAxisSpacing: 5,
+            childAspectRatio: 2.0,
+            children: [
+              // Approval
+              // Visibility(
+              //   visible:
+              if ((userData!.parentId == "3" &&
+                      (userData!.level == "19" ||
+                          userData!.level == "20" ||
+                          userData!.level == "59" ||
+                          userData!.level == "26")) ||
+                  (userData!.parentId == "4" &&
+                      (userData!.level == "1" || userData!.level == "43")) ||
+                  (userData!.parentId == "5" && userData!.level == "77") ||
+                  (userData!.parentId == "7" && userData!.level == "23") ||
+                  (userData!.parentId == "8" && userData!.level == "17") ||
+                  (userData!.parentId == "8" && userData!.level == "18") ||
+                  (userData!.parentId == "9" && userData!.level == "41") ||
+                  (userData!.parentId == "2" && userData!.level == "10") ||
+                  (userData!.parentId == "1") ||
+                  (userData!.level == "96") ||
+                  (userData!.level == "106"))
+                // child:
+                DashboardMenuCard(
+                  title: 'Approval',
+                  icon: Icons.assignment_outlined,
+                  badge: homeC.totalNotif,
+                  color: const Color(0xFF8B5CF6),
+                  onTap: () {
+                    // clear list overtime first
+                    ovrC.listOvt.clear();
+
+                    // 🔥 reset sebelum masuk
+                    homeC.selectedTab.value = 0;
+                    homeC.isTabLoading.value = false;
+
+                    leaveC.listLeaveReq.clear();
+                    var param = {
+                      "type": "get_pending_req_leave",
+                      "kode_cabang": userData!.kodeCabang!,
+                      "id_user": userData!.id!,
+                      "level": userData!.level!,
+                      "parent_id": userData!.parentId!,
+                    };
+                    // print(param);
+                    // leaveC.isLoading.value = true;
+                    leaveC.getLeaveReq(param);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => MainTab()),
+                    );
                   },
-                  child: Container(
-                    height: 25,
-                    width: 25,
-                    decoration: BoxDecoration(
-                      color: AppColors.itemsBackground,
-                      borderRadius: BorderRadius.circular(50),
-                    ),
-                    child: const Icon(
-                      Icons.refresh_rounded,
-                      color: Colors.white,
-                    ),
-                  ),
                 ),
-              ],
-            ),
-            const Divider(thickness: 1),
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
+
+              // ),
+              DashboardMenuCard(
+                title: 'Cuti        ',
+                icon: Icons.edit_calendar_rounded,
+                color: const Color.fromARGB(255, 2, 159, 59),
+                badge: 0.obs,
+                onTap: () {
+                  leaveC.isLoading.value = true;
+                  leaveC.getLeaveReq({"type": "", "id_user": userData!.id!});
+                  //  loadingDialog('Mengecek sisa saldo cuti kamu', '');
+                  // leaveC.leaveBalanceCheck(userData!);
+                  // Get.back();
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => LeaveView()),
+                  );
+                },
+              ),
+
+              if (userData!.kodeCabang != "HO000")
+                // child:
+                DashboardMenuCard(
+                  title: 'Izin',
+                  icon: Icons.health_and_safety_rounded,
+                  color: const Color.fromARGB(255, 208, 9, 181),
+                  badge: 0.obs,
+                  onTap: () {
+                    // LOGIC OVERTIME LAMA
+
+                    prmC.getPermissionList(
+                      idUser: userData!.id!,
+                      parentId: userData!.parentId!,
+                      level: userData!.level!,
+                      type: "",
+                      status: "",
+                    );
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => IzinView()),
+                    );
+                  },
+                ),
+
+              // Visibility(
+              //   visible:
+              if (userData!.kodeCabang != "HO000")
+                // child:
+                DashboardMenuCard(
+                  title: 'Overtime',
+                  icon: Icons.more_time_sharp,
+                  color: const Color(0xFFF59E0B),
+                  badge: 0.obs,
+                  onTap: () {
+                    // Get.to(
+                    //   () => PaySlipView(userData: userData!),
+                    //   transition: Transition.cupertino,
+                    // );
+                    ovrC.listOvt.clear();
+                    ovrC.isLoading.value = true;
+                    ovrC.getListOvertime(
+                      idUser: userData!.id!,
+                      level: userData!.level!,
+                      type: "get_by_id",
+                      status: "",
+                    );
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => OvertimeView()),
+                    );
+                  },
+                ),
+              // ),
+
+              // Visibility(
+              //   visible:
+              if (userData!.parentId == "3" || userData!.parentId == "4")
+                // child:
+                DashboardMenuCard(
+                  title: 'Inbox  ',
+                  icon: Icons.all_inbox_rounded,
+                  color: const Color.fromARGB(255, 59, 132, 221),
+                  badge: 0.obs,
+                  onTap: () {
+                    // Get.to(() {
+                    adjCtrl.getReqAppUpt(
+                      '',
+                      'inbox',
+                      userData!.level,
+                      userData!.id,
+                      userData!.kodeCabang,
+                      adjCtrl.initDate,
+                      adjCtrl.lastDate,
+                    );
+                    //   return ReqAppUserView(userData: userData!);
+                    // }, transition: Transition.cupertino);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => ReqAppUserView(isInbox: true),
+                      ),
+                    );
+                  },
+                ),
+
+              // ),
+              DashboardMenuCard(
+                title: 'Slip Gaji',
+                icon: Icons.receipt_long,
+                color: const Color.fromARGB(255, 174, 196, 5),
+                badge: 0.obs,
+                onTap: () {
+                  // Get.to(
+                  //   () => PaySlipView(userData: userData!),
+                  //   transition: Transition.cupertino,
+                  // );
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => PaySlipView()),
+                  );
+                },
+              ),
+
+              // Visibility(
+
+              //   visible:
+              if (userData!.level == "1" ||
+                  userData!.level == "26" ||
+                  userData!.level == "19" ||
+                  userData!.level == "20")
+                // child:
+                DashboardMenuCard(
+                  title: 'Monitoring',
+                  icon: Icons.monitor,
+                  color: const Color(0xFFEC4899),
+                  badge: 0.obs,
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => MonitoringAbsenView()),
+                    );
+                    absC.searchAbsen.clear();
+                    absC.userMonitor.value = "";
+                  },
+                ),
+
+              // ),
+              // Visibility(
+              //   visible:
+              if (userData!.level == "1")
+                // child:
+                DashboardMenuCard(
+                  title: 'Adjust',
+                  icon: Icons.access_time_filled_outlined,
+                  color: const Color(0xFF14B8A6),
+                  badge: 0.obs,
+                  onTap: () {
+                    adjCtrl.getReqAppUpt(
+                      '',
+                      '',
+                      userData!.level,
+                      userData!.id,
+                      userData!.kodeCabang,
+                      adjCtrl.initDate,
+                      adjCtrl.lastDate,
+                    );
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => AdjustPresenceView()),
+                    );
+                    absC.searchAbsen.clear();
+                    absC.userMonitor.value = "";
+                  },
+                ),
+              // ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class DashboardMenuCard extends StatelessWidget {
+  final String title;
+  final IconData icon;
+  final Color color;
+  final VoidCallback onTap;
+  final RxInt? badge;
+
+  const DashboardMenuCard({
+    super.key,
+    required this.title,
+    required this.icon,
+    required this.color,
+    required this.onTap,
+    this.badge,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Obx(
+      () => Stack(
+        clipBehavior: Clip.none,
+        children: [
+          InkWell(
+            borderRadius: BorderRadius.circular(20),
+            onTap: onTap,
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(
+                horizontal: 10,
+                vertical: 8,
+              ),
+              decoration: BoxDecoration(
+                color: Theme.of(context).cardColor,
+                borderRadius: BorderRadius.circular(10),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(.03),
+                    blurRadius: 10,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
+              ),
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Visibility(
-                    visible:
-                        ((userData!.parentId == "3" &&
-                                    (userData!.level == "19" ||
-                                        userData!.level == "20" ||
-                                        userData!.level == "59" ||
-                                        userData!.level == "26")) ||
-                                (userData!.parentId == "4" &&
-                                    (userData!.level == "1" ||
-                                        userData!.level == "43")) ||
-                                (userData!.parentId == "5" &&
-                                    userData!.level == "77") ||
-                                (userData!.parentId == "7" &&
-                                    userData!.level == "23") ||
-                                (userData!.parentId == "8" &&
-                                    userData!.level == "17") ||
-                                (userData!.parentId == "8" &&
-                                    userData!.level == "18") ||
-                                (userData!.parentId == "9" &&
-                                    userData!.level == "41") ||
-                                (userData!.parentId == "2" &&
-                                    userData!.level == "10") ||
-                                (userData!.parentId == "1") ||
-                                (userData!.level == "96") ||
-                                (userData!.level == "106"))
-                            ? true
-                            : false,
-                    child: Row(
-                      children: [
-                        MenuIconWithBadge(
-                          asset: 'assets/image/req-leave.png',
-                          label: 'Approval',
-                          count: homeC.totalNotif,
-                          isLoading: homeC.isLoadingPending,
-                          isError: homeC.isErrorPending,
-                          onTap: () {
-                            // clear list overtime first
-                            ovrC.listOvt.clear();
-
-                            // 🔥 reset sebelum masuk
-                            homeC.selectedTab.value = 0;
-                            homeC.isTabLoading.value = false;
-
-                            leaveC.listLeaveReq.clear();
-                            var param = {
-                              "type": "get_pending_req_leave",
-                              "kode_cabang": userData!.kodeCabang!,
-                              "id_user": userData!.id!,
-                              "level": userData!.level!,
-                              "parent_id": userData!.parentId!,
-                            };
-                            // print(param);
-                            // leaveC.isLoading.value = true;
-                            leaveC.getLeaveReq(param);
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (_) => MainTab()),
-                            );
-                          },
-                        ),
-
-                        const SizedBox(width: 10),
-                      ],
+                  Container(
+                    width: 32,
+                    height: 32,
+                    decoration: BoxDecoration(
+                      // color: color.withOpacity(.9),
+                      borderRadius: BorderRadius.circular(11),
+                      gradient: AppColors.mainGradient(
+                        context: context,
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
                     ),
+          
+                    child: Icon(icon, color: Colors.white, size: 18),
                   ),
-                  MenuIconItem(
-                    asset: 'assets/image/leave.png',
-                    label: 'Leave',
-                    onTap: () {
-                      leaveC.isLoading.value = true;
-                      leaveC.getLeaveReq({
-                        "type": "",
-                        "id_user": userData!.id!,
-                      });
-                      //  loadingDialog('Mengecek sisa saldo cuti kamu', '');
-                      // leaveC.leaveBalanceCheck(userData!);
-                      // Get.back();
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => LeaveView()),
-                      );
-                    },
-                  ),
-                  Visibility(
-                    visible: userData!.kodeCabang != "HO000",
-                    child: Row(
-                      children: [
-                        const SizedBox(width: 10),
-                        MenuIconItem(
-                          asset: 'assets/image/izin.png',
-                          label: 'Overtime',
-                          onTap: () {
-                            // Get.to(
-                            //   () => PaySlipView(userData: userData!),
-                            //   transition: Transition.cupertino,
-                            // );
-                            ovrC.listOvt.clear();
-                            ovrC.isLoading.value = true;
-                            ovrC.getListOvertime(
-                              idUser: userData!.id!,
-                              level: userData!.level!,
-                              type: "get_by_id",
-                              status: "",
-                            );
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (_) => OvertimeView()),
-                            );
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Visibility(
-                    visible:
-                        userData!.parentId == "3" || userData!.parentId == "4",
-                    child: Row(
-                      children: [
-                        MenuIconItem(
-                          asset: 'assets/image/notif.png',
-                          label: 'Inbox',
-                          // count: homeC.pendingAdjCount,
-                          // isLoading: homeC.isLoadingAdj,
-                          // isError: homeC.isErrorAdj,
-                          onTap: () {
-                            // Get.to(() {
-                            adjCtrl.getReqAppUpt(
-                              '',
-                              'inbox',
-                              userData!.level,
-                              userData!.id,
-                              userData!.kodeCabang,
-                              adjCtrl.initDate,
-                              adjCtrl.lastDate,
-                            );
-                            //   return ReqAppUserView(userData: userData!);
-                            // }, transition: Transition.cupertino);
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => ReqAppUserView(isInbox: true),
-                              ),
-                            );
-                          },
-                        ),
-                        const SizedBox(width: 10),
-                      ],
-                    ),
-                  ),
-                  MenuIconItem(
-                    asset: 'assets/image/payslip.png',
-                    label: 'Payslip',
-                    onTap: () {
-                      // Get.to(
-                      //   () => PaySlipView(userData: userData!),
-                      //   transition: Transition.cupertino,
-                      // );
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => PaySlipView()),
-                      );
-                    },
-                  ),
-                  const SizedBox(width: 10),
-                  Visibility(
-                    visible:
-                        userData!.level == "1" ||
-                                userData!.level == "26" ||
-                                userData!.level == "19" ||
-                                userData!.level == "20"
-                            ? true
-                            : false,
-                    child: Row(
-                      children: [
-                        MenuIconItem(
-                          asset: 'assets/image/monitoring.png',
-                          label: 'Monitoring',
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => MonitoringAbsenView(),
-                              ),
-                            );
-                            absC.searchAbsen.clear();
-                            absC.userMonitor.value = "";
-                          },
-                        ),
-                        const SizedBox(width: 10),
-                      ],
-                    ),
-                  ),
-
-                  Visibility(
-                    visible: userData!.level == "1" ? true : false,
-                    child: MenuIconItem(
-                      asset: 'assets/image/adjust.png',
-                      label: 'Adjust',
-                      onTap: () {
-                        adjCtrl.getReqAppUpt(
-                          '',
-                          '',
-                          userData!.level,
-                          userData!.id,
-                          userData!.kodeCabang,
-                          adjCtrl.initDate,
-                          adjCtrl.lastDate,
-                        );
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => AdjustPresenceView(),
-                          ),
-                        );
-                        absC.searchAbsen.clear();
-                        absC.userMonitor.value = "";
-                      },
+          
+                  const SizedBox(width: 8),
+          
+                  Flexible(
+                    child: Text(
+                      title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 ],
               ),
             ),
-          ],
-        ),
+          ),
+
+          if (badge!.value > 0)
+            Positioned(
+              top: -6,
+              right: 1,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: red,
+                  borderRadius: BorderRadius.circular(20),
+                  //  gradient: AppColors.mainGradient(
+                  //         context: context,
+                  //         begin: Alignment.topLeft,
+                  //         end: Alignment.bottomRight,
+                  //       ),
+                ),
+                child: Text(
+                  '$badge',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }

@@ -258,3 +258,9 @@ loadingWithIcon() {
         ),
   );
 }
+
+void closeLoading() {
+  while (Get.isDialogOpen ?? false) {
+    Get.back();
+  }
+}
