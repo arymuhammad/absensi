@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:get/get.dart';
 import 'package:latlong2/latlong.dart';
 
 import '../../controllers/absen_controller.dart';
@@ -67,20 +68,22 @@ class MapSectionView extends StatelessWidget {
           retinaMode: true,
         ),
 
-        CircleLayer(
-          circles: [
-            CircleMarker(
-              point: storePoint,
-              radius: 30,
-              borderStrokeWidth: 2,
-              color:
-                  controller.isInsideRadius.value
-                      ? Colors.green.withOpacity(0.2)
-                      : Colors.red.withOpacity(0.2),
-              borderColor:
-                  controller.isInsideRadius.value ? Colors.green : Colors.red,
-            ),
-          ],
+        Obx(
+          () => CircleLayer(
+            circles: [
+              CircleMarker(
+                point: storePoint,
+                radius: 30,
+                borderStrokeWidth: 2,
+                color:
+                    controller.isInsideRadius.value
+                        ? Colors.green.withOpacity(0.2)
+                        : Colors.red.withOpacity(0.2),
+                borderColor:
+                    controller.isInsideRadius.value ? Colors.green : Colors.red,
+              ),
+            ],
+          ),
         ),
 
         PolylineLayer(

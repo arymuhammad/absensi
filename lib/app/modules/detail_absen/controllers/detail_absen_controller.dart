@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:absensi/app/services/service_api.dart';
 import 'package:day_night_time_picker/day_night_time_picker.dart';
@@ -138,7 +139,7 @@ class DetailAbsenController extends GetxController {
               "jam_absen_masuk": jamAbsen,
               "jam_pulang": jamPulang,
               "tgl_masuk": tglMasuk.text,
-              "foto_masuk": image!.path,
+              "foto_masuk": image != null ? File(image!.path) : null,
               "alasan": alasan.text,
             };
             loadingDialog("Mengirim data...", "");
@@ -153,7 +154,7 @@ class DetailAbsenController extends GetxController {
               "nama": nama,
               "jam_absen_masuk": jamAbsenMasuk.text,
               "tgl_masuk": tglMasuk.text,
-              "foto_masuk": image!.path,
+              "foto_masuk": image != null ? File(image!.path) : null,
               "alasan": alasan.text,
             };
             loadingDialog("Mengirim data...", "");
@@ -171,7 +172,7 @@ class DetailAbsenController extends GetxController {
           // });
           jamAbsenMasuk.clear();
           alasan.clear();
-          image == null;
+          image = null;
         }
       }
     } else if (jamAbsenPulang.text != "" && jamAbsenMasuk.text == "") {
@@ -203,7 +204,7 @@ class DetailAbsenController extends GetxController {
               "tgl_masuk": tglMasuk.text,
               "tgl_pulang": tglPulang.text,
               "jam_absen_pulang": jamAbsenPulang.text,
-              "foto_pulang": image2!.path,
+              "foto_pulang": image2 != null ? File(image2!.path) : null,
               "lat_out": lat.toString(),
               "long_out": long.toString(),
               "device_info2": devInfo.value,
@@ -222,7 +223,7 @@ class DetailAbsenController extends GetxController {
             tglPulang.clear();
             jamAbsenPulang.clear();
             alasan.clear();
-            image2 == null;
+            image2 = null;
           }
         }
       }
@@ -260,8 +261,8 @@ class DetailAbsenController extends GetxController {
               "tgl_pulang": tglPulang.text,
               "jam_absen_masuk": jamAbsenMasuk.text,
               "jam_absen_pulang": jamAbsenPulang.text,
-              "foto_masuk": image!.path,
-              "foto_pulang": image2!.path,
+              "foto_masuk": image != null ? File(image!.path) : null,
+              "foto_pulang": image2 != null ? File(image2!.path) : null,
               "lat_out": lat.toString(),
               "long_out": long.toString(),
               "device_info2": devInfo.value,
@@ -280,8 +281,8 @@ class DetailAbsenController extends GetxController {
             jamAbsenMasuk.clear();
             jamAbsenMasuk.clear();
             alasan.clear();
-            image == null;
-            image2 == null;
+            image = null;
+            image2 = null;
           }
         }
       }

@@ -13,7 +13,6 @@ import '../../../../data/helper/app_colors.dart';
 import '../../../../data/helper/const.dart';
 import '../../../../data/helper/custom_dialog.dart';
 import '../../../../data/helper/format_waktu.dart';
-import '../../../../data/helper/shift_name_helper.dart';
 import '../../../../data/model/absen_model.dart';
 import '../../../../data/model/login_model.dart';
 import '../../../login/controllers/login_controller.dart';
@@ -185,10 +184,25 @@ class SummaryToday extends StatelessWidget {
                                       fontSize: 20,
                                     ),
                                   ),
-                                  const SizedBox(height: 6),
+                                  const SizedBox(height: 10),
                                   GestureDetector(
                                     onTap: () async {
+                                      // CLEAR ALL SELECTED / INPUT FORM
+                                      //====================================//
+
+                                      absenC.isLoading.value = true;
+                                      absenC.lokasi.value = "";
+                                      absenC.stsAbsenSelected.value = "";
+                                      absenC.optVisitSelected.value = "";
+                                      absenC.selectedCabang.value = "";
+                                      absenC.selectedCabangVisit.value = "";
+                                      absenC.selectedShift.value = "";
+                                      absenC.lat.value = "";
+                                      absenC.long.value = "";
+                                      //====================================//
+
                                       logC.selectedMenu(2);
+
                                       // 🔑 VALIDASI STATUS ABSEN TERKINI (DB / SERVER)
                                       await absenC.refreshAbsen(listDataUser!);
 
@@ -212,14 +226,12 @@ class SummaryToday extends StatelessWidget {
                                       height: 40,
                                       decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(10),
-                                        gradient: const LinearGradient(
+                                        gradient: AppColors.mainGradient(
+                                          context: context,
                                           begin: Alignment.centerLeft,
                                           end: Alignment.centerRight,
-                                          colors: [
-                                            Color(0xFF1B2541),
-                                            Color(0xFF3949AB),
-                                          ],
                                         ),
+
                                         // color: AppColors.contentColorGreenAccent
                                         // image: const DecorationImage(
                                         //   image: AssetImage(
@@ -564,7 +576,7 @@ class SummaryToday extends StatelessWidget {
                                       ),
                                       TextSpan(
                                         text:
-                                            ' ${absenC.dataAbsen.isNotEmpty ? shiftName(jamMasuk: absenC.dataAbsen[0].jamMasuk!) : ''}',
+                                            ' (${absenC.dataAbsen.isNotEmpty ? absenC.dataAbsen[0].namaShift! : ''})',
                                         style: TextStyle(
                                           color:
                                               isDark

@@ -121,7 +121,7 @@ class SummaryAbsen extends GetView {
                       ),
                     ],
                   ),
-                  // const SizedBox(height: 5),
+                  const SizedBox(height: 5),
                   Obx(
                     () =>
                         absenC.isLoading.value && absenC.dataLimitAbsen.isEmpty
@@ -135,11 +135,21 @@ class SummaryAbsen extends GetView {
                               },
                             )
                             : absenC.dataLimitAbsen.isEmpty
-                            ? SizedBox(
-                              height: Get.size.height / 3,
-                              child: const Center(
-                                child: Text(
-                                  'There is no attendance history yet',
+                            ? Card(
+                              elevation: 8,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12)
+                              ),
+                              child: const Padding(
+                                padding: EdgeInsets.fromLTRB(8,25,8,25),
+                                child: Column(mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(Icons.assignment_ind),
+                                    SizedBox(height: 5,),
+                                    Text(
+                                      'There is no attendance history yet',
+                                    ),
+                                  ],
                                 ),
                               ),
                             )

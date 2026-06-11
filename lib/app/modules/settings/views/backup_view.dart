@@ -87,28 +87,52 @@ class BackupView extends GetView {
                     children: [
                       Column(
                         children: [
-                          ElevatedButton.icon(
-                            icon: const Icon(Icons.cloud_download_rounded),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: AppColors.itemsBackground,
-                            ),
+                           Container(
+                            height: 40,
+                            decoration: BoxDecoration(
+                              gradient: AppColors.mainGradient(
+                                context: context,
+                                begin: Alignment.centerLeft,
+                                end: Alignment.centerRight,
+                              ),
 
-                            onPressed: ctrl.backupDatabase,
-                            label: const Text('Backup'),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: ElevatedButton.icon(
+                              icon: const Icon(Icons.cloud_download_rounded),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.transparent,
+                              ),
+                            
+                              onPressed: ctrl.backupDatabase,
+                              label: const Text('Backup'),
+                            ),
                           ),
                           const Text('Cadangkan data'),
                         ],
                       ),
                       Column(
                         children: [
-                          ElevatedButton.icon(
-                            icon: const Icon(Icons.backup),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: AppColors.itemsBackground,
-                            ),
-                            onPressed: ctrl.restoreDatabase,
+                          Container(
+                            height: 40,
+                            decoration: BoxDecoration(
+                              gradient: AppColors.mainGradient(
+                                context: context,
+                                begin: Alignment.centerLeft,
+                                end: Alignment.centerRight,
+                              ),
 
-                            label: const Text('Restore'),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: ElevatedButton.icon(
+                              icon: const Icon(Icons.backup),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.transparent,
+                              ),
+                              onPressed: ctrl.restoreDatabase,
+
+                              label: const Text('Restore'),
+                            ),
                           ),
                           const Text('Pulihkan data'),
                         ],
@@ -348,7 +372,7 @@ class BackupView extends GetView {
                                     "id": userData.id!,
                                     "tgl_visit": today,
                                     // 🔥 SAFE
-                                    "visit_in": firstVisit?.visitIn ?? "",
+                                    "visit_in": firstVisit.visitIn ?? "",
                                   };
 
                                   final success = await ServiceApi()

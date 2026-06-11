@@ -198,6 +198,7 @@ class AbsenView extends GetView<AbsenController> {
           /// ==========================
           /// NORMAL MODE (ONLINE)
           /// ==========================
+          // print("STORE POINT => $storePoint");
           return Stack(
             children: [
               Positioned.fill(

@@ -190,6 +190,8 @@ class AbsenController extends GetxController
   var gpsError = ''.obs;
   final isQrValidated = false.obs;
 
+  final loginC = Get.find<LoginController>();
+
   // bool _hasTriggeredInitialSync = false;
   // bool _isHandlingReconnect = false;
 
@@ -378,16 +380,18 @@ class AbsenController extends GetxController
       if (!isMapReady.value) return;
 
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        _triggerSmartZoom(user);
+        triggerSmartZoom();
       });
     });
 
     ever(isOffline, (offline) {
       try {
         if (!offline) {
+          final currentUser = loginC.logUser.value;
+
           storeLatLng.value = LatLng(
-            double.parse(user.lat!),
-            double.parse(user.long!),
+            double.parse(currentUser.lat!),
+            double.parse(currentUser.long!),
           );
         }
       } catch (e, s) {
@@ -417,6 +421,25 @@ class AbsenController extends GetxController
       ''', s.toString());
 
         rethrow;
+      }
+    });
+
+    // Tambahan: update saat profile user berubah
+    ever(loginC.logUser, (currentUser) {
+      try {
+        if (!isOffline.value &&
+            currentUser.lat != null &&
+            currentUser.long != null) {
+          storeLatLng.value = LatLng(
+            double.parse(currentUser.lat!),
+            double.parse(currentUser.long!),
+          );
+        }
+      } catch (e, s) {
+        ErrorLogger.save(
+          'UPDATE STORE LATLNG FROM LOGUSER FAILED\n$e',
+          s.toString(),
+        );
       }
     });
   }
@@ -2896,7 +2919,7 @@ $s
       "username": dataUser.username!,
       "password": dataUser.password!,
     });
-    
+
     if (newUser == null) {
       await ErrorLogger.save('REFRESH USER GAGAL - NULL RESPONSE', '');
       return;
@@ -3026,19 +3049,25 @@ $s
     // print(barcodeScanRes.value);
   }
 
-  void _triggerSmartZoom(Data? data) {
+  void triggerSmartZoom() {
+    final user = loginC.logUser.value;
+
+    if (user.lat == null || user.long == null || user.areaCover == null) {
+      return;
+    }
+
     final userLatLng =
         scannedLatLng.value ?? LatLng(latFromGps.value, longFromGps.value);
 
     final storeLatLng = LatLng(
-      double.parse(lat.isNotEmpty ? lat.value : data!.lat!),
-      double.parse(long.isNotEmpty ? long.value : data!.long!),
+      double.parse(lat.isNotEmpty ? lat.value : user.lat!),
+      double.parse(long.isNotEmpty ? long.value : user.long!),
     );
 
     autoSmartZoom(
       userLatLng: userLatLng,
       storeLatLng: storeLatLng,
-      allowedRadius: double.parse(data!.areaCover!),
+      allowedRadius: double.parse(user.areaCover!),
     );
   }
 

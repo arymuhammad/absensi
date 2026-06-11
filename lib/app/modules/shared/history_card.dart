@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../data/helper/app_colors.dart';
 import '../../data/helper/const.dart';
 import '../../data/helper/helper_ui.dart';
 
@@ -58,14 +59,17 @@ class HistoryCard extends StatelessWidget {
             width: boxWidth,
             height: hasSyncStatus ? 102 : 82,
             padding: const EdgeInsets.symmetric(vertical: 14),
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               // color: Color(0xFF1E293B),
-              gradient: LinearGradient(
-                colors: [Color(0xFF1B2541), Color(0xFF3949AB)],
+              gradient: AppColors.mainGradient(
+                context: context,
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
-              borderRadius: BorderRadius.horizontal(left: Radius.circular(14)),
+
+              borderRadius: const BorderRadius.horizontal(
+                left: Radius.circular(14),
+              ),
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,

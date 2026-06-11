@@ -1346,16 +1346,16 @@ class ServiceApi {
 
   reqUpdateAbs(Map<String, dynamic> data) async {
     try {
-      // Map<String, String> headers = {
-      //   'Content-Type': 'application/json; charset=UTF-8',
-      // };
+      Map<String, String> headers = {
+        'Content-Type': 'application/json; charset=UTF-8',
+      };
 
       var request = http.MultipartRequest(
         'POST',
         Uri.parse('${baseUrl}req_update_data'),
       );
 
-      // request.headers.addAll(headers);
+      request.headers.addAll(headers);
 
       request.fields['status'] = data["status"];
       request.fields['id_user'] = data["id_user"];
@@ -1396,26 +1396,51 @@ class ServiceApi {
 
       // ================= FILE =================
 
+      File? fotoMasuk = data["foto_masuk"];
+      File? fotoPulang = data["foto_pulang"];
+
       if (data["status"] == "update_masuk" ||
           data["status"] == "update_masuk_cst") {
         request.files.add(
-          await http.MultipartFile.fromPath("foto_masuk", data["foto_masuk"]),
+          http.MultipartFile(
+            "foto_masuk",
+            fotoMasuk!.readAsBytes().asStream(),
+            fotoMasuk.lengthSync(),
+            filename: fotoMasuk.path.split("/").last,
+          ),
         );
       } else if (data["status"] == "update_pulang") {
         request.files.add(
-          await http.MultipartFile.fromPath("foto_pulang", data["foto_pulang"]),
+          http.MultipartFile(
+            "foto_pulang",
+            fotoPulang!.readAsBytes().asStream(),
+            fotoPulang.lengthSync(),
+            filename: fotoPulang.path.split("/").last,
+          ),
         );
       } else if (data["status"] == "update_data_absen") {
         request.files.add(
-          await http.MultipartFile.fromPath("foto_masuk", data["foto_masuk"]),
+          http.MultipartFile(
+            "foto_masuk",
+            fotoMasuk!.readAsBytes().asStream(),
+            fotoMasuk.lengthSync(),
+            filename: fotoMasuk.path.split("/").last,
+          ),
         );
-
         request.files.add(
-          await http.MultipartFile.fromPath("foto_pulang", data["foto_pulang"]),
+          http.MultipartFile(
+            "foto_pulang",
+            fotoPulang!.readAsBytes().asStream(),
+            fotoPulang.lengthSync(),
+            filename: fotoPulang.path.split("/").last,
+          ),
         );
       }
 
       // ================= SEND =================
+
+      print(request.fields);
+      print(request.files.map((e) => e.field).toList());
 
       final streamedResponse = await request.send().timeout(
         const Duration(minutes: 1),

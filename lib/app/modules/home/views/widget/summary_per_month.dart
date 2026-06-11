@@ -155,61 +155,61 @@ Widget genSummaryAbsen(HomeController homeC, bool isDark) {
   );
 }
 
-Widget _buildBox({
-  required String title,
-  required IconData icon,
-  required Color color,
-  required String value,
-  bool isLeft = false,
-  bool isRight = false,
-  required bool isDark,
-}) {
-  return Container(
-    decoration: BoxDecoration(
-      borderRadius: BorderRadius.only(
-        topLeft: isLeft ? const Radius.circular(5) : Radius.zero,
-        bottomLeft: isLeft ? const Radius.circular(5) : Radius.zero,
-        topRight: isRight ? const Radius.circular(5) : Radius.zero,
-        bottomRight: isRight ? const Radius.circular(5) : Radius.zero,
-      ),
-      color: isDark ? Get.theme.cardColor : Colors.white,
-    ),
-    child: Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Icon(icon, size: 24, color: color),
-              const SizedBox(width: 5),
-              Text(
-                title,
-                style: titleTextStyle.copyWith(fontSize: 15, color: color),
-              ),
-            ],
-          ),
-          const SizedBox(height: 2),
-          Row(
-            children: [
-              Text(
-                value,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(width: 5),
-              const Text(
-                'Day',
-                style: TextStyle(color: Colors.grey, fontSize: 12),
-              ),
-            ],
-          ),
-        ],
-      ),
-    ),
-  );
-}
+// Widget _buildBox({
+//   required String title,
+//   required IconData icon,
+//   required Color color,
+//   required String value,
+//   bool isLeft = false,
+//   bool isRight = false,
+//   required bool isDark,
+// }) {
+//   return Container(
+//     decoration: BoxDecoration(
+//       borderRadius: BorderRadius.only(
+//         topLeft: isLeft ? const Radius.circular(5) : Radius.zero,
+//         bottomLeft: isLeft ? const Radius.circular(5) : Radius.zero,
+//         topRight: isRight ? const Radius.circular(5) : Radius.zero,
+//         bottomRight: isRight ? const Radius.circular(5) : Radius.zero,
+//       ),
+//       color: isDark ? Get.theme.cardColor : Colors.white,
+//     ),
+//     child: Padding(
+//       padding: const EdgeInsets.all(8.0),
+//       child: Column(
+//         children: [
+//           Row(
+//             children: [
+//               Icon(icon, size: 24, color: color),
+//               const SizedBox(width: 5),
+//               Text(
+//                 title,
+//                 style: titleTextStyle.copyWith(fontSize: 15, color: color),
+//               ),
+//             ],
+//           ),
+//           const SizedBox(height: 2),
+//           Row(
+//             children: [
+//               Text(
+//                 value,
+//                 style: const TextStyle(
+//                   fontSize: 18,
+//                   fontWeight: FontWeight.bold,
+//                 ),
+//               ),
+//               const SizedBox(width: 5),
+//               const Text(
+//                 'Day',
+//                 style: TextStyle(color: Colors.grey, fontSize: 12),
+//               ),
+//             ],
+//           ),
+//         ],
+//       ),
+//     ),
+//   );
+// }
 
 class CardSummPermonth extends StatelessWidget {
   const CardSummPermonth({

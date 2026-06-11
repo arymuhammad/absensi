@@ -77,7 +77,7 @@ class SummaryAbsenArea extends GetView {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Padding(
-                        padding: const EdgeInsets.fromLTRB(2,5,0,0),
+                        padding: const EdgeInsets.fromLTRB(2, 5, 0, 0),
                         child: Text(
                           'Visit History',
                           style: titleTextStyle.copyWith(fontSize: 15),
@@ -99,10 +99,21 @@ class SummaryAbsenArea extends GetView {
                               },
                             )
                             : absenC.dataLimitVisit.isEmpty
-                            ? SizedBox(
-                              height: Get.size.height / 3,
-                              child: const Center(
-                                child: Text('There is no visit history yet'),
+                            ? Card(
+                              elevation: 8,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: const Padding(
+                                padding: EdgeInsets.fromLTRB(8, 25, 8, 25),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(Icons.assignment_ind),
+                                    SizedBox(height: 5),
+                                    Text('There is no visit history yet'),
+                                  ],
+                                ),
                               ),
                             )
                             : ListView.separated(

@@ -34,57 +34,37 @@ class BottomNavBar extends GetView {
       Navigator(
         key: navigatorKeys[0],
         onGenerateRoute: (settings) {
-          return MaterialPageRoute(
-            builder: (_) => HomeView(),
-          );
+          return MaterialPageRoute(builder: (_) => HomeView());
         },
       ),
       listDataUser.visit == "1"
           ? Navigator(
             key: navigatorKeys[1],
             onGenerateRoute: (settings) {
-              return MaterialPageRoute(
-                builder: (_) => RiwayatVisitView(),
-              );
+              return MaterialPageRoute(builder: (_) => RiwayatVisitView());
             },
           )
           : Navigator(
             key: navigatorKeys[1],
             onGenerateRoute: (settings) {
-              return MaterialPageRoute(
-                builder: (_) => SemuaAbsenView(),
-              );
+              return MaterialPageRoute(builder: (_) => SemuaAbsenView());
             },
           ),
       AbsenView(),
       Navigator(
         key: navigatorKeys[3],
         onGenerateRoute: (settings) {
-          return MaterialPageRoute(
-            builder: (_) => SettingsView(),
-          );
+          return MaterialPageRoute(builder: (_) => SettingsView());
         },
       ),
       Navigator(
         key: navigatorKeys[4],
         onGenerateRoute: (settings) {
-          return MaterialPageRoute(
-            builder: (_) => ProfilView(),
-          );
+          return MaterialPageRoute(builder: (_) => ProfilView());
         },
       ),
     ];
 
-    // List<TabItem> items = [
-    //   const TabItem(icon: CupertinoIcons.home, title: 'Home'),
-    //   const TabItem(icon: CupertinoIcons.doc_text_search, title: 'History'),
-    //   const TabItem(
-    //     icon: Iconsax.camera_outline,
-    //     title: '',
-    //   ), // Label kosong tetap valid
-    //   const TabItem(icon: CupertinoIcons.gear_alt, title: 'Setting'),
-    //   const TabItem(icon: CupertinoIcons.person_crop_circle, title: 'Profile'),
-    // ];
     return Scaffold(
       body: Obx(
         () => IndexedStack(index: logC.selected.value, children: widgetList),
@@ -94,6 +74,7 @@ class BottomNavBar extends GetView {
         () => ModernBottomBar(
           selectedIndex: logC.selected.value,
           onTap: (index) async {
+            final uData = logC.logUser.value;
             // ✅ Jika tab aktif ditekan ulang, kembali ke halaman awal
             if (logC.selected.value == index) {
               navigatorKeys[index].currentState?.popUntil(
@@ -105,18 +86,58 @@ class BottomNavBar extends GetView {
               logC.selectedMenu(index);
               loc.isLoading.value = true;
               loc.searchDate.value = "";
-              listDataUser.visit == "1"
-                  ? loc.getAllVisited(listDataUser.id!, '', '')
-                  : loc.getAllAbsen(listDataUser.id!, '', '');
+              ///// RESET FORM CI / CO ////////
+              loc.stsAbsenSelected.value = "";
+              loc.optVisitSelected.value = "";
+              loc.selectedCabang.value = "";
+              loc.selectedCabangVisit.value = "";
+              loc.selectedShift.value = "";
+              loc.lat.value = "";
+              loc.long.value = "";
+              // loc.storeLatLng.value = LatLng(
+              //   double.parse(uData.lat!),
+              //   double.parse(uData.long!),
+              // );
+              // loc.refreshZoom(uData);
+              ///////////////////////////////
+              uData.visit == "1"
+                  ? loc.getAllVisited(uData.id!, '', '')
+                  : loc.getAllAbsen(uData.id!, '', '');
             } else if (index == 2) {
               loc.isLoading.value = true;
               loc.lokasi.value = "";
+              loc.stsAbsenSelected.value = "";
+              loc.optVisitSelected.value = "";
+              loc.selectedCabang.value = "";
+              loc.selectedCabangVisit.value = "";
+              loc.selectedShift.value = "";
+              loc.lat.value = "";
+              loc.long.value = "";
               // loadingDialog('Finding your location', '');
               logC.selectedMenu(index);
-              await loc.getLoc(listDataUser);
+              await loc.getLoc(uData);
+              // loc.triggerSmartZoom();
+              // loc.refreshZoom(uData);
+              // loc.storeLatLng.value = LatLng(
+              //   double.parse(uData.lat!),
+              //   double.parse(uData.long!),
+              // );
               // Get.back();
             } else {
               logC.selectedMenu(index);
+              ///// RESET FORM CI / CO ////////
+              loc.stsAbsenSelected.value = "";
+              loc.optVisitSelected.value = "";
+              loc.selectedCabang.value = "";
+              loc.selectedCabangVisit.value = "";
+              loc.selectedShift.value = "";
+              loc.lat.value = "";
+              loc.long.value = "";
+              // loc.storeLatLng.value = LatLng(
+              //   double.parse(uData.lat!),
+              //   double.parse(uData.long!),
+              // );
+              ///////////////////////////////
             }
           },
         ),

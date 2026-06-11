@@ -172,7 +172,7 @@ class SettingsView extends GetView<SettingsController> {
                               ),
                             ),
                             subtitle: Text(
-                              'Change Password',
+                              'Change password',
                               style: TextStyle(
                                 color: subTitleColor,
                                 fontSize: 13,
@@ -463,7 +463,7 @@ class SettingsView extends GetView<SettingsController> {
                               ),
                             ),
                             subtitle: Text(
-                              'about version app',
+                              'About version app',
                               style: TextStyle(
                                 color: subTitleColor,
                                 fontSize: 13,
@@ -501,7 +501,7 @@ class SettingsView extends GetView<SettingsController> {
                               ),
                             ),
                             subtitle: Text(
-                              'bug report',
+                              'Bug report',
                               style: TextStyle(
                                 color: subTitleColor,
                                 fontSize: 13,
