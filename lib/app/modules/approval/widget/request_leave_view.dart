@@ -417,73 +417,63 @@ class RequestLeaveView extends GetView<LeaveController> {
                                     ),
                                 const SizedBox(height: 10),
 
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: [
-                                    CsElevatedButton(
-                                      label: 'Reject',
-                                      color: red!,
-                                      fontsize: 15,
-                                      onPressed:
-                                          status == "approved" ||
-                                                  status == "rejected"
-                                              ? null
-                                              : () {
-                                                final userData =
-                                                    auth.logUser.value;
-                                                promptDialog(
-                                                  context: context,
-                                                  title: 'Confirm',
-                                                  desc: 'Reject this request?',
-                                                  btnOkOnPress: () async {
-                                                    var param = {
-                                                      "type": "reject",
-                                                      "uid": leave.uid!,
-                                                      "level": userData.level,
-                                                      "acc_name": userData.nama,
-                                                      "sign": "reject",
-                                                    };
-                                                    await ServiceApi().reqLeave(
-                                                      param,
-                                                    );
-                                                    var reload = {
-                                                      "type":
-                                                          "get_pending_req_leave",
-                                                      "kode_cabang":
-                                                          userData.kodeCabang!,
-                                                      "id_user": userData.id!,
-                                                      "level": userData.level!,
-                                                    };
-                                                    leaveC.isLoading.value =
-                                                        true;
-                                                    leaveC.getLeaveReq(reload);
-                                                  },
-                                                );
-                                              },
-                                      size: const Size(double.infinity, 30),
-                                    ),
-                                    const SizedBox(width: 5),
-                                    CsElevatedButton(
-                                      label: 'Approve',
-                                      color: AppColors.contentColorGreenAccent,
-                                      fontsize: 15,
-                                      onPressed:
-                                          status == "approved" ||
-                                                  status == "rejected"
-                                              ? null
-                                              : () {
-                                                final userData =
-                                                    auth.logUser.value;
-                                                signDialog(
-                                                  context,
-                                                  userData,
-                                                  leave.uid!,
-                                                );
-                                              },
-                                      size: const Size(double.infinity, 30),
-                                    ),
-                                  ],
-                                ),
+                                if (status == "pending")
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      CsElevatedButton(
+                                        label: 'Reject',
+                                        color: red!,
+                                        fontsize: 15,
+                                        onPressed: () {
+                                          final userData = auth.logUser.value;
+                                          promptDialog(
+                                            context: context,
+                                            title: 'Confirm',
+                                            desc: 'Reject this request?',
+                                            btnOkOnPress: () async {
+                                              var param = {
+                                                "type": "reject",
+                                                "uid": leave.uid!,
+                                                "level": userData.level,
+                                                "acc_name": userData.nama,
+                                                "sign": "reject",
+                                              };
+                                              await ServiceApi().reqLeave(
+                                                param,
+                                              );
+                                              var reload = {
+                                                "type": "get_pending_req_leave",
+                                                "kode_cabang":
+                                                    userData.kodeCabang!,
+                                                "id_user": userData.id!,
+                                                "level": userData.level!,
+                                              };
+                                              leaveC.isLoading.value = true;
+                                              leaveC.getLeaveReq(reload);
+                                            },
+                                          );
+                                        },
+                                        size: const Size(double.infinity, 30),
+                                      ),
+                                      const SizedBox(width: 5),
+                                      CsElevatedButton(
+                                        label: 'Approve',
+                                        color:
+                                            AppColors.contentColorGreenAccent,
+                                        fontsize: 15,
+                                        onPressed: () {
+                                          final userData = auth.logUser.value;
+                                          signDialog(
+                                            context,
+                                            userData,
+                                            leave.uid!,
+                                          );
+                                        },
+                                        size: const Size(double.infinity, 30),
+                                      ),
+                                    ],
+                                  ),
                               ],
                             );
                           }),

@@ -335,46 +335,50 @@ class ReqPermView extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(height: 10),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                CsElevatedButton(
-                                  color: red!,
-                                  fontsize: 15,
-                                  label: 'Reject',
-                                  onPressed: () {
-                                    final userData = auth.logUser.value;
-                                    ctrl.reject(
-                                      parentId: userData.parentId!,
-                                      level: userData.level!,
-                                      idUser: userData.id!,
-                                      idPerm: item.id!,
-                                      date1: item.tanggalMulai!,
-                                      date2: item.tanggalSelesai!,
-                                      noted: ctrl.note.text,
-                                    );
-                                  },
-                                ),
-                                const SizedBox(width: 5),
-                                CsElevatedButton(
-                                  color: green!,
-                                  fontsize: 15,
-                                  label: 'Accept',
-                                  onPressed: () {
-                                    final userData = auth.logUser.value;
-                                    ctrl.accept(
-                                      parentId: userData.parentId!,
-                                      level: userData.level!,
-                                      idUser: userData.id!,
-                                      idPerm: item.id!,
-                                      date1: item.tanggalMulai!,
-                                      date2: item.tanggalSelesai!,
-                                      noted: ctrl.note.text,
-                                    );
-                                  },
-                                ),
-                              ],
-                            ),
+                            if (status == "pending")
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  CsElevatedButton(
+                                    color: red!,
+                                    fontsize: 15,
+                                    label: 'Reject',
+                                    onPressed: () {
+                                              final userData =
+                                                  auth.logUser.value;
+                                              ctrl.reject(
+                                                parentId: userData.parentId!,
+                                                level: userData.level!,
+                                                idUser: userData.id!,
+                                                idPerm: item.id!,
+                                                date1: item.tanggalMulai!,
+                                                date2: item.tanggalSelesai!,
+                                                noted: ctrl.note.text,
+                                              );
+                                            },
+                                  ),
+                                  const SizedBox(width: 5),
+                                  CsElevatedButton(
+                                    color: green!,
+                                    fontsize: 15,
+                                    label: 'Accept',
+                                    onPressed:
+                                       () {
+                                              final userData =
+                                                  auth.logUser.value;
+                                              ctrl.accept(
+                                                parentId: userData.parentId!,
+                                                level: userData.level!,
+                                                idUser: userData.id!,
+                                                idPerm: item.id!,
+                                                date1: item.tanggalMulai!,
+                                                date2: item.tanggalSelesai!,
+                                                noted: ctrl.note.text,
+                                              );
+                                            },
+                                  ),
+                                ],
+                              ),
                           ],
                         ),
                       ),

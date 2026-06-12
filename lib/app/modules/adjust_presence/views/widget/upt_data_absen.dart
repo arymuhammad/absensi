@@ -362,7 +362,7 @@ class UptDataAbsen extends StatelessWidget {
         //   return
         Visibility(
           visible:
-              !isInbox
+              !isInbox && data.statusExcep == "pending"
                   // data.statusExcep == "pending" &&
                   //         ([
                   //           '1',

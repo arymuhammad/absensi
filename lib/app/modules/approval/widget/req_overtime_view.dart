@@ -277,42 +277,43 @@ class ReqOvertimeView extends StatelessWidget {
                               ],
                             ),
                             const SizedBox(height: 5),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                CsElevatedButton(
-                                  color: red!,
-                                  fontsize: 15,
-                                  label: 'Reject',
-                                  onPressed: () {
-                                    final userData = auth.logUser.value;
-                                    ctrl.reject(
-                                      level: userData.level!,
-                                      idUser: userData.id!,
-                                      idOvt: item.id!,
-                                      date1: item.initDate!,
-                                      date2: item.endDate!,
-                                    );
-                                  },
-                                ),
-                                const SizedBox(width: 5),
-                                CsElevatedButton(
-                                  color: green!,
-                                  fontsize: 15,
-                                  label: 'Accept',
-                                  onPressed: () {
-                                    final userData = auth.logUser.value;
-                                    ctrl.accept(
-                                      level: userData.level!,
-                                      idUser: userData.id!,
-                                      idOvt: item.id!,
-                                      date1: item.initDate!,
-                                      date2: item.endDate!,
-                                    );
-                                  },
-                                ),
-                              ],
-                            ),
+                            if (status == "pending")
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  CsElevatedButton(
+                                    color: red!,
+                                    fontsize: 15,
+                                    label: 'Reject',
+                                    onPressed: () {
+                                      final userData = auth.logUser.value;
+                                      ctrl.reject(
+                                        level: userData.level!,
+                                        idUser: userData.id!,
+                                        idOvt: item.id!,
+                                        date1: item.initDate!,
+                                        date2: item.endDate!,
+                                      );
+                                    },
+                                  ),
+                                  const SizedBox(width: 5),
+                                  CsElevatedButton(
+                                    color: green!,
+                                    fontsize: 15,
+                                    label: 'Accept',
+                                    onPressed: () {
+                                      final userData = auth.logUser.value;
+                                      ctrl.accept(
+                                        level: userData.level!,
+                                        idUser: userData.id!,
+                                        idOvt: item.id!,
+                                        date1: item.initDate!,
+                                        date2: item.endDate!,
+                                      );
+                                    },
+                                  ),
+                                ],
+                              ),
                           ],
                         ),
                       ),
