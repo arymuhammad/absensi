@@ -1,7 +1,10 @@
 import 'dart:convert';
 import 'package:absensi/app/data/helper/custom_dialog.dart';
+import 'package:absensi/app/data/helper/navigator_helper.dart';
 import 'package:absensi/app/data/model/login_offline_model.dart';
 import 'package:absensi/app/modules/pay_slip/controllers/pay_slip_controller.dart';
+import 'package:absensi/main.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -28,6 +31,7 @@ class LoginController extends GetxController with GetTickerProviderStateMixin {
   @override
   void onInit() async {
     super.onInit();
+    initFCM();
     loadSession();
     ctrAnimated = AnimationController(
       duration: const Duration(milliseconds: 800),
@@ -65,10 +69,10 @@ class LoginController extends GetxController with GetTickerProviderStateMixin {
 
     //checking data
     // if (dataOffline.isNotEmpty) {
-      // showToast("ambil data dari sqlite");
-      // FotoProfil foto = await ServiceApi().getFotoProfil({
-      //   'id': dataOffline.first.id!,
-      // });
+    // showToast("ambil data dari sqlite");
+    // FotoProfil foto = await ServiceApi().getFotoProfil({
+    //   'id': dataOffline.first.id!,
+    // });
 
     //   await pref.setString(
     //     'userDataLogin',
@@ -117,93 +121,97 @@ class LoginController extends GetxController with GetTickerProviderStateMixin {
     //   //   Get.put(AbsenController());
     //   // }
     // } else {
-      try {
-        var response = await ServiceApi().loginUser(data);
-        // showToast("ambil data dari server");
-        // dataUser.value = response;
-        if (response.success == true) {
-          await pref.setString(
-            'userDataLogin',
-            jsonEncode(
-              Data(
-                id: response.data!.id,
-                nama: response.data!.nama,
-                username: response.data!.username,
-                password: response.data!.password,
-                kodeCabang: response.data!.kodeCabang,
-                namaCabang: response.data!.namaCabang,
-                nik: response.data!.nik,
-                lat: response.data!.lat,
-                long: response.data!.long,
-                foto: response.data!.foto,
-                noTelp: response.data!.noTelp,
-                level: response.data!.level,
-                levelUser: response.data!.levelUser,
-                areaCover: response.data!.areaCover,
-                cekStok: response.data!.cekStok,
-                visit: response.data!.visit,
-                idRegion: response.data!.idRegion,
-                leaveBalance: response.data!.leaveBalance,
-                createdAt: response.data!.createdAt,
-                parentId: response.data!.parentId,
-                namaParent: response.data!.namaParent,
-              ),
+    try {
+      var response = await ServiceApi().loginUser(data);
+      // showToast("ambil data dari server");
+      // dataUser.value = response;
+      if (response.success == true) {
+        await pref.setString(
+          'userDataLogin',
+          jsonEncode(
+            Data(
+              id: response.data!.id,
+              nama: response.data!.nama,
+              username: response.data!.username,
+              password: response.data!.password,
+              kodeCabang: response.data!.kodeCabang,
+              namaCabang: response.data!.namaCabang,
+              nik: response.data!.nik,
+              lat: response.data!.lat,
+              long: response.data!.long,
+              foto: response.data!.foto,
+              noTelp: response.data!.noTelp,
+              level: response.data!.level,
+              levelUser: response.data!.levelUser,
+              areaCover: response.data!.areaCover,
+              cekStok: response.data!.cekStok,
+              visit: response.data!.visit,
+              idRegion: response.data!.idRegion,
+              leaveBalance: response.data!.leaveBalance,
+              createdAt: response.data!.createdAt,
+              parentId: response.data!.parentId,
+              namaParent: response.data!.namaParent,
             ),
-          );
+          ),
+        );
 
-          var tempUser = pref.getString('userDataLogin');
-          logUser.value = Data.fromJson(jsonDecode(tempUser!));
-          isAuth.value = await pref.setBool("is_login", true);
-          // isAuth.value = true;
+        var tempUser = pref.getString('userDataLogin');
+        logUser.value = Data.fromJson(jsonDecode(tempUser!));
+        isAuth.value = await pref.setBool("is_login", true);
+        // isAuth.value = true;
 
-          // await SQLHelper.instance
-          //     .getDataUser(response.data!.id!)
-          //     .then((data) => userSqlite.value = data);
+        // await SQLHelper.instance
+        //     .getDataUser(response.data!.id!)
+        //     .then((data) => userSqlite.value = data);
 
-          // if (userSqlite.isEmpty) {
-          //   //insert user data to sqlite
-          //   await SQLHelper.instance.insertDataUser(
-          //     LoginOffline(
-          //       id: '${response.data!.id}',
-          //       nama: '${response.data!.nama}',
-          //       namaCabang: '${response.data!.namaCabang}',
-          //       nik: '${response.data!.nik}',
-          //       noTelp: '${response.data!.noTelp}',
-          //       levelUser: '${response.data!.levelUser}',
-          //       foto: '${response.data!.foto}',
-          //       lat: '${response.data!.lat}',
-          //       long: '${response.data!.long}',
-          //       kodeCabang: '${response.data!.kodeCabang}',
-          //       level: '${response.data!.level}',
-          //       username: '${response.data!.username}',
-          //       password: '${response.data!.password}',
-          //       areaCover: '${response.data!.areaCover}',
-          //       visit: '${response.data!.visit}',
-          //       cekStok: '${response.data!.cekStok}',
-          //       idRegion: '${response.data!.idRegion}',
-          //       leaveBalance: '${response.data!.leaveBalance}',
-          //       createdAt: '${response.data!.createdAt}',
-          //       parentId: '${response.data!.parentId}',
-          //       namaParent: '${response.data!.namaParent}',
-          //     ),
-          //   );
-          //   //end of insert statement
-          // }
+        // if (userSqlite.isEmpty) {
+        //   //insert user data to sqlite
+        //   await SQLHelper.instance.insertDataUser(
+        //     LoginOffline(
+        //       id: '${response.data!.id}',
+        //       nama: '${response.data!.nama}',
+        //       namaCabang: '${response.data!.namaCabang}',
+        //       nik: '${response.data!.nik}',
+        //       noTelp: '${response.data!.noTelp}',
+        //       levelUser: '${response.data!.levelUser}',
+        //       foto: '${response.data!.foto}',
+        //       lat: '${response.data!.lat}',
+        //       long: '${response.data!.long}',
+        //       kodeCabang: '${response.data!.kodeCabang}',
+        //       level: '${response.data!.level}',
+        //       username: '${response.data!.username}',
+        //       password: '${response.data!.password}',
+        //       areaCover: '${response.data!.areaCover}',
+        //       visit: '${response.data!.visit}',
+        //       cekStok: '${response.data!.cekStok}',
+        //       idRegion: '${response.data!.idRegion}',
+        //       leaveBalance: '${response.data!.leaveBalance}',
+        //       createdAt: '${response.data!.createdAt}',
+        //       parentId: '${response.data!.parentId}',
+        //       namaParent: '${response.data!.namaParent}',
+        //     ),
+        //   );
+        //   //end of insert statement
+        // }
 
-          username.clear();
-          password.clear();
+        username.clear();
+        password.clear();
 
-          showToast("Selamat datang ${response.data!.nama}");
-          // Pastikan controller AbsenController sudah didaftarkan
-          // if (!Get.isRegistered<AbsenController>()) {
-          //   Get.put(AbsenController());
-          // }
-        } else {
-          showToast(response.message ?? "Terjadi kesalahan");
-        }
-      } catch (e) {
-        showToast(e.toString()); // 🔥 semua error masuk sini
+        showToast("Selamat datang ${response.data!.nama}");
+
+        // UPDATE TOKEN FIREBASE
+        await updateFcmToken();
+
+        // Pastikan controller AbsenController sudah didaftarkan
+        // if (!Get.isRegistered<AbsenController>()) {
+        //   Get.put(AbsenController());
+        // }
+      } else {
+        showToast(response.message ?? "Terjadi kesalahan");
       }
+    } catch (e) {
+      showToast(e.toString()); // 🔥 semua error masuk sini
+    }
     // }
   }
 
@@ -216,6 +224,18 @@ class LoginController extends GetxController with GetTickerProviderStateMixin {
     if (status && userDataLogin.isNotEmpty) {
       logUser.value = Data.fromJson(jsonDecode(userDataLogin));
       isAuth.value = true;
+
+      // UPDATE TOKEN FCM
+      await updateFcmToken();
+
+      if (pendingNotification != null && !notificationHandled) {
+        notificationHandled = true;
+
+        Future.delayed(const Duration(milliseconds: 300), () {
+          NotificationNavigation.handleNotificationRm(pendingNotification!);
+          pendingNotification = null;
+        });
+      }
     } else {
       isAuth.value = false;
     }
@@ -226,14 +246,22 @@ class LoginController extends GetxController with GetTickerProviderStateMixin {
   logout() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
 
+    // await pref.clear();
+
+    final userId = logUser.value.id;
+    final token = await FirebaseMessaging.instance.getToken();
+    // hapus relasi user-token di server
+    await ServiceApi().deleteToken({"id_user": userId, "token": token});
+    // await FirebaseMessaging.instance.deleteToken();
+
     await pref.remove("is_login");
     await pref.remove('userDataLogin');
-    // await pref.clear();
 
     logUser.value = Data();
 
     isAuth.value = false;
     selected.value = 0;
+
     // Hapus semua controller yang memang ingin dihapus saja
     // if (Get.isRegistered<AbsenController>()) {
     //   final absenC = Get.find<AbsenController>();
@@ -288,5 +316,30 @@ class LoginController extends GetxController with GetTickerProviderStateMixin {
 
     // Buat hash MD5 dari string gabungan ini
     return md5.convert(utf8.encode(combined)).toString();
+  }
+
+  Future<void> initFCM() async {
+    await FirebaseMessaging.instance.requestPermission(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
+  }
+
+  Future<void> updateFcmToken() async {
+    try {
+      final token = await FirebaseMessaging.instance.getToken();
+
+      if (token == null) return;
+
+      // print("FCM TOKEN: $token");
+
+      await ServiceApi().saveFcmToken({
+        "id_user": logUser.value.id,
+        "token": token,
+      });
+    } catch (e) {
+      debugPrint("Update FCM gagal: $e");
+    }
   }
 }

@@ -65,7 +65,7 @@ class ServiceApi {
               return dialogMsg("Time Out", "Koneksi server timeout");
             },
           );
-
+// print(data);
       SmartDialog.dismiss();
 
       final body = json.decode(response.body);
@@ -1518,9 +1518,9 @@ class ServiceApi {
             ),
           )
           .timeout(const Duration(minutes: 1));
-      // print(
-      //   '${baseUrl}get_reqUptAbs?accept=$accept&type=$type&level=$level&id_user=$idUser&kode_cabang=$branchCode&date1=$date1&date2=$date2',
-      // );
+  //     print(
+  // '${baseUrl}get_reqUptAbs?accept=$accept&type=$type&level=$level&id_user=$idUser&kode_cabang=$branchCode&date1=$date1&date2=$date2',
+  //     );
       final res = json.decode(response.body);
       switch (response.statusCode) {
         case 200:
@@ -1889,6 +1889,8 @@ class ServiceApi {
 
       request.headers.addAll(headers);
 
+      // print(data);
+
       request.fields['type'] = data["type"];
       request.fields['id'] = data["id"];
       request.fields['branch_code'] = data["branch_code"];
@@ -1952,6 +1954,44 @@ class ServiceApi {
       }
     } catch (e) {
       return {'success': false, 'error': e.toString()};
+    }
+  }
+
+  Future<bool> saveFcmToken(Map<String, String?> map) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/save_token'),
+        body: map,
+      );
+
+      if (response.statusCode != 200) {
+        return false;
+      }
+
+      final result = jsonDecode(response.body);
+      return result['success'] == true;
+    } catch (e) {
+      debugPrint('saveFcmToken error: $e');
+      return false;
+    }
+  }
+
+  Future<bool> deleteToken(Map<String, String?> map) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/delete_token'),
+        body: map,
+      );
+
+      if (response.statusCode != 200) {
+        return false;
+      }
+
+      final result = jsonDecode(response.body);
+      return result['success'] == true;
+    } catch (e) {
+      debugPrint('deleteFcmToken error: $e');
+      return false;
     }
   }
 }

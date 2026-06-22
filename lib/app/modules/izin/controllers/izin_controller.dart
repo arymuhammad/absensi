@@ -62,6 +62,7 @@ class IzinController extends GetxController {
 
   Future<List<PermissionModel>> getPermissionList({
     required String idUser,
+    required String kodeCabang,
     required String parentId,
     required String level,
     required String type,
@@ -74,6 +75,7 @@ class IzinController extends GetxController {
       "type": type,
       "id_user": idUser,
       "level": level,
+      "kode_cabang": kodeCabang,
       "parent_id": parentId,
       "init_date": (date1?.isNotEmpty ?? false) ? date1! : initDate,
       "end_date": (date2?.isNotEmpty ?? false) ? date2! : endDate,
@@ -129,6 +131,7 @@ class IzinController extends GetxController {
     resetForm();
     await getPermissionList(
       idUser: id,
+      kodeCabang: branchCode,
       parentId: parentId,
       level: level,
       type: "",
@@ -176,6 +179,7 @@ class IzinController extends GetxController {
 
   reject({
     required String level,
+    required String kodeCabang,
     required String parentId,
     required String idPerm,
     required String idUser,
@@ -222,6 +226,7 @@ class IzinController extends GetxController {
     if (response['success'] == true) {
       await getPermissionList(
         idUser: idUser,
+        kodeCabang: kodeCabang,
         parentId: parentId,
         level: level,
         type: "get_pending_req_permission",
@@ -236,6 +241,7 @@ class IzinController extends GetxController {
 
   accept({
     required String level,
+    required String kodeCabang,
     required String parentId,
     required String idPerm,
     required String idUser,
@@ -256,7 +262,7 @@ class IzinController extends GetxController {
             "20": "acc_1",
             "59": "acc_1",
           }[level]!:
-          "approve",
+          "approved",
       {
             "1": "note_acc_4",
             "17": "note_acc_4",
@@ -281,8 +287,9 @@ class IzinController extends GetxController {
     final response = await ServiceApi().permission(data);
     if (response['success'] == true) {
       await getPermissionList(
-        parentId: parentId,
         idUser: idUser,
+        kodeCabang: kodeCabang,
+        parentId: parentId,
         level: level,
         type: "get_pending_req_permission",
         status: "pending",
@@ -294,7 +301,13 @@ class IzinController extends GetxController {
     note.clear();
   }
 
-  delete(String? id, String idUser, String parentId, String level) async {
+  delete(
+    String? id,
+    String idUser,
+    String parentId,
+    String level,
+    String kodeCabang,
+  ) async {
     final response = await http.post(
       Uri.parse('${ServiceApi().baseUrl}perm'),
       body: {"type": "delete", "id": id},
@@ -303,6 +316,7 @@ class IzinController extends GetxController {
       showToast(jsonDecode(response.body)['message']);
       await getPermissionList(
         idUser: idUser,
+        kodeCabang: kodeCabang,
         parentId: parentId,
         level: level,
         type: "",

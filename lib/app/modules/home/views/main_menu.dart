@@ -10,9 +10,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../data/helper/app_colors.dart';
 import '../../../data/helper/const.dart';
-import '../../../data/model/login_model.dart';
 import '../../adjust_presence/views/adjust_presence_view.dart';
 import '../../leave/controllers/leave_controller.dart';
+import '../../login/controllers/login_controller.dart';
 import '../../overtime/controllers/overtime_controller.dart';
 import '../../pay_slip/controllers/pay_slip_controller.dart';
 import '../../pay_slip/views/pay_slip_view.dart';
@@ -20,8 +20,7 @@ import '../../semua_absen/views/monitoring_absen_view.dart';
 import 'req_app_user_view.dart';
 
 class MainMenu extends StatelessWidget {
-  final Data? userData;
-  MainMenu({super.key, this.userData});
+  MainMenu({super.key});
 
   final absC = Get.find<AbsenController>();
   final adjCtrl = Get.find<AdjustPresenceController>();
@@ -30,9 +29,11 @@ class MainMenu extends StatelessWidget {
   final payC = Get.put(PaySlipController());
   final ovrC = Get.put(OvertimeController());
   final prmC = Get.put(IzinController());
-  // final logC = Get.find<LoginController>();
+  final logC = Get.find<LoginController>();
+
   @override
   Widget build(BuildContext context) {
+    final userData = logC.logUser.value;
     return Padding(
       padding: const EdgeInsets.fromLTRB(2, 0, 2, 0),
       child: Column(
@@ -50,47 +51,47 @@ class MainMenu extends StatelessWidget {
               ),
               TextButton.icon(
                 onPressed: () {
-                  if ((userData!.parentId == "3" &&
-                          (userData!.level == "19" ||
-                              userData!.level == "20" ||
-                              userData!.level == "59" ||
-                              userData!.level == "26")) ||
-                      (userData!.parentId == "4" &&
-                          (userData!.level == "1" ||
-                              userData!.level == "43")) ||
-                      (userData!.parentId == "5" && userData!.level == "77") ||
-                      (userData!.parentId == "7" && userData!.level == "23") ||
-                      (userData!.parentId == "8" && userData!.level == "18") ||
-                      (userData!.parentId == "9" && userData!.level == "41") ||
-                      (userData!.parentId == "2" && userData!.level == "10") ||
-                      (userData!.parentId == "1") ||
-                      (userData!.level == "96") ||
-                      (userData!.level == "106")) {
+                  final userData = logC.logUser.value;
+                  if ((userData.parentId == "3" &&
+                          (userData.level == "19" ||
+                              userData.level == "20" ||
+                              userData.level == "59" ||
+                              userData.level == "26")) ||
+                      (userData.parentId == "4" &&
+                          (userData.level == "1" || userData.level == "43")) ||
+                      (userData.parentId == "5" && userData.level == "77") ||
+                      (userData.parentId == "7" && userData.level == "23") ||
+                      (userData.parentId == "8" && userData.level == "18") ||
+                      (userData.parentId == "9" && userData.level == "41") ||
+                      (userData.parentId == "2" && userData.level == "10") ||
+                      (userData.parentId == "1") ||
+                      (userData.level == "96") ||
+                      (userData.level == "106")) {
                     homeC.getPendingAdj(
-                      idUser: userData!.id!,
-                      idCabang: userData!.kodeCabang!,
-                      level: userData!.level!,
+                      idUser: userData.id!,
+                      idCabang: userData.kodeCabang!,
+                      level: userData.level!,
                     );
 
                     homeC.getPendingApproval(
-                      idUser: userData!.id!,
-                      kodeCabang: userData!.kodeCabang!,
-                      level: userData!.level!,
-                      parentId: userData!.parentId!,
+                      idUser: userData.id!,
+                      kodeCabang: userData.kodeCabang!,
+                      level: userData.level!,
+                      parentId: userData.parentId!,
                     );
 
                     homeC.getPendingOvr(
-                      idUser: userData!.id!,
-                      kodeCabang: userData!.kodeCabang!,
-                      level: userData!.level!,
-                      parentId: userData!.parentId!,
+                      idUser: userData.id!,
+                      kodeCabang: userData.kodeCabang!,
+                      level: userData.level!,
+                      parentId: userData.parentId!,
                     );
 
                     homeC.getPendingPrm(
-                      idUser: userData!.id!,
-                      kodeCabang: userData!.kodeCabang!,
-                      level: userData!.level!,
-                      parentId: userData!.parentId!,
+                      idUser: userData.id!,
+                      kodeCabang: userData.kodeCabang!,
+                      level: userData.level!,
+                      parentId: userData.parentId!,
                     );
                   }
                 },
@@ -113,22 +114,22 @@ class MainMenu extends StatelessWidget {
               // Approval
               // Visibility(
               //   visible:
-              if ((userData!.parentId == "3" &&
-                      (userData!.level == "19" ||
-                          userData!.level == "20" ||
-                          userData!.level == "59" ||
-                          userData!.level == "26")) ||
-                  (userData!.parentId == "4" &&
-                      (userData!.level == "1" || userData!.level == "43")) ||
-                  (userData!.parentId == "5" && userData!.level == "77") ||
-                  (userData!.parentId == "7" && userData!.level == "23") ||
-                  (userData!.parentId == "8" && userData!.level == "17") ||
-                  (userData!.parentId == "8" && userData!.level == "18") ||
-                  (userData!.parentId == "9" && userData!.level == "41") ||
-                  (userData!.parentId == "2" && userData!.level == "10") ||
-                  (userData!.parentId == "1") ||
-                  (userData!.level == "96") ||
-                  (userData!.level == "106"))
+              if ((userData.parentId == "3" &&
+                      (userData.level == "19" ||
+                          userData.level == "20" ||
+                          userData.level == "59" ||
+                          userData.level == "26")) ||
+                  (userData.parentId == "4" &&
+                      (userData.level == "1" || userData.level == "43")) ||
+                  (userData.parentId == "5" && userData.level == "77") ||
+                  (userData.parentId == "7" && userData.level == "23") ||
+                  (userData.parentId == "8" && userData.level == "17") ||
+                  (userData.parentId == "8" && userData.level == "18") ||
+                  (userData.parentId == "9" && userData.level == "41") ||
+                  (userData.parentId == "2" && userData.level == "10") ||
+                  (userData.parentId == "1") ||
+                  (userData.level == "96") ||
+                  (userData.level == "106"))
                 // child:
                 DashboardMenuCard(
                   title: 'Approval',
@@ -136,6 +137,7 @@ class MainMenu extends StatelessWidget {
                   badge: homeC.totalNotif,
                   color: const Color(0xFF8B5CF6),
                   onTap: () {
+                    final userData = logC.logUser.value;
                     // clear list overtime first
                     ovrC.listOvt.clear();
 
@@ -146,10 +148,10 @@ class MainMenu extends StatelessWidget {
                     leaveC.listLeaveReq.clear();
                     var param = {
                       "type": "get_pending_req_leave",
-                      "kode_cabang": userData!.kodeCabang!,
-                      "id_user": userData!.id!,
-                      "level": userData!.level!,
-                      "parent_id": userData!.parentId!,
+                      "kode_cabang": userData.kodeCabang!,
+                      "id_user": userData.id!,
+                      "level": userData.level!,
+                      "parent_id": userData.parentId!,
                     };
                     // print(param);
                     // leaveC.isLoading.value = true;
@@ -168,8 +170,9 @@ class MainMenu extends StatelessWidget {
                 color: const Color.fromARGB(255, 2, 159, 59),
                 badge: 0.obs,
                 onTap: () {
+                  final userData = logC.logUser.value;
                   leaveC.isLoading.value = true;
-                  leaveC.getLeaveReq({"type": "", "id_user": userData!.id!});
+                  leaveC.getLeaveReq({"type": "", "id_user": userData.id!});
                   //  loadingDialog('Mengecek sisa saldo cuti kamu', '');
                   // leaveC.leaveBalanceCheck(userData!);
                   // Get.back();
@@ -180,7 +183,7 @@ class MainMenu extends StatelessWidget {
                 },
               ),
 
-              if (userData!.kodeCabang != "HO000")
+              if (userData.kodeCabang != "HO000")
                 // child:
                 DashboardMenuCard(
                   title: 'Izin',
@@ -188,12 +191,14 @@ class MainMenu extends StatelessWidget {
                   color: const Color.fromARGB(255, 208, 9, 181),
                   badge: 0.obs,
                   onTap: () {
+                    final userData = logC.logUser.value;
                     // LOGIC OVERTIME LAMA
 
                     prmC.getPermissionList(
-                      idUser: userData!.id!,
-                      parentId: userData!.parentId!,
-                      level: userData!.level!,
+                      idUser: userData.id!,
+                      kodeCabang: userData.kodeCabang!,
+                      parentId: userData.parentId!,
+                      level: userData.level!,
                       type: "",
                       status: "",
                     );
@@ -206,7 +211,7 @@ class MainMenu extends StatelessWidget {
 
               // Visibility(
               //   visible:
-              if (userData!.kodeCabang != "HO000")
+              if (userData.kodeCabang != "HO000")
                 // child:
                 DashboardMenuCard(
                   title: 'Overtime',
@@ -214,6 +219,7 @@ class MainMenu extends StatelessWidget {
                   color: const Color(0xFFF59E0B),
                   badge: 0.obs,
                   onTap: () {
+                    final userData = logC.logUser.value;
                     // Get.to(
                     //   () => PaySlipView(userData: userData!),
                     //   transition: Transition.cupertino,
@@ -221,8 +227,9 @@ class MainMenu extends StatelessWidget {
                     ovrC.listOvt.clear();
                     ovrC.isLoading.value = true;
                     ovrC.getListOvertime(
-                      idUser: userData!.id!,
-                      level: userData!.level!,
+                      idUser: userData.id!,
+                      branchCode: userData.kodeCabang!,
+                      level: userData.level!,
                       type: "get_by_id",
                       status: "",
                     );
@@ -236,7 +243,7 @@ class MainMenu extends StatelessWidget {
 
               // Visibility(
               //   visible:
-              if (userData!.parentId == "3" || userData!.parentId == "4")
+              if (userData.parentId == "3" || userData.parentId == "4")
                 // child:
                 DashboardMenuCard(
                   title: 'Inbox  ',
@@ -244,13 +251,14 @@ class MainMenu extends StatelessWidget {
                   color: const Color.fromARGB(255, 59, 132, 221),
                   badge: 0.obs,
                   onTap: () {
+                    final userData = logC.logUser.value;
                     // Get.to(() {
                     adjCtrl.getReqAppUpt(
                       '',
                       'inbox',
-                      userData!.level,
-                      userData!.id,
-                      userData!.kodeCabang,
+                      userData.level,
+                      userData.id,
+                      userData.kodeCabang,
                       adjCtrl.initDate,
                       adjCtrl.lastDate,
                     );
@@ -286,10 +294,10 @@ class MainMenu extends StatelessWidget {
               // Visibility(
 
               //   visible:
-              if (userData!.level == "1" ||
-                  userData!.level == "26" ||
-                  userData!.level == "19" ||
-                  userData!.level == "20")
+              if (userData.level == "1" ||
+                  userData.level == "26" ||
+                  userData.level == "19" ||
+                  userData.level == "20")
                 // child:
                 DashboardMenuCard(
                   title: 'Monitoring',
@@ -309,7 +317,7 @@ class MainMenu extends StatelessWidget {
               // ),
               // Visibility(
               //   visible:
-              if (userData!.level == "1")
+              if (userData.level == "1")
                 // child:
                 DashboardMenuCard(
                   title: 'Adjust',
@@ -317,12 +325,13 @@ class MainMenu extends StatelessWidget {
                   color: const Color(0xFF14B8A6),
                   badge: 0.obs,
                   onTap: () {
+                    final userData = logC.logUser.value;
                     adjCtrl.getReqAppUpt(
                       '',
                       '',
-                      userData!.level,
-                      userData!.id,
-                      userData!.kodeCabang,
+                      userData.level,
+                      userData.id,
+                      userData.kodeCabang,
                       adjCtrl.initDate,
                       adjCtrl.lastDate,
                     );
@@ -370,10 +379,7 @@ class DashboardMenuCard extends StatelessWidget {
             onTap: onTap,
             child: Container(
               width: double.infinity,
-              padding: const EdgeInsets.symmetric(
-                horizontal: 10,
-                vertical: 8,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
               decoration: BoxDecoration(
                 color: Theme.of(context).cardColor,
                 borderRadius: BorderRadius.circular(10),
@@ -400,12 +406,12 @@ class DashboardMenuCard extends StatelessWidget {
                         end: Alignment.bottomRight,
                       ),
                     ),
-          
+
                     child: Icon(icon, color: Colors.white, size: 18),
                   ),
-          
+
                   const SizedBox(width: 8),
-          
+
                   Flexible(
                     child: Text(
                       title,

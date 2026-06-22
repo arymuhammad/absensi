@@ -41,6 +41,7 @@ class AbsenUseCase {
         if (sts == "Check In") {
           final result = await visitIn(
             dataUser: data,
+            controller: controller,
             latitude: controller.latFromGps.value,
             longitude: controller.longFromGps.value,
           );
@@ -50,6 +51,7 @@ class AbsenUseCase {
         } else {
           final result = await visitOut(
             dataUser: data,
+            controller: controller,
             latitude: controller.latFromGps.value,
             longitude: controller.longFromGps.value,
           );

@@ -260,7 +260,7 @@ class UptMasukPulang extends StatelessWidget {
               children: [
                 Text('STATUS', style: subtitleTextStyle),
                 Text(
-                  data.status!.replaceAll('_', ' ').toUpperCase(),
+                  data.status!.replaceAll('_', ' ').capitalize ?? '',
                   style: titleTextStyle.copyWith(fontSize: 14),
                 ),
                 Row(
@@ -348,12 +348,15 @@ class UptMasukPulang extends StatelessWidget {
         // }),
         const SizedBox(height: 5),
         Visibility(
-          visible: data.statusExcep == "reject" ? true : false,
+          visible: data.statusExcep == "rejected" ? true : false,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Keterangan', style: titleTextStyle.copyWith(fontSize: 18)),
-              Text(data.keterangan!, style: subtitleTextStyle),
+              Text('Note', style: titleTextStyle),
+              Text(
+                data.keterangan?.capitalizeFirst ?? '',
+                style: const TextStyle(fontStyle: FontStyle.italic),
+              ),
             ],
           ),
         ),
@@ -466,7 +469,11 @@ class UptMasukPulang extends StatelessWidget {
                         "approved",
                     "uid": data.id,
                     "level": dataUser.level,
-                    "keterangan": data.keterangan ?? adjCtrl.keteranganApp.text,
+                    "alasan": data.alasan,
+                    "keterangan":
+                        (data.keterangan?.trim().isNotEmpty ?? false)
+                            ? data.keterangan!
+                            : adjCtrl.keteranganApp.text,
                     "id_user": data.idUser,
                     "tgl_masuk": data.tglMasuk,
                     "status": data.status,
@@ -542,7 +549,10 @@ class UptMasukPulang extends StatelessWidget {
                         "reject",
                     "uid": data.id,
                     "level": dataUser.level,
-                    "keterangan": data.keterangan ?? adjCtrl.keteranganApp.text,
+                    "keterangan":
+                        (data.keterangan?.trim().isNotEmpty ?? false)
+                            ? data.keterangan!
+                            : adjCtrl.keteranganApp.text,
                     "id_user": data.idUser,
                     "tgl_masuk": data.tglMasuk,
                     "status": data.status,

@@ -5,15 +5,17 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import '../../../../data/helper/custom_dialog.dart';
 import '../../../../data/helper/db_helper.dart';
+import '../../../../data/helper/resolve_location_helper.dart';
 import '../../../../data/helper/time_service.dart';
 import '../../../../data/model/login_model.dart';
 import '../../../../data/model/visit_model.dart';
 import '../../../../services/service_api.dart';
 import '../../controllers/absen_controller.dart';
 
-final absC = Get.find<AbsenController>();
+// final absC = Get.find<AbsenController>();
 Future<DbResult> visitIn({
   required Data dataUser,
+  required AbsenController controller,
   required double latitude,
   required double longitude,
 }) async {
@@ -24,23 +26,29 @@ Future<DbResult> visitIn({
     final String dateNow = DateFormat('yyyy-MM-dd').format(now);
     final String timeNow = DateFormat('HH:mm').format(now);
 
-    final online = await absC.isOnline();
+    final online = await controller.isOnline();
     bool sudahVisit = false;
 
-    final visitLocation =
-        absC.optVisitSelected.value == "Store Visit"
-            ? absC.selectedCabangVisit.isNotEmpty
-                ? absC.selectedCabangVisit.value
-                : dataUser.kodeCabang!
-            : absC.rndLoc.text;
+    final visitLocation = resolveVisitLocation(dataUser, controller);
+
+    
+    if (visitLocation.trim().isEmpty) {
+      failedDialog(Get.context, "Error", "Visit location tidak boleh kosong");
+      return DbResult(success: false, message: "Empty visit location");
+    }
 
     // ===============================
     // ✅ ONLINE → CEK SERVER
     // ===============================
     if (online) {
-      await absC.cekDataVisit("masuk", dataUser.id!, dateNow, visitLocation);
+      await controller.cekDataVisit(
+        "masuk",
+        dataUser.id!,
+        dateNow,
+        visitLocation,
+      );
 
-      if (absC.cekVisit.value.total != "0") {
+      if (controller.cekVisit.value.total != "0") {
         sudahVisit = true;
       }
     } else {
@@ -63,7 +71,7 @@ Future<DbResult> visitIn({
     // 🚫 BLOCK JIKA SUDAH VISIT
     // ===============================
     if (sudahVisit) {
-      _resetVisitState();
+      _resetVisitState(controller);
       succesDialog(
         context: Get.context!,
         pageAbsen: "N",
@@ -78,10 +86,10 @@ Future<DbResult> visitIn({
     // =======================
     // 📷 FOTO
     // =======================
-    await absC.uploadFotoAbsen(isVisit: true);
+    await controller.uploadFotoAbsen(isVisit: true);
     // Get.back();
 
-    if (absC.image == null) {
+    if (controller.image == null) {
       failedDialog(Get.context, "Warning", "Check in was cancelled");
       return DbResult(success: false, message: "Check in cancelled");
     }
@@ -95,13 +103,15 @@ Future<DbResult> visitIn({
       "tgl_visit": dateNow,
       "visit_in": visitLocation,
       "jam_in": timeNow,
-      "foto_in": File(absC.image!.path),
+      "foto_in": File(controller.image!.path),
       "foto_out": "",
       "lat_in": latitude.toString(),
       "long_in": longitude.toString(),
-      "device_info": absC.devInfo.value,
+      "device_info": controller.devInfo.value,
       "is_rnd":
-          absC.optVisitSelected.value == "Research and Development" ? "1" : "0",
+          controller.optVisitSelected.value == "Research and Development"
+              ? "1"
+              : "0",
     };
 
     // =======================
@@ -116,23 +126,23 @@ Future<DbResult> visitIn({
         jamIn: timeNow,
         visitOut: '',
         jamOut: '',
-        fotoIn: absC.image!.path,
+        fotoIn: controller.image!.path,
         latIn: latitude.toString(),
         longIn: longitude.toString(),
         fotoOut: '',
         latOut: '',
         longOut: '',
-        deviceInfo: absC.devInfo.value,
+        deviceInfo: controller.devInfo.value,
         deviceInfo2: '',
         isRnd:
-            absC.optVisitSelected.value == "Research and Development"
+            controller.optVisitSelected.value == "Research and Development"
                 ? "1"
                 : "0",
         statusSync: "PENDING",
       ),
     );
 
-    absC.updateSyncVisitStatusRealtime(
+    controller.updateSyncVisitStatusRealtime(
       id: dataUser.id!,
       tglVisit: dateNow,
       visitIn: visitLocation,
@@ -159,37 +169,37 @@ Future<DbResult> visitIn({
           "SUCCESS",
         );
 
-        absC.updateSyncVisitStatusRealtime(
+        controller.updateSyncVisitStatusRealtime(
           id: dataUser.id!,
           tglVisit: dateNow,
           visitIn: visitLocation,
           status: "SUCCESS",
         );
       } catch (_) {
-        absC.triggerSync(isVisit: true);
+        controller.triggerSync(isVisit: true);
       }
     } else {
-      absC.triggerSync(isVisit: true);
+      controller.triggerSync(isVisit: true);
     }
 
     // =======================
     // 🔄 REFRESH UI
     // =======================
-    absC.getVisitToday({
+    controller.getVisitToday({
       "mode": "single",
       "id_user": dataUser.id,
       "tgl_visit": dateNow,
     });
 
-    absC.getLimitVisit({
+    controller.getLimitVisit({
       "mode": "limit",
       "id_user": dataUser.id,
-      "tanggal1": absC.initDate1,
-      "tanggal2": absC.initDate2,
+      "tanggal1": controller.initDate1,
+      "tanggal2": controller.initDate2,
     });
 
-    // absC.startTimer(10);
-    // absC.resend();
+    // controller.startTimer(10);
+    // controller.resend();
 
     Get.back(); // tutup loading
 
@@ -218,7 +228,7 @@ Future<DbResult> visitIn({
     return DbResult(success: false, message: e.toString());
   } finally {
     if (insertSuccess) {
-      _resetVisitState();
+      _resetVisitState(controller);
     }
   }
 }
@@ -226,12 +236,12 @@ Future<DbResult> visitIn({
 // =======================
 // 🧹 RESET VISIT STATE
 // =======================
-void _resetVisitState() {
-  absC.stsAbsenSelected.value = "";
-  absC.optVisitSelected.value = "";
-  absC.selectedCabangVisit.value = "";
-  absC.rndLoc.clear();
-  absC.lat.value = "";
-  absC.long.value = "";
-  absC.isQrValidated.value = false;
+void _resetVisitState(AbsenController controller) {
+  controller.stsAbsenSelected.value = "";
+  controller.optVisitSelected.value = "";
+  controller.selectedCabangVisit.value = "";
+  controller.rndLoc.clear();
+  controller.lat.value = "";
+  controller.long.value = "";
+  controller.isQrValidated.value = false;
 }

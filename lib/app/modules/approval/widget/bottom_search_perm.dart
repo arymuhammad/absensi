@@ -224,8 +224,9 @@ bottomSearchPerm(
                               ctrl.isLoading.value = true;
 
                               await ctrl.getPermissionList(
-                                parentId: userData.parentId!,
                                 idUser: userData.id!,
+                                kodeCabang: userData.kodeCabang!,
+                                parentId: userData.parentId!,
                                 level: userData.level!,
                                 date1: ctrl.date1.text,
                                 date2: ctrl.date2.text,

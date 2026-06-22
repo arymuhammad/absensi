@@ -46,22 +46,33 @@ class ErrorLogger {
   }
 
   static Future<void> shareLog() async {
-    final file = await getLogFile();
+    final original = await getLogFile();
 
-    if (!await file.exists()) {
+    if (!await original.exists()) {
       throw Exception('Log file not found');
     }
 
-    final result = await SharePlus.instance.share(
-      ShareParams(
-        files: [XFile(file.path)],
-        text: 'Error Log Aplikasi',
-        subject: 'Error Log',
-      ),
+    final tempDir = await getTemporaryDirectory();
+
+    final tempFile = File(
+      '${tempDir.path}/error_log_${DateTime.now().millisecondsSinceEpoch}.txt',
     );
 
-    if (result.status == ShareResultStatus.success) {
-      await file.writeAsString('', flush: true);
+    await tempFile.writeAsString(await original.readAsString());
+
+    try {
+      await SharePlus.instance.share(
+        ShareParams(
+          files: [XFile(tempFile.path)],
+          text: 'Error Log Aplikasi',
+          subject: 'Error Log',
+        ),
+      );
+    } finally {
+      // selalu cleanup temp file
+      if (await tempFile.exists()) {
+        await tempFile.delete();
+      }
     }
   }
 }

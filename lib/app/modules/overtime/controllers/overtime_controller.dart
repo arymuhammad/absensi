@@ -61,6 +61,7 @@ class OvertimeController extends GetxController {
 
   Future<List<OvertimeModel>> getListOvertime({
     required String idUser,
+    required String branchCode,
     required String level,
     required String type,
     String? date1,
@@ -71,6 +72,7 @@ class OvertimeController extends GetxController {
     var data = {
       "type": type,
       "user_id": idUser,
+      "branch_code": branchCode,
       "level": level,
       "init_date": (date1?.isNotEmpty ?? false) ? date1! : initDate,
       "end_date": (date2?.isNotEmpty ?? false) ? date2! : endDate,
@@ -115,10 +117,16 @@ class OvertimeController extends GetxController {
       showToast('Data gagal dibuat');
     }
     resetForm();
-    await getListOvertime(idUser: id, level: level, type: "get_by_id", status: "");
+    await getListOvertime(
+      idUser: id,
+      branchCode: branchCode,
+      level: level,
+      type: "get_by_id",
+      status: "",
+    );
   }
 
-  List<OvertimeModel> get  filteredList {
+  List<OvertimeModel> get filteredList {
     return listOvt.where((e) {
       /// 🔹 FILTER STATUS
       if (selectedStatus.value != 'all') {
@@ -160,6 +168,7 @@ class OvertimeController extends GetxController {
 
   reject({
     required String level,
+    required String branchCode,
     required String idOvt,
     required String idUser,
     required String date1,
@@ -190,6 +199,7 @@ class OvertimeController extends GetxController {
     if (response['success'] == true) {
       await getListOvertime(
         idUser: idUser,
+        branchCode: branchCode,
         level: level,
         type: "",
         status: "pending",
@@ -202,6 +212,7 @@ class OvertimeController extends GetxController {
 
   accept({
     required String level,
+    required String branchCode,
     required String idOvt,
     required String idUser,
     required String date1,
@@ -220,7 +231,7 @@ class OvertimeController extends GetxController {
             "20": "acc_1",
             "59": "acc_1",
           }[level]!:
-          "approve",
+          "approved",
       "type": "accept",
       "level": level,
       "id_user": idOvt,
@@ -232,6 +243,7 @@ class OvertimeController extends GetxController {
     if (response['success'] == true) {
       await getListOvertime(
         idUser: idUser,
+        branchCode: branchCode,
         level: level,
         type: "",
         status: "pending",

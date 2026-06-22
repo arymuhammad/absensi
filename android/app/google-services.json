@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "653258167041",
-    "project_id": "presence-app-1d30c",
-    "storage_bucket": "presence-app-1d30c.firebasestorage.app"
+    "project_number": "91282465006",
+    "project_id": "urbanco-spot-d2afe",
+    "storage_bucket": "urbanco-spot-d2afe.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:653258167041:android:a6c7684f2bcf75c2dc8100",
+        "mobilesdk_app_id": "1:91282465006:android:848a82fef14f67749753ff",
         "android_client_info": {
           "package_name": "com.absensi.urbanco"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyBtmOBNEt4rSzcU4MlqzlYuyIGvpJe6pcU"
+          "current_key": "AIzaSyCicSH7IcMd-rSEZW539hBNfydpPvpmq0A"
         }
       ],
       "services": {

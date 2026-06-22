@@ -1,9 +1,9 @@
 import 'dart:io';
 
-import 'package:absensi/app/data/helper/app_colors.dart';
 import 'package:absensi/app/data/model/login_model.dart';
 import 'package:absensi/app/modules/absen/controllers/absen_controller.dart';
 import 'package:absensi/app/data/helper/custom_dialog.dart';
+import 'package:absensi/app/modules/shared/container_main_color.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -18,10 +18,12 @@ searchForm(
   bool isDark,
   AbsenController absC,
 ) {
+  var level = ['19', '20', '59'];
+
   return Get.bottomSheet(
     isScrollControlled: true,
     Container(
-      height: 400,
+      height: 270,
       decoration: BoxDecoration(
         color: isDark ? Theme.of(context).cardColor : Colors.white,
         borderRadius: const BorderRadius.only(
@@ -119,93 +121,111 @@ searchForm(
                     ],
                   ),
                   const SizedBox(height: 8),
-                  FutureBuilder(
-                    future: absC.getCabang(),
-                    builder: (ctx, snapshot) {
-                      if (snapshot.hasData) {
-                        var dataCabang = snapshot.data;
-                        List<String> allStore = <String>[];
-                        dataCabang!.map((data) {
-                          allStore.add(data.namaCabang!);
-                        }).toList();
+                  Visibility(
+                    visible: (!level.contains(userData?.level)),
+                    child: Column(
+                      children: [
+                        FutureBuilder(
+                          future: absC.getCabang(),
+                          builder: (ctx, snapshot) {
+                            if (snapshot.hasData) {
+                              var dataCabang = snapshot.data;
+                              List<String> allStore = <String>[];
+                              dataCabang!.map((data) {
+                                allStore.add(data.namaCabang!);
+                              }).toList();
 
-                        return SizedBox(
-                          height: 40,
-                          child: TypeAheadFormField<String>(
-                            textFieldConfiguration: TextFieldConfiguration(
-                              style: const TextStyle(fontSize: 16),
-                              controller: absC.store,
-                              decoration: InputDecoration(
-                                contentPadding: const EdgeInsets.all(8),
-                                labelText: 'Cabang',
-                                hintText: "AEON BSD",
-                                suffixIcon: IconButton(
-                                  onPressed: () {
-                                    absC.store.clear();
+                              return SizedBox(
+                                height: 40,
+                                child: TypeAheadFormField<String>(
+                                  textFieldConfiguration:
+                                      TextFieldConfiguration(
+                                        style: const TextStyle(fontSize: 16),
+                                        controller: absC.store,
+                                        decoration: InputDecoration(
+                                          contentPadding: const EdgeInsets.all(
+                                            8,
+                                          ),
+                                          labelText: 'Cabang',
+                                          hintText: "AEON BSD",
+                                          suffixIcon: IconButton(
+                                            onPressed: () {
+                                              absC.store.clear();
+                                              absC.userCab.clear();
+                                              absC.selectedUserCabang.value =
+                                                  "";
+                                            },
+                                            icon: const Icon(Icons.cancel),
+                                          ),
+                                          border: const OutlineInputBorder(),
+                                          filled: true,
+                                          fillColor:
+                                              isDark
+                                                  ? Theme.of(
+                                                    context,
+                                                  ).canvasColor
+                                                  : Colors.white,
+                                        ),
+                                      ),
+                                  suggestionsCallback: (pattern) {
+                                    return allStore.where(
+                                      (option) => option.toLowerCase().contains(
+                                        pattern.toLowerCase(),
+                                      ),
+                                    );
+                                  },
+                                  itemBuilder: (context, suggestion) {
+                                    return ListTile(
+                                      tileColor:
+                                          isDark
+                                              ? Theme.of(context).canvasColor
+                                              : Colors.white,
+                                      title: Text(suggestion),
+                                    );
+                                  },
+                                  onSuggestionSelected: (suggestion) {
                                     absC.userCab.clear();
                                     absC.selectedUserCabang.value = "";
+                                    absC.store.text = suggestion;
+                                    for (
+                                      int i = 0;
+                                      i < dataCabang.length;
+                                      i++
+                                    ) {
+                                      if (dataCabang[i].namaCabang ==
+                                          suggestion) {
+                                        absC.selectedCabang.value =
+                                            dataCabang[i].kodeCabang!;
+                                      }
+                                    }
                                   },
-                                  icon: const Icon(Icons.cancel),
-                                ),
-                                border: const OutlineInputBorder(),
-                                filled: true,
-                                fillColor:
-                                    isDark
-                                        ? Theme.of(context).canvasColor
-                                        : Colors.white,
-                              ),
-                            ),
-                            suggestionsCallback: (pattern) {
-                              return allStore.where(
-                                (option) => option.toLowerCase().contains(
-                                  pattern.toLowerCase(),
                                 ),
                               );
-                            },
-                            itemBuilder: (context, suggestion) {
-                              return ListTile(
-                                tileColor:
-                                    isDark
-                                        ? Theme.of(context).canvasColor
-                                        : Colors.white,
-                                title: Text(suggestion),
-                              );
-                            },
-                            onSuggestionSelected: (suggestion) {
-                              absC.userCab.clear();
-                              absC.selectedUserCabang.value = "";
-                              absC.store.text = suggestion;
-                              for (int i = 0; i < dataCabang.length; i++) {
-                                if (dataCabang[i].namaCabang == suggestion) {
-                                  absC.selectedCabang.value =
-                                      dataCabang[i].kodeCabang!;
-                                }
-                              }
-                            },
-                          ),
-                        );
-                      } else if (snapshot.hasError) {
-                        return Text(snapshot.error.toString());
-                      }
-                      return Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Platform.isAndroid
-                              ? const CircularProgressIndicator()
-                              : const CupertinoActivityIndicator(),
-                          const SizedBox(width: 5),
-                          const Text('Loading'),
-                        ],
-                      );
-                    },
+                            } else if (snapshot.hasError) {
+                              return Text(snapshot.error.toString());
+                            }
+                            return Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Platform.isAndroid
+                                    ? const CircularProgressIndicator()
+                                    : const CupertinoActivityIndicator(),
+                                const SizedBox(width: 5),
+                                const Text('Loading'),
+                              ],
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 8),
+                      ],
+                    ),
                   ),
-                  const SizedBox(height: 8),
                   Obx(
                     () => FutureBuilder(
                       future: absC.getUserCabang(
                         absC.selectedCabang.isNotEmpty
                             ? absC.selectedCabang.value
-                            : "UE526",
+                            : userData!.kodeCabang!,
                         "",
                       ),
                       builder: (ctx, snapshot) {
@@ -297,66 +317,84 @@ searchForm(
                       },
                     ),
                   ),
-                  const SizedBox(height: 50),
-                  OutlinedButton(
-                    onPressed: () async {
-                      absC.userCab.clear();
-                      absC.store.clear();
-                      absC.selectedCabang.value = "";
-                      absC.selectedUserCabang.value = "";
-                      absC.date1.clear();
-                      absC.date2.clear();
-                      Get.back();
-                    },
-                    style: ElevatedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
+                  const SizedBox(height: 15),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    // crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      OutlinedButton(
+                        onPressed: () async {
+                          absC.userCab.clear();
+                          absC.store.clear();
+                          absC.selectedCabang.value = "";
+                          absC.selectedUserCabang.value = "";
+                          absC.date1.clear();
+                          absC.date2.clear();
+                          Get.back();
+                        },
+                        style: ElevatedButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          side: const BorderSide(width: 2.0, color: Colors.red),
+                          // fixedSize: Size(Get.mediaQuery.size.width, 50),
+                        ),
+                        child: const Text(
+                          'BATALKAN',
+                          style: TextStyle(fontSize: 18, color: Colors.red),
+                        ),
                       ),
-                      side: const BorderSide(width: 2.0, color: Colors.red),
-                      fixedSize: Size(Get.mediaQuery.size.width, 50),
-                    ),
-                    child: const Text(
-                      'BATALKAN',
-                      style: TextStyle(fontSize: 18, color: Colors.red),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  ElevatedButton(
-                    onPressed: () async {
-                      if (absC.date1.text == "" ||
-                          absC.date2.text == "" ||
-                          absC.selectedCabang.isEmpty ||
-                          absC.userMonitor.isEmpty ||
-                          absC.selectedUserCabang.isEmpty) {
-                        failedDialog(
-                          Get.context,
-                          'ERROR',
-                          'Harap isi semua kolom',
-                        );
-                      } else {
-                        Get.back();
-                        absC.isLoading.value = true;
-                        await absC.getFilteredAbsen(
-                          absC.selectedUserCabang.value,
-                          absC.date1.text,
-                          absC.date2.text,
-                        );
-                        absC.userCab.clear();
-                        absC.selectedUserCabang.value = "";
-                        // absC.store.clear();
-                        // absC.selectedCabang.value = "";
-                        // absC.date1.clear();
-                        // absC.date2.clear();
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.itemsBackground,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
+                      const SizedBox(width: 5),
+
+                      SizedBox(
+                        height: 38,
+                        child: ContainerMainColor(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          radius: 10,
+                          child: ElevatedButton(
+                            onPressed: () async {
+                              if (absC.date1.text == "" ||
+                                  absC.date2.text == "" ||
+                                  absC.selectedCabang.isEmpty ||
+                                  absC.userMonitor.isEmpty ||
+                                  absC.selectedUserCabang.isEmpty) {
+                                failedDialog(
+                                  Get.context,
+                                  'ERROR',
+                                  'Harap isi semua kolom',
+                                );
+                              } else {
+                                Get.back();
+                                absC.isLoading.value = true;
+                                await absC.getFilteredAbsen(
+                                  absC.selectedUserCabang.value,
+                                  absC.date1.text,
+                                  absC.date2.text,
+                                );
+                                absC.userCab.clear();
+                                absC.selectedUserCabang.value = "";
+                                // absC.store.clear();
+                                // absC.selectedCabang.value = "";
+                                // absC.date1.clear();
+                                // absC.date2.clear();
+                              }
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.transparent,
+                              // shape: RoundedRectangleBorder(
+                              //   borderRadius: BorderRadius.circular(30),
+                              // ),
+                              // fixedSize: const Size(80, 10),
+                            ),
+                            child: const Text(
+                              'CARI',
+                              style: TextStyle(fontSize: 18),
+                            ),
+                          ),
+                        ),
                       ),
-                      fixedSize: Size(Get.mediaQuery.size.width, 50),
-                    ),
-                    child: const Text('CARI', style: TextStyle(fontSize: 18)),
+                    ],
                   ),
                 ],
               ),

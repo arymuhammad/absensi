@@ -7,6 +7,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../data/helper/navigator_helper.dart';
 import '../../absen/controllers/absen_controller.dart';
 import '../../absen/views/absen_view.dart';
 import '../../login/controllers/login_controller.dart';
@@ -19,46 +20,38 @@ class BottomNavBar extends GetView {
   final loc = Get.put(AbsenController());
   final homeC = Get.put(HomeController());
 
-  final List<GlobalKey<NavigatorState>> navigatorKeys = [
-    GlobalKey<NavigatorState>(),
-    GlobalKey<NavigatorState>(),
-    GlobalKey<NavigatorState>(),
-    GlobalKey<NavigatorState>(),
-    GlobalKey<NavigatorState>(),
-  ];
-
   @override
   Widget build(BuildContext context) {
     final listDataUser = logC.logUser.value;
     final List<Widget> widgetList = <Widget>[
       Navigator(
-        key: navigatorKeys[0],
+        key: AppNavigator.homeKey,
         onGenerateRoute: (settings) {
           return MaterialPageRoute(builder: (_) => HomeView());
         },
       ),
       listDataUser.visit == "1"
           ? Navigator(
-            key: navigatorKeys[1],
+            key: AppNavigator.historyKey,
             onGenerateRoute: (settings) {
               return MaterialPageRoute(builder: (_) => RiwayatVisitView());
             },
           )
           : Navigator(
-            key: navigatorKeys[1],
+            key: AppNavigator.historyKey,
             onGenerateRoute: (settings) {
               return MaterialPageRoute(builder: (_) => SemuaAbsenView());
             },
           ),
       AbsenView(),
       Navigator(
-        key: navigatorKeys[3],
+        key: AppNavigator.settingKey,
         onGenerateRoute: (settings) {
           return MaterialPageRoute(builder: (_) => SettingsView());
         },
       ),
       Navigator(
-        key: navigatorKeys[4],
+        key: AppNavigator.profileKey,
         onGenerateRoute: (settings) {
           return MaterialPageRoute(builder: (_) => ProfilView());
         },
@@ -77,9 +70,9 @@ class BottomNavBar extends GetView {
             final uData = logC.logUser.value;
             // ✅ Jika tab aktif ditekan ulang, kembali ke halaman awal
             if (logC.selected.value == index) {
-              navigatorKeys[index].currentState?.popUntil(
-                (route) => route.isFirst,
-              );
+              AppNavigator.getKey(
+                index,
+              )?.currentState?.popUntil((route) => route.isFirst);
             }
 
             if (index == 1) {

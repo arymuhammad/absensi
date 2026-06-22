@@ -32,6 +32,7 @@ class ReqOvertimeView extends StatelessWidget {
           final userData = auth.logUser.value;
           await ctrl.getListOvertime(
             idUser: userData.id!,
+            branchCode: userData.kodeCabang!,
             level: userData.level!,
             type: "",
             status: "pending",
@@ -289,6 +290,7 @@ class ReqOvertimeView extends StatelessWidget {
                                       final userData = auth.logUser.value;
                                       ctrl.reject(
                                         level: userData.level!,
+                                        branchCode: userData.kodeCabang!,
                                         idUser: userData.id!,
                                         idOvt: item.id!,
                                         date1: item.initDate!,
@@ -306,6 +308,7 @@ class ReqOvertimeView extends StatelessWidget {
                                       ctrl.accept(
                                         level: userData.level!,
                                         idUser: userData.id!,
+                                        branchCode: userData.kodeCabang!,
                                         idOvt: item.id!,
                                         date1: item.initDate!,
                                         date2: item.endDate!,

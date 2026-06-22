@@ -127,38 +127,38 @@ class ReqPresenceExcepView extends StatelessWidget {
                           ),
                         ),
                       ),
-                      const SizedBox(width: 5),
-                      Expanded(
-                        child: SizedBox(
-                          height: 44,
-                          child: CsDropDown(
-                            value:
-                                adjCtrl.selectedType.isNotEmpty
-                                    ? adjCtrl.selectedType.value
-                                    : null,
-                            items:
-                                adjCtrl.typeReqApp.map((e) {
-                                  return DropdownMenuItem(
-                                    value: e.entries.first.key,
-                                    child: Text(e.entries.first.value),
-                                  );
-                                }).toList(),
-                            onChanged: (val) {
-                              // adjCtrl.isLoading.value = true;
-                              adjCtrl.selectedType.value = val;
-                              // adjCtrl.getReqAppUpt(
-                              //     adjCtrl.selectedStatus.value,
-                              //     val,
-                              //     userData!.level,
-                              //     userData!.id,
-                              //     adjCtrl.initDate,
-                              //     adjCtrl.lastDate);
-                            },
-                            label: 'Kategori',
-                            isDark: isDark,
-                          ),
-                        ),
-                      ),
+                      // const SizedBox(width: 5),
+                      // Expanded(
+                      //   child: SizedBox(
+                      //     height: 44,
+                      //     child: CsDropDown(
+                      //       value:
+                      //           adjCtrl.selectedType.isNotEmpty
+                      //               ? adjCtrl.selectedType.value
+                      //               : null,
+                      //       items:
+                      //           adjCtrl.typeReqApp.map((e) {
+                      //             return DropdownMenuItem(
+                      //               value: e.entries.first.key,
+                      //               child: Text(e.entries.first.value),
+                      //             );
+                      //           }).toList(),
+                      //       onChanged: (val) {
+                      //         // adjCtrl.isLoading.value = true;
+                      //         adjCtrl.selectedType.value = val;
+                      //         // adjCtrl.getReqAppUpt(
+                      //         //     adjCtrl.selectedStatus.value,
+                      //         //     val,
+                      //         //     userData!.level,
+                      //         //     userData!.id,
+                      //         //     adjCtrl.initDate,
+                      //         //     adjCtrl.lastDate);
+                      //       },
+                      //       label: 'Kategori',
+                      //       isDark: isDark,
+                      //     ),
+                      //   ),
+                      // ),
                     ],
                   ),
                 ),

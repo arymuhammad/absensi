@@ -82,6 +82,7 @@ class OvertimeView extends GetView<OvertimeController> {
                   loadingDialog("memuat data...", "");
                   await ctrl.getListOvertime(
                     idUser: userData.id!,
+                    branchCode: userData.kodeCabang!,
                     level: userData.level!,
                     type: "get_by_id",
                     status: "",
@@ -114,6 +115,7 @@ class OvertimeView extends GetView<OvertimeController> {
           ctrl.isLoading.value = true;
           await ctrl.getListOvertime(
             idUser: userData.id!,
+            branchCode: userData.kodeCabang!,
             level: userData.level!,
             type: "get_by_id",
             status: "",

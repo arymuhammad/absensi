@@ -30,7 +30,7 @@ class SummaryAbsenArea extends GetView {
     return Expanded(
       child: Column(
         children: [
-          SummaryToday(listDataUser: userData),
+          SummaryToday(),
           const SizedBox(height: 5),
           Expanded(
             child: CustomMaterialIndicator(
@@ -72,7 +72,7 @@ class SummaryAbsenArea extends GetView {
                 padding: EdgeInsets.zero,
                 children: [
                   // const SizedBox(height: 5),
-                  MainMenu(userData: userData),
+                  MainMenu(),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [

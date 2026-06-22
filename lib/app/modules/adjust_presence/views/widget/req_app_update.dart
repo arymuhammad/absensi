@@ -281,7 +281,7 @@ class ReqAppUpdate extends GetView {
                                 children: [
                                   // const SizedBox(height: 5),
                                   Text(
-                                    excData.nama,
+                                    excData.nama.capitalize ?? '',
                                     style: titleTextStyle.copyWith(
                                       color:
                                           isDark
@@ -290,7 +290,7 @@ class ReqAppUpdate extends GetView {
                                     ),
                                   ),
                                   Text(
-                                    excData.namaCabang,
+                                    excData.namaCabang.capitalize ?? '',
                                     style: subtitleTextStyle,
                                   ),
                                   Row(
@@ -345,10 +345,16 @@ class ReqAppUpdate extends GetView {
                                 excData.status == "update_masuk" ||
                                         excData.status == "update_masuk_cst" ||
                                         excData.status == "update_pulang"
-                                    ? UptMasukPulang(data: excData, isInbox:isInbox)
+                                    ? UptMasukPulang(
+                                      data: excData,
+                                      isInbox: isInbox,
+                                    )
                                     : excData.status == "update_data_absen"
-                                    ? UptDataAbsen(data: excData, isInbox: isInbox,)
-                                    : UptShift(data: excData, isInbox:isInbox),
+                                    ? UptDataAbsen(
+                                      data: excData,
+                                      isInbox: isInbox,
+                                    )
+                                    : UptShift(data: excData, isInbox: isInbox),
                               ],
                             );
                           }),

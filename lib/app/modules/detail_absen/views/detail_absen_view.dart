@@ -143,8 +143,8 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
             //       'ERROR',
             //       'data absen dengan Shift WEEKDAY-KUSTOM tidak dapat di edit!',
             //     )
-            //     : 
-                Get.bottomSheet(EditDataAbsen(data: detailData));
+            //     :
+            Get.bottomSheet(EditDataAbsen(data: detailData));
           },
           label: Text(
             'Edit Data',

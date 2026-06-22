@@ -34,6 +34,7 @@ class ReqPermView extends StatelessWidget {
           final userData = auth.logUser.value;
           await ctrl.getPermissionList(
             idUser: userData.id!,
+            kodeCabang: userData.kodeCabang!,
             parentId: userData.parentId!,
             level: userData.level!,
             type: "get_pending_req_permission",
@@ -151,7 +152,7 @@ class ReqPermView extends StatelessWidget {
                                       //         )
                                       //         : null,
                                       child: Text(
-                                        item.nama![0],
+                                        item.nama![0].capitalize ?? '',
                                         style: TextStyle(
                                           color: color,
                                           fontWeight: FontWeight.bold,
@@ -344,38 +345,37 @@ class ReqPermView extends StatelessWidget {
                                     fontsize: 15,
                                     label: 'Reject',
                                     onPressed: () {
-                                              final userData =
-                                                  auth.logUser.value;
-                                              ctrl.reject(
-                                                parentId: userData.parentId!,
-                                                level: userData.level!,
-                                                idUser: userData.id!,
-                                                idPerm: item.id!,
-                                                date1: item.tanggalMulai!,
-                                                date2: item.tanggalSelesai!,
-                                                noted: ctrl.note.text,
-                                              );
-                                            },
+                                      final userData = auth.logUser.value;
+                                      ctrl.reject(
+                                        idUser: userData.id!,
+                                        kodeCabang: userData.kodeCabang!,
+                                        level: userData.level!,
+                                        parentId: userData.parentId!,
+                                        idPerm: item.id!,
+                                        date1: item.tanggalMulai!,
+                                        date2: item.tanggalSelesai!,
+                                        noted: ctrl.note.text,
+                                      );
+                                    },
                                   ),
                                   const SizedBox(width: 5),
                                   CsElevatedButton(
                                     color: green!,
                                     fontsize: 15,
                                     label: 'Accept',
-                                    onPressed:
-                                       () {
-                                              final userData =
-                                                  auth.logUser.value;
-                                              ctrl.accept(
-                                                parentId: userData.parentId!,
-                                                level: userData.level!,
-                                                idUser: userData.id!,
-                                                idPerm: item.id!,
-                                                date1: item.tanggalMulai!,
-                                                date2: item.tanggalSelesai!,
-                                                noted: ctrl.note.text,
-                                              );
-                                            },
+                                    onPressed: () {
+                                      final userData = auth.logUser.value;
+                                      ctrl.accept(
+                                        idUser: userData.id!,
+                                        kodeCabang: userData.kodeCabang!,
+                                        parentId: userData.parentId!,
+                                        level: userData.level!,
+                                        idPerm: item.id!,
+                                        date1: item.tanggalMulai!,
+                                        date2: item.tanggalSelesai!,
+                                        noted: ctrl.note.text,
+                                      );
+                                    },
                                   ),
                                 ],
                               ),

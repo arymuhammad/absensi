@@ -136,7 +136,7 @@ class MainTab extends StatelessWidget {
                               "level": userData.level!,
                               "parent_id": userData.parentId!,
                             };
-                            print(param);
+                            // print(param);
                             leaveC.isLoading.value = true;
                             await leaveC.getLeaveReq(param);
 
@@ -145,6 +145,7 @@ class MainTab extends StatelessWidget {
                             // if (overtimeC.listOvt.isEmpty) {
                             await overtimeC.getListOvertime(
                               idUser: userData.id!,
+                              branchCode: userData.kodeCabang!,
                               level: userData.level!,
                               type: "",
                               status: "pending",
@@ -167,6 +168,7 @@ class MainTab extends StatelessWidget {
                             await permC.getPermissionList(
                               type: "get_pending_req_permission",
                               idUser: userData.id!,
+                              kodeCabang: userData.kodeCabang!,
                               parentId: userData.parentId!,
                               level: userData.level!,
                               status: "",

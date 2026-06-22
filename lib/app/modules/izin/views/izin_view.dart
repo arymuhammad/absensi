@@ -18,7 +18,6 @@ import '../../../data/model/permission_model.dart';
 import '../../../services/service_api.dart';
 import '../../login/controllers/login_controller.dart';
 import '../../shared/container_main_color.dart';
-import '../../shared/text_field.dart';
 import '../controllers/izin_controller.dart';
 import 'widget/permission_add.dart';
 import 'widget/permission_tab.dart';
@@ -86,8 +85,9 @@ class IzinView extends GetView<IzinController> {
                   final userData = auth.logUser.value;
                   loadingDialog("memuat data...", "");
                   await ctrl.getPermissionList(
-                    parentId: userData.parentId!,
                     idUser: userData.id!,
+                    kodeCabang: userData.kodeCabang!,
+                    parentId: userData.parentId!,
                     level: userData.level!,
                     type: "",
                     status: "",
@@ -119,8 +119,9 @@ class IzinView extends GetView<IzinController> {
           final userData = auth.logUser.value;
           ctrl.isLoading.value = true;
           await ctrl.getPermissionList(
-            parentId: userData.parentId!,
             idUser: userData.id!,
+            kodeCabang: userData.kodeCabang!,
+            parentId: userData.parentId!,
             level: userData.level!,
             type: "",
             status: "",
@@ -373,7 +374,7 @@ class IzinView extends GetView<IzinController> {
                                         backgroundColor: color.withOpacity(.2),
 
                                         child: Text(
-                                          item.nama![0],
+                                          item.nama![0].capitalize??'',
                                           style: TextStyle(
                                             color: color,
                                             fontWeight: FontWeight.bold,
@@ -424,7 +425,7 @@ class IzinView extends GetView<IzinController> {
                                                   CrossAxisAlignment.start,
                                               children: [
                                                 Text(
-                                                  item.nama ?? '-',
+                                                   item.nama?.capitalize ?? '-',
                                                   style: const TextStyle(
                                                     fontWeight: FontWeight.bold,
                                                     fontSize: 15,
@@ -446,7 +447,7 @@ class IzinView extends GetView<IzinController> {
                                                     ),
                                                     const SizedBox(width: 4),
                                                     Text(
-                                                      item.namaCabang ?? '',
+                                                       item.namaCabang?.capitalize ?? '',
                                                       style: TextStyle(
                                                         fontSize: 12,
                                                         color: Colors.grey[600],
@@ -459,7 +460,10 @@ class IzinView extends GetView<IzinController> {
                                                 const SizedBox(height: 5),
 
                                                 Text(
-                                                  item.alasan ?? '-',
+                                                  item
+                                                          .alasan
+                                                          ?.capitalizeFirst ??
+                                                      '-',
                                                   maxLines: 1,
                                                   overflow:
                                                       TextOverflow.ellipsis,
@@ -541,23 +545,24 @@ class IzinView extends GetView<IzinController> {
                                                     ),
                                                   ),
                                                 ),
-
-                                                IconButton(
-                                                  onPressed: () {
-                                                    final userData =
-                                                        auth.logUser.value;
-                                                    ctrl.delete(
-                                                      item.id,
-                                                      userData.id!,
-                                                      userData.parentId!,
-                                                      userData.level!,
-                                                    );
-                                                  },
-                                                  icon: Icon(
-                                                    Icons.delete,
-                                                    color: red,
+                                                if (item.status == "pending")
+                                                  IconButton(
+                                                    onPressed: () {
+                                                      final userData =
+                                                          auth.logUser.value;
+                                                      ctrl.delete(
+                                                        item.id,
+                                                        userData.id!,
+                                                        userData.parentId!,
+                                                        userData.level!,
+                                                        userData.kodeCabang!,
+                                                      );
+                                                    },
+                                                    icon: Icon(
+                                                      Icons.delete,
+                                                      color: red,
+                                                    ),
                                                   ),
-                                                ),
                                               ],
                                             ),
                                           ],
@@ -588,19 +593,19 @@ class IzinView extends GetView<IzinController> {
                                             ],
                                           ),
                                         ),
-                                        Visibility(
-                                          visible: item.status == "pending",
-                                          child: SizedBox(
-                                            height: 40,
-                                            child: CsTextField(
-                                              enabled: true,
-                                              controller: ctrl.note,
-                                              label: 'Note',
-                                              isDark: isDark,
-                                            ),
-                                          ),
-                                        ),
-                                        const SizedBox(height: 10),
+                                        // Visibility(
+                                        //   visible: item.status == "pending",
+                                        //   child: SizedBox(
+                                        //     height: 40,
+                                        //     child: CsTextField(
+                                        //       enabled: true,
+                                        //       controller: ctrl.note,
+                                        //       label: 'Note',
+                                        //       isDark: isDark,
+                                        //     ),
+                                        //   ),
+                                        // ),
+                                        // const SizedBox(height: 10),
                                       ],
                                     ),
                                   ),

@@ -1,6 +1,7 @@
 import 'package:absensi/app/data/helper/app_colors.dart';
 import 'package:absensi/app/modules/absen/controllers/absen_controller.dart';
 import 'package:absensi/app/data/helper/const.dart';
+import 'package:absensi/app/modules/shared/container_main_color.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icons_plus/icons_plus.dart';
@@ -568,14 +569,19 @@ class MonitoringAbsenView extends GetView {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: AppColors.itemsBackground,
-        onPressed: () {
-          searchForm(context, userData, isDark, absenC);
-        },
-        child: Icon(
-          Iconsax.calendar_search_outline,
-          color: isDark ? Colors.blue : Colors.white,
+      floatingActionButton: ContainerMainColor(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        radius: 50,
+        child: FloatingActionButton(
+          backgroundColor: Colors.transparent,
+          onPressed: () {
+            searchForm(context, userData, isDark, absenC);
+          },
+          child: Icon(
+            Iconsax.calendar_search_outline,
+            color: isDark ? Colors.blue : Colors.white,
+          ),
         ),
       ),
     );

@@ -225,6 +225,7 @@ bottomSearchOvertime(
 
                               await ctrl.getListOvertime(
                                 idUser: userData.id!,
+                                branchCode: userData.kodeCabang!,
                                 level: userData.level!,
                                 date1: ctrl.date1.text,
                                 date2: ctrl.date2.text,

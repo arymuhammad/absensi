@@ -14,12 +14,11 @@ import '../../../../data/helper/const.dart';
 import '../../../../data/helper/custom_dialog.dart';
 import '../../../../data/helper/format_waktu.dart';
 import '../../../../data/model/absen_model.dart';
-import '../../../../data/model/login_model.dart';
 import '../../../login/controllers/login_controller.dart';
 
 class SummaryToday extends StatelessWidget {
-  SummaryToday({super.key, this.listDataUser});
-  final Data? listDataUser;
+  SummaryToday({super.key});
+
   final homeC = Get.find<HomeController>();
   final absenC = Get.find<AbsenController>();
   final logC = Get.find<LoginController>();
@@ -27,59 +26,9 @@ class SummaryToday extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final userData = auth.logUser.value;
     return Stack(
       children: [
-        // Container(
-        //   padding: const EdgeInsets.only(left: 10, top: 5, right: 10),
-        //   height: 180,
-        //   decoration: BoxDecoration(
-        //     color: AppColors.itemsBackground,
-        //     borderRadius: BorderRadius.circular(10),
-        //   ),
-        //   child: Row(
-        //     crossAxisAlignment: CrossAxisAlignment.start,
-        //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        //     children: [
-        //       Obx(
-        //         () => Text(
-        //           FormatWaktu.formatIndo(tanggal: absenC.tglStream.value),
-        //           style: const TextStyle(
-        //             color: Theme.of(context).cardColor,
-        //             fontWeight: FontWeight.bold,
-        //             fontSize: 14,
-        //           ),
-        //         ),
-        //       ),
-        //       Row(
-        //         children: [
-        //           const Icon(
-        //             Iconsax.clock_outline,
-        //             size: 18,
-        //             color: Colors.white,
-        //           ),
-        //           StreamBuilder(
-        //             stream: homeC.getTime(),
-        //             builder: (context, snapshot) {
-        //               if (snapshot.hasData) {
-        //                 return Text(
-        //                   snapshot.data!,
-        //                   style: const TextStyle(
-        //                     color: Theme.of(context).cardColor,
-        //                     fontWeight: FontWeight.bold,
-        //                     fontSize: 14,
-        //                   ),
-        //                 );
-        //               } else if (snapshot.hasError) {
-        //                 return Text('${snapshot.error}');
-        //               }
-        //               return const Center(child: CupertinoActivityIndicator());
-        //             },
-        //           ),
-        //         ],
-        //       ),
-        //     ],
-        //   ),
-        // ),
         Padding(
           padding: const EdgeInsets.fromLTRB(2, 0, 2, 0),
           child: Card(
@@ -88,7 +37,7 @@ class SummaryToday extends StatelessWidget {
             ),
             elevation: 8,
             child: Container(
-              height: listDataUser!.visit == "1" ? 170 : 168,
+              height: userData.visit == "1" ? 170 : 168,
               decoration: BoxDecoration(
                 color: Theme.of(context).cardColor,
                 borderRadius: BorderRadius.circular(10),
@@ -116,7 +65,7 @@ class SummaryToday extends StatelessWidget {
                                 data: absenC.dataAbsen,
                                 dataVisit: absenC.dataVisit,
                                 isIn: true,
-                                visit: listDataUser!.visit!,
+                                visit: userData.visit!,
                                 isDark: isDark,
                               ),
                             ),
@@ -136,7 +85,7 @@ class SummaryToday extends StatelessWidget {
                                 data: absenC.dataAbsen,
                                 dataVisit: absenC.dataVisit,
                                 isIn: false,
-                                visit: listDataUser!.visit!,
+                                visit: userData.visit!,
                                 isDark: isDark,
                               ),
                             ),
@@ -204,7 +153,7 @@ class SummaryToday extends StatelessWidget {
                                       logC.selectedMenu(2);
 
                                       // 🔑 VALIDASI STATUS ABSEN TERKINI (DB / SERVER)
-                                      await absenC.refreshAbsen(listDataUser!);
+                                      await absenC.refreshAbsen(userData);
 
                                       // ⛔ Jika masih wajib checkout, jangan lanjut ambil lokasi
                                       if (absenC.mustCheckoutYesterday.value) {
@@ -219,7 +168,7 @@ class SummaryToday extends StatelessWidget {
                                       //   'Finding your location',
                                       //   '',
                                       // );
-                                      await absenC.getLoc(listDataUser);
+                                      await absenC.getLoc(userData);
                                       // Get.back();
                                     },
                                     child: Container(
@@ -285,7 +234,7 @@ class SummaryToday extends StatelessWidget {
                               //       onTap: () async {
                               //         logC.selectedMenu(2);
                               //         // 🔑 VALIDASI STATUS ABSEN TERKINI (DB / SERVER)
-                              //         await absenC.refreshAbsen(listDataUser!);
+                              //         await absenC.refreshAbsen(userData);
 
                               //         // ⛔ Jika masih wajib checkout, jangan lanjut ambil lokasi
                               //         if (absenC.mustCheckoutYesterday.value) {
@@ -300,7 +249,7 @@ class SummaryToday extends StatelessWidget {
                               //         //   'Finding your location',
                               //         //   '',
                               //         // );
-                              //         await absenC.getLoc(listDataUser);
+                              //         await absenC.getLoc(userData;
                               //         // Get.back();
                               //       },
                               //       child: Container(
@@ -339,7 +288,7 @@ class SummaryToday extends StatelessWidget {
                         children: [
                           Visibility(
                             visible:
-                                listDataUser!.visit == "1" &&
+                                userData.visit == "1" &&
                                         absenC.dataVisit.isNotEmpty
                                     ? true
                                     : false,
@@ -438,7 +387,7 @@ class SummaryToday extends StatelessWidget {
                           ),
 
                           Visibility(
-                            visible: listDataUser!.visit != "1",
+                            visible: userData.visit != "1",
                             child:
                                 // Obx(
                                 //   () =>
@@ -574,18 +523,18 @@ class SummaryToday extends StatelessWidget {
                                           fontFamily: 'Nunito',
                                         ),
                                       ),
-                                      TextSpan(
-                                        text:
-                                            ' (${absenC.dataAbsen.isNotEmpty ? absenC.dataAbsen[0].namaShift! : ''})',
-                                        style: TextStyle(
-                                          color:
-                                              isDark
-                                                  ? Colors.grey
-                                                  : AppColors.itemsBackground,
-                                          fontWeight: FontWeight.bold,
-                                          fontFamily: 'Nunito',
-                                        ),
-                                      ),
+                                      // TextSpan(
+                                      //   text:
+                                      //       ' (${absenC.dataAbsen.isNotEmpty ? (absenC.dataAbsen[0].namaShift ?? '-') : ''})',
+                                      //   style: TextStyle(
+                                      //     color:
+                                      //         isDark
+                                      //             ? Colors.grey
+                                      //             : AppColors.itemsBackground,
+                                      //     fontWeight: FontWeight.bold,
+                                      //     fontFamily: 'Nunito',
+                                      //   ),
+                                      // ),
                                     ],
                                   ),
                                   overflow: TextOverflow.ellipsis,
@@ -693,7 +642,7 @@ Widget _buildTimeCard({
                                   ? Theme.of(context).cardColor
                                   : Colors.white)
                               : (effectiveData != null &&
-                                      effectiveData[0].jamAbsenPulang! != ""
+                                     (effectiveData[0].jamAbsenPulang ?? "").isNotEmpty
                                   ? (FormatWaktu.formatJamMenit(
                                         jamMenit:
                                             effectiveData[0].jamAbsenPulang!,
@@ -720,7 +669,7 @@ Widget _buildTimeCard({
                     child: Text(
                       isIn
                           ? (effectiveData != null &&
-                                  effectiveData[0].jamAbsenMasuk! != ""
+                                 (effectiveData[0].jamAbsenMasuk ?? "").isNotEmpty
                               ? (FormatWaktu.formatJamMenit(
                                     jamMenit: effectiveData[0].jamAbsenMasuk!,
                                   ).isBefore(
@@ -740,7 +689,7 @@ Widget _buildTimeCard({
                                   : 'Late')
                               : '')
                           : (effectiveData != null &&
-                                  effectiveData[0].jamAbsenPulang! != ""
+                                  (effectiveData[0].jamAbsenPulang ?? "").isNotEmpty
                               ? (FormatWaktu.formatJamMenit(
                                     jamMenit: effectiveData[0].jamAbsenPulang!,
                                   ).isBefore(
@@ -782,7 +731,7 @@ Widget _buildTimeCard({
               : Text(
                 isIn
                     ? (effectiveData != null &&
-                            effectiveData[0].jamAbsenMasuk! != ""
+                           (effectiveData[0].jamAbsenMasuk ?? "").isNotEmpty
                         ? effectiveData[0].jamAbsenMasuk!
                         : (effectiveVisit != null &&
                                 effectiveVisit[0].visitIn != null &&
@@ -790,7 +739,7 @@ Widget _buildTimeCard({
                             ? effectiveVisit[0].jamIn!
                             : '-:-'))
                     : (effectiveData != null &&
-                            effectiveData[0].jamAbsenPulang! != ""
+                           (effectiveData[0].jamAbsenPulang ?? "").isNotEmpty
                         ? effectiveData[0].jamAbsenPulang!
                         : (effectiveVisit != null &&
                                 effectiveVisit[0].visitOut != null &&
