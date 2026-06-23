@@ -87,7 +87,7 @@ class BackupView extends GetView {
                     children: [
                       Column(
                         children: [
-                           Container(
+                          Container(
                             height: 40,
                             decoration: BoxDecoration(
                               gradient: AppColors.mainGradient(
@@ -103,7 +103,7 @@ class BackupView extends GetView {
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.transparent,
                               ),
-                            
+
                               onPressed: ctrl.backupDatabase,
                               label: const Text('Backup'),
                             ),
@@ -417,10 +417,13 @@ class BackupView extends GetView {
                           icon: Icon(Icons.delete_sweep_rounded, color: red),
                           onPressed: () async {
                             await SQLHelper.instance.truncateShift();
-                            showToast('Data Shift berhasil dihapus');
+                            showToast('Data Shift berhasil diperbarui');
+
+                            // RELOAD SHIFT
+                            await absC.getShift();
                           },
                           label: Text(
-                            'Hapus data shift',
+                            'Perbarui data shift',
                             style: TextStyle(
                               color: isDark ? Colors.grey : Colors.black,
                             ),
@@ -429,7 +432,7 @@ class BackupView extends GetView {
                         const SizedBox(height: 5),
                         OutlinedButton.icon(
                           style: ButtonStyle(
-                            shape: MaterialStateProperty.all(
+                            shape: WidgetStateProperty.all(
                               RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(20),
                               ),
