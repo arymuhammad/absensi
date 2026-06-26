@@ -223,7 +223,7 @@ searchForm(
                   Obx(
                     () => FutureBuilder(
                       future: absC.getUserCabang(
-                        absC.selectedCabang.isNotEmpty
+                        absC.selectedCabang.value.isNotEmpty
                             ? absC.selectedCabang.value
                             : userData!.kodeCabang!,
                         "",
@@ -356,7 +356,7 @@ searchForm(
                             onPressed: () async {
                               if (absC.date1.text == "" ||
                                   absC.date2.text == "" ||
-                                  absC.selectedCabang.isEmpty ||
+                                  // absC.selectedCabang.isEmpty ||
                                   absC.userMonitor.isEmpty ||
                                   absC.selectedUserCabang.isEmpty) {
                                 failedDialog(

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:absensi/app/data/helper/custom_dialog.dart';
 import 'package:absensi/app/data/helper/navigator_helper.dart';
 import 'package:absensi/app/data/model/login_offline_model.dart';
@@ -29,10 +30,10 @@ class LoginController extends GetxController with GetTickerProviderStateMixin {
   late AnimationController ctrAnimated;
 
   @override
-  void onInit() async {
+  void onInit() {
     super.onInit();
-    initFCM();
-    loadSession();
+      _initialize();
+
     ctrAnimated = AnimationController(
       duration: const Duration(milliseconds: 800),
       vsync: this,
@@ -57,6 +58,11 @@ class LoginController extends GetxController with GetTickerProviderStateMixin {
     username.dispose();
     password.dispose();
   }
+
+  Future<void> _initialize() async {
+  // await initFCM();
+  await loadSession();
+}
 
   login() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
@@ -318,28 +324,48 @@ class LoginController extends GetxController with GetTickerProviderStateMixin {
     return md5.convert(utf8.encode(combined)).toString();
   }
 
-  Future<void> initFCM() async {
-    await FirebaseMessaging.instance.requestPermission(
-      alert: true,
-      badge: true,
-      sound: true,
-    );
-  }
+  // Future<void> initFCM() async {
+  //   await FirebaseMessaging.instance.requestPermission(
+  //     alert: true,
+  //     badge: true,
+  //     sound: true,
+  //   );
+  // }
 
   Future<void> updateFcmToken() async {
-    try {
-      final token = await FirebaseMessaging.instance.getToken();
+  try {
+    if (Platform.isIOS) {
+      String? apns;
 
-      if (token == null) return;
+      // Tunggu APNS maksimal 10 detik
+      for (int i = 0; i < 10; i++) {
+        apns = await FirebaseMessaging.instance.getAPNSToken();
 
-      // print("FCM TOKEN: $token");
+        if (apns != null) break;
 
-      await ServiceApi().saveFcmToken({
-        "id_user": logUser.value.id,
-        "token": token,
-      });
-    } catch (e) {
-      debugPrint("Update FCM gagal: $e");
+        await Future.delayed(const Duration(seconds: 1));
+      }
+
+      debugPrint("APNS TOKEN: $apns");
+
+      if (apns == null) {
+        debugPrint("APNS belum tersedia");
+        return;
+      }
     }
+
+    final token = await FirebaseMessaging.instance.getToken();
+
+    if (token == null) return;
+
+    debugPrint("FCM TOKEN: $token");
+
+    await ServiceApi().saveFcmToken({
+      "id_user": logUser.value.id,
+      "token": token,
+    });
+  } catch (e) {
+    debugPrint("Update FCM gagal: $e");
   }
+}
 }

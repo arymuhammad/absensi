@@ -158,12 +158,36 @@ void main() async {
       ),
     );
   };
-
+// print("STEP 1");
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  await NotificationHelper.init(); // init notif on bg
-  pendingLaunchPayload = await NotificationHelper.getLaunchPayload();
-  // debugPrint("NOTIF_DEBUG: MAIN PAYLOAD = $pendingLaunchPayload");
 
+ await FirebaseMessaging.instance.requestPermission(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
+  // iOS foreground notification
+await FirebaseMessaging.instance
+    .setForegroundNotificationPresentationOptions(
+  alert: true,
+  badge: true,
+  sound: true,
+);
+  // print("STEP 2");
+  await NotificationHelper.init(); // init notif on bg
+  // print("STEP 3");
+  try {
+  pendingLaunchPayload =
+      await NotificationHelper.getLaunchPayload();
+
+  // print("PAYLOAD = $pendingLaunchPayload");
+} catch (e, s) {
+  // print("ERROR PAYLOAD");
+  // print(e);
+  // print(s);
+}
+  // debugPrint("NOTIF_DEBUG: MAIN PAYLOAD = $pendingLaunchPayload");
+// print("STEP 4");
   FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
 
   RemoteMessage? initialMessage =

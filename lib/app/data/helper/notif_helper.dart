@@ -13,8 +13,14 @@ class NotificationHelper {
 
   static Future<void> init() async {
     const android = AndroidInitializationSettings('@mipmap/ic_launcher');
+    const darwin = DarwinInitializationSettings(
+  requestAlertPermission: true,
+  requestBadgePermission: true,
+  requestSoundPermission: true,
+);
 
-    const settings = InitializationSettings(android: android);
+
+    const settings = InitializationSettings(android: android, iOS: darwin);
 
     await plugin.initialize(
       settings,
@@ -67,6 +73,11 @@ class NotificationHelper {
         ),
         playSound: true,
       ),
+      iOS: const DarwinNotificationDetails(
+    presentAlert: true,
+    presentBadge: true,
+    presentSound: true,
+  ),
     );
 
     await plugin.show(

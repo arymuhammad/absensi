@@ -34,6 +34,10 @@
 	<string>This app required access to your photo library to pick profile your account image</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>remote-notification</string>
+	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
@@ -51,7 +55,7 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
-	<key>com.startapp.sdk.APPLICATION_ID</key>
-	<string>207249595</string>
+	
+	
 </dict>
 </plist>
