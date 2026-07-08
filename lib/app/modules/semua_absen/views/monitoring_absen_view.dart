@@ -408,7 +408,7 @@ class MonitoringAbsenView extends GetView {
                                       absenC.searchAbsen[i].tanggalMasuk!,
                                     ),
                                     endDate: DateTime.parse(
-                                      absenC.searchAbsen[i].tanggalPulang!,
+                                      absenC.searchAbsen[i].tanggalPulang ?? absenC.searchAbsen[i].tanggalMasuk!,
                                     ),
                                   ),
                                   const SizedBox(width: 20),
