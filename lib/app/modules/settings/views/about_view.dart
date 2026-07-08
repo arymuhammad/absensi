@@ -11,6 +11,7 @@ import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../data/helper/const.dart';
+import '../../../data/helper/helper_ui.dart';
 import '../../../data/helper/loading_platform.dart';
 import '../../home/controllers/home_controller.dart';
 
@@ -89,9 +90,7 @@ class AboutView extends GetView {
                     Obx(
                       () =>
                           setC.isLoading.value
-                              ? Center(
-                                child: platFormDevice(),
-                              )
+                              ? Center(child: platFormDevice())
                               : Expanded(
                                 child: buildChangelog(setC.changelog, setC),
                               ),
@@ -190,10 +189,7 @@ Widget buildChangelog(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Icon(
-                        IconData(
-                          int.parse(update['icon']),
-                          fontFamily: 'MaterialIcons',
-                        ),
+                        getIcon(update['icon']),
                         color: Color(int.parse(update['color'])),
                         size: 28,
                       ),

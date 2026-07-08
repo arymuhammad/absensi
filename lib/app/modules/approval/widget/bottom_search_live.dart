@@ -237,9 +237,9 @@ bottomSearchLive(
                               // print(param);
                               await ctrl.getLeaveReq(param);
 
-                              ctrl.datePick1.clear();
-                              ctrl.datePick2.clear();
-                              ctrl.selectedStatus.value = "";
+                              // ctrl.datePick1.clear();
+                              // ctrl.datePick2.clear();
+                              // ctrl.selectedStatus.value = "";
                               // ctrl.selectedType.value = "";
                             },
                           );

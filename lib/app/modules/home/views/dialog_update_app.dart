@@ -1,5 +1,6 @@
 import 'package:absensi/app/data/helper/const.dart';
 import 'package:absensi/app/data/helper/custom_dialog.dart';
+import 'package:absensi/app/data/helper/helper_ui.dart';
 import 'package:absensi/app/modules/login/controllers/login_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -44,10 +45,7 @@ dialogUpdateApp() {
                   Row(
                     children: [
                       Icon(
-                        IconData(
-                          int.parse(i['icon']),
-                          fontFamily: 'MaterialIcons',
-                        ),
+                        getIcon(i['icon']),
                         color: Color(int.parse(i['color'])),
                       ),
                       const SizedBox(width: 5),
@@ -186,18 +184,18 @@ dialogUpdateApp() {
 
                     /// 🔥 INI DIA TEMPATNYA
                     // Obx(() {
-                       IconButton(
-                        icon: Icon(
-                          homeC.isPaused ? Icons.play_arrow : Icons.pause,
-                        ),
-                        onPressed: () {
-                          if (homeC.isPaused) {
-                            homeC.resumeDownload();
-                          } else {
-                            homeC.pauseDownload();
-                          }
-                        },
-                      )
+                    IconButton(
+                      icon: Icon(
+                        homeC.isPaused ? Icons.play_arrow : Icons.pause,
+                      ),
+                      onPressed: () {
+                        if (homeC.isPaused) {
+                          homeC.resumeDownload();
+                        } else {
+                          homeC.pauseDownload();
+                        }
+                      },
+                    ),
                     // }),
                   ],
                 ),

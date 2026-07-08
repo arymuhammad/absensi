@@ -14,7 +14,7 @@ permissionAdd(BuildContext context, IzinController ctrl, Data userData) {
   final isDark = Theme.of(context).brightness == Brightness.dark;
   Get.bottomSheet(
     Container(
-      height: 250,
+      height: 290,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(8),
         color: isDark ? Theme.of(context).cardColor : Colors.grey[300],
@@ -60,44 +60,92 @@ permissionAdd(BuildContext context, IzinController ctrl, Data userData) {
               alignment: Alignment.topLeft,
               child: InkWell(
                 onTap: () => ctrl.uploadFile(),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.end,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    GetBuilder<IzinController>(
-                      builder: (c) {
-                        if (c.image != null) {
-                          return Container(
-                            height: 65,
-                            width: 65,
-                            decoration: BoxDecoration(color: Colors.grey[300]),
-                            child: Image.file(
-                              File(c.image!.path),
-                              fit: BoxFit.cover,
-                            ),
-                          );
-                        } else {
-                          return Container(
-                            height: 65,
-                            width: 65,
-                            decoration: const BoxDecoration(color: Colors.grey),
-                            child: const Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        GetBuilder<IzinController>(
+                          builder: (c) {
+                            return Wrap(
+                              spacing: 8,
+                              runSpacing: 8,
                               children: [
-                                Icon(Icons.camera_alt),
-                                Text('Upload'),
+                                ...List.generate(c.images.length, (index) {
+                                  return Stack(
+                                    children: [
+                                      Container(
+                                        width: 65,
+                                        height: 65,
+                                        decoration: BoxDecoration(
+                                          color: Colors.grey[300],
+                                          borderRadius: BorderRadius.circular(
+                                            8,
+                                          ),
+                                        ),
+                                        child: ClipRRect(
+                                          borderRadius: BorderRadius.circular(
+                                            8,
+                                          ),
+                                          child: Image.file(
+                                            File(c.images[index].path),
+                                            fit: BoxFit.cover,
+                                          ),
+                                        ),
+                                      ),
+
+                                      Positioned(
+                                        top: -5,
+                                        right: -5,
+                                        child: IconButton(
+                                          icon: const Icon(
+                                            Icons.cancel,
+                                            color: Colors.red,
+                                          ),
+                                          onPressed: () {
+                                            c.images.removeAt(index);
+                                            c.update();
+                                          },
+                                        ),
+                                      ),
+                                    ],
+                                  );
+                                }),
+
+                                if (c.images.length < 3)
+                                  InkWell(
+                                    onTap: c.uploadFile,
+                                    child: Container(
+                                      width: 65,
+                                      height: 65,
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey,
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: const Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Icon(Icons.add_a_photo),
+                                          Text("Upload"),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
                               ],
-                            ),
-                          );
-                        }
-                      },
+                            );
+                          },
+                        ),
+                      ],
                     ),
-                    const SizedBox(width: 5),
-                    const Text('*Upload file pendukung'),
+                        const SizedBox(height: 5),
+                        const Text('*Upload file pendukung (Max 3 file)'),
                   ],
                 ),
               ),
             ),
-            const SizedBox(height: 5),
+            const SizedBox(height: 15),
 
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
@@ -125,6 +173,7 @@ permissionAdd(BuildContext context, IzinController ctrl, Data userData) {
                         parentId: userData.parentId!,
                         branchCode: userData.kodeCabang!,
                         name: userData.nama!,
+                        photo: userData.foto!,
                         level: userData.level!,
                         initDate: ctrl.date1.text,
                         endDate: ctrl.date2.text,

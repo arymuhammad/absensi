@@ -184,29 +184,44 @@ class HistoryCard extends StatelessWidget {
 
                   const SizedBox(height: 3),
                   // LOCATION
-                  Row(
-                    children: [
-                      const Icon(
-                        Icons.location_on_rounded,
-                        size: 16,
-                        color: Colors.grey,
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 2,
+                      horizontal: 3,
+                    ),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      gradient: AppColors.mainGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        context: context,
                       ),
-                      const SizedBox(width: 4),
-                      Expanded(
-                        child: Text(
-                          location.capitalize!,
-                          style: TextStyle(
-                            fontSize: 13,
-                            color:
-                                Theme.of(context).brightness == Brightness.dark
-                                    ? Colors
-                                        .white70 // 🌙 dark → terang
-                                    : Colors.black87,
-                          ),
-                          overflow: TextOverflow.ellipsis,
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Icons.location_on_rounded,
+                          size: 16,
+                          color: Colors.grey,
                         ),
-                      ),
-                    ],
+                        const SizedBox(width: 4),
+                        Expanded(
+                          child: Text(
+                            location.capitalize!,
+                            style: const TextStyle(
+                              fontSize: 13,
+                              color:
+                                  // Theme.of(context).brightness ==
+                                  //         Brightness.dark
+                                  //     ?
+                                  Colors.white70, // 🌙 dark → terang
+                              // : Colors.black87,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                   const SizedBox(height: 3),
                   if (isLocal &&

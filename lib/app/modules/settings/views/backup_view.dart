@@ -417,10 +417,10 @@ class BackupView extends GetView {
                           icon: Icon(Icons.delete_sweep_rounded, color: red),
                           onPressed: () async {
                             await SQLHelper.instance.truncateShift();
-                            showToast('Data Shift berhasil diperbarui');
 
                             // RELOAD SHIFT
                             await absC.getShift();
+                            showToast('Data Shift berhasil diperbarui');
                           },
                           label: Text(
                             'Perbarui data shift',

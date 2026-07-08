@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:convert';
 
+import 'package:absensi/app/data/helper/calendar_badge.dart';
 import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -12,6 +14,7 @@ import 'package:step_progress/step_progress.dart';
 import '../../../data/helper/app_colors.dart';
 import '../../../data/helper/const.dart';
 import '../../../data/helper/custom_dialog.dart';
+import '../../../data/helper/format_waktu.dart';
 import '../../../data/helper/helper_ui.dart';
 import '../../../data/helper/loading_platform.dart';
 import '../../../data/model/permission_model.dart';
@@ -27,8 +30,8 @@ class IzinView extends GetView<IzinController> {
 
   final ctrl = Get.put(IzinController());
   final auth = Get.find<LoginController>();
-  final Rxn<DateTimeRange> pickedRange = Rxn<DateTimeRange>();
-  final Rx<DateTime> pickedMonth = DateTime.now().obs;
+  // final Rxn<DateTimeRange> pickedRange = Rxn<DateTimeRange>();
+  // final Rx<DateTime> pickedMonth = DateTime.now().obs;
 
   @override
   Widget build(BuildContext context) {
@@ -47,8 +50,8 @@ class IzinView extends GetView<IzinController> {
                   firstDate: DateTime(2020),
                   lastDate: DateTime(2100),
                   initialDateRange: DateTimeRange(
-                    start: pickedMonth.value,
-                    end: pickedMonth.value,
+                    start: ctrl.pickedMonth.value,
+                    end: ctrl.pickedMonth.value,
                   ),
                   builder: (context, child) {
                     return Theme(
@@ -96,7 +99,7 @@ class IzinView extends GetView<IzinController> {
                   );
                   Get.back();
 
-                  pickedRange.value = range;
+                  ctrl.pickedRange.value = range;
                 }
               },
               child: const Icon(CupertinoIcons.calendar, color: Colors.white),
@@ -125,6 +128,18 @@ class IzinView extends GetView<IzinController> {
             level: userData.level!,
             type: "",
             status: "",
+            date1:
+                ctrl.pickedRange.value == null
+                    ? ctrl.initDate
+                    : DateFormat(
+                      'yyyy-MM-dd',
+                    ).format(ctrl.pickedRange.value!.start),
+            date2:
+                ctrl.pickedRange.value == null
+                    ? ctrl.endDate
+                    : DateFormat(
+                      'yyyy-MM-dd',
+                    ).format(ctrl.pickedRange.value!.end),
           );
           showToast('Page Refreshed');
         },
@@ -146,7 +161,7 @@ class IzinView extends GetView<IzinController> {
                   itemCount: list.length,
                   itemBuilder: (context, index) {
                     final item = list[index];
-                    final date = DateTime.parse(item.tanggalMulai!);
+                    // final date = DateTime.parse(item.tanggalMulai!);
                     final status = item.status ?? 'pending';
                     final color = getStatusColor(status);
 
@@ -363,162 +378,74 @@ class IzinView extends GetView<IzinController> {
                           padding: const EdgeInsets.all(14),
                           child: Column(
                             children: [
+                              ///========================
+                              /// HEADER
+                              ///========================
                               Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  /// 🔹 AVATAR
+                                  /// Avatar
                                   Column(
                                     children: [
                                       CircleAvatar(
                                         radius: 22,
                                         backgroundColor: color.withOpacity(.2),
-
-                                        child: Text(
-                                          item.nama![0].capitalize??'',
-                                          style: TextStyle(
-                                            color: color,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
+                                        backgroundImage:
+                                            item.photo != null &&
+                                                    item.photo!.isNotEmpty
+                                                ? NetworkImage(
+                                                  '${ServiceApi().baseUrl}${item.photo}',
+                                                )
+                                                : null,
+                                        child:
+                                            item.photo == null ||
+                                                    item.photo!.isEmpty
+                                                ? Text(
+                                                  item.nama![0],
+                                                  style: TextStyle(
+                                                    color: color,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                )
+                                                : null,
                                       ),
                                       const SizedBox(height: 5),
-                                      Column(
-                                        children: [
-                                          Text(
-                                            date.day.toString(),
-                                            style: const TextStyle(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                          Text(
-                                            monthName(date),
-                                            style: TextStyle(
-                                              fontSize: 12,
-                                              color: Colors.grey[600],
-                                            ),
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                        ],
+                                      calendarBadge(
+                                        startDate: DateTime.parse(
+                                          item.tanggalMulai!,
+                                        ),
+                                        endDate: DateTime.parse(
+                                          item.tanggalSelesai!,
+                                        ),
                                       ),
                                     ],
                                   ),
 
                                   const SizedBox(width: 12),
 
-                                  /// 🔹 CONTENT
+                                  /// CONTENT
                                   Expanded(
                                     child: Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        /// 🔸 NAME + STATUS
+                                        /// Nama + Status
                                         Row(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
                                           children: [
-                                            Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                   item.nama?.capitalize ?? '-',
-                                                  style: const TextStyle(
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: 15,
-                                                  ),
+                                            Expanded(
+                                              child: Text(
+                                                item.nama?.capitalize ?? '-',
+                                                style: const TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 15,
                                                 ),
-
-                                                const SizedBox(height: 5),
-
-                                                /// 🔸 STORE LOC
-                                                Row(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    const Icon(
-                                                      Icons
-                                                          .store_mall_directory_rounded,
-                                                      size: 14,
-                                                      color: Colors.grey,
-                                                    ),
-                                                    const SizedBox(width: 4),
-                                                    Text(
-                                                       item.namaCabang?.capitalize ?? '',
-                                                      style: TextStyle(
-                                                        fontSize: 12,
-                                                        color: Colors.grey[600],
-                                                      ),
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                    ),
-                                                  ],
-                                                ),
-                                                const SizedBox(height: 5),
-
-                                                Text(
-                                                  item
-                                                          .alasan
-                                                          ?.capitalizeFirst ??
-                                                      '-',
-                                                  maxLines: 1,
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                  style: const TextStyle(
-                                                    fontSize: 12,
-                                                    color: Colors.grey,
-                                                  ),
-                                                ),
-                                                const SizedBox(height: 5),
-                                                InkWell(
-                                                  onTap: () {
-                                                    showDialog(
-                                                      context: context,
-                                                      builder: (context) {
-                                                        return Dialog(
-                                                          backgroundColor:
-                                                              Colors.black,
-                                                          insetPadding:
-                                                              const EdgeInsets.all(
-                                                                0,
-                                                              ),
-                                                          child: GestureDetector(
-                                                            onTap:
-                                                                () =>
-                                                                    Navigator.of(
-                                                                      context,
-                                                                    ).pop(),
-                                                            child: PhotoView(
-                                                              imageProvider:
-                                                                  NetworkImage(
-                                                                    '${ServiceApi().baseUrl}${item.lampiran!}',
-                                                                  ),
-                                                              backgroundDecoration:
-                                                                  const BoxDecoration(
-                                                                    color:
-                                                                        Colors
-                                                                            .black,
-                                                                  ),
-                                                            ),
-                                                          ),
-                                                        );
-                                                      },
-                                                    );
-                                                  },
-                                                  child: const Text(
-                                                    'show file',
-                                                    style: TextStyle(
-                                                      color: Colors.blue,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
+                                              ),
                                             ),
+                                            const SizedBox(width: 8),
 
-                                            Column(
+                                            /// STATUS
+                                            Row(
+                                              mainAxisSize: MainAxisSize.min,
                                               children: [
                                                 Container(
                                                   padding:
@@ -539,79 +466,293 @@ class IzinView extends GetView<IzinController> {
                                                     status.toUpperCase(),
                                                     style: TextStyle(
                                                       color: color,
-                                                      fontSize: 10,
                                                       fontWeight:
                                                           FontWeight.bold,
+                                                      fontSize: 10,
                                                     ),
                                                   ),
                                                 ),
+                                                // POPUP BUTTON
                                                 if (item.status == "pending")
-                                                  IconButton(
-                                                    onPressed: () {
-                                                      final userData =
-                                                          auth.logUser.value;
-                                                      ctrl.delete(
-                                                        item.id,
-                                                        userData.id!,
-                                                        userData.parentId!,
-                                                        userData.level!,
-                                                        userData.kodeCabang!,
-                                                      );
-                                                    },
-                                                    icon: Icon(
-                                                      Icons.delete,
-                                                      color: red,
+                                                  PopupMenuButton<String>(
+                                                    padding: EdgeInsets.zero,
+                                                    constraints:
+                                                        const BoxConstraints(),
+                                                    position:
+                                                        PopupMenuPosition.under,
+                                                    child: const Padding(
+                                                      padding: EdgeInsets.all(
+                                                        2,
+                                                      ),
+                                                      child: Icon(
+                                                        Icons.more_vert,
+                                                        size: 20,
+                                                      ),
                                                     ),
+                                                    onSelected: (value) {
+                                                      if (value == 'delete') {
+                                                        final userData =
+                                                            auth.logUser.value;
+
+                                                        ctrl.delete(
+                                                          item.id,
+                                                          userData.id!,
+                                                          userData.parentId!,
+                                                          userData.level!,
+                                                          userData.kodeCabang!,
+                                                        );
+                                                      }
+                                                    },
+                                                    itemBuilder:
+                                                        (context) => const [
+                                                          PopupMenuItem(
+                                                            value: 'delete',
+                                                            child: Row(
+                                                              children: [
+                                                                Icon(
+                                                                  Icons.delete,
+                                                                  color:
+                                                                      Colors
+                                                                          .red,
+                                                                ),
+                                                                SizedBox(
+                                                                  width: 8,
+                                                                ),
+                                                                Text('Hapus'),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                        ],
                                                   ),
                                               ],
                                             ),
                                           ],
                                         ),
+                                        const SizedBox(height: 6),
 
-                                        // const SizedBox(height: 5),
-                                        const SizedBox(height: 5),
-                                        Visibility(
-                                          visible: item.status != "pending",
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              const Divider(),
-                                              const SizedBox(height: 5),
-                                              const Text(
-                                                'Note',
+                                        /// Cabang
+                                        Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            const Icon(
+                                              Icons
+                                                  .store_mall_directory_rounded,
+                                              size: 14,
+                                              color: Colors.grey,
+                                            ),
+                                            const SizedBox(width: 4),
+                                            Expanded(
+                                              child: Text(
+                                                item.namaCabang?.capitalize ??
+                                                    '-',
                                                 style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 12,
+                                                  color: Colors.grey[600],
                                                 ),
                                               ),
-                                              Text(
-                                                getLastNote().capitalize ?? '-',
+                                            ),
+                                          ],
+                                        ),
+
+                                        const SizedBox(height: 5),
+
+                                        /// Alasan
+                                        Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            const Icon(
+                                              Icons.health_and_safety_outlined,
+                                              size: 14,
+                                              color: Colors.grey,
+                                            ),
+                                            const SizedBox(width: 4),
+                                            Expanded(
+                                              child: Text(
+                                                item.alasan?.capitalizeFirst ??
+                                                    '-',
                                                 style: const TextStyle(
-                                                  fontStyle: FontStyle.italic,
+                                                  fontSize: 12,
+                                                  color: Colors.grey,
                                                 ),
                                               ),
-                                            ],
+                                            ),
+                                          ],
+                                        ),
+
+                                        const SizedBox(height: 5),
+
+                                        item.lampiran!.trim().isEmpty
+                                            ? const Text('-')
+                                            : InkWell(
+                                              onTap: () {
+                                                final List<String> files = [];
+                                                if (item.lampiran != null &&
+                                                    item.lampiran!.isNotEmpty) {
+                                                  files.addAll(
+                                                    (jsonDecode(item.lampiran!)
+                                                            as List)
+                                                        .map(
+                                                          (e) => e.toString(),
+                                                        ),
+                                                  );
+                                                }
+                                                showDialog(
+                                                  context: context,
+                                                  builder:
+                                                      (_) => Dialog(
+                                                        backgroundColor:
+                                                            Colors.black,
+                                                        insetPadding:
+                                                            EdgeInsets.zero,
+                                                        child: Stack(
+                                                          children: [
+                                                            PageView.builder(
+                                                              itemCount:
+                                                                  files.length,
+                                                              itemBuilder: (
+                                                                context,
+                                                                index,
+                                                              ) {
+                                                                // print(
+                                                                //   '${ServiceApi().baseUrl}${files[index]}',
+                                                                // );
+                                                                return PhotoView(
+                                                                  imageProvider:
+                                                                      NetworkImage(
+                                                                        '${ServiceApi().baseUrl}${files[index]}',
+                                                                      ),
+                                                                  backgroundDecoration:
+                                                                      const BoxDecoration(
+                                                                        color:
+                                                                            Colors.black,
+                                                                      ),
+                                                                );
+                                                              },
+                                                            ),
+
+                                                            Positioned(
+                                                              top: 35,
+                                                              right: 20,
+                                                              child: CircleAvatar(
+                                                                backgroundColor:
+                                                                    Colors
+                                                                        .black54,
+                                                                child: IconButton(
+                                                                  icon: const Icon(
+                                                                    Icons.close,
+                                                                    color:
+                                                                        Colors
+                                                                            .white,
+                                                                  ),
+                                                                  onPressed:
+                                                                      () =>
+                                                                          Get.back(),
+                                                                ),
+                                                              ),
+                                                            ),
+
+                                                            if (files.length >
+                                                                1)
+                                                              Positioned(
+                                                                bottom: 20,
+                                                                left: 0,
+                                                                right: 0,
+                                                                child: Center(
+                                                                  child: Container(
+                                                                    padding: const EdgeInsets.symmetric(
+                                                                      horizontal:
+                                                                          12,
+                                                                      vertical:
+                                                                          6,
+                                                                    ),
+                                                                    decoration: BoxDecoration(
+                                                                      color:
+                                                                          Colors
+                                                                              .black54,
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
+                                                                            20,
+                                                                          ),
+                                                                    ),
+                                                                    child: Text(
+                                                                      'Geser untuk melihat ${files.length} lampiran',
+                                                                      style: const TextStyle(
+                                                                        color:
+                                                                            Colors.white,
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                );
+                                              },
+                                              child: Text(
+                                                item.lampiran!.contains(',')
+                                                    ? 'Show ${item.lampiran!.split(',').length} Files'
+                                                    : 'Show File',
+                                                style: const TextStyle(
+                                                  color: Colors.blue,
+                                                ),
+                                              ),
+                                            ),
+
+                                        const SizedBox(height: 6),
+
+                                        const Text(
+                                          'Diajukan pada',
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 13,
                                           ),
                                         ),
-                                        // Visibility(
-                                        //   visible: item.status == "pending",
-                                        //   child: SizedBox(
-                                        //     height: 40,
-                                        //     child: CsTextField(
-                                        //       enabled: true,
-                                        //       controller: ctrl.note,
-                                        //       label: 'Note',
-                                        //       isDark: isDark,
-                                        //     ),
-                                        //   ),
-                                        // ),
-                                        // const SizedBox(height: 10),
+
+                                        Text(
+                                          FormatWaktu.formatIndoWithTimeStamp(
+                                            tanggal: DateTime.parse(
+                                              item.createdAt!,
+                                            ),
+                                          ),
+                                          style: const TextStyle(
+                                            fontSize: 13,
+                                            color: Colors.grey,
+                                          ),
+                                        ),
+
+                                        if (item.status != "pending") ...[
+                                          const SizedBox(height: 10),
+                                          const Divider(),
+                                          const SizedBox(height: 5),
+
+                                          const Text(
+                                            "Note",
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+
+                                          Text(
+                                            getLastNote().capitalize ?? '-',
+                                            style: const TextStyle(
+                                              fontStyle: FontStyle.italic,
+                                            ),
+                                          ),
+                                        ],
                                       ],
                                     ),
                                   ),
                                 ],
                               ),
-                              const SizedBox(height: 5),
+
+                              // const SizedBox(height: 12),
+
+                              ///========================
+                              /// STEP PROGRESS
+                              ///========================
                               StepProgress(
                                 totalSteps: totalSteps,
                                 controller: controller,
@@ -625,12 +766,12 @@ class IzinView extends GetView<IzinController> {
                                     index,
                                     completedStepIndex,
                                   );
+
                                   return Container(
                                     decoration: BoxDecoration(
                                       color: bgColor,
                                       shape: BoxShape.circle,
                                     ),
-                                    // padding: const EdgeInsets.all(6),
                                     child: icon,
                                   );
                                 },
@@ -648,8 +789,8 @@ class IzinView extends GetView<IzinController> {
                                     labelAxisAlignment: CrossAxisAlignment.end,
                                   ),
                                 ),
-                                onStepChanged: (index) {},
-                                onStepNodeTapped: (index) {},
+                                onStepChanged: (_) {},
+                                onStepNodeTapped: (_) {},
                               ),
                             ],
                           ),

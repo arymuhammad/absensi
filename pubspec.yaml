@@ -1,5 +1,5 @@
 name: absensi
-version: 2.3.53+47
+version: 2.3.54+48
 publish_to: none
 description: URBAN&CO Spot
 environment: 
@@ -71,6 +71,8 @@ dependencies:
   firebase_core: ^4.10.0
   firebase_messaging: ^16.3.0
   flutter_local_notifications: ^19.5.0
+  flutter_image_compress: ^2.4.0
+  shorebird_code_push: ^2.0.6
   # firebase_core: ^3.4.0
   # firebase_messaging: ^15.1.0
   # flutter_local_notifications: ^16.1.0
@@ -100,11 +102,12 @@ flutter_launcher_icons:
   min_sdk_android: 21
 
 flutter: 
-  assets: 
+  assets:
     - assets/image/
     - assets/sound/
     - assets/animation/
     - assets/.env
+    - shorebird.yaml
   fonts: 
     - family: Nunito
       fonts: 

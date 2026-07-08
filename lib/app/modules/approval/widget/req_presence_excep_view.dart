@@ -287,10 +287,10 @@ class ReqPresenceExcepView extends StatelessWidget {
                                   adjCtrl.dateInput2.text,
                                 );
 
-                                adjCtrl.dateInput1.clear();
-                                adjCtrl.dateInput2.clear();
-                                adjCtrl.selectedStatus.value = "";
-                                adjCtrl.selectedType.value = "";
+                                // adjCtrl.dateInput1.clear();
+                                // adjCtrl.dateInput2.clear();
+                                // adjCtrl.selectedStatus.value = "";
+                                // adjCtrl.selectedType.value = "";
                               },
                             );
                           }

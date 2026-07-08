@@ -363,9 +363,9 @@ class UptShift extends StatelessWidget {
                         (data.keterangan?.trim().isNotEmpty ?? false)
                             ? data.keterangan!
                             : adjCtrl.keteranganApp.text,
-                    "id_user": data.idUser,
+                    // "id_user": data.idUser,
                     "tgl_masuk": data.tglMasuk,
-                    "status": data.status,
+                    // "status": data.status,
                   };
                   /////////
                   var dataUptAbs = {
@@ -407,13 +407,14 @@ class UptShift extends StatelessWidget {
                         "reject",
                     "uid": data.id,
                     "level": dataUser.level,
+                    "alasan": data.alasan,
                     "keterangan":
                         (data.keterangan?.trim().isNotEmpty ?? false)
                             ? data.keterangan!
                             : adjCtrl.keteranganApp.text,
-                    "id_user": data.idUser,
+                    // "id_user": data.idUser,
                     "tgl_masuk": data.tglMasuk,
-                    "status": data.status,
+                    // "status": data.status,
                   };
                   adjCtrl.appAbs(dataUptApp, {}, isInbox);
                   homeC.getPendingAdj(

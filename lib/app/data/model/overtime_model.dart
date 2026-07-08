@@ -15,6 +15,7 @@ class OvertimeModel {
   String? acc2;
   String? acc3;
   String? acc4;
+  String? createdAt;
 
   OvertimeModel({
     this.id,
@@ -33,6 +34,7 @@ class OvertimeModel {
     this.acc2,
     this.acc3,
     this.acc4,
+    this.createdAt,
   });
 
   OvertimeModel.fromJson(Map<String, dynamic> json) {
@@ -52,5 +54,6 @@ class OvertimeModel {
     acc2 = json['acc_2'];
     acc3 = json['acc_3'];
     acc4 = json['acc_4'];
+    createdAt = json['created_at'];
   }
 }

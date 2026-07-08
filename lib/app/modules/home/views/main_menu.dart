@@ -165,7 +165,7 @@ class MainMenu extends StatelessWidget {
 
               // ),
               DashboardMenuCard(
-                title: 'Cuti        ',
+                title: 'Cuti     ',
                 icon: Icons.edit_calendar_rounded,
                 color: const Color.fromARGB(255, 2, 159, 59),
                 badge: 0.obs,
@@ -186,7 +186,7 @@ class MainMenu extends StatelessWidget {
               if (userData.kodeCabang != "HO000")
                 // child:
                 DashboardMenuCard(
-                  title: 'Izin',
+                  title: 'Izin      ',
                   icon: Icons.health_and_safety_rounded,
                   color: const Color.fromARGB(255, 208, 9, 181),
                   badge: 0.obs,

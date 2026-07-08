@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:absensi/app/data/helper/const.dart';
 import 'package:absensi/app/modules/login/controllers/login_controller.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -224,7 +227,9 @@ loadingDialog(msg, String? msg2) {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const CircularProgressIndicator(),
+          Platform.isAndroid
+              ? const CircularProgressIndicator()
+              : const CupertinoActivityIndicator(),
           const SizedBox(height: 10),
           Text(msg),
           Text(msg2!),

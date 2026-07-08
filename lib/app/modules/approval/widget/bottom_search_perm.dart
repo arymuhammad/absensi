@@ -234,9 +234,9 @@ bottomSearchPerm(
                                 status: ctrl.selectedstatusPrm.value,
                               );
 
-                              ctrl.date1.clear();
-                              ctrl.date2.clear();
-                              ctrl.selectedstatusPrm.value = "";
+                              // ctrl.date1.clear();
+                              // ctrl.date2.clear();
+                              // ctrl.selectedstatusPrm.value = "";
                               // ctrl.selectedType.value = "";
                             },
                           );

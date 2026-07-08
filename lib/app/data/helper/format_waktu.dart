@@ -6,6 +6,7 @@ class FormatWaktu {
       'MMMM',
     ).format(DateTime.parse(tanggal)).toUpperCase().toString();
   }
+
   static formatShortMonth({required String tanggal}) {
     return DateFormat(
       'MMM',
@@ -19,7 +20,7 @@ class FormatWaktu {
   static formatHariId({required String tanggal}) {
     return DateFormat.EEEE('id').format(DateTime.parse(tanggal)).toString();
   }
-  
+
   static formatHariEn({required String tanggal}) {
     return DateFormat("EE").format(DateTime.parse(tanggal)).toString();
   }
@@ -31,11 +32,18 @@ class FormatWaktu {
   static formatIndo({required DateTime tanggal}) {
     return DateFormat.yMMMMEEEEd('id_ID').format(tanggal).toString();
   }
-  
+
+  static formatIndoWithTimeStamp({required DateTime tanggal}) {
+    return DateFormat(
+      'EEEE, d MMMM y HH:mm:ss',
+      'id_ID',
+    ).format(tanggal).toString();
+  }
+
   static formatEng({required DateTime tanggal}) {
     return DateFormat("EEEE, d MMMM yyyy").format(tanggal).toString();
   }
-  
+
   static formatShortEng({required DateTime tanggal}) {
     return DateFormat("d MMM yyyy").format(tanggal).toString();
   }

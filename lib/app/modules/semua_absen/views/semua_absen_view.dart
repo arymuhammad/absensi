@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:math' as math;
 import 'dart:ui';
 
+import 'package:absensi/app/modules/semua_absen/controllers/semua_absen_controller.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -27,14 +28,14 @@ class SemuaAbsenView extends GetView {
 
   final auth = Get.find<LoginController>();
   final absenC = Get.find<AbsenController>();
-  final Rxn<DateTimeRange> pickedRange = Rxn<DateTimeRange>();
-  final Rx<DateTime> pickedMonth = DateTime.now().obs;
+  final ctrl = Get.put(SemuaAbsenController());
+  // final Rxn<DateTimeRange> pickedRange = Rxn<DateTimeRange>();
+  // final Rx<DateTime> pickedMonth = DateTime.now().obs;
   final RxInt selectedTab = 0.obs;
   final scrollC = ScrollController();
 
   @override
   Widget build(BuildContext context) {
-    final data = auth.logUser.value;
     return Scaffold(
       appBar: AppBar(
         title: Row(
@@ -54,8 +55,8 @@ class SemuaAbsenView extends GetView {
                   firstDate: DateTime(2020),
                   lastDate: DateTime(2100),
                   initialDateRange: DateTimeRange(
-                    start: pickedMonth.value,
-                    end: pickedMonth.value,
+                    start: ctrl.pickedMonth.value,
+                    end: ctrl.pickedMonth.value,
                   ),
                   builder: (context, child) {
                     final isDark =
@@ -91,6 +92,7 @@ class SemuaAbsenView extends GetView {
                 );
 
                 if (range != null) {
+                  final data = auth.logUser.value;
                   loadingDialog("memuat data...", "");
                   await absenC.getAllAbsen(
                     data.id!,
@@ -99,7 +101,7 @@ class SemuaAbsenView extends GetView {
                   );
                   Get.back();
 
-                  pickedRange.value = range;
+                  ctrl.pickedRange.value = range;
                   selectedTab.value = 1;
                 }
               },
@@ -122,14 +124,15 @@ class SemuaAbsenView extends GetView {
       ),
       body: CustomMaterialIndicator(
         onRefresh: () async {
+          final data = auth.logUser.value;
           absenC.resetFilter();
-          pickedRange.value = null;
+          // ctrl.pickedRange.value = null;
           // selectedTab.value = 0;
           absenC.isLoading.value = true;
           await absenC.getAllAbsen(
             data.id!,
-            absenC.initDate1,
-            absenC.initDate2,
+            DateFormat('yyyy-MM-dd').format(ctrl.pickedRange.value!.start),
+            DateFormat('yyyy-MM-dd').format(ctrl.pickedRange.value!.end),
           );
           showToast("Page Refreshed");
         },
@@ -183,9 +186,9 @@ class SemuaAbsenView extends GetView {
                   end = start.add(const Duration(days: 6));
                 } else if (selectedTab.value == 1) {
                   /// BULAN DIPILIH
-                  if (pickedRange.value != null) {
-                    start = pickedRange.value!.start;
-                    end = pickedRange.value!.end;
+                  if (ctrl.pickedRange.value != null) {
+                    start = ctrl.pickedRange.value!.start;
+                    end = ctrl.pickedRange.value!.end;
                   } else {
                     start = DateTime(now.year, now.month, 1);
                     end = DateTime(
@@ -324,6 +327,7 @@ class SemuaAbsenView extends GetView {
                       index: index,
                       child: InkWell(
                         onTap: () {
+                          final data = auth.logUser.value;
                           var detailData = {
                             "foto_profil":
                                 data.foto != "" ? data.foto : data.nama,

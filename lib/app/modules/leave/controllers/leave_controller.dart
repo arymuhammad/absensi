@@ -8,6 +8,7 @@ import 'package:absensi/app/modules/login/controllers/login_controller.dart';
 import 'package:absensi/app/services/service_api.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -15,6 +16,7 @@ import 'package:signature/signature.dart';
 import 'package:step_progress/step_progress.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../data/helper/compress_image.dart';
 import '../../../data/helper/error_logger.dart';
 import '../../../data/model/leave_model.dart';
 
@@ -55,7 +57,7 @@ class LeaveController extends GetxController {
   late StepProgressController stepProgressController;
   int retryCount = 0;
   final int maxRetry = 3;
-  XFile? image;
+  List<XFile> images = [];
   final ImagePicker picker = ImagePicker();
   late Future<List<LeaveModel>> futureLeave;
 
@@ -175,6 +177,7 @@ class LeaveController extends GetxController {
 
     if (phoneNumb == null) {
       showToast("Nomor telepon tidak valid");
+      Get.back();
       return;
     }
 
@@ -210,7 +213,7 @@ class LeaveController extends GetxController {
     | OPTIONAL FILE
     |--------------------------------------------------------------------------
     */
-      "attach_file": image != null ? File(image!.path) : null,
+      "attach_file": images.map((e) => File(e.path)).toList(),
     };
 
     /*
@@ -266,7 +269,7 @@ class LeaveController extends GetxController {
 
     ctrSign.clear();
 
-    image = null;
+    images = [];
 
     /*
   |--------------------------------------------------------------------------
@@ -297,7 +300,13 @@ class LeaveController extends GetxController {
     );
   }
 
-  approveLeave(BuildContext context, Data? userData, String uid) async {
+  approveLeave(
+    BuildContext context,
+    Data? userData,
+    String uid,
+    String date,
+    String alasan,
+  ) async {
     Get.back();
     loadingDialog("Menyetujui pengajuan cuti...", "");
     final signatureBytes = await ctrSign.toPngBytes();
@@ -310,6 +319,8 @@ class LeaveController extends GetxController {
       "level": userData!.level,
       "acc_name": userData.nama,
       "sign": base64SignImage,
+      "date": date,
+      "alasan_cuti": alasan,
     };
     await ServiceApi().reqLeave(param);
     ctrSign.clear();
@@ -385,14 +396,31 @@ class LeaveController extends GetxController {
   }
 
   void uploadFile() async {
-    image = await picker.pickImage(
-      source: ImageSource.gallery,
-      imageQuality: 80,
-      maxHeight: 600,
-      maxWidth: 600,
-    );
-    if (image != null) {
-      update();
+    if (images.length >= 3) {
+      showToast('Maksimal 3 gambar');
+      return;
     }
+
+    final List<XFile> picked = await picker.pickMultiImage(
+      // source: ImageSource.gallery,
+
+      // ambil kualitas asli
+      imageQuality: 100,
+    );
+
+    if (picked.isEmpty) return;
+
+    // cek maksimal 3 gambar
+    if (images.length + picked.length > 3) {
+      showToast('Maksimal 3 gambar');
+      return;
+    }
+
+    for (final picked in picked) {
+      final compressed = await compressImage(File(picked.path));
+      images.add(XFile(compressed.path));
+    }
+
+    update();
   }
 }

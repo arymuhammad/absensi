@@ -1617,12 +1617,22 @@ $s
             final fotoMasuk = item.fotoMasuk;
 
             if (fotoMasuk == null || fotoMasuk.isEmpty) {
+              await ErrorLogger.save('''
+      ////// Check in photo path missing while sync in ////////
+      RAW:
+      ${jsonEncode(item.toJson())}
+''', '');
               throw Exception("Check in photo path missing");
             }
 
             final file = File(fotoMasuk);
 
             if (!await file.exists()) {
+              await ErrorLogger.save('''
+      ////// Check in photo missing while sync in ////////
+      RAW:
+      ${jsonEncode(item.toJson())}
+''', '');
               throw Exception("Check in photo missing");
             }
 
@@ -1648,12 +1658,22 @@ $s
             final fotoPulang = item.fotoPulang;
 
             if (fotoPulang == null || fotoPulang.isEmpty) {
+              await ErrorLogger.save('''
+      ////// Check out photo path missing while sync out ////////
+      RAW:
+      ${jsonEncode(item.toJson())}
+''', '');
               throw Exception("Check out photo path missing");
             }
 
             final file = File(fotoPulang);
 
             if (!await file.exists()) {
+              await ErrorLogger.save('''
+      ////// Check out photo missing while sync out ////////
+      RAW:
+      ${jsonEncode(item.toJson())}
+''', '');
               throw Exception("Check out photo missing");
             }
 
@@ -1890,12 +1910,22 @@ $s
             final fotoIn = item.fotoIn;
 
             if (fotoIn == null || fotoIn.isEmpty) {
+              await ErrorLogger.save('''
+      ////// Visit in photo path missing while sync in ////////
+      RAW:
+      ${jsonEncode(item.toJson())}
+''', '');
               throw Exception("Visit in photo path missing");
             }
 
             final file = File(fotoIn);
 
             if (!await file.exists()) {
+              await ErrorLogger.save('''
+      ////// Visit in photo missing while sync in ////////
+      RAW:
+      ${jsonEncode(item.toJson())}
+''', '');
               throw Exception("Visit in photo missing");
             }
 
@@ -1920,12 +1950,23 @@ $s
             final fotoOut = item.fotoOut;
 
             if (fotoOut == null || fotoOut.isEmpty) {
+              await ErrorLogger.save('''
+      ////// Visit out photo path missing while sync out ////////
+      RAW:
+      ${jsonEncode(item.toJson())}
+''', '');
               throw Exception("Visit out photo path missing");
             }
 
             final file = File(fotoOut);
 
             if (!await file.exists()) {
+
+               await ErrorLogger.save('''
+      ////// Visit out photo missing while sync out ////////
+      RAW:
+      ${jsonEncode(item.toJson())}
+''', '');
               throw Exception("Visit out photo missing");
             }
 
@@ -2360,15 +2401,16 @@ $s
     var param = {
       "mode": "",
       "id_user": id,
-      "tanggal1": d1!.isNotEmpty ? d1 : initDate1,
-      "tanggal2": d2!.isNotEmpty ? d2 : initDate2,
+      "tanggal1": (d1?.isNotEmpty ?? false) ? d1! : initDate1,
+      "tanggal2": (d2?.isNotEmpty ?? false) ? d2! : initDate2,
     };
+    // print(param);
 
     /// 🔥 ambil data lokal dulu (fallback)
     var localData = await SQLHelper.instance.getAllDataAbsen(
       id,
-      d1.isNotEmpty ? d1 : initDate1,
-      d2.isNotEmpty ? d2 : initDate2,
+      (d1?.isNotEmpty ?? false) ? d1! : initDate1,
+      (d2?.isNotEmpty ?? false) ? d2! : initDate2,
     );
 
     localData =

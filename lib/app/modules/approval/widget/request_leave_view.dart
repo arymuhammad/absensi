@@ -18,6 +18,7 @@ import '../../../data/helper/custom_dialog.dart';
 import '../../../data/helper/format_waktu.dart';
 import '../../../data/helper/loading_platform.dart';
 import '../../../data/model/login_model.dart';
+import '../../../data/model/req_leave_model.dart';
 import '../../home/controllers/home_controller.dart';
 import '../../login/controllers/login_controller.dart';
 import '../../leave/controllers/leave_controller.dart';
@@ -416,6 +417,16 @@ class RequestLeaveView extends GetView<LeaveController> {
                                       ),
                                     ),
                                 const SizedBox(height: 10),
+                                const Text(
+                                  'Diajukan pada',
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                                Text(
+                                  FormatWaktu.formatIndoWithTimeStamp(
+                                    tanggal: DateTime.parse(leave.tglBuat!),
+                                  ),
+                                ),
+                                const SizedBox(height: 10),
 
                                 if (status == "pending")
                                   Row(
@@ -438,6 +449,9 @@ class RequestLeaveView extends GetView<LeaveController> {
                                                 "level": userData.level,
                                                 "acc_name": userData.nama,
                                                 "sign": "reject",
+                                                "date": leave.tgl1,
+                                                "alasan_cuti":
+                                                    leave.alasan ?? '',
                                               };
                                               await ServiceApi().reqLeave(
                                                 param,
@@ -468,6 +482,8 @@ class RequestLeaveView extends GetView<LeaveController> {
                                             context,
                                             userData,
                                             leave.uid!,
+                                            leave.tgl1!,
+                                            leave.alasan ?? '',
                                           );
                                         },
                                         size: const Size(double.infinity, 30),
@@ -509,7 +525,13 @@ class RequestLeaveView extends GetView<LeaveController> {
     );
   }
 
-  void signDialog(BuildContext context, Data? userData, String uid) {
+  void signDialog(
+    BuildContext context,
+    Data? userData,
+    String uid,
+    String date,
+    String alasan,
+  ) {
     Get.bottomSheet(
       Container(
         height: 250,
@@ -544,7 +566,7 @@ class RequestLeaveView extends GetView<LeaveController> {
                     if (leaveC.ctrSign.value.isEmpty) {
                       showToast("Harap buat tanda tangan dahulu");
                     } else {
-                      leaveC.approveLeave(context, userData, uid);
+                      leaveC.approveLeave(context, userData, uid, date, alasan);
                     }
                   },
                   child: const Text('Approve'),

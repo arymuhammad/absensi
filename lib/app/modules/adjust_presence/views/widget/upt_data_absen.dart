@@ -411,9 +411,10 @@ class UptDataAbsen extends StatelessWidget {
                         (data.keterangan?.trim().isNotEmpty ?? false)
                             ? data.keterangan!
                             : adjCtrl.keteranganApp.text,
-                    "id_user": data.idUser,
+                    // "id_user": data.idUser,
                     "tgl_masuk": data.tglMasuk,
-                    "status": data.status,
+                    // "status": data.status,
+                    // "date": data.tglMasuk,
                   };
 
                   //////////
@@ -461,13 +462,15 @@ class UptDataAbsen extends StatelessWidget {
                         "reject",
                     "uid": data.id,
                     "level": dataUser.level,
+                    "alasan": data.alasan,
                     "keterangan":
                         (data.keterangan?.trim().isNotEmpty ?? false)
                             ? data.keterangan!
                             : adjCtrl.keteranganApp.text,
-                    "id_user": data.idUser,
+                    // "id_user": data.idUser,
                     "tgl_masuk": data.tglMasuk,
-                    "status": data.status,
+                    // "status": data.status,
+                    // "date": data.tglMasuk,
                   };
                   adjCtrl.appAbs(dataUptApp, {}, isInbox);
                   homeC.getPendingAdj(

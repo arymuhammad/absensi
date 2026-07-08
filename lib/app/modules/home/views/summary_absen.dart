@@ -43,17 +43,7 @@ class SummaryAbsen extends GetView {
                 final uData = auth.logUser.value;
                 final online = await absenC.isOnline();
                 if (online) {
-                  await ErrorLogger.save('''
-                  SUMMARY REFRESH
-
-                  ID          : ${uData.id}
-                  KODE_CABANG : ${uData.kodeCabang}
-                  LEVEL       : ${uData.level}
-
-                  RAW:
-                  ${jsonEncode(uData.toJson())}
-                  ''', ''); //save error to log
-
+                 
                   homeC.getPendingAdj(
                     idUser: uData.id!,
                     idCabang: uData.kodeCabang!,

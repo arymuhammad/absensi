@@ -233,9 +233,9 @@ bottomSearchOvertime(
                                 status: ctrl.selectedstatusOvr.value,
                               );
 
-                              ctrl.date1.clear();
-                              ctrl.date2.clear();
-                              ctrl.selectedstatusOvr.value = "";
+                              // ctrl.date1.clear();
+                              // ctrl.date2.clear();
+                              // ctrl.selectedstatusOvr.value = "";
                               // ctrl.selectedType.value = "";
                             },
                           );

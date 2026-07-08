@@ -345,33 +345,39 @@ class AdjustPresenceController extends GetxController
   ) async {
     // print(dataUptApp['accept']);
     // print(dataUptApp['acc_4']);
-    if (dataUptApp['acc_4'] == "approved") {
-      await ServiceApi().updateReqApp(dataUptApp);
-      await ServiceApi().updateReqAdjAbs(dataUptAbs!);
-      dialogMsg('INFO', 'Data berhasil diupdate');
+    loadingDialog("processing data", "");
+    try {
+      bool success = await ServiceApi().updateReqApp(dataUptApp);
+
+      if (!success) {
+        throw Exception("Gagal update approval");
+      }
+
+      if (dataUptApp['acc_4'] == "approved") {
+        success = await ServiceApi().updateReqAdjAbs(dataUptAbs!);
+
+        if (!success) {
+          throw Exception("Gagal update absensi");
+        }
+      }
+
       await getReqAppUpt(
         '',
         isInbox ? 'inbox' : 'approval',
         levelUser.value,
         idUser.value,
-        idUser.value,
+        dataUptApp['acc_4'] == "approved" ? idUser.value : branchCode.value,
         initDate,
         lastDate,
       );
-    } else {
-      await ServiceApi().updateReqApp(dataUptApp);
+
       dialogMsg('INFO', 'Data berhasil diupdate');
-      await getReqAppUpt(
-        '',
-        isInbox ? 'inbox' : 'approval',
-        levelUser.value,
-        idUser.value,
-        branchCode.value,
-        initDate,
-        lastDate,
-      );
+    } catch (e) {
+      failedDialog(Get.context!, 'ERROR', e.toString());
+    } finally {
+      keteranganApp.clear();
+      closeLoading();
     }
-    keteranganApp.clear();
   }
 
   // Stream<NotifModel> getAdjusmentData({

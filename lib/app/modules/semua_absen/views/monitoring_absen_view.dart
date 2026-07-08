@@ -1,4 +1,5 @@
 import 'package:absensi/app/data/helper/app_colors.dart';
+import 'package:absensi/app/data/helper/calendar_badge.dart';
 import 'package:absensi/app/modules/absen/controllers/absen_controller.dart';
 import 'package:absensi/app/data/helper/const.dart';
 import 'package:absensi/app/modules/shared/container_main_color.dart';
@@ -402,36 +403,17 @@ class MonitoringAbsenView extends GetView {
                                     ),
                                   ),
                                   const SizedBox(width: 20),
-                                  Column(
-                                    children: [
-                                      Text(
-                                        DateFormat('MMM')
-                                            .format(
-                                              DateTime.parse(
-                                                absenC
-                                                    .searchAbsen[i]
-                                                    .tanggalMasuk!,
-                                              ),
-                                            )
-                                            .toUpperCase(),
-                                        style: TextStyle(color: subTitleColor),
-                                      ),
-                                      Text(
-                                        DateFormat('dd').format(
-                                          DateTime.parse(
-                                            absenC.searchAbsen[i].tanggalMasuk!,
-                                          ),
-                                        ),
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 16,
-                                          color: titleColor,
-                                        ),
-                                      ),
-                                    ],
+                                  calendarBadge(
+                                    startDate: DateTime.parse(
+                                      absenC.searchAbsen[i].tanggalMasuk!,
+                                    ),
+                                    endDate: DateTime.parse(
+                                      absenC.searchAbsen[i].tanggalPulang!,
+                                    ),
                                   ),
                                   const SizedBox(width: 20),
                                   Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         DateFormat("EEEE", "id_ID").format(
@@ -441,7 +423,7 @@ class MonitoringAbsenView extends GetView {
                                         ),
                                         style: TextStyle(
                                           fontWeight: FontWeight.bold,
-                                          fontSize: 18,
+                                          fontSize: 16,
                                           color: titleColor,
                                         ),
                                       ),

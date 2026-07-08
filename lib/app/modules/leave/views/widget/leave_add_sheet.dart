@@ -279,44 +279,103 @@ class LeaveAddSheet extends StatelessWidget {
                             alignment: Alignment.topLeft,
                             child: InkWell(
                               onTap: () => leaveC.uploadFile(),
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.end,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  GetBuilder<LeaveController>(
-                                    builder: (c) {
-                                      if (c.image != null) {
-                                        return Container(
-                                          height: 65,
-                                          width: 65,
-                                          decoration: BoxDecoration(
-                                            color: Colors.grey[300],
-                                          ),
-                                          child: Image.file(
-                                            File(c.image!.path),
-                                            fit: BoxFit.cover,
-                                          ),
-                                        );
-                                      } else {
-                                        return Container(
-                                          height: 65,
-                                          width: 65,
-                                          decoration: const BoxDecoration(
-                                            color: Colors.grey,
-                                          ),
-                                          child: const Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
+                                  Row(
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: [
+                                      GetBuilder<LeaveController>(
+                                        builder: (c) {
+                                          return Wrap(
+                                            spacing: 8,
+                                            runSpacing: 8,
                                             children: [
-                                              Icon(Icons.camera_alt),
-                                              Text('Upload'),
+                                              ...List.generate(c.images.length, (
+                                                index,
+                                              ) {
+                                                return Stack(
+                                                  children: [
+                                                    Container(
+                                                      width: 65,
+                                                      height: 65,
+                                                      decoration: BoxDecoration(
+                                                        color: Colors.grey[300],
+                                                        borderRadius:
+                                                            BorderRadius.circular(
+                                                              8,
+                                                            ),
+                                                      ),
+                                                      child: ClipRRect(
+                                                        borderRadius:
+                                                            BorderRadius.circular(
+                                                              8,
+                                                            ),
+                                                        child: Image.file(
+                                                          File(
+                                                            c
+                                                                .images[index]
+                                                                .path,
+                                                          ),
+                                                          fit: BoxFit.cover,
+                                                        ),
+                                                      ),
+                                                    ),
+
+                                                    Positioned(
+                                                      top: -5,
+                                                      right: -5,
+                                                      child: IconButton(
+                                                        icon: const Icon(
+                                                          Icons.cancel,
+                                                          color: Colors.red,
+                                                        ),
+                                                        onPressed: () {
+                                                          c.images.removeAt(
+                                                            index,
+                                                          );
+                                                          c.update();
+                                                        },
+                                                      ),
+                                                    ),
+                                                  ],
+                                                );
+                                              }),
+
+                                              if (c.images.length < 3)
+                                                InkWell(
+                                                  onTap: c.uploadFile,
+                                                  child: Container(
+                                                    width: 65,
+                                                    height: 65,
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.grey,
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                            8,
+                                                          ),
+                                                    ),
+                                                    child: const Column(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .center,
+                                                      children: [
+                                                        Icon(Icons.add_a_photo),
+                                                        Text("Upload"),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
                                             ],
-                                          ),
-                                        );
-                                      }
-                                    },
+                                          );
+                                        },
+                                      ),
+                                    ],
                                   ),
-                                  const SizedBox(width: 5),
-                                  const Text('*Upload file pendukung'),
+                                  const SizedBox(height: 5),
+                                  const Text(
+                                    '*Upload file pendukung (Max 3 file)',
+                                  ),
                                 ],
                               ),
                             ),
@@ -324,7 +383,7 @@ class LeaveAddSheet extends StatelessWidget {
                         ),
                       ),
 
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 8),
 
                       Obx(
                         () => Visibility(
@@ -371,7 +430,7 @@ class LeaveAddSheet extends StatelessWidget {
                                       invalidLeave
                                   ? null
                                   : () {
-                                    if (leaveC.image == null &&
+                                    if (leaveC.images.isEmpty &&
                                         leaveC.selectedLeaveType.value ==
                                             "Lainnya" &&
                                         leaveC.selectedLeave.value !=
@@ -439,7 +498,7 @@ class LeaveAddSheet extends StatelessWidget {
                       showToast("Harap isi no whatsapp aktif");
                       return;
                     }
-                   
+
                     if (leaveC.ctrSign.isEmpty) {
                       showToast("Harap buat tanda tangan dahulu");
                       return;

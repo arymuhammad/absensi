@@ -12,6 +12,8 @@ class SemuaAbsenController extends GetxController {
   var userMonitor = "".obs;
   late TextEditingController date1, date2, store, userCab, rndLoc;
   final TextEditingController filterAbsen = TextEditingController();
+  final Rxn<DateTimeRange> pickedRange = Rxn<DateTimeRange>();
+  final Rx<DateTime> pickedMonth = DateTime.now().obs;
 
   @override
   void onInit() async {
@@ -34,5 +36,4 @@ class SemuaAbsenController extends GetxController {
     filterAbsen.dispose();
     super.onClose();
   }
-
 }

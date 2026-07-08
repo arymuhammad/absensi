@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'dart:math' as math;
-
 import 'package:absensi/app/data/helper/const.dart';
 import 'package:absensi/app/modules/approval/widget/bottom_search_perm.dart';
 import 'package:absensi/app/modules/izin/controllers/izin_controller.dart';
@@ -14,6 +13,8 @@ import 'package:get/get.dart';
 import 'package:photo_view/photo_view.dart';
 
 import '../../../data/helper/app_colors.dart';
+import '../../../data/helper/calendar_badge.dart';
+import '../../../data/helper/format_waktu.dart';
 import '../../../data/helper/helper_ui.dart';
 import '../../../data/helper/loading_platform.dart';
 import '../../../services/service_api.dart';
@@ -88,7 +89,7 @@ class ReqPermView extends StatelessWidget {
                 physics: const AlwaysScrollableScrollPhysics(),
                 itemBuilder: (context, index) {
                   final item = list[index];
-                  final date = DateTime.parse(item.tanggalMulai!);
+                  // final date = DateTime.parse(item.tanggalMulai!);
                   final status = item.status ?? 'pending';
                   final color = getStatusColor(status);
 
@@ -144,41 +145,33 @@ class ReqPermView extends StatelessWidget {
                                     CircleAvatar(
                                       radius: 22,
                                       backgroundColor: color.withOpacity(.2),
-                                      // backgroundImage:
-                                      //     item.photo != null &&
-                                      //             item.photo!.isNotEmpty
-                                      //         ? NetworkImage(
-                                      //           '${ServiceApi().baseUrl}${item.photo}',
-                                      //         )
-                                      //         : null,
-                                      child: Text(
-                                        item.nama![0].capitalize ?? '',
-                                        style: TextStyle(
-                                          color: color,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
+                                      backgroundImage:
+                                          item.photo != null &&
+                                                  item.photo!.isNotEmpty
+                                              ? NetworkImage(
+                                                '${ServiceApi().baseUrl}${item.photo}',
+                                              )
+                                              : null,
+                                      child:
+                                          item.photo == null ||
+                                                  item.photo!.isEmpty
+                                              ? Text(
+                                                item.nama![0].capitalize ?? '',
+                                                style: TextStyle(
+                                                  color: color,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              )
+                                              : null,
                                     ),
                                     const SizedBox(height: 5),
-                                    Column(
-                                      children: [
-                                        Text(
-                                          date.day.toString(),
-                                          style: const TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                        Text(
-                                          monthName(date),
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            color: Colors.grey[600],
-                                          ),
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ],
+                                    calendarBadge(
+                                      startDate: DateTime.parse(
+                                        item.tanggalMulai!,
+                                      ),
+                                      endDate: DateTime.parse(
+                                        item.tanggalSelesai!,
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -202,6 +195,7 @@ class ReqPermView extends StatelessWidget {
                                               fontWeight: FontWeight.bold,
                                               fontSize: 15,
                                             ),
+                                            overflow: TextOverflow.ellipsis,
                                           ),
 
                                           Container(
@@ -250,49 +244,122 @@ class ReqPermView extends StatelessWidget {
 
                                       const SizedBox(height: 5),
 
-                                      Text(
-                                        item.alasan?.capitalizeFirst ?? '-',
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: const TextStyle(
-                                          fontSize: 12,
-                                          color: Colors.grey,
-                                        ),
+                                      Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          const Icon(
+                                            Icons.health_and_safety_outlined,
+                                            size: 14,
+                                            color: Colors.grey,
+                                          ),
+                                          const SizedBox(width: 4),
+                                          Expanded(
+                                            child: Text(
+                                              item.alasan?.capitalizeFirst ??
+                                                  '-',
+                                              // maxLines: 1,
+                                              // overflow: TextOverflow.ellipsis,
+                                              style: const TextStyle(
+                                                fontSize: 12,
+                                                color: Colors.grey,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                       const SizedBox(height: 5),
 
                                       InkWell(
                                         onTap: () {
                                           showDialog(
-                                            context: context,
-                                            builder: (context) {
-                                              return Dialog(
-                                                backgroundColor: Colors.black,
-                                                insetPadding:
-                                                    const EdgeInsets.all(0),
-                                                child: GestureDetector(
-                                                  onTap:
-                                                      () =>
-                                                          Navigator.of(
-                                                            context,
-                                                          ).pop(),
-                                                  child: PhotoView(
-                                                    imageProvider: NetworkImage(
-                                                      '${ServiceApi().baseUrl}${item.lampiran!}',
+                                                context: context,
+                                                builder:
+                                                    (_) => Dialog(
+                                                      backgroundColor:
+                                                          Colors.black,
+                                                      insetPadding:
+                                                          EdgeInsets.zero,
+                                                      child: Stack(
+                                                        children: [
+                                                          PhotoView(
+                                                            imageProvider:
+                                                                NetworkImage(
+                                                                  '${ServiceApi().baseUrl}${item.lampiran!}',
+                                                                ),
+                                                            backgroundDecoration:
+                                                                const BoxDecoration(
+                                                                  color:
+                                                                      Colors
+                                                                          .black,
+                                                                ),
+                                                          ),
+
+                                                          Positioned(
+                                                            top: 20,
+                                                            right: 20,
+                                                            child: Material(
+                                                              color:
+                                                                  Colors
+                                                                      .black45,
+                                                              borderRadius:
+                                                                  BorderRadius.circular(
+                                                                    30,
+                                                                  ),
+                                                              child: InkWell(
+                                                                borderRadius:
+                                                                    BorderRadius.circular(
+                                                                      30,
+                                                                    ),
+                                                                onTap:
+                                                                    () =>   Get.back(),
+                                                                child: const Padding(
+                                                                  padding:
+                                                                      EdgeInsets.all(
+                                                                        8,
+                                                                      ),
+                                                                  child: Icon(
+                                                                    Icons
+                                                                        .close_rounded,
+                                                                    color:
+                                                                        Colors
+                                                                            .white,
+                                                                    size: 28,
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
                                                     ),
-                                                    backgroundDecoration:
-                                                        const BoxDecoration(
-                                                          color: Colors.black,
-                                                        ),
-                                                  ),
-                                                ),
                                               );
-                                            },
-                                          );
                                         },
                                         child: const Text(
                                           'show file',
                                           style: TextStyle(color: Colors.blue),
+                                        ),
+                                      ),
+
+                                      const SizedBox(height: 5),
+
+                                      /// 🔸 CREATED AT
+                                      const Text(
+                                        'Diajukan pada',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 13,
+                                        ),
+                                      ),
+                                      Text(
+                                        FormatWaktu.formatIndoWithTimeStamp(
+                                          tanggal: DateTime.parse(
+                                            item.createdAt!,
+                                          ),
+                                        ),
+                                        style: const TextStyle(
+                                          fontSize: 13,
+                                          color: Colors.grey,
                                         ),
                                       ),
                                     ],
@@ -355,6 +422,7 @@ class ReqPermView extends StatelessWidget {
                                         date1: item.tanggalMulai!,
                                         date2: item.tanggalSelesai!,
                                         noted: ctrl.note.text,
+                                        remark: item.alasan ?? '',
                                       );
                                     },
                                   ),
@@ -374,6 +442,7 @@ class ReqPermView extends StatelessWidget {
                                         date1: item.tanggalMulai!,
                                         date2: item.tanggalSelesai!,
                                         noted: ctrl.note.text,
+                                        remark: item.alasan ?? '',
                                       );
                                     },
                                   ),

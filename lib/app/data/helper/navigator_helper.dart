@@ -8,6 +8,7 @@ import 'package:absensi/app/modules/overtime/views/overtime_view.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 
 import '../../modules/home/controllers/home_controller.dart';
 import '../../modules/home/views/req_app_user_view.dart';
@@ -100,6 +101,15 @@ class NotificationNavigation {
 
   static Future<void> handleNotificationMap(Map<String, dynamic> data) async {
     final menu = data['menu'];
+    final tgl = data['tgl'];
+    final date = DateTime.parse(tgl);
+    final formatter = DateFormat('yyyy-MM-dd');
+
+    final firstDay = DateTime(date.year, date.month, 1);
+    final lastDay = DateTime(date.year, date.month + 1, 0);
+
+    String first = formatter.format(firstDay);
+    String last = formatter.format(lastDay);
 
     final loginC = Get.find<LoginController>();
     final homeC = Get.find<HomeController>();
@@ -156,6 +166,8 @@ class NotificationNavigation {
           "id_user": uData.id!,
           "level": uData.level!,
           "parent_id": uData.parentId!,
+          "date1": first,
+          "date2": last,
         };
         // print(param);
         leaveC.getLeaveReq(param);
@@ -170,6 +182,8 @@ class NotificationNavigation {
           level: uData.level!,
           type: "",
           status: "pending",
+          date1: first,
+          date2: last,
         );
         homeC.isTabLoading.value = false;
         //
@@ -182,8 +196,8 @@ class NotificationNavigation {
           uData.level,
           uData.id,
           uData.kodeCabang,
-          adjC.initDate,
-          adjC.lastDate,
+          first,
+          last,
         );
         homeC.isTabLoading.value = false;
         //
@@ -198,8 +212,8 @@ class NotificationNavigation {
           parentId: uData.parentId!,
           level: uData.level!,
           status: "",
-          date1: permC.initDate,
-          date2: permC.endDate,
+          date1: first,
+          date2: last,
         );
         //
         homeC.isTabLoading.value = false;
@@ -221,6 +235,8 @@ class NotificationNavigation {
           level: uData.level!,
           type: "get_by_id",
           status: "",
+          date1: first,
+          date2: last,
         );
         //
         NotificationNavigation.openOverTime();
@@ -232,8 +248,8 @@ class NotificationNavigation {
           uData.level,
           uData.id,
           uData.kodeCabang,
-          adjC.initDate,
-          adjC.lastDate,
+          first,
+          last,
         );
         //
         NotificationNavigation.openInbox();
@@ -246,6 +262,8 @@ class NotificationNavigation {
           level: uData.level!,
           type: "",
           status: "",
+          date1: first,
+          date2: last,
         );
         //
         NotificationNavigation.openIzin();
@@ -257,6 +275,15 @@ class NotificationNavigation {
 
   static void handleNotificationRm(RemoteMessage message) async {
     final menu = message.data['menu'];
+    final tgl = message.data['tgl'];
+    final date = DateTime.parse(tgl);
+    final formatter = DateFormat('yyyy-MM-dd');
+
+    final firstDay = DateTime(date.year, date.month, 1);
+    final lastDay = DateTime(date.year, date.month + 1, 0);
+
+    String first = formatter.format(firstDay);
+    String last = formatter.format(lastDay);
 
     final loginC = Get.find<LoginController>();
     final homeC = Get.find<HomeController>();
@@ -310,6 +337,8 @@ class NotificationNavigation {
           "id_user": uData.id!,
           "level": uData.level!,
           "parent_id": uData.parentId!,
+          "date1": first,
+          "date2": last,
         };
         // print(param);
         leaveC.getLeaveReq(param);
@@ -324,6 +353,8 @@ class NotificationNavigation {
           level: uData.level!,
           type: "",
           status: "pending",
+          date1: first,
+          date2: last,
         );
         //
         homeC.isTabLoading.value = false;
@@ -336,8 +367,8 @@ class NotificationNavigation {
           uData.level,
           uData.id,
           uData.kodeCabang,
-          adjC.initDate,
-          adjC.lastDate,
+          first,
+          last,
         );
         //
         homeC.isTabLoading.value = false;
@@ -352,8 +383,8 @@ class NotificationNavigation {
           parentId: uData.parentId!,
           level: uData.level!,
           status: "",
-          date1: permC.initDate,
-          date2: permC.endDate,
+          date1: first,
+          date2: last,
         );
         //
         homeC.isTabLoading.value = false;
@@ -375,6 +406,8 @@ class NotificationNavigation {
           level: uData.level!,
           type: "get_by_id",
           status: "",
+          date1: first,
+          date2: last,
         );
         //
         NotificationNavigation.openOverTime();
@@ -386,8 +419,8 @@ class NotificationNavigation {
           uData.level,
           uData.id,
           uData.kodeCabang,
-          adjC.initDate,
-          adjC.lastDate,
+          first,
+          last,
         );
         //
         NotificationNavigation.openInbox();
@@ -400,6 +433,8 @@ class NotificationNavigation {
           level: uData.level!,
           type: "",
           status: "",
+          date1: first,
+          date2: last,
         );
         //
         NotificationNavigation.openIzin();

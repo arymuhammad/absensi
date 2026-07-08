@@ -28,6 +28,7 @@ import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 
 import '../data/helper/custom_dialog.dart';
+import '../data/helper/error_logger.dart';
 import '../data/model/PayslipStoreModel.dart';
 import '../data/model/absen_model.dart';
 import '../data/model/dept_model.dart';
@@ -65,7 +66,7 @@ class ServiceApi {
               return dialogMsg("Time Out", "Koneksi server timeout");
             },
           );
-// print(data);
+      // print(data);
       SmartDialog.dismiss();
 
       final body = json.decode(response.body);
@@ -493,7 +494,13 @@ class ServiceApi {
 
       return {"success": false, "message": "Timeout"};
     } catch (e) {
-      print("SUBMIT ABSEN ERROR: $e");
+      // error log submit absen
+      await ErrorLogger.save('''
+      ////// SUBMIT ABSEN ERROR ////////
+      RAW:
+      ${  e.toString()}
+''', '');
+      // print("SUBMIT ABSEN ERROR: $e");
 
       if (!isSync) {
         if (Get.isDialogOpen ?? false) {
@@ -1052,7 +1059,13 @@ class ServiceApi {
 
       return {"success": false, "message": "Timeout"};
     } catch (e) {
-      print("SUBMIT VISIT ERROR: $e");
+      // error log submit visit
+      await ErrorLogger.save('''
+      ////// SUBMIT VISIT ERROR ////////
+      RAW:
+      ${e.toString()}
+''', '');
+      // print("SUBMIT VISIT ERROR: $e");
 
       if (!isSync) {
         if (Get.isDialogOpen ?? false) {
@@ -1518,9 +1531,9 @@ class ServiceApi {
             ),
           )
           .timeout(const Duration(minutes: 1));
-  //     print(
-  // '${baseUrl}get_reqUptAbs?accept=$accept&type=$type&level=$level&id_user=$idUser&kode_cabang=$branchCode&date1=$date1&date2=$date2',
-  //     );
+      //     print(
+      // '${baseUrl}get_reqUptAbs?accept=$accept&type=$type&level=$level&id_user=$idUser&kode_cabang=$branchCode&date1=$date1&date2=$date2',
+      //     );
       final res = json.decode(response.body);
       switch (response.statusCode) {
         case 200:
@@ -1569,45 +1582,29 @@ class ServiceApi {
     }
   }
 
-  updateReqApp(Map<String, dynamic> data) async {
+  Future<bool> updateReqApp(Map<String, dynamic> data) async {
     try {
       final response = await http
           .post(Uri.parse('${baseUrl}update_reqapp'), body: data)
           .timeout(const Duration(minutes: 1));
-      if (response.statusCode == 200) {
-      } else {
-        failedDialog(
-          Get.context!,
-          'ERROR',
-          'Terjadi kesalahan\n${response.body}',
-        );
-      }
-    } on TimeoutException catch (_) {
-      // Get.back();
-      failedDialog(
-        Get.context!,
-        'ERROR',
-        'Waktu koneksi ke server telah habis\nSilahkan coba lagi nanti',
-      );
-    } on Exception catch (e) {
-      showToast(e.toString());
+      return response.statusCode == 200;
+    } on TimeoutException {
+      return false;
+    } catch (e) {
+      return false;
     }
   }
 
-  updateReqAdjAbs(Map<String, dynamic> data) async {
+  Future<bool> updateReqAdjAbs(Map<String, dynamic> data) async {
     try {
-      await http
+      final response = await http
           .post(Uri.parse('${baseUrl}update_presence_data'), body: data)
           .timeout(const Duration(minutes: 1));
-    } on TimeoutException catch (_) {
-      Get.back();
-      failedDialog(
-        Get.context!,
-        'ERROR',
-        'Waktu koneksi ke server telah habis\nSilahkan coba lagi nanti',
-      );
-    } on Exception catch (e) {
-      showToast(e.toString());
+      return response.statusCode == 200;
+    } on TimeoutException {
+      return false;
+    } catch (e) {
+      return false;
     }
   }
 
@@ -1641,17 +1638,16 @@ class ServiceApi {
       request.fields['parent_id'] = data["parent_id"];
       request.fields['signature'] = data["signature"];
 
-      File? file = data["attach_file"];
+      final List<File> files = (data['attach_file'] as List<File>? ?? []);
 
-      if (file != null && await file.exists()) {
-        request.files.add(
-          http.MultipartFile(
-            "attach_file",
-            file.readAsBytes().asStream(),
-            file.lengthSync(),
-            filename: file.path.split("/").last,
-          ),
-        );
+      if (files.isNotEmpty) {
+        for (final file in files) {
+          if (await file.exists()) {
+            request.files.add(
+              await http.MultipartFile.fromPath('attach_file[]', file.path),
+            );
+          }
+        }
       }
 
       final response = await request.send().timeout(const Duration(minutes: 1));
@@ -1881,13 +1877,13 @@ class ServiceApi {
 
   permissionAdd(Map<String, dynamic> data) async {
     try {
-      Map<String, String> headers = {
-        'Content-Type': 'application/json; charset=UTF-8',
-      };
+      // Map<String, String> headers = {
+      //   'Content-Type': 'application/json; charset=UTF-8',
+      // };
 
       var request = http.MultipartRequest('POST', Uri.parse('${baseUrl}perm'));
 
-      request.headers.addAll(headers);
+      // request.headers.addAll(headers);
 
       // print(data);
 
@@ -1900,23 +1896,23 @@ class ServiceApi {
       request.fields['end_date'] = data["end_date"];
       request.fields['remark'] = data["remark"];
 
-      File? file = data["attach"];
+      final List<File> files = (data['attach'] as List<File>? ?? []);
 
-      if (file != null && await file.exists()) {
-        request.files.add(
-          http.MultipartFile(
-            "attach",
-            file.readAsBytes().asStream(),
-            file.lengthSync(),
-            filename: file.path.split("/").last,
-          ),
-        );
+      if (files.isNotEmpty) {
+        for (final file in files) {
+          if (await file.exists()) {
+            request.files.add(
+              await http.MultipartFile.fromPath('attach[]', file.path),
+            );
+          }
+        }
       }
 
       final streamedResponse = await request.send();
 
       final response = await http.Response.fromStream(streamedResponse);
-
+      print(response.statusCode);
+      print(response.body);
       return jsonDecode(response.body);
     } on TimeoutException {
       return false;

@@ -9,6 +9,7 @@ import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 
+import '../../../data/helper/compress_image.dart';
 import '../../../data/helper/custom_dialog.dart';
 import '../../../services/service_api.dart';
 
@@ -21,19 +22,19 @@ class IzinController extends GetxController {
   final TextEditingController searchC = TextEditingController();
   Timer? debounce;
 
-  XFile? image;
+  List<XFile> images = [];
   final ImagePicker picker = ImagePicker();
 
-  var initDate = DateFormat('yyyy-MM-dd').format(
-    DateTime.parse(
-      DateTime(DateTime.now().year, DateTime.now().month, 1).toString(),
-    ),
-  );
-  var endDate = DateFormat('yyyy-MM-dd').format(
-    DateTime.parse(
-      DateTime(DateTime.now().year, DateTime.now().month + 1, 0).toString(),
-    ),
-  );
+  String get initDate => DateFormat(
+    'yyyy-MM-dd',
+  ).format(DateTime(DateTime.now().year, DateTime.now().month, 1));
+
+  String get endDate => DateFormat(
+    'yyyy-MM-dd',
+  ).format(DateTime(DateTime.now().year, DateTime.now().month + 1, 0));
+
+  final Rxn<DateTimeRange> pickedRange = Rxn<DateTimeRange>();
+  final Rx<DateTime> pickedMonth = DateTime.now().obs;
 
   var statusReqPrm = [
     {"pending": "Pending"},
@@ -89,15 +90,32 @@ class IzinController extends GetxController {
   }
 
   void uploadFile() async {
-    image = await picker.pickImage(
-      source: ImageSource.gallery,
-      imageQuality: 100,
-      maxHeight: 1000,
-      maxWidth: 1000,
-    );
-    if (image != null) {
-      update();
+    if (images.length >= 3) {
+      showToast('Maksimal 3 gambar');
+      return;
     }
+
+    final List<XFile> picked = await picker.pickMultiImage(
+      // source: ImageSource.gallery,
+
+      // ambil kualitas asli
+      imageQuality: 100,
+    );
+
+    if (picked.isEmpty) return;
+
+    // cek maksimal 3 gambar
+    if (images.length + picked.length > 3) {
+      showToast('Maksimal 3 gambar');
+      return;
+    }
+
+    for (final picked in picked) {
+      final compressed = await compressImage(File(picked.path));
+      images.add(XFile(compressed.path));
+    }
+
+    update();
   }
 
   Future<void> submitPermission({
@@ -105,38 +123,48 @@ class IzinController extends GetxController {
     required String parentId,
     required String branchCode,
     required String name,
+    required String photo,
     required String level,
     required String initDate,
     required String endDate,
     required String remarks,
   }) async {
-    final Map<String, dynamic> data = {
-      "type": "add",
-      "id": id,
-      "branch_code": branchCode,
-      "name": name,
-      "level": level,
-      "init_date": initDate,
-      "end_date": endDate,
-      "remark": remarks,
-      "attach": image != null ? File(image!.path) : null,
-    };
-
-    final res = await ServiceApi().permissionAdd(data);
-    if (res['success'] == true) {
-      showToast('Izin berhasil dibuat');
-    } else {
-      showToast('Izin gagal dibuat');
+    Get.back();
+    loadingDialog("Membuat pengajuan izin", "");
+    try {
+      final Map<String, dynamic> data = {
+        "type": "add",
+        "id": id,
+        "branch_code": branchCode,
+        "name": name,
+        "photo": photo,
+        "level": level,
+        "init_date": initDate,
+        "end_date": endDate,
+        "remark": remarks,
+        "attach": images.map((e) => File(e.path)).toList(),
+      };
+      // print(data);
+      final res = await ServiceApi().permissionAdd(data);
+      if (res['success'] == true) {
+        showToast('Izin berhasil dibuat');
+      } else {
+        showToast('Izin gagal dibuat');
+      }
+    } catch (e) {
+      showToast('$e');
+    } finally {
+      await getPermissionList(
+        idUser: id,
+        kodeCabang: branchCode,
+        parentId: parentId,
+        level: level,
+        type: "",
+        status: "pending",
+      );
+      resetForm();
+      closeLoading();
     }
-    resetForm();
-    await getPermissionList(
-      idUser: id,
-      kodeCabang: branchCode,
-      parentId: parentId,
-      level: level,
-      type: "",
-      status: "pending",
-    );
   }
 
   List<PermissionModel> get filteredList {
@@ -166,7 +194,7 @@ class IzinController extends GetxController {
     date1.clear();
     date2.clear();
     remark.clear();
-    image = null;
+    images = [];
     Get.back();
   }
 
@@ -174,7 +202,7 @@ class IzinController extends GetxController {
     return date1.text.isNotEmpty &&
         date2.text.isNotEmpty &&
         remark.text.isNotEmpty &&
-        image != null;
+        images.isNotEmpty;
   }
 
   reject({
@@ -186,6 +214,7 @@ class IzinController extends GetxController {
     required String date1,
     required String date2,
     required String noted,
+    required String remark,
   }) async {
     var data = {
       {
@@ -220,8 +249,11 @@ class IzinController extends GetxController {
       "level": level,
       "tanggal_mulai": date1,
       "tanggal_selesai": date2,
+      "remark": remark,
     };
     // print(data);
+    loadingDialog("Menolak pengajuan izin", "");
+
     final response = await ServiceApi().permission(data);
     if (response['success'] == true) {
       await getPermissionList(
@@ -236,6 +268,7 @@ class IzinController extends GetxController {
     } else {
       showToast(response['message']);
     }
+    closeLoading();
     note.clear();
   }
 
@@ -248,6 +281,7 @@ class IzinController extends GetxController {
     required String date1,
     required String date2,
     required String noted,
+    required String remark,
   }) async {
     var data = {
       {
@@ -282,8 +316,11 @@ class IzinController extends GetxController {
       "level": level,
       "tanggal_mulai": date1,
       "tanggal_selesai": date2,
+      "remark": remark,
     };
     // print(data);
+    loadingDialog("Menyetujui pengajuan izin", "");
+
     final response = await ServiceApi().permission(data);
     if (response['success'] == true) {
       await getPermissionList(
@@ -298,6 +335,7 @@ class IzinController extends GetxController {
     } else {
       showToast(response['message']);
     }
+    closeLoading();
     note.clear();
   }
 
@@ -308,6 +346,8 @@ class IzinController extends GetxController {
     String level,
     String kodeCabang,
   ) async {
+    loadingDialog("Menghapus pengajuan izin", "");
+
     final response = await http.post(
       Uri.parse('${ServiceApi().baseUrl}perm'),
       body: {"type": "delete", "id": id},
@@ -323,5 +363,6 @@ class IzinController extends GetxController {
         status: "",
       );
     }
+    closeLoading();
   }
 }

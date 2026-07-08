@@ -22,6 +22,8 @@ class PermissionModel {
   String? createdAt;
   String? status;
 
+  String? photo;
+
   PermissionModel({
     this.id,
     this.idUser,
@@ -42,6 +44,7 @@ class PermissionModel {
     this.noteAcc4,
     this.createdAt,
     this.status,
+    this.photo,
   });
 
   factory PermissionModel.fromJson(Map<String, dynamic> json) {
@@ -68,6 +71,7 @@ class PermissionModel {
 
       createdAt: json['created_at']?.toString(),
       status: json['status']?.toString(),
+      photo: json['photo']?.toString(),
     );
   }
 
@@ -91,6 +95,7 @@ class PermissionModel {
       'note_acc_4': noteAcc4,
       'created_at': createdAt,
       'status': status,
+      'photo': photo,
     };
   }
 }

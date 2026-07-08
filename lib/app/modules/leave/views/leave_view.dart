@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:math' as math;
 
@@ -760,51 +761,151 @@ class LeaveView extends GetView<LeaveController> {
                                                 ),
                                               ),
                                               leave.attachFile == null ||
-                                                      leave.attachFile!.isEmpty
+                                                      leave.attachFile!
+                                                          .trim()
+                                                          .isEmpty
                                                   ? const Text('-')
                                                   : InkWell(
                                                     onTap: () {
+                                                      final List<String> files =
+                                                          [];
+                                                      if (leave.attachFile !=
+                                                              null &&
+                                                          leave
+                                                              .attachFile!
+                                                              .isNotEmpty) {
+                                                        files.addAll(
+                                                          (jsonDecode(
+                                                                    leave
+                                                                        .attachFile!,
+                                                                  )
+                                                                  as List)
+                                                              .map(
+                                                                (e) =>
+                                                                    e.toString(),
+                                                              ),
+                                                        );
+                                                      }
                                                       showDialog(
                                                         context: context,
-                                                        builder: (context) {
-                                                          return Dialog(
-                                                            backgroundColor:
-                                                                Colors.black,
-                                                            insetPadding:
-                                                                const EdgeInsets.all(
-                                                                  0,
-                                                                ),
-                                                            child: GestureDetector(
-                                                              onTap:
-                                                                  () =>
-                                                                      Navigator.of(
-                                                                        context,
-                                                                      ).pop(),
-                                                              child: PhotoView(
-                                                                imageProvider:
-                                                                    NetworkImage(
-                                                                      '${ServiceApi().baseUrl}${leave.attachFile!}',
-                                                                    ),
-                                                                backgroundDecoration:
-                                                                    const BoxDecoration(
-                                                                      color:
+                                                        builder:
+                                                            (_) => Dialog(
+                                                              backgroundColor:
+                                                                  Colors.black,
+                                                              insetPadding:
+                                                                  EdgeInsets
+                                                                      .zero,
+                                                              child: Stack(
+                                                                children: [
+                                                                  PageView.builder(
+                                                                    itemCount:
+                                                                        files
+                                                                            .length,
+                                                                    itemBuilder: (
+                                                                      context,
+                                                                      index,
+                                                                    ) {
+                                                                      // print(
+                                                                      //   '${ServiceApi().baseUrl}${files[index]}',
+                                                                      // );
+                                                                      return PhotoView(
+                                                                        imageProvider:
+                                                                            NetworkImage(
+                                                                              '${ServiceApi().baseUrl}${files[index]}',
+                                                                            ),
+                                                                        backgroundDecoration: const BoxDecoration(
+                                                                          color:
+                                                                              Colors.black,
+                                                                        ),
+                                                                      );
+                                                                    },
+                                                                  ),
+
+                                                                  Positioned(
+                                                                    top: 35,
+                                                                    right: 20,
+                                                                    child: CircleAvatar(
+                                                                      backgroundColor:
                                                                           Colors
-                                                                              .black,
+                                                                              .black54,
+                                                                      child: IconButton(
+                                                                        icon: const Icon(
+                                                                          Icons
+                                                                              .close,
+                                                                          color:
+                                                                              Colors.white,
+                                                                        ),
+                                                                        onPressed:
+                                                                            () =>
+                                                                                Get.back(),
+                                                                      ),
                                                                     ),
+                                                                  ),
+
+                                                                  if (files
+                                                                          .length >
+                                                                      1)
+                                                                    Positioned(
+                                                                      bottom:
+                                                                          20,
+                                                                      left: 0,
+                                                                      right: 0,
+                                                                      child: Center(
+                                                                        child: Container(
+                                                                          padding: const EdgeInsets.symmetric(
+                                                                            horizontal:
+                                                                                12,
+                                                                            vertical:
+                                                                                6,
+                                                                          ),
+                                                                          decoration: BoxDecoration(
+                                                                            color:
+                                                                                Colors.black54,
+                                                                            borderRadius: BorderRadius.circular(
+                                                                              20,
+                                                                            ),
+                                                                          ),
+                                                                          child: Text(
+                                                                            'Geser untuk melihat ${files.length} lampiran',
+                                                                            style: const TextStyle(
+                                                                              color:
+                                                                                  Colors.white,
+                                                                            ),
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                ],
                                                               ),
                                                             ),
-                                                          );
-                                                        },
                                                       );
                                                     },
-                                                    child: const Text(
-                                                      'show file',
-                                                      style: TextStyle(
+                                                    child: Text(
+                                                      leave.attachFile!
+                                                              .contains(',')
+                                                          ? 'Show ${leave.attachFile!.split(',').length} Files'
+                                                          : 'Show File',
+                                                      style: const TextStyle(
                                                         color: Colors.blue,
                                                       ),
                                                     ),
                                                   ),
                                               const SizedBox(height: 10),
+                                              const Text(
+                                                'Diajukan pada',
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                              Text(
+                                                FormatWaktu.formatIndoWithTimeStamp(
+                                                  tanggal: DateTime.parse(
+                                                    leave.tglBuat!,
+                                                  ),
+                                                ),
+                                              ),
+                                              const SizedBox(height: 10),
+
                                               StepProgress(
                                                 totalSteps: totalSteps,
                                                 controller: controller,

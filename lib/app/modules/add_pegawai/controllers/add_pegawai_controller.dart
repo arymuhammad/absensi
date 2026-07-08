@@ -21,6 +21,7 @@ import 'package:sqflite/sqflite.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../../data/helper/compress_image.dart';
 import '../../../data/helper/custom_dialog.dart';
 import '../../../data/helper/error_logger.dart';
 import '../../../data/model/cabang_model.dart';
@@ -208,11 +209,11 @@ class AddPegawaiController extends GetxController {
     } else {
       image = await picker.pickImage(
         source: ImageSource.gallery,
-        imageQuality: 60,
-        maxHeight: 600,
-        maxWidth: 600,
+        imageQuality: 100,
       );
       if (image != null) {
+        final compressed = await compressImage(File(image!.path));
+        image = XFile(compressed.path);
         update();
       }
     }

@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:math' as math;
 
+import 'package:absensi/app/data/helper/calendar_badge.dart';
 import 'package:absensi/app/data/helper/const.dart';
 import 'package:absensi/app/modules/approval/widget/bottom_search_overtime.dart';
 import 'package:absensi/app/modules/login/controllers/login_controller.dart';
@@ -85,7 +86,7 @@ class ReqOvertimeView extends StatelessWidget {
                 physics: const AlwaysScrollableScrollPhysics(),
                 itemBuilder: (context, index) {
                   final item = list[index];
-                  final date = DateTime.parse(item.initDate!);
+                  // final date = DateTime.parse(item.initDate!);
                   final status = item.status ?? 'pending';
                   final color = getStatusColor(status);
 
@@ -149,25 +150,9 @@ class ReqOvertimeView extends StatelessWidget {
                                               : null,
                                     ),
                                     const SizedBox(height: 5),
-                                    Column(
-                                      children: [
-                                        Text(
-                                          date.day.toString(),
-                                          style: const TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                        Text(
-                                          monthName(date),
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            color: Colors.grey[600],
-                                          ),
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ],
+                                    calendarBadge(
+                                      startDate: DateTime.parse(item.initDate!),
+                                      endDate: DateTime.parse(item.endDate!),
                                     ),
                                   ],
                                 ),
@@ -272,6 +257,17 @@ class ReqOvertimeView extends StatelessWidget {
                                           color: Colors.grey,
                                         ),
                                       ),
+
+                                      const SizedBox(height: 4),
+
+                                      /// 🔸 CREATED AT
+                                      const Text(
+                                        'Diajukan pada',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      Text(item.createdAt ?? '-'),
                                     ],
                                   ),
                                 ),
