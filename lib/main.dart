@@ -197,7 +197,7 @@ await FirebaseMessaging.instance
     pendingNotification = initialMessage;
   }
 
-  Get.put(LoginController());
+  Get.put(LoginController(), permanent: true);
   Get.put(HomeController());
   final themeC = Get.put(ThemeController());
 

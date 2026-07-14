@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:developer' as developer;
 import 'dart:io';
 import 'package:absensi/app/data/helper/custom_dialog.dart';
 import 'package:absensi/app/data/helper/navigator_helper.dart';
@@ -11,7 +10,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:crypto/crypto.dart';
-import '../../../data/helper/shorebird_helper.dart';
 import '../../../services/service_api.dart';
 import '../../../data/model/login_model.dart';
 import '../../absen/controllers/absen_controller.dart';
@@ -241,28 +239,7 @@ class LoginController extends GetxController with GetTickerProviderStateMixin {
       // UPDATE TOKEN FCM
       await updateFcmToken();
 
-      // ============================
-      // CHECK SHOREBIRD
-      // ============================
-      Future.delayed(const Duration(seconds: 2), () async {
-        final updated = await ShorebirdHelper.checkForUpdate();
-
-        developer.log("CHECK SHOREBIRD");
-        developer.log("updated = $updated");
-
-        if (updated) {
-          Future.delayed(const Duration(milliseconds: 300), () {
-            final context = Get.overlayContext;
-
-            if (context != null) {
-              dialogMsgScsUpd(
-                "Update tersedia",
-                "Pembaruan berhasil diunduh.\nSilakan tutup dan buka kembali aplikasi.",
-              );
-            }
-          });
-        }
-      });
+     
 
       if (pendingNotification != null && !notificationHandled) {
         notificationHandled = true;
@@ -376,7 +353,7 @@ class LoginController extends GetxController with GetTickerProviderStateMixin {
           await Future.delayed(const Duration(seconds: 1));
         }
 
-        debugPrint("APNS TOKEN: $apns");
+        // debugPrint("APNS TOKEN: $apns");
 
         if (apns == null) {
           debugPrint("APNS belum tersedia");
@@ -388,7 +365,7 @@ class LoginController extends GetxController with GetTickerProviderStateMixin {
 
       if (token == null) return;
 
-      debugPrint("FCM TOKEN: $token");
+      // debugPrint("FCM TOKEN: $token");
 
       await ServiceApi().saveFcmToken({
         "id_user": logUser.value.id,

@@ -8,11 +8,13 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:shorebird_code_push/shorebird_code_push.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../data/helper/const.dart';
 import '../../../data/helper/helper_ui.dart';
 import '../../../data/helper/loading_platform.dart';
+import '../../../data/helper/shorebird_helper.dart';
 import '../../home/controllers/home_controller.dart';
 
 class AboutView extends GetView {
@@ -45,7 +47,7 @@ class AboutView extends GetView {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.only(top: 150, left: 15.0, right: 15.0),
+            padding: const EdgeInsets.only(top: 110, left: 15.0, right: 15.0),
             child: Card(
               elevation: 4,
               child: SizedBox(
@@ -78,6 +80,62 @@ class AboutView extends GetView {
                         'V${homeC.currVer}',
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
+                    ),
+                    ListTile(
+                      title: const Text('Check Available Patch'),
+                      subtitle: Obx(
+                        () => Text(
+                          'Current ${homeC.currPatchVer.value}',
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      onTap: () async {
+                        final status = await ShorebirdHelper.checkStatus();
+
+                        if (status == null) return;
+
+                        switch (status) {
+                          case UpdateStatus.outdated:
+                            Get.defaultDialog(
+                              title: "Patch tersedia",
+                              middleText:
+                                  "Patch saat ini : ${homeC.currPatchVer}\n\n"
+                                  "Patch baru tersedia.\n\nApakah ingin mengunduh sekarang?",
+                              textCancel: "Nanti",
+                              textConfirm: "Download",
+                              onCancel: () => Get.back(),
+                              onConfirm: () async {
+                                Get.back();
+
+                                final success =
+                                    await ShorebirdHelper.downloadPatch();
+
+                                if (success) {
+                                  homeC.currPatchVer.value =
+                                      await ShorebirdHelper.currentPatchVersion();
+                                  dialogMsgScsUpd(
+                                    "Patch berhasil diunduh",
+                                    "Silakan tutup dan buka kembali aplikasi.",
+                                  );
+                                }
+                              },
+                              barrierDismissible: false,
+                            );
+                            break;
+
+                          case UpdateStatus.restartRequired:
+                            dialogMsgScsUpd(
+                              "Restart diperlukan",
+                              "Patch sudah terpasang.\nSilakan tutup dan buka kembali aplikasi.",
+                            );
+                            break;
+
+                          case UpdateStatus.upToDate:
+                          case UpdateStatus.unavailable:
+                            // Tidak menampilkan popup apa pun
+                            break;
+                        }
+                      },
                     ),
                     const Divider(),
                     Padding(

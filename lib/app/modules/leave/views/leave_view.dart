@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 import 'dart:math' as math;
 
@@ -767,25 +766,36 @@ class LeaveView extends GetView<LeaveController> {
                                                   ? const Text('-')
                                                   : InkWell(
                                                     onTap: () {
-                                                      final List<String> files =
-                                                          [];
-                                                      if (leave.attachFile !=
-                                                              null &&
-                                                          leave
-                                                              .attachFile!
-                                                              .isNotEmpty) {
-                                                        files.addAll(
-                                                          (jsonDecode(
-                                                                    leave
-                                                                        .attachFile!,
-                                                                  )
-                                                                  as List)
-                                                              .map(
-                                                                (e) =>
-                                                                    e.toString(),
-                                                              ),
+                                                      final files =
+                                                          parseLampiran(
+                                                            leave.attachFile,
+                                                          );
+                                                      if (files.isEmpty) {
+                                                        showToast(
+                                                          "Tidak ada lampiran",
                                                         );
+                                                        return;
                                                       }
+
+                                                      // final List<String> files =
+                                                      //     [];
+                                                      // if (leave.attachFile !=
+                                                      //         null &&
+                                                      //     leave
+                                                      //         .attachFile!
+                                                      //         .isNotEmpty) {
+                                                      //   files.addAll(
+                                                      //     (jsonDecode(
+                                                      //               leave
+                                                      //                   .attachFile!,
+                                                      //             )
+                                                      //             as List)
+                                                      //         .map(
+                                                      //           (e) =>
+                                                      //               e.toString(),
+                                                      //         ),
+                                                      //   );
+                                                      // }
                                                       showDialog(
                                                         context: context,
                                                         builder:
@@ -817,6 +827,21 @@ class LeaveView extends GetView<LeaveController> {
                                                                           color:
                                                                               Colors.black,
                                                                         ),
+                                                                        errorBuilder: (
+                                                                          context,
+                                                                          error,
+                                                                          stackTrace,
+                                                                        ) {
+                                                                          return const Center(
+                                                                            child: Text(
+                                                                              'Gagal memuat lampiran',
+                                                                              style: TextStyle(
+                                                                                color:
+                                                                                    Colors.white,
+                                                                              ),
+                                                                            ),
+                                                                          );
+                                                                        },
                                                                       );
                                                                     },
                                                                   ),

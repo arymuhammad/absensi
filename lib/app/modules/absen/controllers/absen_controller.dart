@@ -275,15 +275,15 @@ class AbsenController extends GetxController
   Future<Data> _loadUser() async {
     final pref = await SharedPreferences.getInstance();
     final raw = pref.getString('userDataLogin');
-    await ErrorLogger.save('''
-    TYPE: LOAD_USER
+    // await ErrorLogger.save('''
+    // TYPE: LOAD_USER
 
-    TIME:
-    ${DateTime.now()}
+    // TIME:
+    // ${DateTime.now()}
 
-    RAW_DATA:
-    $raw
-        ''', '');
+    // RAW_DATA:
+    // $raw
+    //     ''', '');
 
     return Data.fromJson(jsonDecode(raw!));
   }
@@ -1961,8 +1961,7 @@ $s
             final file = File(fotoOut);
 
             if (!await file.exists()) {
-
-               await ErrorLogger.save('''
+              await ErrorLogger.save('''
       ////// Visit out photo missing while sync out ////////
       RAW:
       ${jsonEncode(item.toJson())}
@@ -2605,96 +2604,6 @@ $s
     return dataAllVisit;
   }
 
-  // checkForUpdates(status) async {
-  //   if (status != "onInit") {
-  //     loadingDialog("Checking for updates...", "");
-  //   }
-
-  //   try {
-  //     final readDoc = await http
-  //         .get(Uri.parse('http://103.156.15.61/update_apk/updateLog.xml'))
-  //         .timeout(const Duration(seconds: 20));
-  //     final response = await http
-  //         .head(
-  //           Uri.parse(
-  //             // supportedAbi == 'arm64-v8a'
-  //             //     ? 'http://103.156.15.61/update apk/absensiApp.arm64v8a.apk'
-  //             // :
-  //             'http://103.156.15.61/update_apk/latest.apk',
-  //           ),
-  //         )
-  //         .timeout(const Duration(seconds: 20));
-
-  //     Get.back();
-  //     if (response.statusCode == 200) {
-  //       //parsing readDoc
-  //       final document = xml.XmlDocument.parse(readDoc.body);
-  //       final itemsNode = document.findElements('items').first;
-  //       final updates = itemsNode.findElements('update');
-  //       latestVer = itemsNode.findElements('versi').first.innerText;
-  //       //start looping item on readDoc
-  //       updateList.clear();
-  //       for (final listUpdates in updates) {
-  //         final name = listUpdates.findElements('name').first.innerText;
-  //         final desc = listUpdates.findElements('desc').first.innerText;
-  //         final icon = listUpdates.findElements('icon').first.innerText;
-  //         final color = listUpdates.findElements('color').first.innerText;
-
-  //         updateList.add({
-  //           'name': name,
-  //           'desc': desc,
-  //           'icon': icon,
-  //           'color': color,
-  //         });
-  //       }
-  //       //end loop item on readDoc
-  //       if (compareVersion(latestVer, currVer) > 0) {
-  //         dialogUpdateApp();
-  //       } else {
-  //         // print(compareVersion(latestVer, currVer) > 0);
-  //         // print(latestVer);
-  //         // print(currVer);
-  //         if (status != "onInit") {
-  //           Get.back(closeOverlays: true);
-  //           succesDialog(
-  //             context: Get.context!,
-  //             pageAbsen: "N",
-  //             desc: "No system updates",
-  //             type: DialogType.info,
-  //             title: 'INFO',
-  //             btnOkOnPress: () => Get.back(),
-  //           );
-  //         }
-  //       }
-  //     } else {
-  //       showToast("No update available");
-  //       // succesDialog(
-  //       //   context: Get.context!,
-  //       //   pageAbsen: "N",
-  //       //   desc: "No system updates",
-  //       //   type: DialogType.info,
-  //       //   title: 'INFO',
-  //       //   btnOkOnPress: () => Get.back(),
-  //       // );
-  //     }
-  //   } on SocketException catch (e) {
-  //     Get.back(closeOverlays: true);
-  //     Get.defaultDialog(
-  //       title: e.toString(),
-  //       middleText: 'Check your internet connection',
-  //       textConfirm: 'Refresh',
-  //       confirmTextColor: Colors.white,
-  //       onConfirm: () {
-  //         checkForUpdates("");
-  //         Get.back(closeOverlays: true);
-  //       },
-  //     );
-  //   } on TimeoutException catch (_) {
-  //     Get.back(closeOverlays: true);
-  //     showToast("The connection to the server has timed out.");
-  //   }
-  // }
-
   Future<List<Visit>> getVisitToday(
     Map<String, dynamic> paramSingleVisit,
   ) async {
@@ -2986,17 +2895,17 @@ $s
       return;
     }
 
-    await ErrorLogger.save('''
-      REFRESH USER
+    //     await ErrorLogger.save('''
+    //       REFRESH USER
 
-      ID       : ${newUser.id}
-      USERNAME : ${newUser.username}
-      LAT      : ${newUser.lat}
-      LONG     : ${newUser.long}
+    //       ID       : ${newUser.id}
+    //       USERNAME : ${newUser.username}
+    //       LAT      : ${newUser.lat}
+    //       LONG     : ${newUser.long}
 
-      RAW:
-      ${jsonEncode(newUser.toJson())}
-''', '');
+    //       RAW:
+    //       ${jsonEncode(newUser.toJson())}
+    // ''', '');
 
     if (Get.isRegistered<LoginController>()) {
       final logC = Get.find<LoginController>();

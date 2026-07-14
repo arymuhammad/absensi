@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-Widget calendarBadge({
-  required DateTime startDate,
-  required DateTime endDate,
-}) {
+Widget calendarBadge({required DateTime startDate, required DateTime endDate}) {
   final isSameDate =
       startDate.year == endDate.year &&
       startDate.month == endDate.month &&
@@ -17,12 +14,7 @@ Widget calendarBadge({
         color: Colors.white,
         borderRadius: BorderRadius.circular(5),
         border: Border.all(color: Colors.grey.shade300),
-        boxShadow: const [
-          BoxShadow(
-            blurRadius: 3,
-            color: Colors.black12,
-          ),
-        ],
+        boxShadow: const [BoxShadow(blurRadius: 3, color: Colors.black12)],
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -32,9 +24,7 @@ Widget calendarBadge({
             padding: const EdgeInsets.symmetric(vertical: 1),
             decoration: const BoxDecoration(
               color: Colors.red,
-              borderRadius: BorderRadius.vertical(
-                top: Radius.circular(5),
-              ),
+              borderRadius: BorderRadius.vertical(top: Radius.circular(5)),
             ),
             child: Text(
               DateFormat('MMM').format(date).toUpperCase(),
@@ -51,6 +41,7 @@ Widget calendarBadge({
             child: Text(
               '${date.day}',
               style: const TextStyle(
+                color: Colors.black,
                 fontSize: 11,
                 fontWeight: FontWeight.bold,
               ),

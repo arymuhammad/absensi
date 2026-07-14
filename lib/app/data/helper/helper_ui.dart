@@ -1,4 +1,30 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+
+List<String> parseLampiran(String? value) {
+  if (value == null || value.trim().isEmpty) {
+    return [];
+  }
+
+  final text = value.trim();
+
+  try {
+    final decoded = jsonDecode(text);
+
+    if (decoded is List) {
+      return decoded.map((e) => e.toString()).toList();
+    }
+
+    if (decoded is String) {
+      return [decoded];
+    }
+  } catch (_) {
+    // bukan JSON
+  }
+
+  return [text];
+}
 
 Color getStatusColor(String status) {
   switch (status) {

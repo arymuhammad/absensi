@@ -1,12 +1,12 @@
 import 'package:absensi/app/modules/absen/controllers/absen_controller.dart';
 import 'package:get/get.dart';
 
-import '../controllers/login_controller.dart';
+// import '../controllers/login_controller.dart';
 
 class LoginBinding extends Bindings {
   @override
   void dependencies() {
-    Get.lazyPut<LoginController>(() => LoginController(), fenix: true);
+    // Get.lazyPut<LoginController>(() => LoginController(), fenix: true);
     // Get.put(()=>AlarmController());
     Get.put(() => AbsenController());
   }

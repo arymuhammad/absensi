@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:absensi/app/data/helper/calendar_badge.dart';
 import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
@@ -587,17 +586,16 @@ class IzinView extends GetView<IzinController> {
                                             ? const Text('-')
                                             : InkWell(
                                               onTap: () {
-                                                final List<String> files = [];
-                                                if (item.lampiran != null &&
-                                                    item.lampiran!.isNotEmpty) {
-                                                  files.addAll(
-                                                    (jsonDecode(item.lampiran!)
-                                                            as List)
-                                                        .map(
-                                                          (e) => e.toString(),
-                                                        ),
+                                                final files = parseLampiran(
+                                                  item.lampiran,
+                                                );
+                                                if (files.isEmpty) {
+                                                  showToast(
+                                                    "Tidak ada lampiran",
                                                   );
+                                                  return;
                                                 }
+
                                                 showDialog(
                                                   context: context,
                                                   builder:
@@ -628,6 +626,21 @@ class IzinView extends GetView<IzinController> {
                                                                         color:
                                                                             Colors.black,
                                                                       ),
+                                                                  errorBuilder: (
+                                                                    context,
+                                                                    error,
+                                                                    stackTrace,
+                                                                  ) {
+                                                                    return const Center(
+                                                                      child: Text(
+                                                                        'Gagal memuat gambar',
+                                                                        style: TextStyle(
+                                                                          color:
+                                                                              Colors.white,
+                                                                        ),
+                                                                      ),
+                                                                    );
+                                                                  },
                                                                 );
                                                               },
                                                             ),

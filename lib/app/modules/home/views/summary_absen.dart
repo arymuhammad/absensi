@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 import 'dart:math' as math;
 
@@ -17,7 +16,6 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
 import '../../../data/helper/duration_count.dart';
-import '../../../data/helper/error_logger.dart';
 import '../../login/controllers/login_controller.dart';
 import '../../shared/history_card.dart';
 import '../../shared/history_card_shimmer.dart';

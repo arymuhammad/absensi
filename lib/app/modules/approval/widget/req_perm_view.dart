@@ -14,6 +14,7 @@ import 'package:photo_view/photo_view.dart';
 
 import '../../../data/helper/app_colors.dart';
 import '../../../data/helper/calendar_badge.dart';
+import '../../../data/helper/custom_dialog.dart';
 import '../../../data/helper/format_waktu.dart';
 import '../../../data/helper/helper_ui.dart';
 import '../../../data/helper/loading_platform.dart';
@@ -270,9 +271,19 @@ class ReqPermView extends StatelessWidget {
                                       ),
                                       const SizedBox(height: 5),
 
-                                      InkWell(
-                                        onTap: () {
-                                          showDialog(
+                                      item.lampiran!.trim().isEmpty
+                                          ? const Text('-')
+                                          : InkWell(
+                                            onTap: () {
+                                              final files = parseLampiran(
+                                                item.lampiran,
+                                              );
+                                              if (files.isEmpty) {
+                                                showToast("Tidak ada lampiran");
+                                                return;
+                                              }
+
+                                              showDialog(
                                                 context: context,
                                                 builder:
                                                     (_) => Dialog(
@@ -282,64 +293,115 @@ class ReqPermView extends StatelessWidget {
                                                           EdgeInsets.zero,
                                                       child: Stack(
                                                         children: [
-                                                          PhotoView(
-                                                            imageProvider:
-                                                                NetworkImage(
-                                                                  '${ServiceApi().baseUrl}${item.lampiran!}',
-                                                                ),
-                                                            backgroundDecoration:
-                                                                const BoxDecoration(
-                                                                  color:
-                                                                      Colors
-                                                                          .black,
-                                                                ),
+                                                          PageView.builder(
+                                                            itemCount:
+                                                                files.length,
+                                                            itemBuilder: (
+                                                              context,
+                                                              index,
+                                                            ) {
+                                                              // print(
+                                                              //   '${ServiceApi().baseUrl}${files[index]}',
+                                                              // );
+                                                              return PhotoView(
+                                                                imageProvider:
+                                                                    NetworkImage(
+                                                                      '${ServiceApi().baseUrl}${files[index]}',
+                                                                    ),
+                                                                backgroundDecoration:
+                                                                    const BoxDecoration(
+                                                                      color:
+                                                                          Colors
+                                                                              .black,
+                                                                    ),
+                                                                errorBuilder: (
+                                                                  context,
+                                                                  error,
+                                                                  stackTrace,
+                                                                ) {
+                                                                  return const Center(
+                                                                    child: Text(
+                                                                      'Gagal memuat gambar',
+                                                                      style: TextStyle(
+                                                                        color:
+                                                                            Colors.white,
+                                                                      ),
+                                                                    ),
+                                                                  );
+                                                                },
+                                                              );
+                                                            },
                                                           ),
 
                                                           Positioned(
-                                                            top: 20,
+                                                            top: 35,
                                                             right: 20,
-                                                            child: Material(
-                                                              color:
+                                                            child: CircleAvatar(
+                                                              backgroundColor:
                                                                   Colors
-                                                                      .black45,
-                                                              borderRadius:
-                                                                  BorderRadius.circular(
-                                                                    30,
-                                                                  ),
-                                                              child: InkWell(
-                                                                borderRadius:
-                                                                    BorderRadius.circular(
-                                                                      30,
-                                                                    ),
-                                                                onTap:
-                                                                    () =>   Get.back(),
-                                                                child: const Padding(
+                                                                      .black54,
+                                                              child: IconButton(
+                                                                icon: const Icon(
+                                                                  Icons.close,
+                                                                  color:
+                                                                      Colors
+                                                                          .white,
+                                                                ),
+                                                                onPressed:
+                                                                    () =>
+                                                                        Get.back(),
+                                                              ),
+                                                            ),
+                                                          ),
+
+                                                          if (files.length > 1)
+                                                            Positioned(
+                                                              bottom: 20,
+                                                              left: 0,
+                                                              right: 0,
+                                                              child: Center(
+                                                                child: Container(
                                                                   padding:
-                                                                      EdgeInsets.all(
-                                                                        8,
+                                                                      const EdgeInsets.symmetric(
+                                                                        horizontal:
+                                                                            12,
+                                                                        vertical:
+                                                                            6,
                                                                       ),
-                                                                  child: Icon(
-                                                                    Icons
-                                                                        .close_rounded,
+                                                                  decoration: BoxDecoration(
                                                                     color:
                                                                         Colors
-                                                                            .white,
-                                                                    size: 28,
+                                                                            .black54,
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                          20,
+                                                                        ),
+                                                                  ),
+                                                                  child: Text(
+                                                                    'Geser untuk melihat ${files.length} lampiran',
+                                                                    style: const TextStyle(
+                                                                      color:
+                                                                          Colors
+                                                                              .white,
+                                                                    ),
                                                                   ),
                                                                 ),
                                                               ),
                                                             ),
-                                                          ),
                                                         ],
                                                       ),
                                                     ),
                                               );
-                                        },
-                                        child: const Text(
-                                          'show file',
-                                          style: TextStyle(color: Colors.blue),
-                                        ),
-                                      ),
+                                            },
+                                            child: Text(
+                                              item.lampiran!.contains(',')
+                                                  ? 'Show ${item.lampiran!.split(',').length} Files'
+                                                  : 'Show File',
+                                              style: const TextStyle(
+                                                color: Colors.blue,
+                                              ),
+                                            ),
+                                          ),
 
                                       const SizedBox(height: 5),
 

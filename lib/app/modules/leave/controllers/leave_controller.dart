@@ -373,17 +373,17 @@ class LeaveController extends GetxController {
       return;
     }
 
-    await ErrorLogger.save('''
-      REFRESH USER
+//     await ErrorLogger.save('''
+//       REFRESH USER
 
-      ID       : ${newUser.id}
-      USERNAME : ${newUser.username}
-      LAT      : ${newUser.lat}
-      LONG     : ${newUser.long}
+//       ID       : ${newUser.id}
+//       USERNAME : ${newUser.username}
+//       LAT      : ${newUser.lat}
+//       LONG     : ${newUser.long}
 
-      RAW:
-      ${jsonEncode(newUser.toJson())}
-''', '');
+//       RAW:
+//       ${jsonEncode(newUser.toJson())}
+// ''', '');
 
     if (Get.isRegistered<LoginController>()) {
       final logC = Get.find<LoginController>();

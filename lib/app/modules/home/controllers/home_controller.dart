@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'package:absensi/app/data/helper/shorebird_helper.dart';
 import 'package:absensi/app/data/model/notif_model.dart';
 import 'package:absensi/app/data/model/summary_absen_model.dart';
 import 'package:absensi/app/services/service_api.dart';
@@ -16,6 +17,7 @@ import 'package:open_filex/open_filex.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shorebird_code_push/shorebird_code_push.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:xml/xml.dart' as xml;
 import '../../../data/helper/custom_dialog.dart';
@@ -73,6 +75,7 @@ class HomeController extends GetxController
   var isDownloading = false.obs;
   var updateList = [];
   var currVer = "";
+  var currPatchVer = "".obs;
   var latestVer = "";
 
   var speed = ''.obs;
@@ -93,60 +96,68 @@ class HomeController extends GetxController
   }
 
   Future<void> initData() async {
-    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    final packageInfo = await PackageInfo.fromPlatform();
     currVer = packageInfo.version;
 
-    // print('VERSI SEKARANG $currVer');
-    final online = await isOnline();
-    if (online) {
-      try {
-        final readDoc = await http
-            .get(Uri.parse('http://103.156.15.61/update_apk/updateLog.xml'))
-            .timeout(const Duration(seconds: 5));
+    // tampilkan patch yang sedang dipakai
+    currPatchVer.value = await ShorebirdHelper.currentPatchVersion();
 
-        if (readDoc.statusCode == 200) {
-          //parsing readDoc
-          final document = xml.XmlDocument.parse(readDoc.body);
-          final cLog = document.findElements('items').first;
-          latestVer = cLog.findElements('versi').first.innerText;
-          if (compareVersion(latestVer, currVer) > 0) {
-            if (Platform.isAndroid) {
-              // final DeviceInfoNullSafety deviceInfoNullSafety =
-              //     DeviceInfoNullSafety();
-              // Map<String, dynamic> abiInfo = await deviceInfoNullSafety.abiInfo;
-              // var abi = abiInfo.entries.toList();
-              // supportedAbi = abi[1].value;
-              checkForUpdates("onInit");
-            } else {
-              launchUrl(
-                Uri.parse(
-                  'https://apps.apple.com/us/app/urbanco-spot/id6476486235',
-                ),
-              );
-            }
-          }
-        }
-      } catch (e) {
-        // print("Update check failed: $e");
-      }
+    if (!await isOnline()) {
+      _initializeHome();
+      return;
     }
 
+    // ==========================
+    // PRIORITAS 1 : CEK APK
+    // ==========================
+    final hasNewApk = await checkApkUpdate();
+
+    if (hasNewApk) {
+      if (Platform.isAndroid) {
+        checkForUpdates("onInit");
+      } else {
+        launchUrl(
+          Uri.parse('https://apps.apple.com/us/app/urbanco-spot/id6476486235'),
+        );
+      }
+
+      // jangan cek shorebird
+      _initializeHome();
+      return;
+    }
+
+    // ==========================
+    // PRIORITAS 2 : CEK PATCH
+    // ==========================
+    await checkPatchUpdate();
+
+    // ==========================
+    // LOAD DATA HOME
+    // ==========================
+    _initializeHome();
+  }
+
+  Future<void> _initializeHome() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
-    var dataUserLogin = Data.fromJson(
+
+    final dataUserLogin = Data.fromJson(
       jsonDecode(pref.getString('userDataLogin')!),
     );
-    // var userID = Data.fromJson(jsonDecode(pref.getString('userDataLogin')!)).id!;
+
     tabController = TabController(length: 3, vsync: this);
+
     tabController.animation!.addListener(() {
       final value = tabController.animation!.value.round();
+
       if (value != currentPage.value) {
         changePage(value);
-        // print(value);
       }
     });
+
     if (dataUserLogin.visit == "0") {
       getSummAttPerMonth(dataUserLogin.id!);
     }
+
     if ((dataUserLogin.parentId == "3" &&
             (dataUserLogin.level == "19" ||
                 dataUserLogin.level == "20" ||
@@ -189,10 +200,76 @@ class HomeController extends GetxController
 
     _refresh();
 
-    // update tiap 30 detik (aman & smooth)
-    timer = Timer.periodic(const Duration(seconds: 30), (_) {
-      _refresh();
-    });
+    timer = Timer.periodic(const Duration(seconds: 30), (_) => _refresh());
+  }
+
+  Future<bool> checkApkUpdate() async {
+    try {
+      final readDoc = await http
+          .get(Uri.parse('http://103.156.15.61/update_apk/updateLog.xml'))
+          .timeout(const Duration(seconds: 5));
+
+      if (readDoc.statusCode != 200) return false;
+
+      final document = xml.XmlDocument.parse(readDoc.body);
+
+      final item = document.findElements('items').first;
+
+      latestVer = item.findElements('versi').first.innerText;
+
+      return compareVersion(latestVer, currVer) > 0;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  Future<void> checkPatchUpdate() async {
+    final status = await ShorebirdHelper.checkStatus();
+
+    if (status == null) return;
+
+    switch (status) {
+      case UpdateStatus.outdated:
+        Get.defaultDialog(
+          title: "Patch tersedia",
+          middleText:
+              "Patch saat ini : ${currPatchVer.value}\n\n"
+              "Patch baru tersedia.\n\n"
+              "Apakah ingin mengunduh sekarang?",
+          textCancel: "Nanti",
+          textConfirm: "Download",
+          onConfirm: () async {
+            Get.back();
+
+            final success = await ShorebirdHelper.downloadPatch();
+
+            if (success) {
+              currPatchVer.value = await ShorebirdHelper.currentPatchVersion();
+
+              dialogMsgScsUpd(
+                "Patch berhasil diunduh",
+                "Silakan tutup dan buka kembali aplikasi.",
+              );
+            }
+          },
+          barrierDismissible: false,
+        );
+        break;
+
+      case UpdateStatus.restartRequired:
+        dialogMsgScsUpd(
+          "Restart diperlukan",
+          "Patch sudah terpasang.\nSilakan tutup dan buka kembali aplikasi.",
+        );
+        break;
+
+      case UpdateStatus.upToDate:
+        showToast("patch up to date");
+        break;
+      case UpdateStatus.unavailable:
+        showToast("patch unavailable");
+        break;
+    }
   }
 
   void _refresh() async {
@@ -324,7 +401,7 @@ class HomeController extends GetxController
       pendingOvrCount.value = res.totalOvr ?? 0;
       // print(pendingOvrCount.value);
       totalNotif.value =
-            pendingAdjCount.value +
+          pendingAdjCount.value +
           pendingAppCount.value +
           pendingOvrCount.value +
           pendingPrmCount.value;
@@ -357,7 +434,7 @@ class HomeController extends GetxController
       pendingAppCount.value = res.totalRequest ?? 0;
       // print(pendingAppCount.value);
       totalNotif.value =
-           pendingAdjCount.value +
+          pendingAdjCount.value +
           pendingAppCount.value +
           pendingOvrCount.value +
           pendingPrmCount.value;
@@ -391,7 +468,7 @@ class HomeController extends GetxController
       pendingAdjCount.value = res.totalNotif ?? 0;
       // print(pendingAdjCount.value);
       totalNotif.value =
-           pendingAdjCount.value +
+          pendingAdjCount.value +
           pendingAppCount.value +
           pendingOvrCount.value +
           pendingPrmCount.value;

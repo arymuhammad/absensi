@@ -547,17 +547,17 @@ class AddPegawaiController extends GetxController {
               return false;
             }
 
-            await ErrorLogger.save('''
-      REFRESH USER
+//             await ErrorLogger.save('''
+//       REFRESH USER
 
-      ID       : ${newUsr.id}
-      USERNAME : ${newUsr.username}
-      LAT      : ${newUsr.lat}
-      LONG     : ${newUsr.long}
+//       ID       : ${newUsr.id}
+//       USERNAME : ${newUsr.username}
+//       LAT      : ${newUsr.lat}
+//       LONG     : ${newUsr.long}
 
-      RAW:
-      ${jsonEncode(newUsr.toJson())}
-''', '');
+//       RAW:
+//       ${jsonEncode(newUsr.toJson())}
+// ''', '');
 
             if (Get.isRegistered<LoginController>()) {
               final logC = Get.find<LoginController>();
@@ -727,17 +727,17 @@ class AddPegawaiController extends GetxController {
               return false;
             }
 
-            await ErrorLogger.save('''
-      REFRESH USER
+//             await ErrorLogger.save('''
+//       REFRESH USER
 
-      ID       : ${newUsr.id}
-      USERNAME : ${newUsr.username}
-      LAT      : ${newUsr.lat}
-      LONG     : ${newUsr.long}
+//       ID       : ${newUsr.id}
+//       USERNAME : ${newUsr.username}
+//       LAT      : ${newUsr.lat}
+//       LONG     : ${newUsr.long}
 
-      RAW:
-      ${jsonEncode(newUsr.toJson())}
-''', '');
+//       RAW:
+//       ${jsonEncode(newUsr.toJson())}
+// ''', '');
 
             if (Get.isRegistered<LoginController>()) {
               final logC = Get.find<LoginController>();
@@ -981,17 +981,17 @@ class AddPegawaiController extends GetxController {
       return;
     }
 
-    await ErrorLogger.save('''
-      REFRESH USER
+//     await ErrorLogger.save('''
+//       REFRESH USER
 
-      ID       : ${newUsr.id}
-      USERNAME : ${newUsr.username}
-      LAT      : ${newUsr.lat}
-      LONG     : ${newUsr.long}
+//       ID       : ${newUsr.id}
+//       USERNAME : ${newUsr.username}
+//       LAT      : ${newUsr.lat}
+//       LONG     : ${newUsr.long}
 
-      RAW:
-      ${jsonEncode(newUsr.toJson())}
-''', '');
+//       RAW:
+//       ${jsonEncode(newUsr.toJson())}
+// ''', '');
 
     if (Get.isRegistered<LoginController>()) {
       final logC = Get.find<LoginController>();
@@ -1066,17 +1066,17 @@ class AddPegawaiController extends GetxController {
       return;
     }
 
-    await ErrorLogger.save('''
-      REFRESH USER
+//     await ErrorLogger.save('''
+//       REFRESH USER
 
-      ID       : ${newUser.id}
-      USERNAME : ${newUser.username}
-      LAT      : ${newUser.lat}
-      LONG     : ${newUser.long}
+//       ID       : ${newUser.id}
+//       USERNAME : ${newUser.username}
+//       LAT      : ${newUser.lat}
+//       LONG     : ${newUser.long}
 
-      RAW:
-      ${jsonEncode(newUser.toJson())}
-''', '');
+//       RAW:
+//       ${jsonEncode(newUser.toJson())}
+// ''', '');
 
     if (Get.isRegistered<LoginController>()) {
       final logC = Get.find<LoginController>();
