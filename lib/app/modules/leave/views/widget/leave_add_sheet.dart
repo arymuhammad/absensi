@@ -102,6 +102,10 @@ class LeaveAddSheet extends StatelessWidget {
                           onChanged: (val) {
                             leaveC.selectedLeaveType.value = val;
                           },
+                           value:
+                              leaveC.selectedLeaveType.value.isNotEmpty
+                                  ? leaveC.selectedLeaveType.value
+                                  : null,
                           isDark: isDark,
                         ),
                       ),

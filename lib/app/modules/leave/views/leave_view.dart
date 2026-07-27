@@ -47,40 +47,155 @@ class LeaveView extends GetView<LeaveController> {
         actions: [
           IconButton(
             onPressed: () async {
-              BuildContext? dialogContext;
+              leaveC.selectedLeaveType.value = ""; // RESET LEAVE TYPE ON INIT
 
-              showDialog(
-                context: context,
-                barrierDismissible: false,
-                builder: (ctx) {
-                  dialogContext = ctx;
+              final list = ['Cuti', 'Replacement Off'];
+              Get.defaultDialog(
+                title: 'Leave',
+                content: DropdownButtonFormField(
+                  items:
+                      list
+                          .map(
+                            (e) => DropdownMenuItem(value: e, child: Text(e)),
+                          )
+                          .toList(),
+                  onChanged: (value) {
+                    if (value == 'Replacement Off') {
+                      leaveC.selectedLeaveType.value = 'Lainnya';
+                    } else {
+                      leaveC.selectedLeaveType.value = 'Hak Cuti Tahunan';
+                    }
+                    // print(leaveC.selectedLeaveType.value);
+                  },
+                  decoration: const InputDecoration(
+                    labelText: 'Pilih salah satu',
+                  ),
+                ),
+                radius: 8,
+                actions: [
+                  Obx(
+                    () => OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: Colors.blue,
+                        side: BorderSide(
+                          color:
+                              leaveC.selectedLeaveType.value.isEmpty
+                                  ? Colors.grey
+                                  : Colors.blue,
+                          width: 1.5,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 5,
+                          vertical: 4,
+                        ),
+                      ),
+                      onPressed:
+                          leaveC.selectedLeaveType.value.isEmpty ||
+                                  leaveC.selectedLeaveType.value == ""
+                              ? null
+                              : () async {
+                                if (leaveC.selectedLeaveType.value ==
+                                    'Lainnya') {
+                                  closeLoading();
+                                  final newUserData = auth.logUser.value;
+                                  leaveC.selectedLeaveType.value = "Lainnya";
+                                  leaveC.selectedLeave.value =
+                                      "Replacement Off";
+                                  Get.bottomSheet(
+                                    LeaveAddSheet(userData: newUserData),
+                                    isScrollControlled: true,
+                                  );
+                                } else {
+                                  closeLoading();
 
-                  return const Center(child: CircularProgressIndicator());
-                },
+                                  BuildContext? dialogContext;
+
+                                  showDialog(
+                                    context: context,
+                                    barrierDismissible: false,
+                                    builder: (ctx) {
+                                      dialogContext = ctx;
+
+                                      return const Center(
+                                        child: CircularProgressIndicator(),
+                                      );
+                                    },
+                                  );
+                                  // leaveC.getLeaveList();
+                                  await leaveC.leaveBalanceCheck(userData);
+
+                                  if (dialogContext != null) {
+                                    Navigator.of(dialogContext!).pop();
+                                  }
+
+                                  final newUserData = auth.logUser.value;
+
+                                  leaveC.generateUid();
+
+                                  if (newUserData.leaveBalance == "0") {
+                                    showToast(
+                                      "Saldo Cuti Anda Habis\nAnda tidak dapat mengajukan permohonan cuti",
+                                    );
+
+                                    return;
+                                  }
+                                  leaveC.selectedLeaveType.value = "";
+                                  leaveC.selectedLeave.value = "";
+                                  Get.bottomSheet(
+                                    LeaveAddSheet(userData: newUserData),
+                                    isScrollControlled: true,
+                                  );
+                                }
+                              },
+                      child: Obx(
+                        () => Text(
+                          leaveC.selectedLeaveType.value == 'Lainnya'
+                              ? 'Lanjut'
+                              : 'Cek saldo cuti',
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               );
-              leaveC.getLeaveList();
-              await leaveC.leaveBalanceCheck(userData);
 
-              if (dialogContext != null) {
-                Navigator.of(dialogContext!).pop();
-              }
+              // BuildContext? dialogContext;
 
-              final newUserData = auth.logUser.value;
+              // showDialog(
+              //   context: context,
+              //   barrierDismissible: false,
+              //   builder: (ctx) {
+              //     dialogContext = ctx;
 
-              leaveC.generateUid();
+              //     return const Center(child: CircularProgressIndicator());
+              //   },
+              // );
+              // // leaveC.getLeaveList();
+              // await leaveC.leaveBalanceCheck(userData);
 
-              if (newUserData.leaveBalance == "0") {
-                showToast(
-                  "Saldo Cuti Anda Habis\nAnda tidak dapat mengajukan permohonan cuti",
-                );
+              // if (dialogContext != null) {
+              //   Navigator.of(dialogContext!).pop();
+              // }
 
-                return;
-              }
+              // final newUserData = auth.logUser.value;
 
-              Get.bottomSheet(
-                LeaveAddSheet(userData: newUserData),
-                isScrollControlled: true,
-              );
+              // leaveC.generateUid();
+
+              // if (newUserData.leaveBalance == "0") {
+              //   showToast(
+              //     "Saldo Cuti Anda Habis\nAnda tidak dapat mengajukan permohonan cuti",
+              //   );
+
+              //   return;
+              // }
+
+              // Get.bottomSheet(
+              //   LeaveAddSheet(userData: newUserData),
+              //   isScrollControlled: true,
+              // );
             },
             icon: const Icon(Icons.format_list_bulleted_add),
           ),

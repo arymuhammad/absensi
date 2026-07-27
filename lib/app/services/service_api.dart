@@ -116,7 +116,7 @@ class ServiceApi {
     try {
       final response = await http
           .post(Uri.parse('${baseUrl}auth'), body: data)
-          .timeout(const Duration(minutes: 1));
+          .timeout(const Duration(seconds: 30));
 
       // if (response.statusCode == 200) {
       return Data.fromJson(jsonDecode(response.body)['data']);
