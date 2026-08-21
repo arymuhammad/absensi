@@ -10,6 +10,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icons_plus/icons_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 // import '../../alarm/views/alarm_view.dart';
 import '../../../data/helper/custom_dialog.dart';
 import '../../../data/helper/error_logger.dart';
@@ -517,68 +518,90 @@ class SettingsView extends GetView<SettingsController> {
                           ),
                           // ListTile(
                           //   onTap: () async {
-                          //     // Get.to(
-                          //     //   () => AboutView(),
-                          //     //   transition: Transition.cupertino,
-                          //     // );
-                          //     // Navigator.push(
-                          //     //   context,
-                          //     //   MaterialPageRoute(builder: (_) => AboutView()),
-                          //     // );
+                              // Get.to(
+                              //   () => AboutView(),
+                              //   transition: Transition.cupertino,
+                              // );
+                              // Navigator.push(
+                              //   context,
+                              //   MaterialPageRoute(builder: (_) => AboutView()),
+                              // );
 
-                          //     const nomor =
-                          //         '6285124034523'; // format tanpa 0, pakai kode negara
-                          //     final pesan = Uri.encodeComponent(
-                          //       'Halo, ini pesan dari Flutter',
-                          //     );
+//                               const nomor = '6285124034523';
 
-                          //     final url = Uri.parse(
-                          //       'https://api.whatsapp.com/send?phone=$nomor&text=$pesan',
-                          //     );
+//                               final pesan = Uri.encodeComponent('''
+// 🔔 *NOTIFIKASI CUTI*
 
-                          //     // if (await canLaunchUrl(url)) {
-                          //     await launchUrl(url);
-                          //     // } else {
-                          //     // throw 'Tidak bisa buka WhatsApp';
-                          //     // }
-                          //   },
-                          //   leading: Container(
-                          //     height: 40,
-                          //     width: 40,
-                          //     decoration: BoxDecoration(
-                          //       color:
-                          //           isDark
-                          //               ? Colors.blue.withOpacity(0.15)
-                          //               : bgContainer,
-                          //       borderRadius: BorderRadius.circular(8),
-                          //     ),
-                          //     child: Icon(
-                          //       Iconsax.info_circle_bold,
-                          //       color:
-                          //           isDark
-                          //               ? Colors.blue
-                          //               : AppColors.itemsBackground,
-                          //     ),
-                          //   ),
-                          //   title: const Text(
-                          //     'Kirim WA',
-                          //     style: TextStyle(
-                          //       // color: titleColor,
-                          //       fontWeight: FontWeight.bold,
-                          //     ),
-                          //   ),
-                          //   subtitle: Text(
-                          //     'Send chat',
-                          //     style: TextStyle(
-                          //       color: subTitleColor,
-                          //       fontSize: 13,
-                          //     ),
-                          //   ),
-                          //   trailing: Icon(
-                          //     Icons.keyboard_arrow_right_rounded,
-                          //     color: subTitleColor,
-                          //   ),
-                          // ),
+// Halo, Ade 👋
+
+// Pengajuan cuti Anda memiliki pembaruan:
+
+// ━━━━━━━━━━━━━━━━━━
+// 📋 *Status* : DIBATALKAN
+// 📅 *Tanggal* : 20 Agustus 2026
+// 🏷️ *Jenis* : Cuti Tahunan
+// ━━━━━━━━━━━━━━━━━━
+
+// Pengajuan tersebut telah dibatalkan oleh Admin.
+
+// Jika ada pertanyaan, silakan hubungi Admin.
+
+// Terima kasih 🙏
+
+// 🏢 *URBAN&CO Spot*
+// ''');
+
+//                               final url = Uri.parse(
+//                                 'https://api.whatsapp.com/send'
+//                                 '?phone=$nomor'
+//                                 '&text=$pesan',
+//                               );
+
+//                               await launchUrl(
+//                                 url,
+//                                 mode: LaunchMode.externalApplication,
+//                               );
+//                               // } else {
+//                               // throw 'Tidak bisa buka WhatsApp';
+//                               // }
+//                             },
+//                             leading: Container(
+//                               height: 40,
+//                               width: 40,
+//                               decoration: BoxDecoration(
+//                                 color:
+//                                     isDark
+//                                         ? Colors.blue.withOpacity(0.15)
+//                                         : bgContainer,
+//                                 borderRadius: BorderRadius.circular(8),
+//                               ),
+//                               child: Icon(
+//                                 Iconsax.info_circle_bold,
+//                                 color:
+//                                     isDark
+//                                         ? Colors.blue
+//                                         : AppColors.itemsBackground,
+//                               ),
+//                             ),
+//                             title: const Text(
+//                               'Kirim WA',
+//                               style: TextStyle(
+//                                 // color: titleColor,
+//                                 fontWeight: FontWeight.bold,
+//                               ),
+//                             ),
+//                             subtitle: Text(
+//                               'Send chat',
+//                               style: TextStyle(
+//                                 color: subTitleColor,
+//                                 fontSize: 13,
+//                               ),
+//                             ),
+//                             trailing: Icon(
+//                               Icons.keyboard_arrow_right_rounded,
+//                               color: subTitleColor,
+//                             ),
+//                           ),
                           // ListTile(
                           //   onTap: () {
                           //     promptDialog(

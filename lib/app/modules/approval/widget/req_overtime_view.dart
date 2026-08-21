@@ -10,6 +10,7 @@ import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:icons_plus/icons_plus.dart';
 
 import '../../../data/helper/app_colors.dart';
 import '../../../data/helper/helper_ui.dart';
@@ -326,19 +327,123 @@ class ReqOvertimeView extends StatelessWidget {
       ),
       floatingActionButton: Builder(
         builder:
-            (context) => ContainerMainColor(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              radius: 30,
-              child: FloatingActionButton(
-                backgroundColor: Colors.transparent,
-                onPressed: () {
-                  final userData = auth.logUser.value;
-                  bottomSearchOvertime(context, isDark, userData, ctrl);
-                },
-                child: Icon(
-                  Icons.manage_search_outlined,
-                  color: isDark ? Colors.blue : Colors.white,
+            (context) => Obx(
+              () => AnimatedSize(
+                duration: const Duration(milliseconds: 250),
+                curve: Curves.easeInOut,
+                alignment: Alignment.bottomCenter,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    if (ctrl.isFabExpanded.value) ...[
+                      // SEARCH FAB
+                      TweenAnimationBuilder<double>(
+                        duration: const Duration(milliseconds: 250),
+                        curve: Curves.easeOutBack,
+                        tween: Tween(begin: 0, end: 1),
+                        builder: (context, value, child) {
+                          return Transform.scale(
+                            scale: value,
+                            child: Transform.translate(
+                              offset: Offset(0, 20 * (1 - value)),
+                              child: child,
+                            ),
+                          );
+                        },
+                        child: ContainerMainColor(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          radius: 30,
+                          child: FloatingActionButton(
+                            heroTag: 'search_overtime',
+                            backgroundColor: Colors.transparent,
+                            onPressed: () {
+                              final userData = auth.logUser.value;
+
+                              bottomSearchOvertime(
+                                context,
+                                isDark,
+                                userData,
+                                ctrl,
+                              );
+                            },
+                            child: Icon(
+                              Icons.manage_search_outlined,
+                              color: isDark ? Colors.blue : Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(height: 12),
+
+                      // ADD FAB
+                      TweenAnimationBuilder<double>(
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeOutBack,
+                        tween: Tween(begin: 0, end: 1),
+                        builder: (context, value, child) {
+                          return Transform.scale(
+                            scale: value,
+                            child: Transform.translate(
+                              offset: Offset(0, 20 * (1 - value)),
+                              child: child,
+                            ),
+                          );
+                        },
+                        child: ContainerMainColor(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          radius: 30,
+                          child: FloatingActionButton(
+                            heroTag: 'export_excel',
+                            backgroundColor: Colors.transparent,
+                            onPressed: () async {
+                              await ctrl.exportOvertimeCsv();
+                            },
+                            child: Icon(
+                              FontAwesome.file_excel_solid,
+                              color: isDark ? Colors.blue : Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(height: 12),
+                    ],
+
+                    // MAIN FAB
+                    ContainerMainColor(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      radius: 30,
+                      child: FloatingActionButton(
+                        heroTag: 'main_fab',
+                        backgroundColor: Colors.transparent,
+                        onPressed: () {
+                          ctrl.isFabExpanded.toggle();
+                        },
+                        child: AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 600),
+                          transitionBuilder: (child, animation) {
+                            return RotationTransition(
+                              turns: animation,
+                              child: ScaleTransition(
+                                scale: animation,
+                                child: child,
+                              ),
+                            );
+                          },
+                          child: Icon(
+                            ctrl.isFabExpanded.value ? Icons.close : Icons.menu,
+                            key: ValueKey(ctrl.isFabExpanded.value),
+                            color: isDark ? Colors.blue : Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),

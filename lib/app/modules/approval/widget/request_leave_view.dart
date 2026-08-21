@@ -13,6 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:signature/signature.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../data/helper/app_colors.dart';
 import '../../../data/helper/custom_dialog.dart';
 import '../../../data/helper/format_waktu.dart';
@@ -29,6 +30,7 @@ class RequestLeaveView extends GetView<LeaveController> {
   final auth = Get.find<LoginController>();
   final leaveC = Get.find<LeaveController>();
   final homeC = Get.find<HomeController>();
+  final levelUser = ['1', '17', '18', '39'];
 
   @override
   Widget build(BuildContext context) {
@@ -39,8 +41,10 @@ class RequestLeaveView extends GetView<LeaveController> {
           CustomMaterialIndicator(
             onRefresh: () async {
               final userData = auth.logUser.value;
+
               var param = {
                 "type": "get_pending_req_leave",
+                "accept": leaveC.selectedStatus.value,
                 "kode_cabang": userData.kodeCabang!,
                 "id_user": userData.id!,
                 "level": userData.level!,
@@ -113,6 +117,7 @@ class RequestLeaveView extends GetView<LeaveController> {
                           toggleType: ToggleType.expandOnlyCurrent,
                           spaceBetweenItem: 5,
                           children: List.generate(filteredList.length, (i) {
+                            final userData = auth.logUser.value;
                             final leave = filteredList[i];
                             final status = leave.status ?? 'pending';
 
@@ -147,28 +152,30 @@ class RequestLeaveView extends GetView<LeaveController> {
                               title: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
-                                    leave.nama!.capitalize!,
-                                    style: titleTextStyle.copyWith(
-                                      fontSize: 16,
-                                    ),
-                                  ),
                                   Row(
                                     children: [
+                                      Text(
+                                        leave.nama!.capitalize!.length > 20
+                                            ? '${leave.nama!.capitalize!.substring(0, 17)}...'
+                                            : leave.nama!.capitalize!,
+                                        style: titleTextStyle.copyWith(
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                      const Text(' - '),
                                       Text(
                                         leave.idUser!,
                                         style: subtitleTextStyle.copyWith(
                                           fontSize: 14,
                                         ),
                                       ),
-                                      const Text(' - '),
-                                      Text(
-                                        leave.namaLevel!.capitalize!,
-                                        style: subtitleTextStyle.copyWith(
-                                          fontSize: 14,
-                                        ),
-                                      ),
                                     ],
+                                  ),
+                                  Text(
+                                    leave.namaLevel!.capitalize!,
+                                    style: subtitleTextStyle.copyWith(
+                                      fontSize: 14,
+                                    ),
                                   ),
                                   Text(
                                     leave.namaCabang?.capitalize ?? '-',
@@ -523,7 +530,7 @@ class RequestLeaveView extends GetView<LeaveController> {
                                         color: red!,
                                         fontsize: 15,
                                         onPressed: () {
-                                          final userData = auth.logUser.value;
+                                          // final userData = auth.logUser.value;
                                           promptDialog(
                                             context: context,
                                             title: 'Confirm',
@@ -544,10 +551,13 @@ class RequestLeaveView extends GetView<LeaveController> {
                                               );
                                               var reload = {
                                                 "type": "get_pending_req_leave",
+                                                "accept":
+                                                    leaveC.selectedStatus.value,
                                                 "kode_cabang":
                                                     userData.kodeCabang!,
                                                 "id_user": userData.id!,
                                                 "level": userData.level!,
+                                                "parent_id": userData.parentId!,
                                               };
                                               leaveC.isLoading.value = true;
                                               leaveC.getLeaveReq(reload);
@@ -575,6 +585,56 @@ class RequestLeaveView extends GetView<LeaveController> {
                                         size: const Size(double.infinity, 30),
                                       ),
                                     ],
+                                  ),
+                                if (status == "approved" &&
+                                    levelUser.contains(userData.level))
+                                  CsElevatedButton(
+                                    label: 'Cancel Leave',
+                                    color: AppColors.contentColorRed,
+                                    fontsize: 15,
+                                    onPressed: () async {
+                                      final userData = auth.logUser.value;
+                                      await leaveC.rejectLeave(
+                                        context,
+                                        userData,
+                                        leave.uid!,
+                                        leave.tgl1!,
+                                      );
+
+                                      final pesan = Uri.encodeComponent('''
+🔔 *NOTIFIKASI CUTI*
+
+Halo, ${leave.nama} 👋
+
+Pengajuan cuti Anda memiliki pembaruan:
+
+━━━━━━━━━━━━━━━━━━
+📋 *Status* : DIBATALKAN
+📅 *Tanggal* : ${FormatWaktu.formatIndo(tanggal: DateTime.parse(leave.tgl1!))}
+🏷️ *Jenis* : ${leave.jenisCuti}
+━━━━━━━━━━━━━━━━━━
+
+Pengajuan tersebut telah dibatalkan oleh HR.
+
+Jika ada pertanyaan, silakan hubungi HR.
+
+Terima kasih 🙏
+
+🏢 *URBAN&CO Spot*
+''');
+
+                                      final url = Uri.parse(
+                                        'https://api.whatsapp.com/send'
+                                        '?phone=${leave.telp}'
+                                        '&text=$pesan',
+                                      );
+
+                                      await launchUrl(
+                                        url,
+                                        mode: LaunchMode.externalApplication,
+                                      );
+                                    },
+                                    size: const Size(double.infinity, 30),
                                   ),
                               ],
                             );

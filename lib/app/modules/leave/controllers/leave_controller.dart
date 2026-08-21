@@ -336,6 +336,46 @@ class LeaveController extends GetxController {
     getLeaveReq(reload);
   }
 
+  rejectLeave(
+    BuildContext context,
+    Data? userData,
+    String uid,
+    String date,
+    // String alasan,
+  ) async {
+    // Get.back();
+    loadingDialog("Membatalkan pengajuan cuti...", "");
+    // final signatureBytes = await ctrSign.toPngBytes();
+    // if (signatureBytes == null) return;
+
+    // String base64SignImage = base64Encode(signatureBytes);
+    var param = {
+      "type": "reject",
+      "uid": uid,
+      "level": userData!.level,
+      "acc_name": userData.nama,
+      "sign": "reject",
+      "date": date,
+      // "alasan_cuti": alasan,
+    };
+    await ServiceApi().reqLeave(param);
+    // ctrSign.clear();
+    Get.back();
+    isLoading.value = true;
+    var reload = {
+      "type": "get_pending_req_leave",
+
+      "accept": selectedStatus.value,
+      "kode_cabang": userData.kodeCabang!,
+      "id_user": userData.id!,
+      "level": userData.level!,
+      "parent_id": userData.parentId!,
+      "date1": datePick1.text,
+      "date2": datePick2.text,
+    };
+    getLeaveReq(reload);
+  }
+
   remainingOff(String a, String b) {
     int total = int.parse(a);
     int input = int.parse(b.isNotEmpty ? b : '0');
@@ -373,17 +413,17 @@ class LeaveController extends GetxController {
       return;
     }
 
-//     await ErrorLogger.save('''
-//       REFRESH USER
+    //     await ErrorLogger.save('''
+    //       REFRESH USER
 
-//       ID       : ${newUser.id}
-//       USERNAME : ${newUser.username}
-//       LAT      : ${newUser.lat}
-//       LONG     : ${newUser.long}
+    //       ID       : ${newUser.id}
+    //       USERNAME : ${newUser.username}
+    //       LAT      : ${newUser.lat}
+    //       LONG     : ${newUser.long}
 
-//       RAW:
-//       ${jsonEncode(newUser.toJson())}
-// ''', '');
+    //       RAW:
+    //       ${jsonEncode(newUser.toJson())}
+    // ''', '');
 
     if (Get.isRegistered<LoginController>()) {
       final logC = Get.find<LoginController>();

@@ -89,7 +89,7 @@ class LeaveView extends GetView<LeaveController> {
                         ),
                         padding: const EdgeInsets.symmetric(
                           horizontal: 5,
-                          vertical: 4,
+                          vertical: 1,
                         ),
                       ),
                       onPressed:
@@ -104,6 +104,9 @@ class LeaveView extends GetView<LeaveController> {
                                   leaveC.selectedLeaveType.value = "Lainnya";
                                   leaveC.selectedLeave.value =
                                       "Replacement Off";
+                                  // leaveC.remainDays.value = 1;
+                                  leaveC.amtTkn.text = "1";
+
                                   Get.bottomSheet(
                                     LeaveAddSheet(userData: newUserData),
                                     isScrollControlled: true,
@@ -137,13 +140,14 @@ class LeaveView extends GetView<LeaveController> {
 
                                   if (newUserData.leaveBalance == "0") {
                                     showToast(
-                                      "Saldo Cuti Anda Habis\nAnda tidak dapat mengajukan permohonan cuti",
+                                      "Saldo Cuti Anda Habis\nTidak dapat mengajukan cuti",
                                     );
 
                                     return;
                                   }
                                   leaveC.selectedLeaveType.value = "";
                                   leaveC.selectedLeave.value = "";
+                                  leaveC.amtTkn.text = "0";
                                   Get.bottomSheet(
                                     LeaveAddSheet(userData: newUserData),
                                     isScrollControlled: true,
@@ -155,6 +159,7 @@ class LeaveView extends GetView<LeaveController> {
                           leaveC.selectedLeaveType.value == 'Lainnya'
                               ? 'Lanjut'
                               : 'Cek saldo cuti',
+                          // style: const TextStyle(color: AppColors.contentColorWhite),
                         ),
                       ),
                     ),

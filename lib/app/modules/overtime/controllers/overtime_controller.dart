@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
 
 import 'package:absensi/app/data/helper/custom_dialog.dart';
 import 'package:absensi/app/data/model/overtime_model.dart';
@@ -33,6 +35,8 @@ class OvertimeController extends GetxController {
     {"approved": "Approved"},
   ];
   var selectedstatusOvr = "".obs;
+
+  RxBool isFabExpanded = false.obs;
 
   @override
   void onInit() {
@@ -83,6 +87,75 @@ class OvertimeController extends GetxController {
     isLoading.value = false;
     if (response != null) listOvt.value = response;
     return listOvt;
+  }
+
+  Future<void> exportOvertimeCsv() async {
+    if (listOvt.isEmpty) {
+      Get.snackbar('Export', 'Tidak ada data overtime untuk diexport');
+      return;
+    }
+
+    final rows = <List<String>>[];
+
+    // Header
+    rows.add([
+      'No',
+      'Store',
+      'Nama',
+      'Tanggal',
+      'Jam Mulai',
+      'Jam Selesai',
+      'Di Ajukan Pada',
+      'Status',
+    ]);
+
+    // Data
+    for (int i = 0; i < listOvt.length; i++) {
+      final item = listOvt[i];
+
+      rows.add([
+        '${i + 1}',
+        item.branchName ?? '',
+        item.name ?? '',
+        item.initDate ?? '',
+        item.start ?? '',
+        item.end ?? '',
+        item.createdAt ?? '',
+        item.status ?? '',
+      ]);
+    }
+
+    // Convert ke CSV
+    final csv = rows
+        .map((row) {
+          return row
+              .map((value) {
+                final text = value
+                    .replaceAll('"', '""')
+                    .replaceAll('\n', ' ')
+                    .replaceAll('\r', ' ');
+
+                return '"$text"';
+              })
+              .join(',');
+        })
+        .join('\r\n');
+
+    // Folder Download Android
+    final directory = Directory('/storage/emulated/0/Download');
+
+    if (!await directory.exists()) {
+      await directory.create(recursive: true);
+    }
+
+    final fileName = 'overtime_${DateTime.now().millisecondsSinceEpoch}.csv';
+
+    final file = File('${directory.path}/$fileName');
+
+    // BOM supaya Excel membaca UTF-8 dengan benar
+    await file.writeAsString('\uFEFF$csv', encoding: utf8);
+
+    Get.snackbar('Export Berhasil', 'File tersimpan di Download/$fileName');
   }
 
   Future<void> submitOvertime({
