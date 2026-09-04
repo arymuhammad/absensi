@@ -2254,28 +2254,23 @@ $s
   Future<List<Absen>> getLimitAbsen(paramLimitAbsen) async {
     isLoading.value = true;
 
-    /// =========================
-    /// 📦 LOAD LOCAL DATA
-    /// =========================
-    var localData = await SQLHelper.instance.getLimitDataAbsen(
-      idUser.value,
-      initDate1,
-      initDate2,
-    );
-
-    localData =
-        localData.map((e) {
-          e.isLocal = true;
-          return e;
-        }).toList();
-
     try {
       final online = await isOnline();
 
-      /// =========================
-      /// 🔴 OFFLINE MODE
-      /// =========================
+      /// =========================================================
+      /// 🔴 OFFLINE
+      /// =========================================================
       if (!online) {
+        final localData = await SQLHelper.instance.getLimitDataAbsen(
+          idUser.value,
+          initDate1,
+          initDate2,
+        );
+
+        for (final e in localData) {
+          e.isLocal = true;
+        }
+
         if (localData.isNotEmpty) {
           dataLimitAbsen.value = localData;
 
@@ -2289,96 +2284,115 @@ $s
         return dataLimitAbsen;
       }
 
-      /// =========================
-      /// 🟢 ONLINE MODE
-      /// =========================
-      var response = await ServiceApi()
+      /// =========================================================
+      /// 🟢 ONLINE
+      /// =========================================================
+
+      final response = await ServiceApi()
           .getAbsen(paramLimitAbsen)
           .timeout(const Duration(seconds: 10));
 
-      response =
-          response.map((e) {
-            e.isLocal = false;
-            return e;
-          }).toList();
+      /// Server bukan local
+      for (final e in response) {
+        e.isLocal = false;
+      }
 
-      /// =========================
-      /// 🔥 MERGE SERVER + LOCAL
-      /// =========================
-      final merged = <Absen>[];
+      /// =========================================================
+      /// 📦 AMBIL LOCAL PENDING / FAILED SAJA
+      /// =========================================================
 
-      /// ✅ SERVER = SOURCE UTAMA
-      merged.addAll(response);
+      final localPending = await SQLHelper.instance.getPendingLimitDataAbsen(
+        idUser.value,
+        initDate1,
+        initDate2,
+      );
 
-      /// =========================
-      /// 🔑 SERVER UNIQUE KEYS
-      /// =========================
+      for (final e in localPending) {
+        e.isLocal = true;
+      }
+
+      /// =========================================================
+      /// 🔑 SERVER KEY
+      /// =========================================================
+
       final serverKeys =
           response.map((e) {
-            return '${e.idUser}_'
-                '${e.tanggalMasuk}_'
-                '${e.jamAbsenMasuk}_'
-                '${e.jamAbsenPulang}';
+            return _absenKey(e);
           }).toSet();
 
-      /// =========================
-      /// ➕ TAMBAHKAN LOCAL
-      /// JIKA BELUM ADA DI SERVER
-      /// =========================
-      for (final local in localData) {
-        final localKey =
-            '${local.idUser}_'
-            '${local.tanggalMasuk}_'
-            '${local.jamAbsenMasuk}_'
-            '${local.jamAbsenPulang}';
+      /// =========================================================
+      /// 🔥 SERVER + LOCAL PENDING/FAILED
+      /// =========================================================
 
-        final existsInServer = serverKeys.contains(localKey);
+      final merged = <Absen>[...response];
 
-        if (!existsInServer) {
+      for (final local in localPending) {
+        final key = _absenKey(local);
+
+        /// Jangan tampilkan local kalau sudah ada di server
+        if (!serverKeys.contains(key)) {
           merged.add(local);
         }
       }
 
-      /// =========================
-      /// 📅 SORT TERBARU
-      /// =========================
+      /// =========================================================
+      /// 📅 SORT
+      /// =========================================================
+
       merged.sort((a, b) {
-        final aDate = DateTime.parse(
-          '${a.tanggalMasuk} '
-          '${a.jamAbsenMasuk}',
-        );
+        DateTime parseDate(Absen data) {
+          return DateTime.tryParse(
+                '${data.tanggalMasuk ?? ''} '
+                '${data.jamAbsenMasuk ?? '00:00:00'}',
+              ) ??
+              DateTime(1970);
+        }
 
-        final bDate = DateTime.parse(
-          '${b.tanggalMasuk} '
-          '${b.jamAbsenMasuk}',
-        );
-
-        return bDate.compareTo(aDate);
+        return parseDate(b).compareTo(parseDate(a));
       });
 
-      /// =========================
-      /// ✅ ASSIGN FINAL DATA
-      /// =========================
-      dataLimitAbsen.value = merged;
+      /// =========================================================
+      /// 🔢 LIMIT 7 UNTUK HASIL AKHIR
+      /// =========================================================
 
-      /// =========================
-      /// ℹ️ STATUS INFO
-      /// =========================
-      if (localData.isNotEmpty && merged.any((e) => e.isLocal == true)) {
-        statsCon.value = 'Some data loaded from local storage';
-      } else {
-        statsCon.value = '';
-      }
+      final finalData = merged.take(7).toList();
+
+      /// =========================================================
+      /// ✅ ASSIGN
+      /// =========================================================
+
+      dataLimitAbsen.value = finalData;
+
+      /// =========================================================
+      /// ℹ️ STATUS
+      /// =========================================================
+
+      final hasPending = finalData.any((e) => e.isLocal == true);
+
+      statsCon.value = hasPending ? 'Some data waiting to sync' : '';
 
       return dataLimitAbsen;
     } catch (e) {
-      /// =========================
-      /// ⚠️ FALLBACK LOCAL
-      /// =========================
+      /// =========================================================
+      /// ⚠️ API ERROR → LOCAL
+      /// =========================================================
+
+      final localData = await SQLHelper.instance.getLimitDataAbsen(
+        idUser.value,
+        initDate1,
+        initDate2,
+      );
+
+      for (final e in localData) {
+        e.isLocal = true;
+      }
+
       if (localData.isNotEmpty) {
         dataLimitAbsen.value = localData;
 
-        statsCon.value = 'Connection unstable\nLoad data from local storage';
+        statsCon.value =
+            'Connection unstable\n'
+            'Load data from local storage';
       } else {
         dataLimitAbsen.clear();
 
@@ -2387,11 +2401,12 @@ $s
 
       return dataLimitAbsen;
     } finally {
-      /// =========================
-      /// 🔚 FINISH LOADING
-      /// =========================
       isLoading.value = false;
     }
+  }
+
+  String _absenKey(Absen e) {
+    return '${e.idUser}|${e.tanggalMasuk}';
   }
 
   Future<List<Absen>> getAllAbsen(String id, String? d1, String? d2) async {

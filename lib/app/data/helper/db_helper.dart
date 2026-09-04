@@ -337,8 +337,8 @@ class SQLHelper {
     final db = await instance.database;
     final result = await db.query(
       'absen',
-      where: 'status_sync != ?',
-      whereArgs: ['SUCCESS'],
+      where: 'status_sync IS NULL OR status_sync IN (?, ?)',
+      whereArgs: ['PENDING', 'FAILED'],
     );
 
     return result.map((e) => Absen.fromJson(e)).toList();
@@ -579,8 +579,52 @@ class SQLHelper {
   ) async {
     Database db = await instance.database;
     var res = await db.rawQuery(
-      " SELECT A.*, B.nama_shift, C.nama_cabang FROM absen A INNER JOIN shift_kerja B ON B.id = A.id_shift INNER JOIN tbl_cabang C ON C.kode_cabang = A.kode_cabang WHERE id_user =  '$idUser'  AND tanggal_masuk BETWEEN '$date1' AND '$date2' ORDER BY tanggal_masuk DESC LIMIT 7 ",
+      '''
+    SELECT 
+      A.*, 
+      B.nama_shift, 
+      C.nama_cabang
+    FROM absen A
+    INNER JOIN shift_kerja B ON B.id = A.id_shift
+    INNER JOIN tbl_cabang C ON C.kode_cabang = A.kode_cabang
+    WHERE A.id_user = ?
+      AND A.tanggal_masuk BETWEEN ? AND ?
+    ORDER BY A.tanggal_masuk DESC
+    LIMIT 7
+    ''',
+      [idUser, date1, date2],
     );
+    return res.map((json) => Absen.fromJson(json)).toList();
+  }
+
+  Future<List<Absen>> getPendingLimitDataAbsen(
+    String idUser,
+    String date1,
+    String date2,
+  ) async {
+    final db = await instance.database;
+
+    final res = await db.rawQuery(
+      '''
+    SELECT 
+      A.*, 
+      B.nama_shift, 
+      C.nama_cabang
+    FROM absen A
+    INNER JOIN shift_kerja B ON B.id = A.id_shift
+    INNER JOIN tbl_cabang C ON C.kode_cabang = A.kode_cabang
+    WHERE A.id_user = ?
+      AND A.tanggal_masuk BETWEEN ? AND ?
+      AND (
+        A.status_sync = 'PENDING'
+        OR A.status_sync = 'FAILED'
+        OR A.status_sync IS NULL
+      )
+    ORDER BY A.tanggal_masuk DESC
+    ''',
+      [idUser, date1, date2],
+    );
+
     return res.map((json) => Absen.fromJson(json)).toList();
   }
 
