@@ -16,9 +16,10 @@ import '../../../shared/text_field.dart';
 import '../../controllers/leave_controller.dart';
 
 class LeaveAddSheet extends StatelessWidget {
-  LeaveAddSheet({super.key, this.userData});
+  LeaveAddSheet({super.key, this.userData, required this.isActive});
 
   final Data? userData;
+  final bool isActive;
   final leaveC = Get.find<LeaveController>();
 
   @override
@@ -28,7 +29,7 @@ class LeaveAddSheet extends StatelessWidget {
     return DraggableScrollableSheet(
       initialChildSize: 0.75,
       maxChildSize: 0.80,
-      minChildSize: 0.6,
+      minChildSize: 0.75,
       expand: false,
       builder: (context, scrollController) {
         return Container(
@@ -39,14 +40,50 @@ class LeaveAddSheet extends StatelessWidget {
           ),
           child: Column(
             children: [
-              // 🔹 HANDLE
-              Container(
-                margin: const EdgeInsets.symmetric(vertical: 8),
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: Colors.grey[400],
-                  borderRadius: BorderRadius.circular(10),
+              // 🔹 HANDLE + CLOSE
+              SizedBox(
+                height: 40,
+                child: Stack(
+                  children: [
+                    Align(
+                      alignment: Alignment.center,
+                      child: Container(
+                        width: 40,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: Colors.grey[400],
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                    ),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: Padding(
+                        padding: const EdgeInsets.only(right: 8.0),
+                        child: Container(
+                          height: 30,
+                          width: 30,
+                          decoration: BoxDecoration(
+                            color: Colors.red.withValues(alpha: 0.2),
+                            borderRadius: BorderRadius.circular(50),
+                          ),
+                          child: IconButton(
+                            onPressed: () {
+                              leaveC.resetForm();
+                              Get.back();
+                            },
+                            icon: const Icon(
+                              Icons.close_rounded,
+                              size: 22,
+                              color: Colors.red,
+                            ),
+                            tooltip: 'Tutup',
+                            padding: EdgeInsets.zero,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
 
@@ -99,10 +136,27 @@ class LeaveAddSheet extends StatelessWidget {
                                     ),
                                   )
                                   .toList(),
-                          onChanged: (val) {
-                            leaveC.selectedLeaveType.value = val;
-                          },
-                           value:
+                          onChanged:
+                              !isActive
+                                  ? null
+                                  : (val) {
+                                    leaveC.selectedLeaveType.value = val;
+
+                                    // Reset pilihan jenis cuti ketika mengganti tipe pengajuan
+                                    leaveC.selectedLeave.value = '';
+
+                                    // Reset jumlah cuti agar tidak membawa nilai sebelumnya
+                                    leaveC.amtTkn.clear();
+                                    leaveC.totalLeave.value = 0;
+
+                                    // Reset sisa cuti
+                                    leaveC.remainDays.value =
+                                        int.tryParse(
+                                          userData!.leaveBalance ?? '0',
+                                        ) ??
+                                        0;
+                                  },
+                          value:
                               leaveC.selectedLeaveType.value.isNotEmpty
                                   ? leaveC.selectedLeaveType.value
                                   : null,
@@ -114,7 +168,12 @@ class LeaveAddSheet extends StatelessWidget {
                         if (leaveC.selectedLeaveType.value != "Lainnya") {
                           return const SizedBox();
                         }
-                        final data = leaveC.leaveList;
+                        final data =
+                            !isActive
+                                ? leaveC.leaveList
+                                : leaveC.leaveList
+                                    .where((e) => e.id != '8')
+                                    .toList();
                         return CsDropDown(
                           items:
                               data
@@ -138,21 +197,40 @@ class LeaveAddSheet extends StatelessWidget {
                                   ? leaveC.selectedLeave.value
                                   : null,
 
-                          onChanged: (val) {
-                            leaveC.selectedLeave.value = val;
-                            // print(leaveC.selectedLeave.value);
+                          onChanged:
+                              !isActive
+                                  ? null
+                                  : (val) {
+                                    if (val == null || val.isEmpty) {
+                                      leaveC.selectedLeave.value = '';
+                                      leaveC.amtTkn.clear();
+                                      leaveC.totalLeave.value = 0;
 
-                            final selected = data.firstWhere(
-                              (e) => e.name == val,
-                              orElse: () => data.first,
-                            );
+                                      leaveC.remainDays.value =
+                                          int.tryParse(
+                                            userData!.leaveBalance ?? '0',
+                                          ) ??
+                                          0;
 
-                            leaveC.amtTkn.text = selected.duration.toString();
-                            leaveC.remainingOff(
-                              userData!.leaveBalance!,
-                              selected.duration!,
-                            );
-                          },
+                                      return;
+                                    }
+
+                                    leaveC.selectedLeave.value = val;
+                                    // print(leaveC.selectedLeave.value);
+
+                                    final selected = data.firstWhere(
+                                      (e) => e.name == val,
+                                      orElse: () => data.first,
+                                    );
+                                    leaveC.amtTkn.text = selected.duration!;
+                                    leaveC.totalLeave.value = int.parse(
+                                      selected.duration!,
+                                    );
+                                    leaveC.remainingOff(
+                                      userData!.leaveBalance!,
+                                      selected.duration!,
+                                    );
+                                  },
                           selectedItemBuilder: (context) {
                             return data.map((e) {
                               return Row(
@@ -208,6 +286,9 @@ class LeaveAddSheet extends StatelessWidget {
                                                   TextInputType.number,
                                               maxLines: 1,
                                               onChanged: (val) {
+                                                leaveC.totalLeave.value =
+                                                    int.tryParse(val) ?? 0;
+
                                                 leaveC.remainingOff(
                                                   userData!.leaveBalance!,
                                                   val,
@@ -415,30 +496,54 @@ class LeaveAddSheet extends StatelessWidget {
 
                       /// 🔹 SIGN BUTTON
                       Obx(() {
+                        final String leaveType = leaveC.selectedLeaveType.value;
+                        final String selectedLeave = leaveC.selectedLeave.value;
+
                         final int totalLeave =
-                            int.tryParse(leaveC.amtTkn.text) ?? 0;
+                            int.tryParse(leaveC.amtTkn.text.trim()) ?? 0;
+
+                        final bool isLainnya = leaveType == "Lainnya";
+
+                        // Untuk Lainnya wajib pilih jenis cuti
+                        final bool noLeaveSelection =
+                            isLainnya && selectedLeave.isEmpty;
+
+                        // Jumlah cuti wajib > 0
+                        final bool invalidTotalLeave = totalLeave <= 0;
+
+                        // Saldo tidak boleh minus
+                        final bool insufficientBalance =
+                            leaveC.remainDays.value < 0;
 
                         final bool invalidLeave =
-                            leaveC.remainDays.value < 0 || totalLeave <= 0;
+                            leaveType.isEmpty ||
+                            noLeaveSelection ||
+                            invalidTotalLeave ||
+                            insufficientBalance;
+
                         return CsElevatedButton(
                           color: AppColors.itemsBackground,
+
                           label:
-                              totalLeave <= 0
+                              leaveType.isEmpty
+                                  ? 'Pilih jenis pengajuan'
+                                  : noLeaveSelection
+                                  ? 'Pilih jenis cuti'
+                                  : invalidTotalLeave
                                   ? 'Jumlah cuti harus lebih dari 0'
-                                  : leaveC.remainDays.value < 0
+                                  : insufficientBalance
                                   ? 'Saldo cuti tidak cukup'
                                   : 'Tanda tangan',
+
                           fontsize: 14,
+
                           onPressed:
-                              leaveC.selectedLeaveType.value.isEmpty ||
-                                      invalidLeave
+                              invalidLeave
                                   ? null
                                   : () {
                                     if (leaveC.images.isEmpty &&
-                                        leaveC.selectedLeaveType.value ==
-                                            "Lainnya" &&
-                                        leaveC.selectedLeave.value !=
-                                            "Replacement Off") {
+                                        leaveType == "Lainnya" &&
+                                        selectedLeave != "Replacement Off") {
                                       showToast('Upload file pendukung');
                                     } else {
                                       openDialogSign(context);

@@ -34,6 +34,7 @@ class LeaveController extends GetxController {
   var phone = TextEditingController();
   var amtTkn = TextEditingController();
   var remainDays = 0.obs;
+  var totalLeave = 0.obs;
   var selectedLeaveType = "".obs;
   var selectedLeave = "".obs;
   var selectedIdUser = "".obs;
@@ -250,26 +251,7 @@ class LeaveController extends GetxController {
   |--------------------------------------------------------------------------
   */
 
-    datePick1.clear();
-    datePick2.clear();
-
-    selectedLeave.value = "";
-    leaveList.clear();
-
-    amtTkn.clear();
-    reasonLeave.clear();
-    addrLeave.clear();
-    phone.clear();
-
-    selectedIdUser.value = "";
-    nikUser.clear();
-
-    selectedLevelUser.value = "";
-    selectednamaLevel.value = "";
-
-    ctrSign.clear();
-
-    images = [];
+    resetForm();
 
     /*
   |--------------------------------------------------------------------------
@@ -462,5 +444,36 @@ class LeaveController extends GetxController {
     }
 
     update();
+  }
+
+  Future<void> deleteLeaveReq(String uid) async {
+    final param = {"type": "delete", 'uid': uid};
+    await ServiceApi().reqLeave(param);
+    getLeaveReq({"type": "", "id_user": idUser});
+  }
+
+  void resetForm() {
+    datePick1.clear();
+    datePick2.clear();
+
+    selectedLeave.value = "";
+    selectedLeaveType.value = "";
+    // leaveList.clear();
+
+    amtTkn.clear();
+    remainDays.value = 0;
+    reasonLeave.clear();
+    addrLeave.clear();
+    phone.clear();
+
+    selectedIdUser.value = "";
+    nikUser.clear();
+
+    selectedLevelUser.value = "";
+    selectednamaLevel.value = "";
+
+    ctrSign.clear();
+
+    images = [];
   }
 }

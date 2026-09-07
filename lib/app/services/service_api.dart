@@ -498,7 +498,7 @@ class ServiceApi {
       await ErrorLogger.save('''
       ////// SUBMIT ABSEN ERROR ////////
       RAW:
-      ${  e.toString()}
+      ${e.toString()}
 ''', '');
       // print("SUBMIT ABSEN ERROR: $e");
 
@@ -1681,6 +1681,8 @@ class ServiceApi {
           showToast("Pengajuan berhasil disetujui");
         } else if (type == "add_leave") {
           showToast("Pengajuan berhasil dibuat");
+        } else if (type == "delete") {
+          showToast("Pengajuan berhasil dihapus");
         } else {
           showToast("Pengajuan berhasil dicancel");
         }

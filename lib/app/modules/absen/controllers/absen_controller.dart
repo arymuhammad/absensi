@@ -1529,19 +1529,41 @@ $s
   }
 
   Future<List<ShiftKerja>> getShift() async {
-    var tempShift = await SQLHelper.instance.getShift();
+    final localShift = await SQLHelper.instance.getShift();
 
-    if (tempShift.isNotEmpty) {
-      shiftKerja.value =
-          tempShift.where((e) => e.id != "0" && e.id != null).toList();
-      return shiftKerja;
-    } else {
-      final response = await ServiceApi().getShift();
+    List<ShiftKerja> filterShift(List<ShiftKerja> data) {
+      return data.where((e) => e.id != null && e.id != "0").toList();
+    }
 
-      shiftKerja.value =
-          response.where((e) => e.id != "0" && e.id != null).toList();
+    try {
+      final online = await isOnline();
 
-      for (final e in shiftKerja) {
+      // ============================================================
+      // OFFLINE
+      // ============================================================
+      if (!online) {
+        shiftKerja.value = filterShift(localShift);
+        return shiftKerja;
+      }
+
+      // ============================================================
+      // ONLINE
+      // ============================================================
+      final response = await ServiceApi().getShift().timeout(
+        const Duration(seconds: 10),
+      );
+
+      final serverShift = filterShift(response);
+
+      shiftKerja.value = serverShift;
+
+      // ============================================================
+      // UPDATE CACHE LOCAL
+      // ============================================================
+
+      await SQLHelper.instance.truncateShift();
+
+      for (final e in serverShift) {
         await SQLHelper.instance.insertShift(
           ShiftKerja(
             id: e.id,
@@ -1551,6 +1573,13 @@ $s
           ),
         );
       }
+
+      return shiftKerja;
+    } catch (e) {
+      // ============================================================
+      // API ERROR → FALLBACK LOCAL
+      // ============================================================
+      shiftKerja.value = filterShift(localShift);
 
       return shiftKerja;
     }

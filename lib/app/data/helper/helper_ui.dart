@@ -34,6 +34,8 @@ Color getStatusColor(String status) {
       return Colors.orange;
     case 'rejected':
       return Colors.red;
+    case 'expired':
+      return Colors.grey;
     default:
       return Colors.grey;
   }
