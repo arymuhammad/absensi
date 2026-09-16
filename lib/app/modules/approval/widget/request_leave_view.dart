@@ -119,7 +119,27 @@ class RequestLeaveView extends GetView<LeaveController> {
                           children: List.generate(filteredList.length, (i) {
                             final userData = auth.logUser.value;
                             final leave = filteredList[i];
-                            final status = leave.status ?? 'pending';
+
+                            final DateTime created = DateTime.parse(
+                              leave.tglBuat!,
+                            );
+                            final DateTime now = DateTime.now();
+
+                            // Request aktif sampai tanggal 9 bulan berikutnya.
+                            // Expired mulai tanggal 10.
+                            final DateTime expiredAt = DateTime(
+                              created.year,
+                              created.month + 1,
+                              10,
+                            );
+
+                            final bool isExpired = !now.isBefore(expiredAt);
+
+                            final String status =
+                                isExpired
+                                    ? 'expired'
+                                    : (leave.status ?? 'pending');
+                            // final status = leave.status ?? 'pending';
 
                             final color = getStatusColor(status);
 
@@ -201,12 +221,7 @@ class RequestLeaveView extends GetView<LeaveController> {
                                   vertical: 4,
                                 ),
                                 decoration: BoxDecoration(
-                                  color:
-                                      status == "pending"
-                                          ? Colors.amber.withOpacity(.1)
-                                          : status == "approved"
-                                          ? Colors.green.withOpacity(.1)
-                                          : red!.withOpacity(.1),
+                                  color: color.withOpacity(.1),
                                   borderRadius: BorderRadius.circular(20),
                                 ),
                                 child: Text(

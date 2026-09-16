@@ -293,20 +293,7 @@ class AddPegawaiController extends GetxController {
     try {
       Random random = Random();
       int randomNumber = random.nextInt(100);
-      final response = await ServiceApi().getUser();
-      cekDataUser.value = response;
 
-      // var lstUser = [];
-      // cekDataUser.map((e) {
-      //   lstUser.add(e.username!);
-      // }).toList();
-      // var lstPhone = [];
-      // cekDataUser.map((e) {
-      //   lstPhone.add(e.notelp!);
-      // }).toList();
-      final isUsrExist = cekDataUser.any(
-        (dt) => dt.username?.trim() == username.text.trim(),
-      );
       final inputTelp = telp.text.trim();
       final oldTelp = dataUser.noTelp?.trim() ?? '';
 
@@ -318,6 +305,23 @@ class AddPegawaiController extends GetxController {
       // }
       if (mode == "add") {
         loadingDialog("Registering user", "Please wait");
+        //===================|| LOADING DIALOG ||====================
+
+        final response = await ServiceApi().getUser();
+        cekDataUser.value = response;
+
+        // var lstUser = [];
+        // cekDataUser.map((e) {
+        //   lstUser.add(e.username!);
+        // }).toList();
+        // var lstPhone = [];
+        // cekDataUser.map((e) {
+        //   lstPhone.add(e.notelp!);
+        // }).toList();
+        final isUsrExist = cekDataUser.any(
+          (dt) => dt.username?.trim() == username.text.trim(),
+        );
+
         if (selectedCabang.isNotEmpty &&
             username.text != "" &&
             pass.text != "" &&
@@ -447,12 +451,8 @@ class AddPegawaiController extends GetxController {
             }
           }
         } else {
-          Get.back();
-          warningDialog(
-            Get.context!,
-            "Warning",
-            "Please fill in the data in all columns",
-          );
+          _showWarning("Please fill in the data in all columns");
+
           return false;
         }
       } else {
@@ -490,12 +490,10 @@ class AddPegawaiController extends GetxController {
           };
 
           if (inputTelp.isNotEmpty && isPhoneExist(inputTelp)) {
-            Get.back();
-            warningDialog(
-              Get.context!,
-              "Warning",
+            _showWarning(
               "This phone number is already registered\nPlease enter another phone number",
             );
+
             isLoading.value = false;
             return false;
           } else {
@@ -547,17 +545,17 @@ class AddPegawaiController extends GetxController {
               return false;
             }
 
-//             await ErrorLogger.save('''
-//       REFRESH USER
+            //             await ErrorLogger.save('''
+            //       REFRESH USER
 
-//       ID       : ${newUsr.id}
-//       USERNAME : ${newUsr.username}
-//       LAT      : ${newUsr.lat}
-//       LONG     : ${newUsr.long}
+            //       ID       : ${newUsr.id}
+            //       USERNAME : ${newUsr.username}
+            //       LAT      : ${newUsr.lat}
+            //       LONG     : ${newUsr.long}
 
-//       RAW:
-//       ${jsonEncode(newUsr.toJson())}
-// ''', '');
+            //       RAW:
+            //       ${jsonEncode(newUsr.toJson())}
+            // ''', '');
 
             if (Get.isRegistered<LoginController>()) {
               final logC = Get.find<LoginController>();
@@ -648,12 +646,10 @@ class AddPegawaiController extends GetxController {
         } else {
           // if (lstPhone.contains(telp.text)) {
           if (inputTelp.isNotEmpty && isPhoneExist(inputTelp)) {
-            Get.back();
-            warningDialog(
-              Get.context!,
-              "Warning",
+            _showWarning(
               "This phone number is already registered\nPlease enter another phone number",
             );
+
             isLoading.value = false;
             return false;
           } else {
@@ -727,17 +723,17 @@ class AddPegawaiController extends GetxController {
               return false;
             }
 
-//             await ErrorLogger.save('''
-//       REFRESH USER
+            //             await ErrorLogger.save('''
+            //       REFRESH USER
 
-//       ID       : ${newUsr.id}
-//       USERNAME : ${newUsr.username}
-//       LAT      : ${newUsr.lat}
-//       LONG     : ${newUsr.long}
+            //       ID       : ${newUsr.id}
+            //       USERNAME : ${newUsr.username}
+            //       LAT      : ${newUsr.lat}
+            //       LONG     : ${newUsr.long}
 
-//       RAW:
-//       ${jsonEncode(newUsr.toJson())}
-// ''', '');
+            //       RAW:
+            //       ${jsonEncode(newUsr.toJson())}
+            // ''', '');
 
             if (Get.isRegistered<LoginController>()) {
               final logC = Get.find<LoginController>();
@@ -906,7 +902,8 @@ class AddPegawaiController extends GetxController {
         btnOkOnPress: () {
           // Future.delayed(const Duration(seconds: 1), () {
           auth.logout();
-          Get.back(closeOverlays: true);
+          Get.back();
+          Get.back();
           // });
         },
       );
@@ -981,17 +978,17 @@ class AddPegawaiController extends GetxController {
       return;
     }
 
-//     await ErrorLogger.save('''
-//       REFRESH USER
+    //     await ErrorLogger.save('''
+    //       REFRESH USER
 
-//       ID       : ${newUsr.id}
-//       USERNAME : ${newUsr.username}
-//       LAT      : ${newUsr.lat}
-//       LONG     : ${newUsr.long}
+    //       ID       : ${newUsr.id}
+    //       USERNAME : ${newUsr.username}
+    //       LAT      : ${newUsr.lat}
+    //       LONG     : ${newUsr.long}
 
-//       RAW:
-//       ${jsonEncode(newUsr.toJson())}
-// ''', '');
+    //       RAW:
+    //       ${jsonEncode(newUsr.toJson())}
+    // ''', '');
 
     if (Get.isRegistered<LoginController>()) {
       final logC = Get.find<LoginController>();
@@ -1066,17 +1063,17 @@ class AddPegawaiController extends GetxController {
       return;
     }
 
-//     await ErrorLogger.save('''
-//       REFRESH USER
+    //     await ErrorLogger.save('''
+    //       REFRESH USER
 
-//       ID       : ${newUser.id}
-//       USERNAME : ${newUser.username}
-//       LAT      : ${newUser.lat}
-//       LONG     : ${newUser.long}
+    //       ID       : ${newUser.id}
+    //       USERNAME : ${newUser.username}
+    //       LAT      : ${newUser.lat}
+    //       LONG     : ${newUser.long}
 
-//       RAW:
-//       ${jsonEncode(newUser.toJson())}
-// ''', '');
+    //       RAW:
+    //       ${jsonEncode(newUser.toJson())}
+    // ''', '');
 
     if (Get.isRegistered<LoginController>()) {
       final logC = Get.find<LoginController>();

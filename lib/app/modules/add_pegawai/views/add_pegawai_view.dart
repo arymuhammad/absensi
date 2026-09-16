@@ -112,7 +112,8 @@ class AddPegawaiView extends GetView<AddPegawaiController> {
                                           controller: controller.store,
                                           decoration: InputDecoration(
                                             labelText: 'Cabang',
-                                            contentPadding: const EdgeInsets.all(8),
+                                            contentPadding:
+                                                const EdgeInsets.all(8),
                                             border: const OutlineInputBorder(),
                                             filled: true,
                                             fillColor:
@@ -262,6 +263,7 @@ class AddPegawaiView extends GetView<AddPegawaiController> {
                                       : Colors.white,
                               border: const OutlineInputBorder(),
                             ),
+                            maxLines: 1,
                           ),
                         ),
                         const SizedBox(height: 10),
@@ -301,6 +303,7 @@ class AddPegawaiView extends GetView<AddPegawaiController> {
                                       : Colors.white,
                               border: const OutlineInputBorder(),
                             ),
+                            maxLines: 1,
                           ),
                         ),
                         const SizedBox(height: 10),

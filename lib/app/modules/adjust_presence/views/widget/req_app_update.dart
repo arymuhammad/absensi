@@ -215,7 +215,27 @@ class ReqAppUpdate extends GetView {
                           spaceBetweenItem: 5,
                           children: List.generate(filteredList.length, (i) {
                             final excData = filteredList[i];
-                            final status = excData.statusExcep ?? 'pending';
+
+                            final DateTime created = DateTime.parse(
+                              excData.entryAt!,
+                            );
+                            final DateTime now = DateTime.now();
+
+                            // Request aktif sampai tanggal 9 bulan berikutnya.
+                            // Expired mulai tanggal 10.
+                            final DateTime expiredAt = DateTime(
+                              created.year,
+                              created.month + 1,
+                              10,
+                            );
+
+                            final bool isExpired = !now.isBefore(expiredAt);
+
+                            final String status =
+                                isExpired
+                                    ? 'expired'
+                                    : (excData.statusExcep ?? 'pending');
+                            // final status = excData.statusExcep ?? 'pending';
                             final color = getStatusColor(status);
 
                             return ExpansionTileItem(
@@ -322,12 +342,7 @@ class ReqAppUpdate extends GetView {
                                   vertical: 4,
                                 ),
                                 decoration: BoxDecoration(
-                                  color:
-                                      excData.statusExcep == "pending"
-                                          ? Colors.amber.withOpacity(.1)
-                                          : excData.statusExcep == "approved"
-                                          ? Colors.green.withOpacity(.1)
-                                          : red!.withOpacity(.1),
+                                  color: color.withOpacity(.1),
                                   borderRadius: BorderRadius.circular(20),
                                 ),
                                 child: Text(

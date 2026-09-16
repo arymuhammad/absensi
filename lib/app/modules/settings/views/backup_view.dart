@@ -444,7 +444,7 @@ class BackupView extends GetView {
                             showToast('Data Cabang berhasil dihapus');
                           },
                           label: Text(
-                            'Hapus data cabang',
+                            'Perbarui data cabang',
                             style: TextStyle(
                               color: isDark ? Colors.grey : Colors.black,
                             ),

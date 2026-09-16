@@ -264,6 +264,7 @@ class OvertimeController extends GetxController {
       "type": "reject",
       "level": level,
       "id_user": idOvt,
+      "approval_id": idUser,
       "init_date": date1,
       "end_date": date2,
     };
@@ -308,6 +309,7 @@ class OvertimeController extends GetxController {
       "type": "accept",
       "level": level,
       "id_user": idOvt,
+      "approval_id": idUser,
       "init_date": date1,
       "end_date": date2,
     };

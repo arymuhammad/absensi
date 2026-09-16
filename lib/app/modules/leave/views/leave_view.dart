@@ -287,8 +287,32 @@ class LeaveView extends GetView<LeaveController> {
                                                 initialStep: safeStep,
                                                 totalSteps: totalSteps,
                                               );
-                                          final leaveStats = StepConfig()
-                                              .getStepStatus(leave);
+
+                                          //=======================================
+
+                                          final DateTime created =
+                                              DateTime.parse(leave.tglBuat!);
+                                          final DateTime now = DateTime.now();
+
+                                          // Request aktif sampai tanggal 9 bulan berikutnya.
+                                          // Expired mulai tanggal 10.
+                                          final DateTime expiredAt = DateTime(
+                                            created.year,
+                                            created.month + 1,
+                                            10,
+                                          );
+
+                                          final bool isExpired =
+                                              !now.isBefore(expiredAt);
+
+                                          //========================================
+
+                                          final leaveStats =
+                                              isExpired
+                                                  ? 'expired'
+                                                  : StepConfig().getStepStatus(
+                                                    leave,
+                                                  );
                                           final color = getStatusColor(
                                             leaveStats,
                                           );
@@ -377,23 +401,9 @@ class LeaveView extends GetView<LeaveController> {
                                                           vertical: 4,
                                                         ),
                                                     decoration: BoxDecoration(
-                                                      color:
-                                                          leaveStats ==
-                                                                  "pending"
-                                                              ? Colors.amber
-                                                                  .withOpacity(
-                                                                    .1,
-                                                                  )
-                                                              : leaveStats ==
-                                                                  "approved"
-                                                              ? Colors.green
-                                                                  .withOpacity(
-                                                                    .1,
-                                                                  )
-                                                              : red!
-                                                                  .withOpacity(
-                                                                    .1,
-                                                                  ),
+                                                      color: color.withOpacity(
+                                                        .1,
+                                                      ),
                                                       borderRadius:
                                                           BorderRadius.circular(
                                                             20,

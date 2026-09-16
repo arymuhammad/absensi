@@ -759,30 +759,32 @@ class AbsenController extends GetxController
 
   Future<Position> _determinePositionInternal() async {
     try {
-      bool serviceEnabled;
-      LocationPermission permission;
-
       isGpsLoading.value = true;
       gpsError.value = '';
 
-      /// =========================
-      /// CHECK GPS SERVICE
-      /// =========================
-      serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      // ============================================================
+      // CHECK GPS SERVICE
+      // ============================================================
+      final serviceEnabled = await Geolocator.isLocationServiceEnabled();
 
       if (!serviceEnabled) {
         stopLoading();
-        gpsError.value = "Location disabled";
+
+        isLoading.value = false;
+        isEnabled.value = false;
         isGpsLoading.value = false;
 
+        gpsError.value = "Location disabled";
+
         showToast("Location disabled");
+
         return Future.error('Location disabled.');
       }
 
-      /// =========================
-      /// CHECK PERMISSION
-      /// =========================
-      permission = await Geolocator.checkPermission();
+      // ============================================================
+      // CHECK PERMISSION
+      // ============================================================
+      LocationPermission permission = await Geolocator.checkPermission();
 
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
@@ -790,129 +792,125 @@ class AbsenController extends GetxController
 
       if (permission == LocationPermission.denied) {
         stopLoading();
+
         isLoading.value = false;
         isEnabled.value = false;
-
-        gpsError.value = "Permission denied";
         isGpsLoading.value = false;
 
+        gpsError.value = "Permission denied";
+
         showToast("Permission denied");
+
         return Future.error('Permission denied');
       }
 
       if (permission == LocationPermission.deniedForever) {
         stopLoading();
+
         isLoading.value = false;
         isEnabled.value = false;
-
-        gpsError.value = "Permission denied forever";
         isGpsLoading.value = false;
 
+        gpsError.value = "Permission denied forever";
+
         showToast("Permission denied forever");
+
         return Future.error('Permission denied forever');
       }
 
-      /// =========================
-      /// LAST KNOWN POSITION
-      /// =========================
-      /// 🔥 1. coba ambil last known dulu (CEPAT)
-      Position? lastKnown = await Geolocator.getLastKnownPosition();
+      // ============================================================
+      // LAST KNOWN POSITION
+      // ============================================================
+      final Position? lastKnown = await Geolocator.getLastKnownPosition();
 
-      /// 🔥 2. coba ambil GPS real (TAPI ADA LIMIT)
-      try {
-        /// =========================
-        /// GPS WARMUP
-        /// =========================
-        await Geolocator.getPositionStream(
-              locationSettings: const LocationSettings(
-                accuracy: LocationAccuracy.bestForNavigation,
-                distanceFilter: 0,
-              ),
-            )
-            // .where((p) {
-            //   /// terima kalau sudah lumayan bagus
-            //   if (Platform.isIOS) {
-            //     return p.accuracy <= 100;
-            //   }
-            //   return p.accuracy <= 50;
-            // })
-            // .first
-            .where((p) => p.accuracy <= 100)
-            .first
-            .timeout(const Duration(seconds: 30));
+      // ============================================================
+      // GPS BARU SAJA DINYALAKAN
+      // ============================================================
+      //
+      // Android kadang membutuhkan sedikit waktu untuk
+      // mengaktifkan kembali Location Provider setelah user
+      // menyalakan GPS dari Quick Settings.
+      //
+      await Future.delayed(const Duration(milliseconds: 800));
 
-        /// =========================
-        /// GET FINAL POSITION
-        /// =========================
-        final fresh = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.bestForNavigation,
-          timeLimit: const Duration(seconds: 30),
-        );
+      // ============================================================
+      // GET FRESH POSITION
+      // ============================================================
+      Position? fresh;
 
-        // print("ACCURACY=${fresh.accuracy}");
-        // print("ALTITUDE=${fresh.altitude}");
-        // print("SPEED=${fresh.speed}");
-        // print("HEADING=${fresh.heading}");
+      Exception? lastError;
 
-        // print(await Geolocator.getLocationAccuracy());
+      for (int attempt = 1; attempt <= 3; attempt++) {
+        try {
+          debugPrint('[GPS] ATTEMPT $attempt/3');
 
-        // print("FINAL accuracy: ${fresh.accuracy}");
+          // Cek lagi karena GPS bisa berubah status ketika
+          // aplikasi sedang menunggu.
+          final enabled = await Geolocator.isLocationServiceEnabled();
 
-        /// =========================
-        /// VALIDATE ACCURACY
-        /// =========================
+          if (!enabled) {
+            stopLoading();
 
-        // final maxAccuracy = Platform.isIOS ? 100.0 : 50.0;
-        const maxAccuracy = 100.0;
+            isLoading.value = false;
+            isEnabled.value = false;
+            isGpsLoading.value = false;
 
-        if (fresh.accuracy > maxAccuracy) {
-          stopLoading();
+            gpsError.value = "Location disabled";
 
-          isLoading.value = false;
-          isEnabled.value = false;
+            showToast("Location disabled");
 
-          gpsError.value = "GPS not accurate enough";
-          isGpsLoading.value = false;
+            return Future.error('Location disabled');
+          }
 
-          showToast(
-            "GPS not accurate enough (${fresh.accuracy.toStringAsFixed(0)}m)",
+          fresh = await Geolocator.getCurrentPosition(
+            desiredAccuracy: LocationAccuracy.bestForNavigation,
+            timeLimit: const Duration(seconds: 30),
           );
-          return Future.error("GPS not accurate enough");
+
+          debugPrint(
+            '[GPS] POSITION RECEIVED '
+            'lat=${fresh.latitude} '
+            'lng=${fresh.longitude} '
+            'accuracy=${fresh.accuracy}',
+          );
+
+          break;
+        } on TimeoutException catch (e) {
+          lastError = e;
+
+          debugPrint('[GPS] ATTEMPT $attempt TIMEOUT');
+
+          if (attempt < 3) {
+            await Future.delayed(const Duration(seconds: 1));
+          }
+        } catch (e) {
+          lastError = Exception(e.toString());
+
+          debugPrint('[GPS] ATTEMPT $attempt ERROR: $e');
+
+          if (attempt < 3) {
+            await Future.delayed(const Duration(seconds: 1));
+          }
         }
+      }
 
-        /// =========================
-        /// FAKE GPS DETECTION
-        /// =========================
-        if (fresh.isMocked) {
-          stopLoading();
-
-          isLoading.value = false;
-          isEnabled.value = false;
-
-          gpsError.value = "Fake GPS detected";
-          isGpsLoading.value = false;
-
-          failedDialog(Get.context, 'Warning', 'Fake GPS detected');
-          return Future.error("Fake GPS detected");
-        }
-        stopLoading();
-        isGpsLoading.value = false;
-        gpsError.value = '';
-        return fresh;
-      } catch (e) {
-        // print("GPS ERROR: $e");
-
-        /// =========================
-        /// FALLBACK LAST KNOWN
-        /// =========================
-        // if (lastKnown != null) {
-        //   return lastKnown;
-        // }
-
-        final maxLastKnownAccuracy = Platform.isIOS ? 150.0 : 80.0;
+      // ============================================================
+      // KALAU FRESH GPS GAGAL
+      // ============================================================
+      if (fresh == null) {
+        // ----------------------------------------------------------
+        // FALLBACK LAST KNOWN
+        // ----------------------------------------------------------
+        const maxLastKnownAccuracy = 80.0;
 
         if (lastKnown != null) {
           final age = DateTime.now().difference(lastKnown.timestamp);
+
+          debugPrint(
+            '[GPS] LAST KNOWN '
+            'age=${age.inSeconds}s '
+            'accuracy=${lastKnown.accuracy}',
+          );
 
           if (age.inSeconds < 30 &&
               lastKnown.accuracy <= maxLastKnownAccuracy) {
@@ -921,19 +919,93 @@ class AbsenController extends GetxController
             isGpsLoading.value = false;
             gpsError.value = '';
 
+            debugPrint('[GPS] USING LAST KNOWN POSITION');
+
             return lastKnown;
           }
         }
-        rethrow;
+
+        stopLoading();
+
+        isLoading.value = false;
+        isEnabled.value = false;
+        isGpsLoading.value = false;
+
+        gpsError.value = "Failed to get location";
+
+        debugPrint(
+          '[GPS] FAILED AFTER 3 ATTEMPTS '
+          'ERROR=$lastError',
+        );
+
+        showToast("Failed to get location, please try again.");
+
+        return Future.error(lastError ?? 'Failed to get location');
       }
+
+      // ============================================================
+      // VALIDATE ACCURACY
+      // ============================================================
+      const maxAccuracy = 100.0;
+
+      if (fresh.accuracy > maxAccuracy) {
+        stopLoading();
+
+        isLoading.value = false;
+        isEnabled.value = false;
+        isGpsLoading.value = false;
+
+        gpsError.value = "GPS not accurate enough";
+
+        showToast(
+          "GPS not accurate enough "
+          "(${fresh.accuracy.toStringAsFixed(0)}m)",
+        );
+
+        return Future.error("GPS not accurate enough");
+      }
+
+      // ============================================================
+      // FAKE GPS DETECTION
+      // ============================================================
+      if (fresh.isMocked) {
+        stopLoading();
+
+        isLoading.value = false;
+        isEnabled.value = false;
+        isGpsLoading.value = false;
+
+        gpsError.value = "Fake GPS detected";
+
+        failedDialog(Get.context, 'Warning', 'Fake GPS detected');
+
+        return Future.error("Fake GPS detected");
+      }
+
+      // ============================================================
+      // SUCCESS
+      // ============================================================
+      stopLoading();
+
+      isGpsLoading.value = false;
+      gpsError.value = '';
+
+      debugPrint(
+        '[GPS] SUCCESS '
+        'lat=${fresh.latitude} '
+        'lng=${fresh.longitude} '
+        'accuracy=${fresh.accuracy}',
+      );
+
+      return fresh;
     } on TimeoutException catch (e, s) {
       stopLoading();
 
       isLoading.value = false;
       isEnabled.value = false;
+      isGpsLoading.value = false;
 
       gpsError.value = "Location timeout";
-      isGpsLoading.value = false;
 
       await ErrorLogger.save('''
 TIMEOUT ERROR
@@ -947,16 +1019,21 @@ $s
       showToast("Failed to get location, please try again.");
 
       return Future.error('Timeout while getting location');
-    } catch (e) {
+    } catch (e, s) {
       stopLoading();
 
       isLoading.value = false;
       isEnabled.value = false;
-
-      gpsError.value = "Failed to get location";
       isGpsLoading.value = false;
 
+      gpsError.value = "Failed to get location";
+
+      debugPrint('[GPS] FINAL ERROR: $e');
+
+      debugPrint('[GPS] STACK: $s');
+
       showToast("Failed to get location");
+
       return Future.error(e);
     }
   }

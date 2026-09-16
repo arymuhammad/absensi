@@ -91,7 +91,23 @@ class ReqPermView extends StatelessWidget {
                 itemBuilder: (context, index) {
                   final item = list[index];
                   // final date = DateTime.parse(item.tanggalMulai!);
-                  final status = item.status ?? 'pending';
+
+                  final DateTime created = DateTime.parse(item.createdAt!);
+                  final DateTime now = DateTime.now();
+
+                  // Request aktif sampai tanggal 9 bulan berikutnya.
+                  // Expired mulai tanggal 10.
+                  final DateTime expiredAt = DateTime(
+                    created.year,
+                    created.month + 1,
+                    10,
+                  );
+
+                  final bool isExpired = !now.isBefore(expiredAt);
+
+                  final String status =
+                      isExpired ? 'expired' : (item.status ?? 'pending');
+                  // final status = item.status ?? 'pending';
                   final color = getStatusColor(status);
 
                   String getLastNote() {
@@ -431,7 +447,7 @@ class ReqPermView extends StatelessWidget {
                             ),
                             const SizedBox(height: 5),
                             Visibility(
-                              visible: item.status != "pending",
+                              visible: status != "pending",
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -453,7 +469,7 @@ class ReqPermView extends StatelessWidget {
                               ),
                             ),
                             Visibility(
-                              visible: item.status == "pending",
+                              visible: status == "pending",
                               child: SizedBox(
                                 height: 40,
                                 child: CsTextField(
