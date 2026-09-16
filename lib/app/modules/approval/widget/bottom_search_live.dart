@@ -231,8 +231,8 @@ bottomSearchLive(
                                 "id_user": userData.id!,
                                 "level": userData.level!,
                                 "parent_id": userData.parentId!,
-                                "date1": ctrl.datePick1.text,
-                                "date2": ctrl.datePick2.text,
+                                "tgl1": ctrl.datePick1.text,
+                                "tgl2": ctrl.datePick2.text,
                               };
                               // print(param);
                               await ctrl.getLeaveReq(param);
