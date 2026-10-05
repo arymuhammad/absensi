@@ -72,8 +72,7 @@ class OvertimeController extends GetxController {
     String? date2,
     required String status,
   }) async {
-    listOvt.clear();
-    var data = {
+    final data = {
       "type": type,
       "user_id": idUser,
       "branch_code": branchCode,
@@ -82,11 +81,46 @@ class OvertimeController extends GetxController {
       "end_date": (date2?.isNotEmpty ?? false) ? date2! : endDate,
       "status": status,
     };
-    // print(data);
-    final response = await ServiceApi().overtime(data);
-    isLoading.value = false;
-    if (response != null) listOvt.value = response;
-    return listOvt;
+
+    debugPrint('======================================');
+    debugPrint('[OVERTIME] RELOAD');
+    debugPrint('[OVERTIME] PARAM : $data');
+
+    try {
+      isLoading.value = true;
+
+      final response = await ServiceApi().overtime(data);
+
+      debugPrint('[OVERTIME] RESPONSE TYPE : ${response.runtimeType}');
+
+      if (response is List<OvertimeModel>) {
+        debugPrint('[OVERTIME] RESPONSE LIST : ${response.length}');
+
+        listOvt.assignAll(response);
+      } else if (response is Map<String, dynamic>) {
+        debugPrint('[OVERTIME] RESPONSE MAP : $response');
+
+        // API berhasil tetapi tidak ada data
+        if (response['success'] == true && response['data'] == null) {
+          listOvt.clear();
+        }
+      } else {
+        debugPrint('[OVERTIME] RESPONSE TIDAK VALID : $response');
+
+        listOvt.clear();
+      }
+
+      debugPrint('[OVERTIME] LIST AFTER RELOAD : ${listOvt.length}');
+
+      return listOvt.toList();
+    } catch (e, stackTrace) {
+      debugPrint('[OVERTIME] RELOAD ERROR : $e');
+      debugPrint('[OVERTIME] STACK : $stackTrace');
+
+      return listOvt.toList();
+    } finally {
+      isLoading.value = false;
+    }
   }
 
   Future<void> exportOvertimeCsv() async {
@@ -244,8 +278,7 @@ class OvertimeController extends GetxController {
     required String branchCode,
     required String idOvt,
     required String idUser,
-    required String date1,
-    required String date2,
+    required String idUsrOvt,
   }) async {
     var data = {
       {
@@ -262,11 +295,10 @@ class OvertimeController extends GetxController {
           }[level]!:
           "reject",
       "type": "reject",
-      "level": level,
-      "id_user": idOvt,
+      "id": idOvt,
+      "id_user": idUsrOvt,
       "approval_id": idUser,
-      "init_date": date1,
-      "end_date": date2,
+      "level": level,
     };
     // print(data);
     final response = await ServiceApi().overtime(data);
@@ -277,6 +309,8 @@ class OvertimeController extends GetxController {
         level: level,
         type: "",
         status: "pending",
+        date1: date1.text,
+        date2: date2.text,
       );
       showToast(response['message']);
     } else {
@@ -289,8 +323,7 @@ class OvertimeController extends GetxController {
     required String branchCode,
     required String idOvt,
     required String idUser,
-    required String date1,
-    required String date2,
+    required String idUsrOvt,
   }) async {
     var data = {
       {
@@ -307,11 +340,10 @@ class OvertimeController extends GetxController {
           }[level]!:
           "approved",
       "type": "accept",
-      "level": level,
-      "id_user": idOvt,
+      "id": idOvt,
+      "id_user": idUsrOvt,
       "approval_id": idUser,
-      "init_date": date1,
-      "end_date": date2,
+      "level": level,
     };
     // print(data);
     final response = await ServiceApi().overtime(data);
@@ -322,6 +354,8 @@ class OvertimeController extends GetxController {
         level: level,
         type: "",
         status: "pending",
+        date1: date1.text,
+        date2: date2.text,
       );
       showToast(response['message']);
     } else {

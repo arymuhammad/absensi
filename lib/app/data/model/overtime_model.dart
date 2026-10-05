@@ -1,5 +1,6 @@
 class OvertimeModel {
   String? id;
+  String? idUser;
   String? branchCode;
   String? branchName;
   String? name;
@@ -19,6 +20,7 @@ class OvertimeModel {
 
   OvertimeModel({
     this.id,
+    this.idUser,
     this.branchCode,
     this.branchName,
     this.name,
@@ -38,7 +40,8 @@ class OvertimeModel {
   });
 
   OvertimeModel.fromJson(Map<String, dynamic> json) {
-    id = json['id_user'];
+    id = json['id'];
+    idUser = json['id_user'];
     branchCode = json['branch_code'];
     branchName = json['nama_cabang'];
     name = json['name'];

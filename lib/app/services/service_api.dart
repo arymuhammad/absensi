@@ -1846,33 +1846,60 @@ class ServiceApi {
     // }
   }
 
-  overtime(Map<String, String> data) async {
+  Future<dynamic> overtime(Map<String, String> data) async {
     try {
       final response = await http
           .post(Uri.parse('${baseUrl}overtime'), body: data)
           .timeout(const Duration(seconds: 10));
 
       final res = json.decode(response.body);
-      // print(res);
+
+      debugPrint('[OVERTIME API] TYPE : ${data['type']}');
+      debugPrint('[OVERTIME API] STATUS : ${response.statusCode}');
+      debugPrint('[OVERTIME API] BODY : ${response.body}');
 
       if (response.statusCode == 200) {
+        // =========================================================
+        // GET LIST / GET BY ID
+        // =========================================================
         if (data['type'] == "" || data['type'] == "get_by_id") {
-          if (res['data'] != null) {
-            List<dynamic> listOvr = res['data'];
-            List<OvertimeModel> result =
-                listOvr.map((e) => OvertimeModel.fromJson(e)).toList();
+          if (res['data'] != null && res['data'] is List) {
+            final List<dynamic> listOvr = res['data'];
+
+            final List<OvertimeModel> result =
+                listOvr
+                    .map(
+                      (e) =>
+                          OvertimeModel.fromJson(Map<String, dynamic>.from(e)),
+                    )
+                    .toList();
+
             return result;
           } else {
-            showToast(res['message']);
+            // Tidak ada data = return list kosong
+            return <OvertimeModel>[];
           }
-        } else {
-          // print(res);
-          return res; // ✅ WAJIB return
         }
-      } else {
-        return {'success': false};
+
+        // =========================================================
+        // ACCEPT / REJECT / ACTION LAIN
+        // =========================================================
+        return res;
       }
-    } catch (e) {
+
+      return {
+        'success': false,
+        'message':
+            res is Map ? res['message'] ?? 'Request gagal' : 'Request gagal',
+      };
+    } on TimeoutException {
+      return {'success': false, 'message': 'Server tidak merespon'};
+    } on SocketException {
+      return {'success': false, 'message': 'Tidak dapat terhubung ke server'};
+    } catch (e, stackTrace) {
+      debugPrint('[OVERTIME API] ERROR : $e');
+      debugPrint('[OVERTIME API] STACK : $stackTrace');
+
       return {'success': false, 'error': e.toString()};
     }
   }

@@ -307,8 +307,7 @@ class ReqOvertimeView extends StatelessWidget {
                                         branchCode: userData.kodeCabang!,
                                         idUser: userData.id!,
                                         idOvt: item.id!,
-                                        date1: item.initDate!,
-                                        date2: item.endDate!,
+                                        idUsrOvt: item.idUser!,
                                       );
                                     },
                                   ),
@@ -324,8 +323,7 @@ class ReqOvertimeView extends StatelessWidget {
                                         idUser: userData.id!,
                                         branchCode: userData.kodeCabang!,
                                         idOvt: item.id!,
-                                        date1: item.initDate!,
-                                        date2: item.endDate!,
+                                        idUsrOvt: item.idUser!,
                                       );
                                     },
                                   ),
