@@ -135,11 +135,13 @@ class RequestLeaveView extends GetView<LeaveController> {
 
                             final bool isExpired = !now.isBefore(expiredAt);
 
+                            final String itemStatus = leave.status ?? 'pending';
+
+                            // Hanya status pending yang bisa berubah menjadi expired.
                             final String status =
-                                isExpired
+                                itemStatus == 'pending' && isExpired
                                     ? 'expired'
-                                    : (leave.status ?? 'pending');
-                            // final status = leave.status ?? 'pending';
+                                    : itemStatus;
 
                             final color = getStatusColor(status);
 

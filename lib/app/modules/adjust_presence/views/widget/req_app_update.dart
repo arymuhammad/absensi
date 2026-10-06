@@ -231,11 +231,14 @@ class ReqAppUpdate extends GetView {
 
                             final bool isExpired = !now.isBefore(expiredAt);
 
+                            final String itemStatus =
+                                excData.statusExcep ?? 'pending';
+
+                            // Hanya status pending yang bisa berubah menjadi expired.
                             final String status =
-                                isExpired
+                                itemStatus == 'pending' && isExpired
                                     ? 'expired'
-                                    : (excData.statusExcep ?? 'pending');
-                            // final status = excData.statusExcep ?? 'pending';
+                                    : itemStatus;
                             final color = getStatusColor(status);
 
                             return ExpansionTileItem(

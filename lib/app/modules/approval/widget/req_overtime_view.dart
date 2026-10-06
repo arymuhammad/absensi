@@ -103,8 +103,13 @@ class ReqOvertimeView extends StatelessWidget {
 
                   final bool isExpired = !now.isBefore(expiredAt);
 
+                  final String itemStatus = item.status ?? 'pending';
+
+                  // Hanya status pending yang bisa berubah menjadi expired.
                   final String status =
-                      isExpired ? 'expired' : (item.status ?? 'pending');
+                      itemStatus == 'pending' && isExpired
+                          ? 'expired'
+                          : itemStatus;
 
                   final color = getStatusColor(status);
 
