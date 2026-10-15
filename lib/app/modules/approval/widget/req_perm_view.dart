@@ -40,6 +40,8 @@ class ReqPermView extends StatelessWidget {
             parentId: userData.parentId!,
             level: userData.level!,
             type: "get_pending_req_permission",
+            date1: ctrl.date1.text,
+            date2: ctrl.date2.text,
             status: "pending",
           );
         },

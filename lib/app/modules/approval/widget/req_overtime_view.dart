@@ -37,6 +37,8 @@ class ReqOvertimeView extends StatelessWidget {
             branchCode: userData.kodeCabang!,
             level: userData.level!,
             type: "",
+            date1: ctrl.date1.text,
+            date2: ctrl.date2.text,
             status: "pending",
           );
         },
