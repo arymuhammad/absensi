@@ -368,8 +368,7 @@
 				CURRENT_PROJECT_VERSION = 47;
 				DEVELOPMENT_TEAM = 4PYK8X6245;
 				ENABLE_BITCODE = NO;
-				FLUTTER_BUILD_NAME = 2.3.53;
-				FLUTTER_BUILD_NUMBER = 47;
+				
 				INFOPLIST_FILE = Runner/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "URBAN&CO Spot";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
@@ -512,8 +511,7 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = 4PYK8X6245;
 				ENABLE_BITCODE = NO;
-				FLUTTER_BUILD_NAME = 2.3.53;
-				FLUTTER_BUILD_NUMBER = 47;
+				
 				INFOPLIST_FILE = Runner/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "URBAN&CO Spot";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
@@ -547,8 +545,7 @@
 				CURRENT_PROJECT_VERSION = 47;
 				DEVELOPMENT_TEAM = 4PYK8X6245;
 				ENABLE_BITCODE = NO;
-				FLUTTER_BUILD_NAME = 2.3.53;
-				FLUTTER_BUILD_NUMBER = 47;
+				
 				INFOPLIST_FILE = Runner/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "URBAN&CO Spot";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
