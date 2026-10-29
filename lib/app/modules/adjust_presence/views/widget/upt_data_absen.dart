@@ -1,9 +1,9 @@
-import 'package:absensi/app/data/helper/convert_time.dart';
+﻿import 'package:absensi/app/data/helper/convert_time.dart';
 import 'package:absensi/app/modules/adjust_presence/controllers/adjust_presence_controller.dart';
 import 'package:absensi/app/modules/home/controllers/home_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:icons_plus/icons_plus.dart';
+import 'package:icons_flutter/icons_flutter.dart';
 import 'package:step_progress/step_progress.dart';
 import 'package:widget_zoom/widget_zoom.dart';
 
@@ -119,12 +119,12 @@ class UptDataAbsen extends StatelessWidget {
 
       final val = getApprovalValue(data, index);
 
-      // ❌ reject
+      // âŒ reject
       if (val == 'reject') {
         return const Icon(Icons.close, color: Colors.white, size: 18);
       }
 
-      // 🔥 cek step sebelumnya
+      // ðŸ”¥ cek step sebelumnya
       bool previousApproved = true;
 
       for (int i = 1; i < index; i++) {
@@ -136,17 +136,17 @@ class UptDataAbsen extends StatelessWidget {
         }
       }
 
-      // ⏳ belum waktunya
+      // â³ belum waktunya
       if (!previousApproved) {
         return const Icon(Icons.hourglass_empty, color: Colors.grey);
       }
 
-      // ⏳ belum approve
+      // â³ belum approve
       if (isEmptyApproval(val)) {
         return const Icon(Icons.hourglass_empty, color: Colors.grey);
       }
 
-      // ✅ approved
+      // âœ… approved
       return const Icon(Icons.check, color: Colors.white, size: 18);
     }
 
@@ -200,7 +200,7 @@ class UptDataAbsen extends StatelessWidget {
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Icon(Iconsax.clock_outline),
+                    const Icon(Typicons.clock),
                     const SizedBox(width: 5),
                     Text('${data.jamAbsenMasuk!} (IN)', style: titleTextStyle),
                   ],
@@ -229,7 +229,7 @@ class UptDataAbsen extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    const Icon(Iconsax.clock_outline),
+                    const Icon(Typicons.clock),
                     const SizedBox(width: 5),
                     Text(
                       '${data.jamAbsenPulang!} (OUT)',

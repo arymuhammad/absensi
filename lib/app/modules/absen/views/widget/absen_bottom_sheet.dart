@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:slider_button/slider_button.dart';
 import '../../../../data/helper/app_colors.dart';
@@ -8,7 +8,6 @@ import '../../../login/controllers/login_controller.dart';
 import '../../controllers/absen_controller.dart';
 import 'absen_form.dart';
 import 'visit_form.dart';
-import 'package:icons_plus/icons_plus.dart';
 
 class AbsenBottomSheet extends StatelessWidget {
   AbsenBottomSheet({
@@ -292,7 +291,7 @@ class AbsenBottomSheet extends StatelessWidget {
                       ),
                       icon: Icon(
                         controller.stsAbsenSelected.value.contains("Break")
-                            ? Iconsax.coffee_bold
+                            ? Icons.coffee_maker
                             : Icons.double_arrow_rounded,
                         color: AppColors.itemsBackground,
                       ),

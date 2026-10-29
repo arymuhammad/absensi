@@ -1,4 +1,4 @@
-import 'dart:io';
+﻿import 'dart:io';
 import 'dart:math' as math;
 
 import 'package:absensi/app/data/helper/calendar_badge.dart';
@@ -10,7 +10,7 @@ import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:icons_plus/icons_plus.dart';
+import 'package:icons_flutter/icons_flutter.dart';
 
 import '../../../data/helper/app_colors.dart';
 import '../../../data/helper/helper_ui.dart';
@@ -116,7 +116,9 @@ class ReqOvertimeView extends StatelessWidget {
                   final color = getStatusColor(status);
 
                   final duration = getDuration(
+                    item.initDate ?? '',
                     item.start ?? '',
+                    item.endDate ?? '',
                     item.end ?? '',
                   );
 
@@ -149,7 +151,7 @@ class ReqOvertimeView extends StatelessWidget {
                             Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                /// 🔹 AVATAR
+                                /// ðŸ”¹ AVATAR
                                 Column(
                                   children: [
                                     CircleAvatar(
@@ -184,13 +186,13 @@ class ReqOvertimeView extends StatelessWidget {
 
                                 const SizedBox(width: 5),
 
-                                /// 🔹 CONTENT
+                                /// ðŸ”¹ CONTENT
                                 Expanded(
                                   child: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      /// 🔸 NAME + STATUS
+                                      /// ðŸ”¸ NAME + STATUS
                                       Row(
                                         mainAxisAlignment:
                                             MainAxisAlignment.spaceBetween,
@@ -227,7 +229,7 @@ class ReqOvertimeView extends StatelessWidget {
 
                                       const SizedBox(height: 5),
 
-                                      /// 🔸 STORE LOC
+                                      /// ðŸ”¸ STORE LOC
                                       Row(
                                         children: [
                                           const Icon(
@@ -249,7 +251,7 @@ class ReqOvertimeView extends StatelessWidget {
 
                                       const SizedBox(height: 5),
 
-                                      /// 🔸 TIME
+                                      /// ðŸ”¸ TIME
                                       Row(
                                         children: [
                                           const Icon(
@@ -264,7 +266,7 @@ class ReqOvertimeView extends StatelessWidget {
 
                                       const SizedBox(height: 4),
 
-                                      /// 🔸 DURATION
+                                      /// ðŸ”¸ DURATION
                                       Text(
                                         'Durasi: $duration',
                                         style: TextStyle(
@@ -285,7 +287,7 @@ class ReqOvertimeView extends StatelessWidget {
 
                                       const SizedBox(height: 4),
 
-                                      /// 🔸 CREATED AT
+                                      /// ðŸ”¸ CREATED AT
                                       const Text(
                                         'Diajukan pada',
                                         style: TextStyle(
@@ -425,7 +427,7 @@ class ReqOvertimeView extends StatelessWidget {
                               await ctrl.exportOvertimeCsv();
                             },
                             child: Icon(
-                              FontAwesome.file_excel_solid,
+                              Typicons.export_icon,
                               color: isDark ? Colors.blue : Colors.white,
                             ),
                           ),

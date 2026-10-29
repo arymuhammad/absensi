@@ -1,10 +1,10 @@
-import 'dart:io';
+﻿import 'dart:io';
 
 import 'package:absensi/app/data/helper/custom_dialog.dart';
 import 'package:absensi/app/modules/shared/text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:icons_plus/icons_plus.dart';
+import 'package:icons_flutter/icons_flutter.dart';
 
 import '../../../data/helper/app_colors.dart';
 import '../../../data/helper/const.dart';
@@ -45,7 +45,7 @@ class ListUserView extends StatelessWidget {
                 enabled: true,
                 label: 'Search user',
                 controller: ctrl.filterUser,
-                icon: const Icon(Iconsax.user_search_bold),
+                icon: const Icon(Typicons.search),
                 maxLines: 1,
                 onChanged: (val) => ctrl.searchKeyword.value = val,
                 isDark: isDark,

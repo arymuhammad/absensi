@@ -1,11 +1,11 @@
-import 'package:absensi/app/data/helper/app_colors.dart';
+﻿import 'package:absensi/app/data/helper/app_colors.dart';
 import 'package:absensi/app/data/helper/calendar_badge.dart';
 import 'package:absensi/app/modules/absen/controllers/absen_controller.dart';
 import 'package:absensi/app/data/helper/const.dart';
 import 'package:absensi/app/modules/shared/container_main_color.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:icons_plus/icons_plus.dart';
+import 'package:icons_flutter/icons_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -561,7 +561,7 @@ class MonitoringAbsenView extends GetView {
             searchForm(context, userData, isDark, absenC);
           },
           child: Icon(
-            Iconsax.calendar_search_outline,
+           Typicons.calendar_outlilne,
             color: isDark ? Colors.blue : Colors.white,
           ),
         ),

@@ -1,4 +1,4 @@
-import 'dart:io';
+﻿import 'dart:io';
 import 'dart:math' as math;
 import 'package:absensi/app/data/helper/app_colors.dart';
 import 'package:absensi/app/data/helper/const.dart';
@@ -11,7 +11,7 @@ import 'package:expansion_tile_group/expansion_tile_group.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:icons_plus/icons_plus.dart';
+import 'package:icons_flutter/icons_flutter.dart';
 import '../../../../data/helper/helper_ui.dart';
 import '../../../../data/helper/loading_platform.dart';
 import '../../../home/controllers/home_controller.dart';
@@ -37,7 +37,7 @@ class ReqAppUpdate extends GetView {
           Row(
             children: [
               const Icon(
-                Iconsax.task_outline,
+              Typicons.th_list,
                 color: AppColors.contentColorBlue,
               ),
               const SizedBox(width: 5),
@@ -319,7 +319,7 @@ class ReqAppUpdate extends GetView {
                                   Row(
                                     children: [
                                       Icon(
-                                        Iconsax.calendar_1_outline,
+                                        Typicons.calendar,
                                         color:
                                             isDark
                                                 ? Colors.grey[600]

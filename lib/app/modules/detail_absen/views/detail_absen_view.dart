@@ -1,4 +1,4 @@
-import 'package:absensi/app/data/helper/app_colors.dart';
+﻿import 'package:absensi/app/data/helper/app_colors.dart';
 import 'package:absensi/app/data/helper/const.dart';
 import 'package:absensi/app/data/helper/duration_count.dart';
 import 'package:absensi/app/data/helper/format_waktu.dart';
@@ -6,7 +6,7 @@ import 'package:absensi/app/modules/detail_absen/views/widget/edit_data_absen.da
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
-import 'package:icons_plus/icons_plus.dart';
+import 'package:icons_flutter/icons_flutter.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../services/service_api.dart';
@@ -27,7 +27,7 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
           double.parse(detailData["lat_masuk"]),
           double.parse(detailData["long_masuk"]),
         ),
-        child: const Icon(HeroIcons.map_pin, color: AppColors.contentColorBlue),
+        child: const Icon(Typicons.pin_outline, color: AppColors.contentColorBlue),
       ),
     ];
 
@@ -43,7 +43,7 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
             detailData["long_pulang"] != "" ? detailData["long_pulang"] : "0.0",
           ),
         ),
-        child: const Icon(HeroIcons.map_pin, color: AppColors.contentColorBlue),
+        child: const Icon(Typicons.pin_outline, color: AppColors.contentColorBlue),
       ),
     ];
 

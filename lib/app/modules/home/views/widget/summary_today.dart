@@ -1,4 +1,4 @@
-import 'dart:io';
+﻿import 'dart:io';
 
 import 'package:absensi/app/data/model/visit_model.dart';
 import 'package:absensi/app/modules/absen/controllers/absen_controller.dart';
@@ -6,7 +6,7 @@ import 'package:absensi/app/modules/home/controllers/home_controller.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:icons_plus/icons_plus.dart';
+import 'package:icons_flutter/icons_flutter.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../data/helper/app_colors.dart';
@@ -152,10 +152,10 @@ class SummaryToday extends StatelessWidget {
 
                                       logC.selectedMenu(2);
 
-                                      // 🔑 VALIDASI STATUS ABSEN TERKINI (DB / SERVER)
+                                      // ðŸ”‘ VALIDASI STATUS ABSEN TERKINI (DB / SERVER)
                                       await absenC.refreshAbsen(userData);
 
-                                      // ⛔ Jika masih wajib checkout, jangan lanjut ambil lokasi
+                                      // â›” Jika masih wajib checkout, jangan lanjut ambil lokasi
                                       if (absenC.mustCheckoutYesterday.value) {
                                         showToast(
                                           'You must Check Out yesterday first',
@@ -163,7 +163,7 @@ class SummaryToday extends StatelessWidget {
                                         return;
                                       }
 
-                                      // 📍 BARU ambil lokasi
+                                      // ðŸ“ BARU ambil lokasi
                                       // loadingDialog(
                                       //   'Finding your location',
                                       //   '',
@@ -220,7 +220,7 @@ class SummaryToday extends StatelessWidget {
                                 fit: BoxFit.contain,
                               ),
 
-                              /// ✅ BUTTON FIX DI BOTTOM
+                              /// âœ… BUTTON FIX DI BOTTOM
                               // Align(
                               //   alignment: Alignment.bottomCenter,
                               //   child: Padding(
@@ -233,10 +233,10 @@ class SummaryToday extends StatelessWidget {
                               //     child: GestureDetector(
                               //       onTap: () async {
                               //         logC.selectedMenu(2);
-                              //         // 🔑 VALIDASI STATUS ABSEN TERKINI (DB / SERVER)
+                              //         // ðŸ”‘ VALIDASI STATUS ABSEN TERKINI (DB / SERVER)
                               //         await absenC.refreshAbsen(userData);
 
-                              //         // ⛔ Jika masih wajib checkout, jangan lanjut ambil lokasi
+                              //         // â›” Jika masih wajib checkout, jangan lanjut ambil lokasi
                               //         if (absenC.mustCheckoutYesterday.value) {
                               //           showToast(
                               //             'You must Check Out yesterday first',
@@ -244,7 +244,7 @@ class SummaryToday extends StatelessWidget {
                               //           return;
                               //         }
 
-                              //         // 📍 BARU ambil lokasi
+                              //         // ðŸ“ BARU ambil lokasi
                               //         // loadingDialog(
                               //         //   'Finding your location',
                               //         //   '',
@@ -297,7 +297,7 @@ class SummaryToday extends StatelessWidget {
                                 Row(
                                   children: [
                                     const Icon(
-                                      HeroIcons.map_pin,
+                                     Typicons.pin_outline,
                                       color: AppColors.contentColorBlue,
                                       size: 20,
                                     ),
@@ -324,7 +324,7 @@ class SummaryToday extends StatelessWidget {
                                 Row(
                                   children: [
                                     const Icon(
-                                      Iconsax.clock_bold,
+                                   Typicons.clock,
                                       color: AppColors.contentColorBlue,
                                       size: 20,
                                     ),
@@ -400,7 +400,7 @@ class SummaryToday extends StatelessWidget {
                                         ),
                                       ),
                                       builder: (context, snapshot) {
-                                        // ⛔ JIKA SUDAH CHECK OUT, JANGAN TAMPILKAN APA-APA
+                                        // â›” JIKA SUDAH CHECK OUT, JANGAN TAMPILKAN APA-APA
                                         final jamPulang =
                                             absenC.dataAbsen[0].jamAbsenPulang;
                                         if (jamPulang != null &&
@@ -411,7 +411,7 @@ class SummaryToday extends StatelessWidget {
                                         if (snapshot.hasData) {
                                           final remaining = snapshot.data!;
 
-                                          // ✅ WAKTU SUDAH HABIS & BELUM CHECKOUT
+                                          // âœ… WAKTU SUDAH HABIS & BELUM CHECKOUT
                                           if (remaining == Duration.zero) {
                                             return const Row(
                                               children: [
@@ -430,7 +430,7 @@ class SummaryToday extends StatelessWidget {
                                             );
                                           }
 
-                                          // ⏳ MASIH COUNTDOWN
+                                          // â³ MASIH COUNTDOWN
                                           return Row(
                                             children: [
                                               const Icon(
@@ -474,7 +474,7 @@ class SummaryToday extends StatelessWidget {
                                           );
                                         }
 
-                                        // ⏱️ LOADING STREAM
+                                        // â±ï¸ LOADING STREAM
                                         return const Row(
                                           children: [
                                             Text(

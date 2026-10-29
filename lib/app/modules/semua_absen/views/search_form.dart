@@ -1,4 +1,4 @@
-import 'dart:io';
+﻿import 'dart:io';
 
 import 'package:absensi/app/data/model/login_model.dart';
 import 'package:absensi/app/modules/absen/controllers/absen_controller.dart';
@@ -9,7 +9,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:get/get.dart';
-import 'package:icons_plus/icons_plus.dart';
+import 'package:icons_flutter/icons_flutter.dart';
 import 'package:intl/intl.dart';
 
 searchForm(
@@ -39,7 +39,7 @@ searchForm(
             children: [
               const Row(
                 children: [
-                  Icon(Iconsax.search_zoom_out_outline),
+                  Icon(Typicons.search),
                   SizedBox(width: 5),
                   Text(
                     'Cari Data Absensi',
@@ -67,7 +67,7 @@ searchForm(
                           decoration: InputDecoration(
                             contentPadding: const EdgeInsets.all(0.5),
                             prefixIcon: const Icon(
-                              Iconsax.calendar_edit_outline,
+                            Typicons.calendar_outlilne,
                             ),
                             hintText: 'Tanggal Awal',
                             filled: true,
@@ -97,7 +97,7 @@ searchForm(
                           decoration: InputDecoration(
                             contentPadding: const EdgeInsets.all(0.5),
                             prefixIcon: const Icon(
-                              Iconsax.calendar_edit_outline,
+                             Typicons.calendar_outlilne,
                             ),
                             hintText: 'Tanggal Akhir',
                             filled: true,

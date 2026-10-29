@@ -68,13 +68,16 @@ void main() async {
     DeviceOrientation.portraitDown,
   ]);
 
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent, // <-- transparan
-      statusBarIconBrightness: Brightness.light, // icon putih
-      statusBarBrightness: Brightness.dark, // iOS
-      // systemNavigationBarColor: Color(0xFF1B2541),
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.light,
+      statusBarBrightness: Brightness.dark,
+      systemNavigationBarColor: Colors.transparent,
       systemNavigationBarDividerColor: Colors.transparent,
+      systemNavigationBarIconBrightness: Brightness.dark,
     ),
   );
 
@@ -158,36 +161,34 @@ void main() async {
       ),
     );
   };
-// print("STEP 1");
+  // print("STEP 1");
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
- await FirebaseMessaging.instance.requestPermission(
-      alert: true,
-      badge: true,
-      sound: true,
-    );
+  await FirebaseMessaging.instance.requestPermission(
+    alert: true,
+    badge: true,
+    sound: true,
+  );
   // iOS foreground notification
-await FirebaseMessaging.instance
-    .setForegroundNotificationPresentationOptions(
-  alert: true,
-  badge: true,
-  sound: true,
-);
+  await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
+    alert: true,
+    badge: true,
+    sound: true,
+  );
   // print("STEP 2");
   await NotificationHelper.init(); // init notif on bg
   // print("STEP 3");
   try {
-  pendingLaunchPayload =
-      await NotificationHelper.getLaunchPayload();
+    pendingLaunchPayload = await NotificationHelper.getLaunchPayload();
 
-  // print("PAYLOAD = $pendingLaunchPayload");
-} catch (e, s) {
-  // print("ERROR PAYLOAD");
-  // print(e);
-  // print(s);
-}
+    // print("PAYLOAD = $pendingLaunchPayload");
+  } catch (e, s) {
+    // print("ERROR PAYLOAD");
+    // print(e);
+    // print(s);
+  }
   // debugPrint("NOTIF_DEBUG: MAIN PAYLOAD = $pendingLaunchPayload");
-// print("STEP 4");
+  // print("STEP 4");
   FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
 
   RemoteMessage? initialMessage =
@@ -253,6 +254,13 @@ await FirebaseMessaging.instance
           useMaterial3: false,
           canvasColor: AppColors.pageBackground,
           fontFamily: 'Nunito',
+          appBarTheme: const AppBarTheme(
+            systemOverlayStyle: SystemUiOverlayStyle(
+              statusBarColor: Colors.transparent,
+              statusBarIconBrightness: Brightness.light,
+              statusBarBrightness: Brightness.dark,
+            ),
+          ),
         ),
 
         darkTheme: ThemeData(
@@ -260,7 +268,15 @@ await FirebaseMessaging.instance
           useMaterial3: false,
           canvasColor: const Color(0xFF121212),
           fontFamily: 'Nunito',
+          appBarTheme: const AppBarTheme(
+            systemOverlayStyle: SystemUiOverlayStyle(
+              statusBarColor: Colors.transparent,
+              statusBarIconBrightness: Brightness.light,
+              statusBarBrightness: Brightness.dark,
+            ),
+          ),
         ),
+
         themeMode: themeC.themeMode.value,
         home: const RootView(),
         localizationsDelegates: const [MonthYearPickerLocalizations.delegate],

@@ -1,4 +1,4 @@
-import 'dart:async';
+﻿import 'dart:async';
 import 'dart:io';
 import 'dart:math' as math;
 import 'dart:ui';
@@ -8,12 +8,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
-import 'package:icons_plus/icons_plus.dart';
 
 import 'package:absensi/app/data/helper/app_colors.dart';
 import 'package:absensi/app/data/helper/const.dart';
 import 'package:absensi/app/data/helper/custom_dialog.dart';
 import 'package:absensi/app/modules/absen/controllers/absen_controller.dart';
+import 'package:icons_flutter/icons_flutter.dart';
 import 'package:intl/intl.dart';
 
 import '../../../data/helper/duration_count.dart';
@@ -68,13 +68,13 @@ class SemuaAbsenView extends GetView {
                                 ? const ColorScheme.dark(
                                   primary:
                                       Colors
-                                          .blueAccent, // 🔥 warna selection (range highlight)
+                                          .blueAccent, // ðŸ”¥ warna selection (range highlight)
                                   onPrimary:
                                       Colors
-                                          .white, // 🔥 warna text di tanggal terpilih
+                                          .white, // ðŸ”¥ warna text di tanggal terpilih
                                   secondary:
                                       Colors
-                                          .blueAccent, // 🔥 untuk hover / range
+                                          .blueAccent, // ðŸ”¥ untuk hover / range
                                   onSurface: Colors.white, // text normal
                                   surface: Color(0xFF121212),
                                 )
@@ -156,11 +156,11 @@ class SemuaAbsenView extends GetView {
           controller: scrollC,
           physics: const AlwaysScrollableScrollPhysics(),
           slivers: [
-            /// 🔥 STICKY TAB
+            /// ðŸ”¥ STICKY TAB
             SliverPersistentHeader(
               pinned: true,
               delegate: HistoryTabHeaderDelegate(
-                height: 62, // ⬅️ HARUS SAMA
+                height: 62, // â¬…ï¸ HARUS SAMA
                 child: HistoryRangeTab(
                   selectedIndex: selectedTab,
                   scrollController: scrollC,
@@ -169,7 +169,7 @@ class SemuaAbsenView extends GetView {
               ),
             ),
 
-            /// 🔹 CONTENT
+            /// ðŸ”¹ CONTENT
             SliverPadding(
               padding: const EdgeInsets.all(12),
               sliver: Obx(() {
@@ -390,7 +390,7 @@ class SemuaAbsenView extends GetView {
         ),
       ),
 
-      /// 🔹 PDF BUTTON
+      /// ðŸ”¹ PDF BUTTON
       floatingActionButton: Obx(
         () => Visibility(
           visible: absenC.searchAbsen.isNotEmpty,
@@ -402,7 +402,7 @@ class SemuaAbsenView extends GetView {
               await absenC.exportPdf();
               Get.back();
             },
-            child: const Icon(FontAwesome.file_pdf_solid, color: Colors.white),
+            child: const Icon(FontAwesome.file_pdf_o, color: Colors.white),
           ),
         ),
       ),
@@ -497,7 +497,7 @@ class _HistoryRangeTabState extends State<HistoryRangeTab> {
         if (v == 2) {
           isSearching.value = true;
 
-          /// 🧲 AUTO SCROLL KE ATAS
+          /// ðŸ§² AUTO SCROLL KE ATAS
           widget.scrollController.animateTo(
             0,
             duration: const Duration(milliseconds: 350),
@@ -584,7 +584,7 @@ class HistoryTabHeaderDelegate extends SliverPersistentHeaderDelegate {
   }
 }
 
-/// 🔥 ANIMATED CARD
+/// ðŸ”¥ ANIMATED CARD
 class AnimatedHistoryCard extends StatelessWidget {
   final Widget child;
   final int index;

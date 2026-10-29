@@ -1,8 +1,9 @@
-import 'package:absensi/app/data/helper/const.dart';
+﻿import 'package:absensi/app/data/helper/const.dart';
 import 'package:flutter/material.dart';
 import 'package:absensi/app/data/helper/app_colors.dart';
 import 'package:expansion_tile_group/expansion_tile_group.dart';
-import 'package:icons_plus/icons_plus.dart';
+import 'package:icons_flutter/icons_flutter.dart';
+
 
 class FaqView extends StatelessWidget {
   const FaqView({super.key});
@@ -50,7 +51,7 @@ class FaqView extends StatelessWidget {
                       Row(
                         children: [
                           Icon(
-                            Iconsax.clock_bold,
+                           Typicons.clock,
                             color: Colors.blue,
                             size: 20,
                           ),
@@ -98,7 +99,7 @@ class FaqView extends StatelessWidget {
                       Row(
                         children: [
                           Icon(
-                            Iconsax.bag_timer_bold,
+                            Typicons.clock,
                             color: Colors.blue,
                             size: 20,
                           ),
@@ -147,7 +148,7 @@ class FaqView extends StatelessWidget {
                       Row(
                         children: [
                           Icon(
-                            Iconsax.shuffle_outline,
+                          Typicons.shuffle,
                             color: Colors.blue,
                             size: 20,
                           ),

@@ -1,7 +1,7 @@
-import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
+﻿import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:icons_plus/icons_plus.dart';
+import 'package:icons_flutter/icons_flutter.dart';
 import 'package:intl/intl.dart';
 
 import '../../../data/helper/app_colors.dart';
@@ -124,7 +124,7 @@ bottomSearchLive(
                         style: const TextStyle(fontSize: 16),
                         decoration: InputDecoration(
                           contentPadding: const EdgeInsets.all(0.5),
-                          prefixIcon: const Icon(Iconsax.calendar_edit_outline),
+                          prefixIcon: const Icon(Typicons.calendar_outlilne),
                           hintText: 'Tanggal Awal',
                           filled: true,
                           fillColor: isDark ? Colors.black : Colors.white,
@@ -150,7 +150,7 @@ bottomSearchLive(
                         style: const TextStyle(fontSize: 16),
                         decoration: InputDecoration(
                           contentPadding: const EdgeInsets.all(0.5),
-                          prefixIcon: const Icon(Iconsax.calendar_edit_outline),
+                          prefixIcon: const Icon(Typicons.calendar_outlilne),
                           hintText: 'Tanggal Akhir',
                           filled: true,
                           fillColor: isDark ? Colors.black : Colors.white,

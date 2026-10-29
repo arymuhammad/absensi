@@ -1,4 +1,4 @@
-import 'dart:io';
+﻿import 'dart:io';
 import 'dart:math' as math;
 
 import 'package:absensi/app/data/helper/app_colors.dart';
@@ -11,10 +11,10 @@ import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 import 'package:expansion_tile_group/expansion_tile_group.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:icons_flutter/icons_flutter.dart';
 // import 'package:startapp_sdk/startapp.dart';
 import 'package:step_progress/step_progress.dart';
 import 'package:get/get.dart';
-import 'package:icons_plus/icons_plus.dart';
 import '../../../data/helper/const.dart';
 import '../../../data/helper/helper_ui.dart';
 import '../../approval/widget/bottom_search_live.dart';
@@ -359,8 +359,7 @@ class LeaveView extends GetView<LeaveController> {
                                                 Row(
                                                   children: [
                                                     const Icon(
-                                                      Iconsax
-                                                          .calendar_1_outline,
+                                                    Typicons.calendar_outlilne,
                                                       color: Colors.blue,
                                                       size: 20,
                                                     ),
@@ -420,7 +419,7 @@ class LeaveView extends GetView<LeaveController> {
                                                     ),
                                                   ),
 
-                                                  // ⋮ HANYA PENDING
+                                                  // â‹® HANYA PENDING
                                                   if (leaveStats == "pending")
                                                     liveRemove(
                                                       context,

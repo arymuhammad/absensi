@@ -1,8 +1,8 @@
-import 'dart:io';
+﻿import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:icons_plus/icons_plus.dart';
+import 'package:icons_flutter/icons_flutter.dart';
 import 'package:signature/signature.dart';
 
 import '../../../../data/helper/app_colors.dart';
@@ -40,7 +40,7 @@ class LeaveAddSheet extends StatelessWidget {
           ),
           child: Column(
             children: [
-              // 🔹 HANDLE + CLOSE
+              // ðŸ”¹ HANDLE + CLOSE
               SizedBox(
                 height: 40,
                 child: Stack(
@@ -87,7 +87,7 @@ class LeaveAddSheet extends StatelessWidget {
                 ),
               ),
 
-              // 🔹 TITLE
+              // ðŸ”¹ TITLE
               Text(
                 'Form Permohonan Cuti',
                 style: titleTextStyle.copyWith(fontSize: 16),
@@ -95,7 +95,7 @@ class LeaveAddSheet extends StatelessWidget {
 
               const Divider(),
 
-              // 🔹 CONTENT
+              // ðŸ”¹ CONTENT
               Expanded(
                 child: SingleChildScrollView(
                   controller: scrollController,
@@ -251,7 +251,7 @@ class LeaveAddSheet extends StatelessWidget {
 
                       const SizedBox(height: 10),
 
-                      /// 🔹 TABLE
+                      /// ðŸ”¹ TABLE
                       Obx(
                         () => Visibility(
                           visible:
@@ -323,7 +323,7 @@ class LeaveAddSheet extends StatelessWidget {
                         label: 'Alasan cuti',
                         maxLines: 3,
                         isDark: isDark,
-                        icon: const Icon(FontAwesome.pencil_solid, size: 18),
+                        icon: const Icon(Typicons.pencil, size: 18),
                       ),
 
                       const SizedBox(height: 10),
@@ -335,7 +335,7 @@ class LeaveAddSheet extends StatelessWidget {
                         maxLines: 3,
                         isDark: isDark,
                         icon: const Icon(
-                          FontAwesome.house_user_solid,
+                        Typicons.home,
                           size: 18,
                         ),
                       ),
@@ -349,7 +349,7 @@ class LeaveAddSheet extends StatelessWidget {
                         hint: '6285xxxxxx',
                         keyboardType: TextInputType.number,
                         isDark: isDark,
-                        icon: const Icon(Iconsax.whatsapp_bold, size: 18),
+                        icon: const Icon(FontAwesome.whatsapp, size: 18),
                       ),
 
                       const SizedBox(height: 10),
@@ -494,7 +494,7 @@ class LeaveAddSheet extends StatelessWidget {
                         ),
                       ),
 
-                      /// 🔹 SIGN BUTTON
+                      /// ðŸ”¹ SIGN BUTTON
                       Obx(() {
                         final String leaveType = leaveC.selectedLeaveType.value;
                         final String selectedLeave = leaveC.selectedLeave.value;
@@ -564,7 +564,7 @@ class LeaveAddSheet extends StatelessWidget {
     );
   }
 
-  /// 🔥 SIGNATURE (TETAP SAMA LOGIC LU)
+  /// ðŸ”¥ SIGNATURE (TETAP SAMA LOGIC LU)
   void openDialogSign(BuildContext context) {
     Get.bottomSheet(
       Container(
@@ -587,7 +587,7 @@ class LeaveAddSheet extends StatelessWidget {
                 ),
                 ElevatedButton(
                   onPressed: () async {
-                    // 🔥 VALIDASI LU TETAP
+                    // ðŸ”¥ VALIDASI LU TETAP
                     if (leaveC.datePick1.text.isEmpty ||
                         leaveC.datePick2.text.isEmpty) {
                       showToast("Tanggal kosong");
