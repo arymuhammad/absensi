@@ -1,10 +1,10 @@
-import 'package:absensi/app/data/model/req_app_model.dart';
+﻿import 'package:absensi/app/data/model/req_app_model.dart';
 import 'package:absensi/app/modules/adjust_presence/controllers/adjust_presence_controller.dart';
 import 'package:absensi/app/modules/home/controllers/home_controller.dart';
 import 'package:absensi/app/modules/shared/text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:icons_plus/icons_plus.dart';
+import 'package:icons_flutter/icons_flutter.dart';
 import 'package:step_progress/step_progress.dart';
 import 'package:widget_zoom/widget_zoom.dart';
 
@@ -82,8 +82,8 @@ class UptMasukPulang extends StatelessWidget {
       }
       // }
 
-      // 🔥 INI YANG DIPERBAIKI
-      // selain parentId 3 → hanya pakai acc2 & acc4
+      // ðŸ”¥ INI YANG DIPERBAIKI
+      // selain parentId 3 â†’ hanya pakai acc2 & acc4
       // switch (index) {
       //   case 1:
       //     return data.acc2; // atasan
@@ -99,7 +99,7 @@ class UptMasukPulang extends StatelessWidget {
     //   final dataUser = auth.logUser.value;
     //   bool isEmpty(String? val) => val == null || val.isEmpty;
 
-    //   // 🔴 reject tetap global
+    //   // ðŸ”´ reject tetap global
     //   if (data.acc1 == 'reject' ||
     //       data.acc2 == 'reject' ||
     //       data.acc3 == 'reject' ||
@@ -108,18 +108,18 @@ class UptMasukPulang extends StatelessWidget {
     //   }
 
     //   // ======================
-    //   // 🔥 KHUSUS PARENT 3
+    //   // ðŸ”¥ KHUSUS PARENT 3
     //   // ======================
     //   // if (data.parentId == "3") {
     //   final skipStore = dataUser.level == "19" || dataUser.level == "20";
 
     //   if (skipStore) {
-    //     // acc2 → acc3 → acc4
+    //     // acc2 â†’ acc3 â†’ acc4
     //     if (isEmpty(data.acc2) || isEmpty(data.acc3) || isEmpty(data.acc4)) {
     //       return "pending";
     //     }
     //   } else {
-    //     // acc1 → acc2 → acc3 → acc4
+    //     // acc1 â†’ acc2 â†’ acc3 â†’ acc4
     //     if (isEmpty(data.acc1) ||
     //         isEmpty(data.acc2) ||
     //         isEmpty(data.acc3) ||
@@ -132,10 +132,10 @@ class UptMasukPulang extends StatelessWidget {
     //   // }
 
     //   // ======================
-    //   // 🔥 SEMUA PARENT LAIN
+    //   // ðŸ”¥ SEMUA PARENT LAIN
     //   // ======================
-    //   // Apply → Atasan → HR
-    //   // 👉 acc2 & acc4 doang
+    //   // Apply â†’ Atasan â†’ HR
+    //   // ðŸ‘‰ acc2 & acc4 doang
     //   // if (isEmpty(data.acc2) || isEmpty(data.acc4)) {
     //   //   return "pending";
     //   // }
@@ -182,12 +182,12 @@ class UptMasukPulang extends StatelessWidget {
 
       final val = getApprovalValue(data, index);
 
-      // ❌ reject
+      // âŒ reject
       if (val == 'reject') {
         return const Icon(Icons.close, color: Colors.white, size: 18);
       }
 
-      // 🔥 cek step sebelumnya
+      // ðŸ”¥ cek step sebelumnya
       bool previousApproved = true;
 
       for (int i = 1; i < index; i++) {
@@ -199,17 +199,17 @@ class UptMasukPulang extends StatelessWidget {
         }
       }
 
-      // ⏳ belum waktunya
+      // â³ belum waktunya
       if (!previousApproved) {
         return const Icon(Icons.hourglass_empty, color: Colors.grey);
       }
 
-      // ⏳ belum approve
+      // â³ belum approve
       if (isEmptyApproval(val)) {
         return const Icon(Icons.hourglass_empty, color: Colors.grey);
       }
 
-      // ✅ approved
+      // âœ… approved
       return const Icon(Icons.check, color: Colors.white, size: 18);
     }
 
@@ -265,7 +265,7 @@ class UptMasukPulang extends StatelessWidget {
                 ),
                 Row(
                   children: [
-                    const Icon(Iconsax.clock_outline),
+                    const Icon(Typicons.clock),
                     const SizedBox(width: 5),
                     Text(
                       data.status == "update_masuk" ||
@@ -284,7 +284,7 @@ class UptMasukPulang extends StatelessWidget {
                           : true,
                   child: Row(
                     children: [
-                      const Icon(Iconsax.calendar_2_outline),
+                      const Icon(Typicons.calendar),
                       const SizedBox(width: 5),
                       Text(data.tglPulang!, style: titleTextStyle),
                     ],
@@ -509,7 +509,7 @@ class UptMasukPulang extends StatelessWidget {
                     "lat_out": data.latOut,
                     "long_out": data.longOut,
                     "device_info2": data.devInfo,
-                    // 🔥 tambahan khusus
+                    // ðŸ”¥ tambahan khusus
                     if (data.status == "update_masuk_cst") ...{
                       "jam_masuk": data.jamMasuk,
                       "jam_pulang": data.jamPulang,

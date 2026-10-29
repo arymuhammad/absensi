@@ -1,4 +1,4 @@
-import 'package:absensi/app/data/helper/app_colors.dart';
+﻿import 'package:absensi/app/data/helper/app_colors.dart';
 import 'package:absensi/app/data/helper/const.dart';
 import 'package:absensi/app/modules/add_pegawai/controllers/add_pegawai_controller.dart';
 import 'package:absensi/app/modules/add_pegawai/views/list_user.dart';
@@ -9,7 +9,7 @@ import 'package:absensi/app/modules/profil/views/verifikasi_update_password.dart
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:icons_plus/icons_plus.dart';
+import 'package:icons_flutter/icons_flutter.dart';
 // import '../../alarm/views/alarm_view.dart';
 import '../../../data/helper/custom_dialog.dart';
 import '../../../data/helper/error_logger.dart';
@@ -157,7 +157,7 @@ class SettingsView extends GetView<SettingsController> {
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Icon(
-                                Iconsax.key_bulk,
+                               Typicons.key,
                                 color:
                                     isDark
                                         ? Colors.blue
@@ -206,7 +206,7 @@ class SettingsView extends GetView<SettingsController> {
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Icon(
-                                Bootstrap.database_fill_exclamation,
+                              Typicons.database,
                                 color:
                                     isDark
                                         ? Colors.blue
@@ -399,7 +399,7 @@ class SettingsView extends GetView<SettingsController> {
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Icon(
-                                Iconsax.message_question_bold,
+                               Typicons.mail,
                                 color:
                                     isDark
                                         ? Colors.blue
@@ -448,7 +448,7 @@ class SettingsView extends GetView<SettingsController> {
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Icon(
-                                Iconsax.info_circle_bold,
+                              Typicons.info,
                                 color:
                                     isDark
                                         ? Colors.blue
@@ -529,25 +529,25 @@ class SettingsView extends GetView<SettingsController> {
 //                               const nomor = '6285124034523';
 
 //                               final pesan = Uri.encodeComponent('''
-// 🔔 *NOTIFIKASI CUTI*
+// ðŸ”” *NOTIFIKASI CUTI*
 
-// Halo, Ade 👋
+// Halo, Ade ðŸ‘‹
 
 // Pengajuan cuti Anda memiliki pembaruan:
 
-// ━━━━━━━━━━━━━━━━━━
-// 📋 *Status* : DIBATALKAN
-// 📅 *Tanggal* : 20 Agustus 2026
-// 🏷️ *Jenis* : Cuti Tahunan
-// ━━━━━━━━━━━━━━━━━━
+// â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”
+// ðŸ“‹ *Status* : DIBATALKAN
+// ðŸ“… *Tanggal* : 20 Agustus 2026
+// ðŸ·ï¸ *Jenis* : Cuti Tahunan
+// â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”
 
 // Pengajuan tersebut telah dibatalkan oleh Admin.
 
 // Jika ada pertanyaan, silakan hubungi Admin.
 
-// Terima kasih 🙏
+// Terima kasih ðŸ™
 
-// 🏢 *URBAN&CO Spot*
+// ðŸ¢ *URBAN&CO Spot*
 // ''');
 
 //                               final url = Uri.parse(

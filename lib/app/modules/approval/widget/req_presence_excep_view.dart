@@ -1,8 +1,8 @@
-import 'package:absensi/app/data/helper/app_colors.dart';
+﻿import 'package:absensi/app/data/helper/app_colors.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:icons_plus/icons_plus.dart';
+import 'package:icons_flutter/icons_flutter.dart';
 import 'package:intl/intl.dart';
 
 import '../../../data/helper/const.dart';
@@ -174,7 +174,7 @@ class ReqPresenceExcepView extends StatelessWidget {
                           decoration: InputDecoration(
                             contentPadding: const EdgeInsets.all(0.5),
                             prefixIcon: const Icon(
-                              Iconsax.calendar_edit_outline,
+                             Typicons.calendar_outlilne,
                             ),
                             hintText: 'Tanggal Awal',
                             filled: true,
@@ -202,7 +202,7 @@ class ReqPresenceExcepView extends StatelessWidget {
                           decoration: InputDecoration(
                             contentPadding: const EdgeInsets.all(0.5),
                             prefixIcon: const Icon(
-                              Iconsax.calendar_edit_outline,
+                             Typicons.calendar_outlilne
                             ),
                             hintText: 'Tanggal Akhir',
                             filled: true,

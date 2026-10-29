@@ -1,9 +1,9 @@
-import 'package:absensi/app/data/helper/const.dart';
+﻿import 'package:absensi/app/data/helper/const.dart';
 import 'package:absensi/app/services/service_api.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:get/get.dart';
-import 'package:icons_plus/icons_plus.dart';
+import 'package:icons_flutter/icons_flutter.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../data/helper/app_colors.dart';
@@ -23,7 +23,7 @@ class DetailVisitView extends GetView {
           double.parse(detailData["lat_in"]),
           double.parse(detailData["long_in"]),
         ),
-        child: const Icon(HeroIcons.map_pin, color: AppColors.contentColorBlue),
+        child: const Icon(Typicons.pin_outline, color: AppColors.contentColorBlue),
       ),
     ];
 
@@ -39,7 +39,7 @@ class DetailVisitView extends GetView {
             detailData["long_out"] != "" ? detailData["long_out"] : "0.0",
           ),
         ),
-        child: const Icon(HeroIcons.map_pin, color: AppColors.contentColorBlue),
+        child: const Icon(Typicons.pin_outline, color: AppColors.contentColorBlue),
       ),
     ];
 

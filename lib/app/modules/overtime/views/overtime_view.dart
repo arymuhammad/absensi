@@ -164,7 +164,9 @@ class OvertimeView extends GetView<OvertimeController> {
                     final color = getStatusColor(status);
 
                     final duration = getDuration(
+                      item.initDate ?? '',
                       item.start ?? '',
+                      item.endDate ?? '',
                       item.end ?? '',
                     );
 
@@ -180,98 +182,98 @@ class OvertimeView extends GetView<OvertimeController> {
                       return 5;
                     }
 
-                      int totalSteps = getTotalSteps();
-                      List<String> nodeTitlesFull = const [
-                        'Apply',
-                        'Store Manager',
-                        'Area Manager',
-                        'Ops',
-                        'HR',
-                      ];
+                    int totalSteps = getTotalSteps();
+                    List<String> nodeTitlesFull = const [
+                      'Apply',
+                      'Store Manager',
+                      'Area Manager',
+                      'Ops',
+                      'HR',
+                    ];
 
-                      // Node titles untuk 3 steps (kurangi 1 step, misalnya tanpa step terakhir "HR")
-                      List<String> nodeTitles4Steps = const [
-                        'Apply',
-                        // 'Store Manager',
-                        'Area Manager',
-                        'Ops',
-                        'HR',
-                      ];
+                    // Node titles untuk 3 steps (kurangi 1 step, misalnya tanpa step terakhir "HR")
+                    List<String> nodeTitles4Steps = const [
+                      'Apply',
+                      // 'Store Manager',
+                      'Area Manager',
+                      'Ops',
+                      'HR',
+                    ];
 
-                      List<String> getNodeTitles() {
-                        if (item.level == "19" ||
-                            item.level == "20" ||
-                            item.level == "59") {
-                          // Level 19 di parent 3; 3 steps tapi sM seperti contoh kamu
-                          return nodeTitles4Steps;
-                        } else {
-                          // parentId 3 tapi levelId bukan yg disebut di atas, pakai 4 steps
-                          return nodeTitlesFull;
+                    List<String> getNodeTitles() {
+                      if (item.level == "19" ||
+                          item.level == "20" ||
+                          item.level == "59") {
+                        // Level 19 di parent 3; 3 steps tapi sM seperti contoh kamu
+                        return nodeTitles4Steps;
+                      } else {
+                        // parentId 3 tapi levelId bukan yg disebut di atas, pakai 4 steps
+                        return nodeTitlesFull;
+                      }
+                    }
+
+                    int getCurrentStep(OvertimeModel ovr, int totalSteps) {
+                      int step = 0;
+
+                      if (totalSteps == 5) {
+                        if (ovr.acc4 != null) {
+                          step = 4;
+                        } else if (ovr.acc3 != null) {
+                          step = 3;
+                        } else if (ovr.acc2 != null) {
+                          step = 2;
+                        } else if (ovr.acc1 != null) {
+                          step = 1;
+                        }
+                      } else {
+                        if (ovr.acc4 != null) {
+                          step = 3;
+                        } else if (ovr.acc3 != null) {
+                          step = 2;
+                        } else if (ovr.acc2 != null) {
+                          step = 1;
                         }
                       }
 
-                      int getCurrentStep(OvertimeModel ovr, int totalSteps) {
-                        int step = 0;
+                      return step;
+                    }
 
-                        if (totalSteps == 5) {
-                          if (ovr.acc4 != null) {
-                            step = 4;
-                          } else if (ovr.acc3 != null) {
-                            step = 3;
-                          } else if (ovr.acc2 != null) {
-                            step = 2;
-                          } else if (ovr.acc1 != null) {
-                            step = 1;
-                          }
-                        } else {
-                          if (ovr.acc4 != null) {
-                            step = 3;
-                          } else if (ovr.acc3 != null) {
-                            step = 2;
-                          } else if (ovr.acc2 != null) {
-                            step = 1;
-                          }
+                    final int currentStep = getCurrentStep(item, totalSteps);
+                    // print(stepInfo['currentStep']);
+                    final controller = StepProgressController(
+                      initialStep: currentStep,
+                      totalSteps: totalSteps,
+                    );
+
+                    String? getValByStep(int index) {
+                      if (totalSteps == 5) {
+                        // normal (5 step)
+                        switch (index) {
+                          case 1:
+                            return item.acc1;
+                          case 2:
+                            return item.acc2;
+                          case 3:
+                            return item.acc3;
+                          case 4:
+                            return item.acc4;
+                          default:
+                            return null;
                         }
-
-                        return step;
-                      }
-
-                      final int currentStep = getCurrentStep(item, totalSteps);
-                      // print(stepInfo['currentStep']);
-                      final controller = StepProgressController(
-                        initialStep: currentStep,
-                        totalSteps: totalSteps,
-                      );
-
-                      String? getValByStep(int index) {
-                        if (totalSteps == 5) {
-                          // normal (5 step)
-                          switch (index) {
-                            case 1:
-                              return item.acc1;
-                            case 2:
-                              return item.acc2;
-                            case 3:
-                              return item.acc3;
-                            case 4:
-                              return item.acc4;
-                            default:
-                              return null;
-                          }
-                        } else {
-                          // totalSteps == 4 (skip acc1)
-                          switch (index) {
-                            case 1:
-                              return item.acc2;
-                            case 2:
-                              return item.acc3;
-                            case 3:
-                              return item.acc4;
-                            default:
-                              return null;
-                          }
+                      } else {
+                        // totalSteps == 4 (skip acc1)
+                        switch (index) {
+                          case 1:
+                            return item.acc2;
+                          case 2:
+                            return item.acc3;
+                          case 3:
+                            return item.acc4;
+                          default:
+                            return null;
                         }
                       }
+                    }
 
                     Color getBackgroundColorForStep(int index) {
                       if (index == 0) return Colors.green;

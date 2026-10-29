@@ -42,9 +42,9 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     namespace "com.absensi.urbanco"
-    compileSdkVersion 35
+    compileSdkVersion 36
     // compileSdkVersion flutter.compileSdkVersion
-    ndkVersion "26.1.10909125"
+    ndkVersion "27.0.12077973"
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17

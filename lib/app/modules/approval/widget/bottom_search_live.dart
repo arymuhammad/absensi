@@ -1,7 +1,7 @@
-import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
+﻿import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:icons_plus/icons_plus.dart';
+import 'package:icons_flutter/icons_flutter.dart';
 import 'package:intl/intl.dart';
 
 import '../../../data/helper/app_colors.dart';
@@ -46,71 +46,71 @@ bottomSearchLive(
               ),
               const Divider(),
               Obx(
-                () => 
+                () =>
                 // Row(
-                  // children: [
-                    SizedBox(
-                      height: 44,
-                      child: CsDropDown(
-                        value:
-                            ctrl.selectedStatus.isNotEmpty
-                                ? ctrl.selectedStatus.value
-                                : null,
-                        items:
-                            ctrl.statusReqLeave.map((e) {
-                              return DropdownMenuItem(
-                                value: e.entries.first.key,
-                                child: Text(e.entries.first.value),
-                              );
-                            }).toList(),
-                        onChanged: (val) {
-                          // adjCtrl.isLoading.value = true;
-                          ctrl.selectedStatus.value = val;
-                          // adjCtrl.getReqAppUpt(
-                          //     val,
-                          //     adjCtrl.selectedType.value,
-                          //     userData!.level,
-                          //     userData!.id,
-                          //     adjCtrl.initDate,
-                          //     adjCtrl.lastDate);
-                        },
-                        label: 'Status',
-                        isDark: isDark,
-                      ),
-                    ),
-                    // const SizedBox(width: 5),
-                    // Expanded(
-                    //   child: SizedBox(
-                    //     height: 44,
-                    //     child: CsDropDown(
-                    //       value:
-                    //           ctrl.selectedType.isNotEmpty
-                    //               ? ctrl.selectedType.value
-                    //               : null,
-                    //       items:
-                    //           ctrl.typeReqApp.map((e) {
-                    //             return DropdownMenuItem(
-                    //               value: e.entries.first.key,
-                    //               child: Text(e.entries.first.value),
-                    //             );
-                    //           }).toList(),
-                    //       onChanged: (val) {
-                    //         // ctrl.isLoading.value = true;
-                    //         ctrl.selectedType.value = val;
-                    //         // ctrl.getReqAppUpt(
-                    //         //     ctrl.selectedStatus.value,
-                    //         //     val,
-                    //         //     userData!.level,
-                    //         //     userData!.id,
-                    //         //     ctrl.initDate,
-                    //         //     ctrl.lastDate);
-                    //       },
-                    //       label: 'Kategori',
-                    //       isDark: isDark,
-                    //     ),
-                    //   ),
-                    // ),
-                  // ],
+                // children: [
+                SizedBox(
+                  height: 44,
+                  child: CsDropDown(
+                    value:
+                        ctrl.selectedStatus.isNotEmpty
+                            ? ctrl.selectedStatus.value
+                            : null,
+                    items:
+                        ctrl.statusReqLeave.map((e) {
+                          return DropdownMenuItem(
+                            value: e.entries.first.key,
+                            child: Text(e.entries.first.value),
+                          );
+                        }).toList(),
+                    onChanged: (val) {
+                      // adjCtrl.isLoading.value = true;
+                      ctrl.selectedStatus.value = val;
+                      // adjCtrl.getReqAppUpt(
+                      //     val,
+                      //     adjCtrl.selectedType.value,
+                      //     userData!.level,
+                      //     userData!.id,
+                      //     adjCtrl.initDate,
+                      //     adjCtrl.lastDate);
+                    },
+                    label: 'Status',
+                    isDark: isDark,
+                  ),
+                ),
+                // const SizedBox(width: 5),
+                // Expanded(
+                //   child: SizedBox(
+                //     height: 44,
+                //     child: CsDropDown(
+                //       value:
+                //           ctrl.selectedType.isNotEmpty
+                //               ? ctrl.selectedType.value
+                //               : null,
+                //       items:
+                //           ctrl.typeReqApp.map((e) {
+                //             return DropdownMenuItem(
+                //               value: e.entries.first.key,
+                //               child: Text(e.entries.first.value),
+                //             );
+                //           }).toList(),
+                //       onChanged: (val) {
+                //         // ctrl.isLoading.value = true;
+                //         ctrl.selectedType.value = val;
+                //         // ctrl.getReqAppUpt(
+                //         //     ctrl.selectedStatus.value,
+                //         //     val,
+                //         //     userData!.level,
+                //         //     userData!.id,
+                //         //     ctrl.initDate,
+                //         //     ctrl.lastDate);
+                //       },
+                //       label: 'Kategori',
+                //       isDark: isDark,
+                //     ),
+                //   ),
+                // ),
+                // ],
                 // ),
               ),
               const SizedBox(height: 5),
@@ -124,7 +124,7 @@ bottomSearchLive(
                         style: const TextStyle(fontSize: 16),
                         decoration: InputDecoration(
                           contentPadding: const EdgeInsets.all(0.5),
-                          prefixIcon: const Icon(Iconsax.calendar_edit_outline),
+                          prefixIcon: const Icon(Typicons.calendar_outlilne),
                           hintText: 'Tanggal Awal',
                           filled: true,
                           fillColor: isDark ? Colors.black : Colors.white,
@@ -150,7 +150,7 @@ bottomSearchLive(
                         style: const TextStyle(fontSize: 16),
                         decoration: InputDecoration(
                           contentPadding: const EdgeInsets.all(0.5),
-                          prefixIcon: const Icon(Iconsax.calendar_edit_outline),
+                          prefixIcon: const Icon(Typicons.calendar_outlilne),
                           hintText: 'Tanggal Akhir',
                           filled: true,
                           fillColor: isDark ? Colors.black : Colors.white,
@@ -231,8 +231,8 @@ bottomSearchLive(
                                 "id_user": userData.id!,
                                 "level": userData.level!,
                                 "parent_id": userData.parentId!,
-                                "tgl1": ctrl.datePick1.text,
-                                "tgl2": ctrl.datePick2.text,
+                                "date1": ctrl.datePick1.text,
+                                "date2": ctrl.datePick2.text,
                               };
                               // print(param);
                               await ctrl.getLeaveReq(param);

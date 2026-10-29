@@ -1,8 +1,8 @@
-import 'package:absensi/app/modules/absen/controllers/absen_controller.dart';
+﻿import 'package:absensi/app/modules/absen/controllers/absen_controller.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:icons_plus/icons_plus.dart';
+import 'package:icons_flutter/icons_flutter.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../data/helper/app_colors.dart';
@@ -36,7 +36,7 @@ void formFilter(idUser) {
                     style: const TextStyle(fontSize: 14),
                     decoration: const InputDecoration(
                       contentPadding: EdgeInsets.all(0.5),
-                      prefixIcon: Icon(Iconsax.calendar_edit_outline),
+                      prefixIcon: Icon(Typicons.calendar_outlilne),
                       hintText: 'Tanggal Awal',
                       border: OutlineInputBorder(),
                     ),
@@ -58,7 +58,7 @@ void formFilter(idUser) {
                     style: const TextStyle(fontSize: 14),
                     decoration: const InputDecoration(
                       contentPadding: EdgeInsets.all(0.5),
-                      prefixIcon: Icon(Iconsax.calendar_edit_outline),
+                      prefixIcon: Icon(Typicons.calendar_outlilne),
                       hintText: 'Tanggal Akhir',
                       border: OutlineInputBorder(),
                     ),

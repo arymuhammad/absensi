@@ -1,4 +1,4 @@
-import 'package:absensi/app/data/helper/app_colors.dart';
+﻿import 'package:absensi/app/data/helper/app_colors.dart';
 import 'package:absensi/app/data/helper/const.dart';
 import 'package:absensi/app/data/helper/custom_dialog.dart';
 import 'package:absensi/app/data/model/login_model.dart';
@@ -8,7 +8,7 @@ import 'package:absensi/app/modules/shared/elevated_button_icon.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:icons_plus/icons_plus.dart';
+import 'package:icons_flutter/icons_flutter.dart';
 import 'package:intl/intl.dart';
 
 import '../../adjust_presence/controllers/adjust_presence_controller.dart';
@@ -199,7 +199,7 @@ class ReqAppUserView extends GetView {
                         style: const TextStyle(fontSize: 16),
                         decoration: InputDecoration(
                           contentPadding: const EdgeInsets.all(0.5),
-                          prefixIcon: const Icon(Iconsax.calendar_edit_outline),
+                          prefixIcon: const Icon(Typicons.calendar_outlilne),
                           hintText: 'Tanggal Awal',
                           filled: true,
                           fillColor: isDark ? Colors.black : Colors.white,
@@ -223,7 +223,7 @@ class ReqAppUserView extends GetView {
                         style: const TextStyle(fontSize: 16),
                         decoration: InputDecoration(
                           contentPadding: const EdgeInsets.all(0.5),
-                          prefixIcon: const Icon(Iconsax.calendar_edit_outline),
+                          prefixIcon: const Icon(Typicons.calendar_outlilne),
                           hintText: 'Tanggal Akhir',
                           filled: true,
                           fillColor: isDark ? Colors.black : Colors.white,

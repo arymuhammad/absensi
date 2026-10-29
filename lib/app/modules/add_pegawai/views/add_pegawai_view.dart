@@ -1,4 +1,4 @@
-import 'dart:io';
+﻿import 'dart:io';
 
 import 'package:absensi/app/data/helper/app_colors.dart';
 import 'package:absensi/app/data/helper/const.dart';
@@ -10,7 +10,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:get/get.dart';
-import 'package:icons_plus/icons_plus.dart';
+import 'package:icons_flutter/icons_flutter.dart';
 
 import '../../../data/helper/custom_dialog.dart';
 import '../controllers/add_pegawai_controller.dart';
@@ -445,7 +445,7 @@ class AddPegawaiView extends GetView<AddPegawaiController> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text('REGISTER', style: titleTextStyle),
-                        const Icon(Iconsax.arrow_right_bold),
+                        const Icon(Typicons.arrows_cw),
                       ],
                     ),
                   ),

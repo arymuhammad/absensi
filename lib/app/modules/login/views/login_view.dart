@@ -1,4 +1,4 @@
-import 'package:absensi/app/data/helper/app_colors.dart';
+﻿import 'package:absensi/app/data/helper/app_colors.dart';
 import 'package:absensi/app/data/helper/const.dart';
 import 'package:absensi/app/data/helper/db_helper.dart';
 import 'package:absensi/app/data/helper/custom_dialog.dart';
@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
-import 'package:icons_plus/icons_plus.dart';
+import 'package:icons_flutter/icons_flutter.dart';
 import '../../shared/container_main_color.dart';
 import '../controllers/login_controller.dart';
 
@@ -83,8 +83,8 @@ class LoginView extends GetView<LoginController> {
                                 ),
                                 labelText: 'Username',
                                 prefixIcon: const Icon(
-                                  Iconsax.user_octagon_bold,
-                                  size: 35,
+                                 FontAwesome.user_circle_o,
+                                  size: 22,
                                 ),
                               ),
                             ),
@@ -107,7 +107,8 @@ class LoginView extends GetView<LoginController> {
                                   borderRadius: BorderRadius.circular(30),
                                 ),
                                 labelText: 'Password',
-                                prefixIcon: const Icon(Iconsax.key_bold),
+                                prefixIcon: const Icon(Typicons.key_outline,
+                                  size: 22,),
                                 suffixIcon: InkWell(
                                   onTap: () {
                                     controller.isPassHide.value =
@@ -166,7 +167,7 @@ class LoginView extends GetView<LoginController> {
                                     MainAxisAlignment.spaceEvenly,
                                 children: [
                                   Text('LOGIN', style: titleTextStyle),
-                                  const Icon(Iconsax.arrow_right_bold),
+                                  const Icon(Typicons.right_small),
                                 ],
                               ),
                             ),

@@ -1,8 +1,8 @@
-import 'package:absensi/app/data/model/absen_model.dart';
+﻿import 'package:absensi/app/data/model/absen_model.dart';
 import 'package:absensi/app/modules/absen/controllers/absen_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:icons_plus/icons_plus.dart';
+import 'package:icons_flutter/icons_flutter.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 import '../../../../data/helper/app_colors.dart';
@@ -316,7 +316,7 @@ class ListItemData extends StatelessWidget {
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       Icon(
-                                        HeroIcons.map_pin,
+                                     FontAwesome.map_pin,
                                         size: 16,
                                         color:
                                             isSelected

@@ -1,4 +1,4 @@
-import 'dart:io';
+﻿import 'dart:io';
 import 'package:absensi/app/data/helper/custom_dialog.dart';
 import 'package:absensi/app/modules/adjust_presence/controllers/adjust_presence_controller.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:get/get.dart';
-import 'package:icons_plus/icons_plus.dart';
+import 'package:icons_flutter/icons_flutter.dart';
 import 'package:intl/intl.dart';
 import '../expanded_data_absen.dart';
 import '../expanded_data_visit.dart';
@@ -44,7 +44,7 @@ class AdjustData extends GetView<AdjustPresenceController> {
                     style: const TextStyle(fontSize: 16),
                     decoration: const InputDecoration(
                       contentPadding: EdgeInsets.all(0.5),
-                      prefixIcon: Icon(Iconsax.calendar_edit_outline),
+                      prefixIcon: Icon(Typicons.calendar),
                       hintText: 'Tanggal Awal',
                       filled: true,
                       fillColor: Colors.white,

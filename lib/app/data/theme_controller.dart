@@ -58,8 +58,15 @@ class ThemeController extends GetxController {
   void _updateSystemBar(bool isDark) {
     SystemChrome.setSystemUIOverlayStyle(
       SystemUiOverlayStyle(
+        // Status bar: tetap transparan dengan ikon putih
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.light,
+        statusBarBrightness: Brightness.dark,
+
+        // Navigation bar: tetap mengikuti pengaturan tema sebelumnya
         systemNavigationBarColor:
             isDark ? const Color(0xFF0F172A) : const Color(0xFF1B2541),
+        systemNavigationBarDividerColor: Colors.transparent,
         systemNavigationBarIconBrightness:
             isDark ? Brightness.light : Brightness.dark,
       ),

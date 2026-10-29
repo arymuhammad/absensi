@@ -130,15 +130,27 @@ IconData getStatusIcon(String status) {
   }
 }
 
-String getDuration(String start, String end) {
+String getDuration(String startDate, String start, String endDate, String end) {
   try {
-    final s = start.split(':');
-    final e = end.split(':');
+    DateTime parseDateTime(String date, String time) {
+      final d = date.split('-');
+      final t = time.split(':');
 
-    final startTime = DateTime(0, 0, 0, int.parse(s[0]), int.parse(s[1]));
-    final endTime = DateTime(0, 0, 0, int.parse(e[0]), int.parse(e[1]));
+      return DateTime(
+        int.parse(d[0]),
+        int.parse(d[1]),
+        int.parse(d[2]),
+        int.parse(t[0]),
+        int.parse(t[1]),
+      );
+    }
+
+    final startTime = parseDateTime(startDate, start);
+    final endTime = parseDateTime(endDate, end);
 
     final diff = endTime.difference(startTime);
+
+    if (diff.isNegative) return '-';
 
     final hours = diff.inHours;
     final minutes = diff.inMinutes % 60;
