@@ -155,6 +155,7 @@ class LeaveController extends GetxController {
     // required String userPengganti,
     // required String levelUserPengganti,
     required String parentId,
+    required bool isDark,
   }) async {
     /*
   |--------------------------------------------------------------------------
@@ -164,7 +165,7 @@ class LeaveController extends GetxController {
 
     Get.back();
 
-    loadingDialog("Mengirim pengajuan cuti...", "");
+    loadingDialog("Mengirim pengajuan cuti...", "", isDark);
 
     final signatureBytes = await ctrSign.toPngBytes();
 
@@ -279,6 +280,7 @@ class LeaveController extends GetxController {
       btnOkOnPress: () {
         Get.back();
       },
+      isDark: isDark
     );
   }
 
@@ -288,9 +290,10 @@ class LeaveController extends GetxController {
     String uid,
     String date,
     String alasan,
+    bool isDark,
   ) async {
     Get.back();
-    loadingDialog("Menyetujui pengajuan cuti...", "");
+    loadingDialog("Menyetujui pengajuan cuti...", "", isDark);
     final signatureBytes = await ctrSign.toPngBytes();
     if (signatureBytes == null) return;
 
@@ -323,10 +326,11 @@ class LeaveController extends GetxController {
     Data? userData,
     String uid,
     String date,
+    bool isDark,
     // String alasan,
   ) async {
     // Get.back();
-    loadingDialog("Membatalkan pengajuan cuti...", "");
+    loadingDialog("Membatalkan pengajuan cuti...", "", isDark);
     // final signatureBytes = await ctrSign.toPngBytes();
     // if (signatureBytes == null) return;
 

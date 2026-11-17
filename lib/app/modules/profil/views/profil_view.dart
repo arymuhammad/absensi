@@ -35,12 +35,11 @@ class ProfilView extends GetView<ProfilController> {
         children: [
           /// HEADER GRADIENT + GLOW
           Container(
-            height: 260,
+            height: 400,
             decoration: BoxDecoration(
-              gradient: AppColors.mainGradient(
-                context: context,
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
+              image: DecorationImage(
+                image: AssetImage( isDark ? 'assets/image/bg-hd-drk.png' : 'assets/image/bg-hd.png'),
+                fit: BoxFit.cover,
               ),
             ),
           ),
@@ -70,12 +69,20 @@ class ProfilView extends GetView<ProfilController> {
             top: 180,
             left: 16,
             right: 16,
-            bottom: 0,
-            child: Container(
-              decoration: BoxDecoration(
-                color: Theme.of(context).cardColor,
-                borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(20),
+            height: Get.height / 1.5,
+            child: Card(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              color:  isDark
+                          ? const Color(0xFF1E293B).withOpacity(0.78)
+                          : Colors.white.withOpacity(0.82),
+              elevation: 4,
+              child: Container(
+                decoration: const BoxDecoration(
+                  // color: Theme.of(context).cardColor,
+                  borderRadius: BorderRadius.vertical(
+                    top: Radius.circular(20),
+                    bottom: Radius.circular(20),
+                  ),
                 ),
               ),
             ),
@@ -97,7 +104,7 @@ class ProfilView extends GetView<ProfilController> {
                       shape: BoxShape.circle,
                       border: Border.all(
                         color: isDark ? Colors.grey.shade800 : Colors.white,
-                        width: 6,
+                        width: 3,
                       ),
                       boxShadow: [
                         BoxShadow(
@@ -223,393 +230,428 @@ class ProfilView extends GetView<ProfilController> {
                                   : const CupertinoActivityIndicator(),
                         );
                       },
-                      child: ListView(
-                        padding: EdgeInsets.zero,
-                        children: [
-                          /// CARD DATA USER
-                          Column(
-                            // padding: EdgeInsets.zero,
-                            // physics: const NeverScrollableScrollPhysics(),
-                            children: [
-                              ListTile(
-                                title: Row(
-                                  children: [
-                                    Container(
-                                      width: 30,
-                                      height: 30,
-                                      decoration: BoxDecoration(
-                                        color:
-                                            isDark
-                                                ? Colors.blue.withOpacity(0.15)
-                                                : Colors.blue[50],
-                                        borderRadius: BorderRadius.circular(5),
-                                      ),
-                                      child: const Icon(
-                                        Icons.account_circle,
-                                        // size: 15,
-                                        color: Colors.lightBlue,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 5),
-                                    Text('Username', style: subtitleTextStyle),
-                                  ],
-                                ),
-                                trailing: Text(
-                                  listDataUser.username ?? '',
-                                  style: titleTextStyle,
-                                ),
-                                contentPadding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                ),
-                                dense: true,
-                              ),
-                              const Divider(height: 0),
-                              ListTile(
-                                title: Row(
-                                  children: [
-                                    Container(
-                                      width: 30,
-                                      height: 30,
-                                      decoration: BoxDecoration(
-                                        color:
-                                            isDark
-                                                ? Colors.blue.withOpacity(0.15)
-                                                : Colors.blue[50],
-                                        borderRadius: BorderRadius.circular(5),
-                                      ),
-                                      child: const Icon(
-                                        Icons.work,
-                                        // size: 15,
-                                        color: Colors.lightBlue,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 5),
-                                    Text(
-                                      'Employee ID',
-                                      style: subtitleTextStyle,
-                                    ),
-                                  ],
-                                ),
-                                trailing:
-                                    (listDataUser.nik ?? '').isEmpty
-                                        ? CsElevatedButton(
-                                          color: AppColors.itemsBackground,
-                                          fontsize: 12,
-                                          label: 'Generate ID',
-                                          onPressed:
-                                              (listDataUser.createdAt ?? '')
-                                                      .isEmpty
-                                                  ? null
-                                                  : () {
-                                                    ctr.generateEmpId(
-                                                      listDataUser,
-                                                    );
-                                                  },
-                                        )
-                                        : Text(
-                                          listDataUser.nik ?? '',
-                                          style: titleTextStyle,
-                                        ),
-                                contentPadding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                ),
-                                dense: true,
-                              ),
-                              const Divider(height: 0),
-                              ListTile(
-                                title: Row(
-                                  children: [
-                                    Container(
-                                      width: 30,
-                                      height: 30,
-                                      decoration: BoxDecoration(
-                                        color:
-                                            isDark
-                                                ? Colors.blue.withOpacity(0.15)
-                                                : Colors.blue[50],
-                                        borderRadius: BorderRadius.circular(5),
-                                      ),
-                                      child: const Icon(
-                                        Icons.phone,
-                                        // size: 15,
-                                        color: Colors.lightBlue,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 5),
-                                    Text('Phone No.', style: subtitleTextStyle),
-                                  ],
-                                ),
-                                trailing: Text(
-                                  listDataUser.noTelp ?? '',
-                                  style: titleTextStyle,
-                                ),
-                                contentPadding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                ),
-                                dense: true,
-                              ),
-                              const Divider(height: 0),
-                              ListTile(
-                                title: Row(
-                                  children: [
-                                    Container(
-                                      width: 30,
-                                      height: 30,
-                                      decoration: BoxDecoration(
-                                        color:
-                                            isDark
-                                                ? Colors.blue.withOpacity(0.15)
-                                                : Colors.blue[50],
-                                        borderRadius: BorderRadius.circular(5),
-                                      ),
-                                      child: const Icon(
-                                        Icons.location_pin,
-                                        // size: 15,
-                                        color: Colors.lightBlue,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 5),
-                                    Text(
-                                      'Registered In',
-                                      style: subtitleTextStyle,
-                                    ),
-                                  ],
-                                ),
-                                trailing: Text(
-                                  (listDataUser.namaCabang ?? '').capitalize ??
-                                      '',
-                                  style: titleTextStyle.copyWith(
-                                    fontSize:
-                                        (listDataUser.namaCabang ?? '').length >
-                                                21
-                                            ? 11
-                                            : 15,
-                                  ),
-                                ),
-                                contentPadding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                ),
-                                dense: true,
-                              ),
-                              const Divider(height: 0),
-                              ListTile(
-                                title: Row(
-                                  children: [
-                                    Container(
-                                      width: 30,
-                                      height: 30,
-                                      decoration: BoxDecoration(
-                                        color:
-                                            isDark
-                                                ? Colors.blue.withOpacity(0.15)
-                                                : Colors.blue[50],
-                                        borderRadius: BorderRadius.circular(5),
-                                      ),
-                                      child: const Icon(
-                                        Icons.calendar_month_outlined,
-                                        // size: 15,
-                                        color: Colors.lightBlue,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 5),
-                                    Text(
-                                      'Registered At',
-                                      style: subtitleTextStyle,
-                                    ),
-                                  ],
-                                ),
-                                trailing: Text(
-                                  listDataUser.createdAt != ""
-                                      ? FormatWaktu.formatShortEng(
-                                        tanggal: DateTime.parse(
-                                          listDataUser.createdAt!,
-                                        ),
-                                      )
-                                      : '-',
-                                  style: titleTextStyle,
-                                ),
-                                contentPadding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                ),
-                                dense: true,
-                              ),
-                            ],
-                          ),
-                          const Divider(),
-
-                          Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 8,
-                            ),
-                            child: Align(
-                              alignment: Alignment.centerLeft,
-                              child: Text(
-                                'Employee Documents',
-                                style: titleTextStyle.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ),
-                          _buildDocumentTile(
-                            context,
-                            title: 'KTP',
-                            icon: Icons.badge_outlined,
-                            color: AppColors.contentColorBlue,
-                            path: listDataUser.ktp ?? '',
-                            isDark: isDark,
-                          ),
-
-                          _buildDocumentTile(
-                            context,
-                            title: 'Kartu Keluarga',
-                            icon: Icons.groups_outlined,
-                            color: AppColors.contentColorCyan,
-                            path: listDataUser.kk ?? '',
-                            isDark: isDark,
-                          ),
-
-                          _buildDocumentTile(
-                            context,
-                            title: 'NPWP',
-                            icon: Icons.receipt_long_outlined,
-                            color: AppColors.contentColorOrange,
-                            path: listDataUser.npwp ?? '',
-                            isDark: isDark,
-                          ),
-
-                          _buildDocumentTile(
-                            context,
-                            title: 'Sertifikat Vaksin',
-                            icon: Icons.health_and_safety_outlined,
-                            color: AppColors.contentColorGreenAccent,
-                            path: listDataUser.vaksin ?? '',
-                            isDark: isDark,
-                          ),
-
-                          _buildDocumentTile(
-                            context,
-                            title: 'Sertifikat Pelatihan',
-                            icon: Icons.workspace_premium_outlined,
-                            color: AppColors.contentColorPurple,
-                            path: listDataUser.sertifikat ?? '',
-                            isDark: isDark,
-                          ),
-
-                          const Divider(),
-
-                          /// EDIT PROFILE
-                          ListTile(
-                            dense: true,
-                            visualDensity: const VisualDensity(
-                              horizontal: 0,
-                              vertical: -1,
-                            ),
-                            // minTileHeight: 50,
-                            contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 0,
-                            ),
-                            onTap: () {
-                              // Get.to(
-                              //   () => UpdateProfil(userData: listDataUser!),
-                              // );
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder:
-                                      (_) =>
-                                          UpdateProfil(userData: listDataUser),
-                                ),
-                              );
-                            },
-                            title: Row(
+                      child: SizedBox(
+                        height: Get.height / 2.1,
+                        child: ListView(
+                          // padding: EdgeInsets.zero,
+                          children: [
+                            /// CARD DATA USER
+                            Column(
+                              // padding: EdgeInsets.zero,
+                              // physics: const NeverScrollableScrollPhysics(),
                               children: [
-                                Container(
-                                  width: 30,
-                                  height: 30,
-                                  decoration: BoxDecoration(
-                                    color:
-                                        isDark
-                                            ? Colors.blue.withOpacity(0.15)
-                                            : Colors.blue[50],
-                                    borderRadius: BorderRadius.circular(5),
+                                ListTile(
+                                  title: Row(
+                                    children: [
+                                      Container(
+                                        width: 30,
+                                        height: 30,
+                                        decoration: BoxDecoration(
+                                          color:
+                                              isDark
+                                                  ? Colors.blue.withOpacity(
+                                                    0.15,
+                                                  )
+                                                  : Colors.blue[50],
+                                          borderRadius: BorderRadius.circular(
+                                            5,
+                                          ),
+                                        ),
+                                        child: const Icon(
+                                          Icons.account_circle,
+                                          // size: 15,
+                                          color: Colors.lightBlue,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 5),
+                                      Text(
+                                        'Username',
+                                        style: subtitleTextStyle,
+                                      ),
+                                    ],
                                   ),
-                                  child: const Icon(
-                                    Icons.edit,
-
-                                    color: Colors.lightBlue,
+                                  trailing: Text(
+                                    listDataUser.username ?? '',
+                                    style: titleTextStyle,
                                   ),
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                  ),
+                                  dense: true,
                                 ),
-                                const SizedBox(width: 5),
-                                const Text(
-                                  'Edit Profile',
-                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                const Divider(height: 0),
+                                ListTile(
+                                  title: Row(
+                                    children: [
+                                      Container(
+                                        width: 30,
+                                        height: 30,
+                                        decoration: BoxDecoration(
+                                          color:
+                                              isDark
+                                                  ? Colors.blue.withOpacity(
+                                                    0.15,
+                                                  )
+                                                  : Colors.blue[50],
+                                          borderRadius: BorderRadius.circular(
+                                            5,
+                                          ),
+                                        ),
+                                        child: const Icon(
+                                          Icons.work,
+                                          // size: 15,
+                                          color: Colors.lightBlue,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 5),
+                                      Text(
+                                        'Employee ID',
+                                        style: subtitleTextStyle,
+                                      ),
+                                    ],
+                                  ),
+                                  trailing:
+                                      (listDataUser.nik ?? '').isEmpty
+                                          ? CsElevatedButton(
+                                            color: AppColors.itemsBackground,
+                                            fontsize: 12,
+                                            label: 'Generate ID',
+                                            onPressed:
+                                                (listDataUser.createdAt ?? '')
+                                                        .isEmpty
+                                                    ? null
+                                                    : () {
+                                                      ctr.generateEmpId(
+                                                        listDataUser,
+                                                      );
+                                                    },
+                                          )
+                                          : Text(
+                                            listDataUser.nik ?? '',
+                                            style: titleTextStyle,
+                                          ),
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                  ),
+                                  dense: true,
+                                ),
+                                const Divider(height: 0),
+                                ListTile(
+                                  title: Row(
+                                    children: [
+                                      Container(
+                                        width: 30,
+                                        height: 30,
+                                        decoration: BoxDecoration(
+                                          color:
+                                              isDark
+                                                  ? Colors.blue.withOpacity(
+                                                    0.15,
+                                                  )
+                                                  : Colors.blue[50],
+                                          borderRadius: BorderRadius.circular(
+                                            5,
+                                          ),
+                                        ),
+                                        child: const Icon(
+                                          Icons.phone,
+                                          // size: 15,
+                                          color: Colors.lightBlue,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 5),
+                                      Text(
+                                        'Phone No.',
+                                        style: subtitleTextStyle,
+                                      ),
+                                    ],
+                                  ),
+                                  trailing: Text(
+                                    listDataUser.noTelp ?? '',
+                                    style: titleTextStyle,
+                                  ),
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                  ),
+                                  dense: true,
+                                ),
+                                const Divider(height: 0),
+                                ListTile(
+                                  title: Row(
+                                    children: [
+                                      Container(
+                                        width: 30,
+                                        height: 30,
+                                        decoration: BoxDecoration(
+                                          color:
+                                              isDark
+                                                  ? Colors.blue.withOpacity(
+                                                    0.15,
+                                                  )
+                                                  : Colors.blue[50],
+                                          borderRadius: BorderRadius.circular(
+                                            5,
+                                          ),
+                                        ),
+                                        child: const Icon(
+                                          Icons.location_pin,
+                                          // size: 15,
+                                          color: Colors.lightBlue,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 5),
+                                      Text(
+                                        'Registered In',
+                                        style: subtitleTextStyle,
+                                      ),
+                                    ],
+                                  ),
+                                  trailing: Text(
+                                    (listDataUser.namaCabang ?? '')
+                                            .capitalize ??
+                                        '',
+                                    style: titleTextStyle.copyWith(
+                                      fontSize:
+                                          (listDataUser.namaCabang ?? '')
+                                                      .length >
+                                                  21
+                                              ? 11
+                                              : 15,
+                                    ),
+                                  ),
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                  ),
+                                  dense: true,
+                                ),
+                                const Divider(height: 0),
+                                ListTile(
+                                  title: Row(
+                                    children: [
+                                      Container(
+                                        width: 30,
+                                        height: 30,
+                                        decoration: BoxDecoration(
+                                          color:
+                                              isDark
+                                                  ? Colors.blue.withOpacity(
+                                                    0.15,
+                                                  )
+                                                  : Colors.blue[50],
+                                          borderRadius: BorderRadius.circular(
+                                            5,
+                                          ),
+                                        ),
+                                        child: const Icon(
+                                          Icons.calendar_month_outlined,
+                                          // size: 15,
+                                          color: Colors.lightBlue,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 5),
+                                      Text(
+                                        'Registered At',
+                                        style: subtitleTextStyle,
+                                      ),
+                                    ],
+                                  ),
+                                  trailing: Text(
+                                    listDataUser.createdAt != ""
+                                        ? FormatWaktu.formatShortEng(
+                                          tanggal: DateTime.parse(
+                                            listDataUser.createdAt!,
+                                          ),
+                                        )
+                                        : '-',
+                                    style: titleTextStyle,
+                                  ),
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                  ),
+                                  dense: true,
                                 ),
                               ],
                             ),
-                            trailing: const Icon(
-                              Icons.keyboard_arrow_right_rounded,
-                            ),
-                          ),
+                            const Divider(),
 
-                          // const SizedBox(height: 3),
-
-                          /// LOGOUT
-                          ListTile(
-                            dense: true,
-                            visualDensity: const VisualDensity(
-                              horizontal: 0,
-                              vertical: -1,
-                            ),
-                            // minTileHeight: 50,
-                            contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 0,
-                            ),
-                            onTap: () {
-                              promptDialog(
-                                context: context,
-                                title: 'LOG OUT',
-                                desc: 'Anda yakin ingin keluar?',
-                                btnOkOnPress: () => auth.logout(),
-                              );
-                            },
-                            title: Row(
-                              children: [
-                                Container(
-                                  width: 30,
-                                  height: 30,
-                                  decoration: BoxDecoration(
-                                    color:
-                                        isDark
-                                            ? Colors.blue.withOpacity(0.15)
-                                            : Colors.blue[50],
-                                    borderRadius: BorderRadius.circular(5),
-                                  ),
-                                  child: const Icon(
-                                    Icons.logout,
-                                    // size: 15,
-                                    color: Colors.red,
-                                  ),
-                                ),
-                                const SizedBox(width: 5),
-                                const Text(
-                                  'Logout',
-                                  style: TextStyle(
-                                    color: Colors.red,
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 8,
+                              ),
+                              child: Align(
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  'Employee Documents',
+                                  style: titleTextStyle.copyWith(
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                              ],
+                              ),
                             ),
-                            trailing: const Icon(
-                              Icons.keyboard_arrow_right_rounded,
+                            _buildDocumentTile(
+                              context,
+                              title: 'KTP',
+                              icon: Icons.badge_outlined,
+                              color: AppColors.contentColorBlue,
+                              path: listDataUser.ktp ?? '',
+                              isDark: isDark,
                             ),
-                          ),
-                          const SizedBox(height: 40),
-                        ],
+
+                            _buildDocumentTile(
+                              context,
+                              title: 'Kartu Keluarga',
+                              icon: Icons.groups_outlined,
+                              color: AppColors.contentColorCyan,
+                              path: listDataUser.kk ?? '',
+                              isDark: isDark,
+                            ),
+
+                            _buildDocumentTile(
+                              context,
+                              title: 'NPWP',
+                              icon: Icons.receipt_long_outlined,
+                              color: AppColors.contentColorOrange,
+                              path: listDataUser.npwp ?? '',
+                              isDark: isDark,
+                            ),
+
+                            _buildDocumentTile(
+                              context,
+                              title: 'Sertifikat Vaksin',
+                              icon: Icons.health_and_safety_outlined,
+                              color: AppColors.contentColorGreenAccent,
+                              path: listDataUser.vaksin ?? '',
+                              isDark: isDark,
+                            ),
+
+                            _buildDocumentTile(
+                              context,
+                              title: 'Sertifikat Pelatihan',
+                              icon: Icons.workspace_premium_outlined,
+                              color: AppColors.contentColorPurple,
+                              path: listDataUser.sertifikat ?? '',
+                              isDark: isDark,
+                            ),
+
+                            const Divider(),
+
+                            /// EDIT PROFILE
+                            ListTile(
+                              dense: true,
+                              visualDensity: const VisualDensity(
+                                horizontal: 0,
+                                vertical: -1,
+                              ),
+                              // minTileHeight: 50,
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 0,
+                              ),
+                              onTap: () {
+                                // Get.to(
+                                //   () => UpdateProfil(userData: listDataUser!),
+                                // );
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder:
+                                        (_) => UpdateProfil(
+                                          userData: listDataUser,
+                                        ),
+                                  ),
+                                );
+                              },
+                              title: Row(
+                                children: [
+                                  Container(
+                                    width: 30,
+                                    height: 30,
+                                    decoration: BoxDecoration(
+                                      color:
+                                          isDark
+                                              ? Colors.blue.withOpacity(0.15)
+                                              : Colors.blue[50],
+                                      borderRadius: BorderRadius.circular(5),
+                                    ),
+                                    child: const Icon(
+                                      Icons.edit,
+
+                                      color: Colors.lightBlue,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 5),
+                                  const Text(
+                                    'Edit Profile',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              trailing: const Icon(
+                                Icons.keyboard_arrow_right_rounded,
+                              ),
+                            ),
+
+                            // const SizedBox(height: 3),
+
+                            /// LOGOUT
+                            ListTile(
+                              dense: true,
+                              visualDensity: const VisualDensity(
+                                horizontal: 0,
+                                vertical: -1,
+                              ),
+                              // minTileHeight: 50,
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 0,
+                              ),
+                              onTap: () {
+                                promptDialog(
+                                  context: context,
+                                  title: 'LOG OUT',
+                                  desc: 'Anda yakin ingin keluar?',
+                                  btnOkOnPress: () => auth.logout(),
+                                  isDark: isDark
+                                );
+                              },
+                              title: Row(
+                                children: [
+                                  Container(
+                                    width: 30,
+                                    height: 30,
+                                    decoration: BoxDecoration(
+                                      color:
+                                          isDark
+                                              ? Colors.blue.withOpacity(0.15)
+                                              : Colors.blue[50],
+                                      borderRadius: BorderRadius.circular(5),
+                                    ),
+                                    child: const Icon(
+                                      Icons.logout,
+                                      // size: 15,
+                                      color: Colors.red,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 5),
+                                  const Text(
+                                    'Logout',
+                                    style: TextStyle(
+                                      color: Colors.red,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              trailing: const Icon(
+                                Icons.keyboard_arrow_right_rounded,
+                              ),
+                            ),
+                            const SizedBox(height: 40),
+                          ],
+                        ),
                       ),
                     ),
                   ),

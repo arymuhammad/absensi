@@ -16,14 +16,29 @@ class LoginView extends GetView<LoginController> {
   const LoginView({super.key});
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       body: Stack(
+        fit: StackFit.expand,
         children: [
-          ContainerMainColor(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            radius: 0,
-            child: Container(),
+          // GLOBAL BACKGROUND
+          Image.asset(
+            isDark ? 'assets/image/bg-ctn-drk.png' : 'assets/image/bg-ctn.png',
+            fit: BoxFit.cover,
+          ),
+
+          // BLUE HEADER
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            height: 400,
+            child: Image.asset(
+              isDark ? 'assets/image/bg-hd-drk.png' : 'assets/image/bg-hd.png',
+              fit: BoxFit.cover,
+              alignment: Alignment.topCenter,
+            ),
           ),
 
           Padding(
@@ -78,12 +93,19 @@ class LoginView extends GetView<LoginController> {
                             child: TextField(
                               controller: controller.username,
                               decoration: InputDecoration(
+                                filled: true,
+                                fillColor:
+                                    isDark
+                                        ? const Color(
+                                          0xFF1E293B,
+                                        ).withOpacity(0.78)
+                                        : Colors.white.withOpacity(0.82),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(30),
                                 ),
                                 labelText: 'Username',
                                 prefixIcon: const Icon(
-                                 FontAwesome.user_circle_o,
+                                  FontAwesome.user_circle_o,
                                   size: 22,
                                 ),
                               ),
@@ -103,12 +125,21 @@ class LoginView extends GetView<LoginController> {
                               obscureText: controller.isPassHide.value,
 
                               decoration: InputDecoration(
+                                filled: true,
+                                fillColor:
+                                    isDark
+                                        ? const Color(
+                                          0xFF1E293B,
+                                        ).withOpacity(0.78)
+                                        : Colors.white.withOpacity(0.82),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(30),
                                 ),
                                 labelText: 'Password',
-                                prefixIcon: const Icon(Typicons.key_outline,
-                                  size: 22,),
+                                prefixIcon: const Icon(
+                                  Typicons.key_outline,
+                                  size: 22,
+                                ),
                                 suffixIcon: InkWell(
                                   onTap: () {
                                     controller.isPassHide.value =
@@ -139,36 +170,58 @@ class LoginView extends GetView<LoginController> {
                               child: Row(
                                 children: [
                                   Icon(Icons.gpp_bad, color: red),
-                                  Text('Forgot Password?', style: titleTextStyle.copyWith(color: Colors.white)),
+                                  Text(
+                                    'Forgot Password?',
+                                    style: titleTextStyle.copyWith(
+                                      color: isDark ? Colors.white : mainColor,
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),
-                            ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                elevation: 0,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(30),
+                            Container(
+                              decoration: BoxDecoration(
+                                gradient: AppColors.mainGradient(
+                                  context: context,
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
                                 ),
-                                backgroundColor: AppColors.itemsBackground,
-                                fixedSize: const Size(130, 40),
-                              ),
-                              onPressed: () {
-                                if (controller.username.text != "" &&
-                                    controller.password.text != "") {
-                                  controller.login();
-                                } else {
-                                  showToast(
-                                    'Username dan Password tidak boleh kosong',
-                                  );
-                                }
-                              },
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  Text('LOGIN', style: titleTextStyle),
-                                  const Icon(Typicons.right_small),
+                                borderRadius: BorderRadius.circular(30),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.blueAccent.withOpacity(0.4),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 4),
+                                  ),
                                 ],
+                              ),
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  elevation: 0,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(30),
+                                  ),
+                                  backgroundColor: Colors.transparent,
+                                  fixedSize: const Size(100, 30),
+                                ),
+                                onPressed: () {
+                                  if (controller.username.text != "" &&
+                                      controller.password.text != "") {
+                                    controller.login();
+                                  } else {
+                                    showToast(
+                                      'Username dan Password tidak boleh kosong',
+                                    );
+                                  }
+                                },
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    Text('LOGIN', style: titleTextStyle),
+                                    const Icon(Typicons.right_small),
+                                  ],
+                                ),
                               ),
                             ),
                           ],
@@ -179,8 +232,8 @@ class LoginView extends GetView<LoginController> {
                             textAlign: TextAlign.center,
                             text: TextSpan(
                               text: 'Don`t have an account?\n',
-                              style: const TextStyle(
-                                color: AppColors.contentColorWhite,
+                              style: TextStyle(
+                                color: isDark ? Colors.white : Colors.grey,
                                 fontFamily: 'Nunito',
                                 fontWeight: FontWeight.bold,
                               ),
@@ -211,6 +264,7 @@ class LoginView extends GetView<LoginController> {
                                 loadingDialog(
                                   "Menghapus data...",
                                   "Mohon menunggu",
+                                  isDark,
                                 );
                                 await SQLHelper.instance.truncateUser();
                                 Get.back();
@@ -219,10 +273,10 @@ class LoginView extends GetView<LoginController> {
                                 children: [
                                   Icon(Icons.cancel_sharp, color: red),
                                   const SizedBox(width: 10),
-                                  const Text(
+                                  Text(
                                     'Hapus data user',
                                     style: TextStyle(
-                                      color: Colors.white,
+                                      color: isDark ? Colors.white : mainColor,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),

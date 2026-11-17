@@ -18,6 +18,7 @@ Future<DbResult> visitOut({
   required AbsenController controller,
   required double latitude,
   required double longitude,
+  required bool isDark
 }) async {
   bool updateSuccess = false;
 
@@ -42,7 +43,7 @@ Future<DbResult> visitOut({
     // ✅ ONLINE → CEK SERVER
     // ===============================
     if (online) {
-      loadingDialog("Checking data", "");
+      loadingDialog("Checking data", "", isDark);
       await controller.cekDataVisit(
         "masuk",
         dataUser.id!,
@@ -58,7 +59,7 @@ Future<DbResult> visitOut({
     // ⚠️ OFFLINE → CEK LOCAL
     // ===============================
     else {
-      loadingDialog("Checking data", "");
+      loadingDialog("Checking data", "", isDark);
       final localData = await SQLHelper.instance.getVisitToday(
         dataUser.id!,
         dateNow,
@@ -97,7 +98,7 @@ Future<DbResult> visitOut({
 
     await Future.delayed(const Duration(milliseconds: 200));
     closeLoading();
-    loadingDialog("Sending data...", "");
+    loadingDialog("Sending data...", "", isDark);
 
     var data = {
       "status": "update",
@@ -280,6 +281,7 @@ Future<DbResult> visitOut({
         Future.delayed(const Duration(milliseconds: 300));
         Get.back();
       },
+      isDark: isDark
     );
 
     return DbResult(success: true, message: "Check out success");

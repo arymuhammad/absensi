@@ -15,20 +15,33 @@ import 'package:photo_view/photo_view.dart';
 import '../../../data/helper/app_colors.dart';
 import '../../../data/helper/calendar_badge.dart';
 import '../../../data/helper/custom_dialog.dart';
+import '../../../data/helper/custom_fab_location.dart';
 import '../../../data/helper/format_waktu.dart';
 import '../../../data/helper/helper_ui.dart';
 import '../../../data/helper/loading_platform.dart';
 import '../../../services/service_api.dart';
+import '../../home/controllers/home_controller.dart';
 import '../../shared/container_main_color.dart';
 
 class ReqPermView extends StatelessWidget {
   ReqPermView({super.key});
   final ctrl = Get.find<IzinController>();
   final auth = Get.find<LoginController>();
+  final homeC = Get.find<HomeController>();
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    // Ambil inset langsung dari FlutterView
+    final view = View.of(context);
+    final viewMedia = MediaQueryData.fromView(view);
+
+    final keyboardHeight = viewMedia.viewInsets.bottom;
+    final keyboardOpen = keyboardHeight > 0;
+
+    final bottomPadding =
+        keyboardOpen ? 8.0 : 68.0 + viewMedia.padding.bottom + 26.0;
 
     return Scaffold(
       body: CustomMaterialIndicator(
@@ -42,7 +55,7 @@ class ReqPermView extends StatelessWidget {
             type: "get_pending_req_permission",
             date1: ctrl.date1.text,
             date2: ctrl.date2.text,
-            status: "pending",
+            status: "",
           );
         },
         backgroundColor: Colors.white,
@@ -63,19 +76,49 @@ class ReqPermView extends StatelessWidget {
         },
 
         child: Obx(() {
+          // final list = ctrl.filteredList;
+          final keyword = homeC.search.value.toLowerCase();
+
+          final list =
+              ctrl.filteredList.where((leave) {
+                return (leave.nama ?? '').toLowerCase().contains(keyword) ||
+                    (leave.idUser ?? '').toLowerCase().contains(keyword) ||
+                    (leave.namaCabang ?? '').toLowerCase().contains(keyword);
+              }).toList();
+
+          // print('========== DEBUG IZIN ==========');
+          // print('Controller hash : ${ctrl.hashCode}');
+          // print('isLoading       : ${ctrl.isLoading.value}');
+          // print('listPrm length  : ${ctrl.listPrm.length}');
+          // print('filtered length : ${list.length}');
+          // print('selectedStatus  : ${ctrl.selectedStatus.value}');
+          // print('searchQuery     : ${ctrl.searchQuery.value}');
+          // print('================================');
+
           if (ctrl.isLoading.value) {
             return Center(child: platFormDevice());
           }
-          final list = ctrl.filteredList;
 
           if (list.isEmpty) {
             return Padding(
-              padding: const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 8.0),
+              padding: EdgeInsets.only(
+                left: 8,
+                right: 8,
+                bottom: bottomPadding,
+              ),
               child: Card(
+                color:
+                    isDark
+                        ? const Color(0xFF1E293B).withOpacity(0.78)
+                        : Colors.white.withOpacity(0.82),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                elevation: 4,
                 child: ListView(
                   physics: const AlwaysScrollableScrollPhysics(),
                   children: [
-                    SizedBox(height: MediaQuery.of(context).size.height * 0.3),
+                    SizedBox(height: MediaQuery.of(context).size.height * 0.2),
                     const Icon(Icons.inbox, size: 50, color: Colors.grey),
                     const SizedBox(height: 10),
                     const Center(child: Text('No Permission request')),
@@ -84,9 +127,18 @@ class ReqPermView extends StatelessWidget {
               ),
             );
           }
+
           return Padding(
-            padding: const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 8.0),
+            padding: EdgeInsets.only(left: 8, right: 8, bottom: bottomPadding),
             child: Card(
+              color:
+                  isDark
+                      ? const Color(0xFF1E293B).withOpacity(0.78)
+                      : Colors.white.withOpacity(0.82),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              elevation: 4,
               child: ListView.builder(
                 itemCount: list.length,
                 physics: const AlwaysScrollableScrollPhysics(),
@@ -146,394 +198,406 @@ class ReqPermView extends StatelessWidget {
                         ),
                       );
                     },
-                    child: Card(
-                      elevation: 4,
-                      margin: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(14),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                /// 🔹 AVATAR
-                                Column(
-                                  children: [
-                                    CircleAvatar(
-                                      radius: 22,
-                                      backgroundColor: color.withOpacity(.2),
-                                      backgroundImage:
-                                          item.photo != null &&
-                                                  item.photo!.isNotEmpty
-                                              ? NetworkImage(
-                                                '${ServiceApi().baseUrl}${item.photo}',
-                                              )
-                                              : null,
-                                      child:
-                                          item.photo == null ||
-                                                  item.photo!.isEmpty
-                                              ? Text(
-                                                item.nama![0].capitalize ?? '',
-                                                style: TextStyle(
-                                                  color: color,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              )
-                                              : null,
-                                    ),
-                                    const SizedBox(height: 5),
-                                    calendarBadge(
-                                      startDate: DateTime.parse(
-                                        item.tanggalMulai!,
-                                      ),
-                                      endDate: DateTime.parse(
-                                        item.tanggalSelesai!,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-
-                                const SizedBox(width: 12),
-
-                                /// 🔹 CONTENT
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(5.0, 0.0, 5.0, 0.0),
+                      child: Card(
+                        color:
+                            isDark
+                                ? const Color(0xFF1E293B).withOpacity(0.78)
+                                : Colors.white.withOpacity(0.82),
+                        elevation: 4,
+                        margin: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 8,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(14),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  /// 🔹 AVATAR
+                                  Column(
                                     children: [
-                                      /// 🔸 NAME + STATUS
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Text(
-                                            item.nama?.capitalize ?? '-',
-                                            style: const TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 15,
-                                            ),
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-
-                                          Container(
-                                            padding: const EdgeInsets.symmetric(
-                                              horizontal: 10,
-                                              vertical: 4,
-                                            ),
-                                            decoration: BoxDecoration(
-                                              color: color.withOpacity(.1),
-                                              borderRadius:
-                                                  BorderRadius.circular(20),
-                                            ),
-                                            child: Text(
-                                              status.toUpperCase(),
-                                              style: TextStyle(
-                                                color: color,
-                                                fontSize: 10,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-
-                                      const SizedBox(height: 5),
-
-                                      /// 🔸 STORE LOC
-                                      Row(
-                                        children: [
-                                          const Icon(
-                                            Icons.store_mall_directory_rounded,
-                                            size: 14,
-                                            color: Colors.grey,
-                                          ),
-                                          const SizedBox(width: 4),
-                                          Text(
-                                            item.namaCabang?.capitalize ?? '',
-                                            style: TextStyle(
-                                              fontSize: 12,
-                                              color: Colors.grey[600],
-                                            ),
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                        ],
-                                      ),
-
-                                      const SizedBox(height: 5),
-
-                                      Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          const Icon(
-                                            Icons.health_and_safety_outlined,
-                                            size: 14,
-                                            color: Colors.grey,
-                                          ),
-                                          const SizedBox(width: 4),
-                                          Expanded(
-                                            child: Text(
-                                              item.alasan?.capitalizeFirst ??
-                                                  '-',
-                                              // maxLines: 1,
-                                              // overflow: TextOverflow.ellipsis,
-                                              style: const TextStyle(
-                                                fontSize: 12,
-                                                color: Colors.grey,
-                                              ),
-                                            ),
-                                          ),
-                                        ],
+                                      CircleAvatar(
+                                        radius: 22,
+                                        backgroundColor: color.withOpacity(.2),
+                                        backgroundImage:
+                                            item.photo != null &&
+                                                    item.photo!.isNotEmpty
+                                                ? NetworkImage(
+                                                  '${ServiceApi().baseUrl}${item.photo}',
+                                                )
+                                                : null,
+                                        child:
+                                            item.photo == null ||
+                                                    item.photo!.isEmpty
+                                                ? Text(
+                                                  item.nama![0].capitalize ??
+                                                      '',
+                                                  style: TextStyle(
+                                                    color: color,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                )
+                                                : null,
                                       ),
                                       const SizedBox(height: 5),
-
-                                      item.lampiran!.trim().isEmpty
-                                          ? const Text('-')
-                                          : InkWell(
-                                            onTap: () {
-                                              final files = parseLampiran(
-                                                item.lampiran,
-                                              );
-                                              if (files.isEmpty) {
-                                                showToast("Tidak ada lampiran");
-                                                return;
-                                              }
-
-                                              showDialog(
-                                                context: context,
-                                                builder:
-                                                    (_) => Dialog(
-                                                      backgroundColor:
-                                                          Colors.black,
-                                                      insetPadding:
-                                                          EdgeInsets.zero,
-                                                      child: Stack(
-                                                        children: [
-                                                          PageView.builder(
-                                                            itemCount:
-                                                                files.length,
-                                                            itemBuilder: (
-                                                              context,
-                                                              index,
-                                                            ) {
-                                                              // print(
-                                                              //   '${ServiceApi().baseUrl}${files[index]}',
-                                                              // );
-                                                              return PhotoView(
-                                                                imageProvider:
-                                                                    NetworkImage(
-                                                                      '${ServiceApi().baseUrl}${files[index]}',
-                                                                    ),
-                                                                backgroundDecoration:
-                                                                    const BoxDecoration(
-                                                                      color:
-                                                                          Colors
-                                                                              .black,
-                                                                    ),
-                                                                errorBuilder: (
-                                                                  context,
-                                                                  error,
-                                                                  stackTrace,
-                                                                ) {
-                                                                  return const Center(
-                                                                    child: Text(
-                                                                      'Gagal memuat gambar',
-                                                                      style: TextStyle(
-                                                                        color:
-                                                                            Colors.white,
-                                                                      ),
-                                                                    ),
-                                                                  );
-                                                                },
-                                                              );
-                                                            },
-                                                          ),
-
-                                                          Positioned(
-                                                            top: 35,
-                                                            right: 20,
-                                                            child: CircleAvatar(
-                                                              backgroundColor:
-                                                                  Colors
-                                                                      .black54,
-                                                              child: IconButton(
-                                                                icon: const Icon(
-                                                                  Icons.close,
-                                                                  color:
-                                                                      Colors
-                                                                          .white,
-                                                                ),
-                                                                onPressed:
-                                                                    () =>
-                                                                        Get.back(),
-                                                              ),
-                                                            ),
-                                                          ),
-
-                                                          if (files.length > 1)
-                                                            Positioned(
-                                                              bottom: 20,
-                                                              left: 0,
-                                                              right: 0,
-                                                              child: Center(
-                                                                child: Container(
-                                                                  padding:
-                                                                      const EdgeInsets.symmetric(
-                                                                        horizontal:
-                                                                            12,
-                                                                        vertical:
-                                                                            6,
-                                                                      ),
-                                                                  decoration: BoxDecoration(
-                                                                    color:
-                                                                        Colors
-                                                                            .black54,
-                                                                    borderRadius:
-                                                                        BorderRadius.circular(
-                                                                          20,
-                                                                        ),
-                                                                  ),
-                                                                  child: Text(
-                                                                    'Geser untuk melihat ${files.length} lampiran',
-                                                                    style: const TextStyle(
-                                                                      color:
-                                                                          Colors
-                                                                              .white,
-                                                                    ),
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                            ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                              );
-                                            },
-                                            child: Text(
-                                              item.lampiran!.contains(',')
-                                                  ? 'Show ${item.lampiran!.split(',').length} Files'
-                                                  : 'Show File',
-                                              style: const TextStyle(
-                                                color: Colors.blue,
-                                              ),
-                                            ),
-                                          ),
-
-                                      const SizedBox(height: 5),
-
-                                      /// 🔸 CREATED AT
-                                      const Text(
-                                        'Diajukan pada',
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 13,
+                                      calendarBadge(
+                                        startDate: DateTime.parse(
+                                          item.tanggalMulai!,
                                         ),
-                                      ),
-                                      Text(
-                                        FormatWaktu.formatIndoWithTimeStamp(
-                                          tanggal: DateTime.parse(
-                                            item.createdAt!,
-                                          ),
-                                        ),
-                                        style: const TextStyle(
-                                          fontSize: 13,
-                                          color: Colors.grey,
+                                        endDate: DateTime.parse(
+                                          item.tanggalSelesai!,
                                         ),
                                       ),
                                     ],
                                   ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 5),
-                            Visibility(
-                              visible: status != "pending",
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const Divider(),
-                                  const SizedBox(height: 5),
-                                  const Text(
-                                    'Note',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  Text(
-                                    getLastNote().capitalize ?? '-',
-                                    style: const TextStyle(
-                                      fontStyle: FontStyle.italic,
+
+                                  const SizedBox(width: 12),
+
+                                  /// 🔹 CONTENT
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        /// 🔸 NAME + STATUS
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              item.nama?.capitalize ?? '-',
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 15,
+                                              ),
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+
+                                            Container(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                    horizontal: 10,
+                                                    vertical: 4,
+                                                  ),
+                                              decoration: BoxDecoration(
+                                                color: color.withOpacity(.1),
+                                                borderRadius:
+                                                    BorderRadius.circular(20),
+                                              ),
+                                              child: Text(
+                                                status.toUpperCase(),
+                                                style: TextStyle(
+                                                  color: color,
+                                                  fontSize: 10,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+
+                                        const SizedBox(height: 5),
+
+                                        /// 🔸 STORE LOC
+                                        Row(
+                                          children: [
+                                            const Icon(
+                                              Icons
+                                                  .store_mall_directory_rounded,
+                                              size: 14,
+                                              color: Colors.grey,
+                                            ),
+                                            const SizedBox(width: 4),
+                                            Text(
+                                              item.namaCabang?.capitalize ?? '',
+                                              style: TextStyle(
+                                                fontSize: 12,
+                                                color: Colors.grey[600],
+                                              ),
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ],
+                                        ),
+
+                                        const SizedBox(height: 5),
+
+                                        Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            const Icon(
+                                              Icons.health_and_safety_outlined,
+                                              size: 14,
+                                              color: Colors.grey,
+                                            ),
+                                            const SizedBox(width: 4),
+                                            Expanded(
+                                              child: Text(
+                                                item.alasan?.capitalizeFirst ??
+                                                    '-',
+                                                // maxLines: 1,
+                                                // overflow: TextOverflow.ellipsis,
+                                                style: const TextStyle(
+                                                  fontSize: 12,
+                                                  color: Colors.grey,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 5),
+
+                                        item.lampiran!.trim().isEmpty
+                                            ? const Text('-')
+                                            : InkWell(
+                                              onTap: () {
+                                                final files = parseLampiran(
+                                                  item.lampiran,
+                                                );
+                                                if (files.isEmpty) {
+                                                  showToast(
+                                                    "Tidak ada lampiran",
+                                                  );
+                                                  return;
+                                                }
+
+                                                showDialog(
+                                                  context: context,
+                                                  builder:
+                                                      (_) => Dialog(
+                                                        backgroundColor:
+                                                            Colors.black,
+                                                        insetPadding:
+                                                            EdgeInsets.zero,
+                                                        child: Stack(
+                                                          children: [
+                                                            PageView.builder(
+                                                              itemCount:
+                                                                  files.length,
+                                                              itemBuilder: (
+                                                                context,
+                                                                index,
+                                                              ) {
+                                                                // print(
+                                                                //   '${ServiceApi().baseUrl}${files[index]}',
+                                                                // );
+                                                                return PhotoView(
+                                                                  imageProvider:
+                                                                      NetworkImage(
+                                                                        '${ServiceApi().baseUrl}${files[index]}',
+                                                                      ),
+                                                                  backgroundDecoration:
+                                                                      const BoxDecoration(
+                                                                        color:
+                                                                            Colors.black,
+                                                                      ),
+                                                                  errorBuilder: (
+                                                                    context,
+                                                                    error,
+                                                                    stackTrace,
+                                                                  ) {
+                                                                    return const Center(
+                                                                      child: Text(
+                                                                        'Gagal memuat gambar',
+                                                                        style: TextStyle(
+                                                                          color:
+                                                                              Colors.white,
+                                                                        ),
+                                                                      ),
+                                                                    );
+                                                                  },
+                                                                );
+                                                              },
+                                                            ),
+
+                                                            Positioned(
+                                                              top: 35,
+                                                              right: 20,
+                                                              child: CircleAvatar(
+                                                                backgroundColor:
+                                                                    Colors
+                                                                        .black54,
+                                                                child: IconButton(
+                                                                  icon: const Icon(
+                                                                    Icons.close,
+                                                                    color:
+                                                                        Colors
+                                                                            .white,
+                                                                  ),
+                                                                  onPressed:
+                                                                      () =>
+                                                                          Get.back(),
+                                                                ),
+                                                              ),
+                                                            ),
+
+                                                            if (files.length >
+                                                                1)
+                                                              Positioned(
+                                                                bottom: 20,
+                                                                left: 0,
+                                                                right: 0,
+                                                                child: Center(
+                                                                  child: Container(
+                                                                    padding: const EdgeInsets.symmetric(
+                                                                      horizontal:
+                                                                          12,
+                                                                      vertical:
+                                                                          6,
+                                                                    ),
+                                                                    decoration: BoxDecoration(
+                                                                      color:
+                                                                          Colors
+                                                                              .black54,
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
+                                                                            20,
+                                                                          ),
+                                                                    ),
+                                                                    child: Text(
+                                                                      'Geser untuk melihat ${files.length} lampiran',
+                                                                      style: const TextStyle(
+                                                                        color:
+                                                                            Colors.white,
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                );
+                                              },
+                                              child: Text(
+                                                item.lampiran!.contains(',')
+                                                    ? 'Show ${item.lampiran!.split(',').length} Files'
+                                                    : 'Show File',
+                                                style: const TextStyle(
+                                                  color: Colors.blue,
+                                                ),
+                                              ),
+                                            ),
+
+                                        const SizedBox(height: 5),
+
+                                        /// 🔸 CREATED AT
+                                        const Text(
+                                          'Diajukan pada',
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 13,
+                                          ),
+                                        ),
+                                        Text(
+                                          FormatWaktu.formatIndoWithTimeStamp(
+                                            tanggal: DateTime.parse(
+                                              item.createdAt!,
+                                            ),
+                                          ),
+                                          style: const TextStyle(
+                                            fontSize: 13,
+                                            color: Colors.grey,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ],
                               ),
-                            ),
-                            Visibility(
-                              visible: status == "pending",
-                              child: SizedBox(
-                                height: 40,
-                                child: CsTextField(
-                                  enabled: true,
-                                  controller: ctrl.note,
-                                  label: 'Note',
-                                  isDark: isDark,
+                              const SizedBox(height: 5),
+                              Visibility(
+                                visible: status != "pending",
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Divider(),
+                                    const SizedBox(height: 5),
+                                    const Text(
+                                      'Note',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    Text(
+                                      getLastNote().capitalize ?? '-',
+                                      style: const TextStyle(
+                                        fontStyle: FontStyle.italic,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                            ),
-                            const SizedBox(height: 10),
-                            if (status == "pending")
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  CsElevatedButton(
-                                    color: red!,
-                                    fontsize: 15,
-                                    label: 'Reject',
-                                    onPressed: () {
-                                      final userData = auth.logUser.value;
-                                      ctrl.reject(
-                                        idUser: userData.id!,
-                                        kodeCabang: userData.kodeCabang!,
-                                        level: userData.level!,
-                                        parentId: userData.parentId!,
-                                        idPerm: item.id!,
-                                        date1: item.tanggalMulai!,
-                                        date2: item.tanggalSelesai!,
-                                        noted: ctrl.note.text,
-                                        remark: item.alasan ?? '',
-                                      );
-                                    },
+                              Visibility(
+                                visible: status == "pending",
+                                child: SizedBox(
+                                  height: 40,
+                                  child: CsTextField(
+                                    enabled: true,
+                                    controller: ctrl.note,
+                                    label: 'Note',
+                                    isDark: isDark,
                                   ),
-                                  const SizedBox(width: 5),
-                                  CsElevatedButton(
-                                    color: green!,
-                                    fontsize: 15,
-                                    label: 'Accept',
-                                    onPressed: () {
-                                      final userData = auth.logUser.value;
-                                      ctrl.accept(
-                                        idUser: userData.id!,
-                                        kodeCabang: userData.kodeCabang!,
-                                        parentId: userData.parentId!,
-                                        level: userData.level!,
-                                        idPerm: item.id!,
-                                        date1: item.tanggalMulai!,
-                                        date2: item.tanggalSelesai!,
-                                        noted: ctrl.note.text,
-                                        remark: item.alasan ?? '',
-                                      );
-                                    },
-                                  ),
-                                ],
+                                ),
                               ),
-                          ],
+                              const SizedBox(height: 10),
+                              if (status == "pending")
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    CsElevatedButton(
+                                      color: red!,
+                                      fontsize: 15,
+                                      label: 'Reject',
+                                      onPressed: () {
+                                        final userData = auth.logUser.value;
+                                        ctrl.reject(
+                                          idUser: userData.id!,
+                                          kodeCabang: userData.kodeCabang!,
+                                          level: userData.level!,
+                                          parentId: userData.parentId!,
+                                          idPerm: item.id!,
+                                          date1: item.tanggalMulai!,
+                                          date2: item.tanggalSelesai!,
+                                          noted: ctrl.note.text,
+                                          remark: item.alasan ?? '',
+                                          isDark: isDark,
+                                        );
+                                      },
+                                    ),
+                                    const SizedBox(width: 5),
+                                    CsElevatedButton(
+                                      color: green!,
+                                      fontsize: 15,
+                                      label: 'Accept',
+                                      onPressed: () {
+                                        final userData = auth.logUser.value;
+                                        ctrl.accept(
+                                          idUser: userData.id!,
+                                          kodeCabang: userData.kodeCabang!,
+                                          parentId: userData.parentId!,
+                                          level: userData.level!,
+                                          idPerm: item.id!,
+                                          date1: item.tanggalMulai!,
+                                          date2: item.tanggalSelesai!,
+                                          noted: ctrl.note.text,
+                                          remark: item.alasan ?? '',
+                                          isDark: isDark,
+                                        );
+                                      },
+                                    ),
+                                  ],
+                                ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
@@ -544,6 +608,8 @@ class ReqPermView extends StatelessWidget {
           );
         }),
       ),
+      floatingActionButtonLocation: const RaisedFabLocation(offsetY: 70),
+
       floatingActionButton: Builder(
         builder:
             (context) => ContainerMainColor(
@@ -552,6 +618,7 @@ class ReqPermView extends StatelessWidget {
               radius: 30,
               child: FloatingActionButton(
                 backgroundColor: Colors.transparent,
+                elevation: 0,
                 onPressed: () {
                   final userData = auth.logUser.value;
                   bottomSearchPerm(context, isDark, userData, ctrl);

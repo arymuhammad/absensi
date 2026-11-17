@@ -10,9 +10,9 @@ import 'package:intl/intl.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:step_progress/step_progress.dart';
 
-import '../../../data/helper/app_colors.dart';
 import '../../../data/helper/const.dart';
 import '../../../data/helper/custom_dialog.dart';
+import '../../../data/helper/custom_fab_location.dart';
 import '../../../data/helper/format_waktu.dart';
 import '../../../data/helper/helper_ui.dart';
 import '../../../data/helper/loading_platform.dart';
@@ -85,7 +85,7 @@ class IzinView extends GetView<IzinController> {
 
                 if (range != null) {
                   final userData = auth.logUser.value;
-                  loadingDialog("memuat data...", "");
+                  loadingDialog("memuat data...", "", isDark);
                   await ctrl.getPermissionList(
                     idUser: userData.id!,
                     kodeCabang: userData.kodeCabang!,
@@ -108,10 +108,13 @@ class IzinView extends GetView<IzinController> {
         centerTitle: true,
         flexibleSpace: Container(
           decoration: BoxDecoration(
-            gradient: AppColors.mainGradient(
-              context: context,
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
+            image: DecorationImage(
+              image: AssetImage(
+                isDark
+                    ? 'assets/image/bg-hd-drk.png'
+                    : 'assets/image/bg-hd.png',
+              ),
+              fit: BoxFit.cover,
             ),
           ),
         ),
@@ -144,7 +147,7 @@ class IzinView extends GetView<IzinController> {
         },
         child: Column(
           children: [
-            PermissionTab(selected: ctrl.selectedStatus),
+            PermissionTab(selected: ctrl.selectedStatus, isDark: isDark),
             searchField(isDark, ctrl),
             Expanded(
               child: Obx(() {
@@ -157,6 +160,11 @@ class IzinView extends GetView<IzinController> {
                   return const Center(child: Text('Data not found'));
                 }
                 return ListView.builder(
+                  padding: EdgeInsets.only(
+                    // left: 12,
+                    // right: 12,
+                    bottom: 68 + MediaQuery.of(context).padding.bottom + 24,
+                  ),
                   itemCount: list.length,
                   itemBuilder: (context, index) {
                     final item = list[index];
@@ -382,6 +390,10 @@ class IzinView extends GetView<IzinController> {
                         );
                       },
                       child: Card(
+                        color:
+                            isDark
+                                ? const Color(0xFF1E293B).withOpacity(0.78)
+                                : Colors.white.withOpacity(0.82),
                         elevation: 4,
                         margin: const EdgeInsets.symmetric(
                           horizontal: 12,
@@ -491,6 +503,15 @@ class IzinView extends GetView<IzinController> {
                                                 // POPUP BUTTON
                                                 if (item.status == "pending")
                                                   PopupMenuButton<String>(
+                                                    color:
+                                                        isDark
+                                                            ? const Color(
+                                                              0xFF1E293B,
+                                                            ).withOpacity(0.78)
+                                                            : Colors.white
+                                                                .withOpacity(
+                                                                  0.82,
+                                                                ),
                                                     padding: EdgeInsets.zero,
                                                     constraints:
                                                         const BoxConstraints(),
@@ -516,6 +537,7 @@ class IzinView extends GetView<IzinController> {
                                                           userData.parentId!,
                                                           userData.level!,
                                                           userData.kodeCabang!,
+                                                          isDark,
                                                         );
                                                       }
                                                     },
@@ -834,6 +856,8 @@ class IzinView extends GetView<IzinController> {
           ],
         ),
       ),
+
+      floatingActionButtonLocation: const RaisedFabLocation(offsetY: 70),
       floatingActionButton: ContainerMainColor(
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
@@ -859,14 +883,17 @@ Widget searchField(bool isDark, IzinController ctrl) {
     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
     child: CupertinoTextField(
       controller: ctrl.searchC,
-      placeholder: 'Search overtime...',
+      placeholder: 'Search permission...',
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-      prefix: const Padding(
-        padding: EdgeInsets.only(left: 8),
+      prefix: Padding(
+        padding: const EdgeInsets.only(left: 8),
         child: Icon(
           CupertinoIcons.search,
           size: 18,
-          color: CupertinoColors.systemGrey,
+          color:
+              isDark
+                  ? Colors.white.withOpacity(0.82)
+                  : CupertinoColors.systemGrey,
         ),
       ),
       suffix: Obx(() {
@@ -887,7 +914,10 @@ Widget searchField(bool isDark, IzinController ctrl) {
         );
       }),
       decoration: BoxDecoration(
-        color: isDark ? Colors.grey[900] : Colors.white,
+        color:
+            isDark
+                ? CupertinoColors.systemGrey.withOpacity(0.50)
+                : Colors.white.withOpacity(0.82),
         borderRadius: BorderRadius.circular(10),
       ),
       onChanged: (val) {

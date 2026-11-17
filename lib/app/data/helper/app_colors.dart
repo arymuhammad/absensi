@@ -31,14 +31,19 @@ class AppColors {
     AlignmentGeometry? begin,
     AlignmentGeometry? end,
   }) {
-   
     final isDark = Theme.of(context!).brightness == Brightness.dark;
 
     return LinearGradient(
       colors:
           isDark
-              ? [const Color(0xFF0F172A), const Color(0xFF1E293B)]
-              : [const Color(0xFF1B2541), const Color(0xFF3949AB)],
+              ? [const Color(0xFF17366F), const Color(0xFF176B78)]
+              : [
+                const Color.fromARGB(255, 7, 55, 188),
+                const Color.fromARGB(255, 33, 195, 210),
+              ],
+      // LINEAR GRADIENT LAMA
+      //  ? [const Color(0xFF0F172A), const Color(0xFF1E293B)]
+      // : [const Color(0xFF1B2541), const Color(0xFF3949AB)],
       // begin: Alignment.bottomCenter,
       // end: Alignment.topCenter,
       begin: begin!,

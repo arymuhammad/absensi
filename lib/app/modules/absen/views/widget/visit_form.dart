@@ -18,8 +18,15 @@ Widget buildVisit({
       SizedBox(
         height: 40,
         child: DropdownButtonFormField<String>(
+          dropdownColor:
+              isDark
+                  ? const Color(0xFF1E293B).withOpacity(0.98)
+                  : Colors.white.withOpacity(0.82),
           decoration: InputDecoration(
-            fillColor: isDark ? Theme.of(context).canvasColor : Colors.white,
+            fillColor:
+                isDark
+                    ? const Color(0xFF1E293B).withOpacity(0.78)
+                    : Colors.white.withOpacity(0.82),
             filled: true,
             // isDense: true, // 🔑 biar tinggi tetap rapih
             contentPadding: const EdgeInsets.all(5),
@@ -73,9 +80,15 @@ Widget buildVisit({
           child: SizedBox(
             height: 40,
             child: DropdownButtonFormField(
+              dropdownColor:
+                  isDark
+                      ? const Color(0xFF1E293B).withOpacity(0.98)
+                      : Colors.white.withOpacity(0.82),
               decoration: InputDecoration(
                 fillColor:
-                    isDark ? Theme.of(context).canvasColor : Colors.white,
+                    isDark
+                        ? const Color(0xFF1E293B).withOpacity(0.98)
+                        : Colors.white.withOpacity(0.82),
                 filled: true,
                 // isDense: true, // 🔑 biar tinggi tetap rapih
                 contentPadding: const EdgeInsets.all(5),
@@ -124,7 +137,9 @@ Widget buildVisit({
               controller: controller.rndLoc,
               decoration: InputDecoration(
                 fillColor:
-                    isDark ? Theme.of(context).canvasColor : Colors.white,
+                    isDark
+                        ? const Color(0xFF1E293B).withOpacity(0.98)
+                        : Colors.white.withOpacity(0.82),
                 filled: true,
                 // isDense: true, // 🔑 biar tinggi tetap rapih
                 contentPadding: const EdgeInsets.all(5),

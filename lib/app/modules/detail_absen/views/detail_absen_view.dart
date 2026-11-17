@@ -9,6 +9,7 @@ import 'package:get/get.dart';
 import 'package:icons_flutter/icons_flutter.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../../data/helper/custom_fab_location.dart';
 import '../../../services/service_api.dart';
 import '../controllers/detail_absen_controller.dart';
 import 'package:flutter_map/flutter_map.dart'; // Suitable for most situations
@@ -27,7 +28,10 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
           double.parse(detailData["lat_masuk"]),
           double.parse(detailData["long_masuk"]),
         ),
-        child: const Icon(Typicons.pin_outline, color: AppColors.contentColorBlue),
+        child: const Icon(
+          Typicons.pin_outline,
+          color: AppColors.contentColorBlue,
+        ),
       ),
     ];
 
@@ -43,7 +47,10 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
             detailData["long_pulang"] != "" ? detailData["long_pulang"] : "0.0",
           ),
         ),
-        child: const Icon(Typicons.pin_outline, color: AppColors.contentColorBlue),
+        child: const Icon(
+          Typicons.pin_outline,
+          color: AppColors.contentColorBlue,
+        ),
       ),
     ];
 
@@ -63,10 +70,13 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
         backgroundColor: AppColors.itemsBackground,
         flexibleSpace: Container(
           decoration: BoxDecoration(
-            gradient: AppColors.mainGradient(
-              context: context,
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
+            image: DecorationImage(
+              image: AssetImage(
+                isDark
+                    ? 'assets/image/bg-hd-drk.png'
+                    : 'assets/image/bg-hd.png',
+              ),
+              fit: BoxFit.cover,
             ),
           ),
         ),
@@ -76,12 +86,13 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
       body: Stack(
         children: [
           ListView(
-            padding: const EdgeInsets.only(
+            padding: EdgeInsets.only(
+              bottom: 68 + MediaQuery.of(context).padding.bottom + 24,
               left: 20,
               top: 100,
               right: 20,
-              bottom: 10,
             ),
+
             children: [
               buildCard(
                 context: context,
@@ -117,6 +128,8 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
           ),
         ],
       ),
+      floatingActionButtonLocation: const RaisedFabLocation(offsetY: 70),
+
       floatingActionButton: Container(
         decoration: BoxDecoration(
           gradient: AppColors.mainGradient(
@@ -186,7 +199,10 @@ class DetailAbsenView extends GetView<DetailAbsenController> {
       margin: const EdgeInsets.symmetric(vertical: 12),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(24),
-        color: isDark ? Theme.of(context).cardColor : Colors.white,
+        color:
+            isDark
+                ? const Color(0xFF1E293B).withOpacity(0.78)
+                : Colors.white.withOpacity(0.82),
         boxShadow: [
           BoxShadow(
             blurRadius: 30,

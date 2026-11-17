@@ -23,8 +23,8 @@ class Cabang {
     brandCabang = json['brand_cabang'];
     lat = json['lat'];
     long = json['long'];
-    cvrArea = json['area_coverage'];
-    cvrAreaQR = json['area_coverage_qr'];
+    cvrArea = json['area_coverage'].toString();
+    cvrAreaQR = json['area_coverage_qr'].toString();
   }
 
   Map<String, dynamic> toJson() {

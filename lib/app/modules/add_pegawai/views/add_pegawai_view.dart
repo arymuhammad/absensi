@@ -23,12 +23,25 @@ class AddPegawaiView extends GetView<AddPegawaiController> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       body: Stack(
+        fit: StackFit.expand,
         children: [
-          ContainerMainColor(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            radius: 0,
-            child: Container(height: 250),
+          // GLOBAL BACKGROUND
+          Image.asset(
+            isDark ? 'assets/image/bg-ctn-drk.png' : 'assets/image/bg-ctn.png',
+            fit: BoxFit.cover,
+          ),
+
+          // BLUE HEADER
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            height: 400,
+            child: Image.asset(
+              isDark ? 'assets/image/bg-hd-drk.png' : 'assets/image/bg-hd.png',
+              fit: BoxFit.cover,
+              alignment: Alignment.topCenter,
+            ),
           ),
           ListView(
             scrollDirection: Axis.vertical,
@@ -77,19 +90,24 @@ class AddPegawaiView extends GetView<AddPegawaiController> {
                                         ),
                                       )
                                       .toList(),
+                              borderRadius: BorderRadius.circular(10),
                               decoration: InputDecoration(
                                 labelText: 'Brand',
                                 filled: true,
                                 fillColor:
                                     isDark
-                                        ? Theme.of(context).canvasColor
-                                        : Colors.white,
+                                        ? const Color(
+                                          0xFF1E293B,
+                                        ).withOpacity(0.78)
+                                        : Colors.white.withOpacity(0.82),
                                 contentPadding: const EdgeInsets.all(8),
                                 border: const OutlineInputBorder(),
                               ),
                               dropdownColor:
                                   isDark
-                                      ? Theme.of(context).canvasColor
+                                      ? const Color(
+                                        0xFF1E293B,
+                                      ).withOpacity(0.78)
                                       : Colors.white,
                             ),
                           ),
@@ -118,10 +136,24 @@ class AddPegawaiView extends GetView<AddPegawaiController> {
                                             filled: true,
                                             fillColor:
                                                 isDark
-                                                    ? Theme.of(
-                                                      context,
-                                                    ).canvasColor
-                                                    : Colors.white,
+                                                    ? const Color(
+                                                      0xFF1E293B,
+                                                    ).withOpacity(0.78)
+                                                    : Colors.white.withOpacity(
+                                                      0.82,
+                                                    ),
+                                          ),
+                                        ),
+                                    suggestionsBoxDecoration:
+                                        SuggestionsBoxDecoration(
+                                          color:
+                                              isDark
+                                                  ? const Color(
+                                                    0xFF1E293B,
+                                                  ).withOpacity(0.78)
+                                                  : Colors.white,
+                                          borderRadius: BorderRadius.circular(
+                                            10,
                                           ),
                                         ),
                                     suggestionsCallback: (pattern) {
@@ -135,7 +167,7 @@ class AddPegawaiView extends GetView<AddPegawaiController> {
                                       return ListTile(
                                         tileColor:
                                             isDark
-                                                ? Theme.of(context).canvasColor
+                                                ? const Color(0xFF1E293B)
                                                 : Colors.white,
                                         title: Text(suggestion),
                                       );
@@ -181,13 +213,16 @@ class AddPegawaiView extends GetView<AddPegawaiController> {
                             if (c.image != null || c.webImage.isNotEmpty) {
                               return kIsWeb
                                   ? Container(
-                                    height: 110,
-                                    width: 110,
+                                    height: 100,
+                                    width: 100,
                                     decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(10),
                                       color:
                                           isDark
-                                              ? Theme.of(context).canvasColor
-                                              : Colors.grey[300],
+                                              ? const Color(
+                                                0xFF1E293B,
+                                              ).withOpacity(0.78)
+                                              : Colors.white.withOpacity(0.82),
                                     ),
                                     child: Image.memory(
                                       c.webImage,
@@ -195,28 +230,37 @@ class AddPegawaiView extends GetView<AddPegawaiController> {
                                     ),
                                   )
                                   : Container(
-                                    height: 110,
-                                    width: 110,
+                                    height: 100,
+                                    width: 100,
                                     decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(10),
                                       color:
                                           isDark
-                                              ? Theme.of(context).canvasColor
-                                              : Colors.grey[300],
+                                              ? const Color(
+                                                0xFF1E293B,
+                                              ).withOpacity(0.78)
+                                              : Colors.white.withOpacity(0.82),
                                     ),
-                                    child: Image.file(
-                                      File(c.image!.path),
-                                      fit: BoxFit.cover,
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(10),
+                                      child: Image.file(
+                                        File(c.image!.path),
+                                        fit: BoxFit.cover,
+                                      ),
                                     ),
                                   );
                             } else {
                               return Container(
-                                height: 110,
-                                width: 110,
+                                height: 100,
+                                width: 100,
                                 decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
                                   color:
                                       isDark
-                                          ? Theme.of(context).canvasColor
-                                          : Colors.grey[300],
+                                          ? const Color(
+                                            0xFF1E293B,
+                                          ).withOpacity(0.78)
+                                          : Colors.white.withOpacity(0.82),
                                 ),
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
@@ -259,8 +303,10 @@ class AddPegawaiView extends GetView<AddPegawaiController> {
                               filled: true,
                               fillColor:
                                   isDark
-                                      ? Theme.of(context).canvasColor
-                                      : Colors.white,
+                                      ? const Color(
+                                        0xFF1E293B,
+                                      ).withOpacity(0.78)
+                                      : Colors.white.withOpacity(0.82),
                               border: const OutlineInputBorder(),
                             ),
                             maxLines: 1,
@@ -277,8 +323,10 @@ class AddPegawaiView extends GetView<AddPegawaiController> {
                               filled: true,
                               fillColor:
                                   isDark
-                                      ? Theme.of(context).canvasColor
-                                      : Colors.white,
+                                      ? const Color(
+                                        0xFF1E293B,
+                                      ).withOpacity(0.78)
+                                      : Colors.white.withOpacity(0.82),
                               border: const OutlineInputBorder(),
                             ),
                           ),
@@ -299,8 +347,10 @@ class AddPegawaiView extends GetView<AddPegawaiController> {
                               filled: true,
                               fillColor:
                                   isDark
-                                      ? Theme.of(context).canvasColor
-                                      : Colors.white,
+                                      ? const Color(
+                                        0xFF1E293B,
+                                      ).withOpacity(0.78)
+                                      : Colors.white.withOpacity(0.82),
                               border: const OutlineInputBorder(),
                             ),
                             maxLines: 1,
@@ -316,8 +366,10 @@ class AddPegawaiView extends GetView<AddPegawaiController> {
                               filled: true,
                               fillColor:
                                   isDark
-                                      ? Theme.of(context).canvasColor
-                                      : Colors.white,
+                                      ? const Color(
+                                        0xFF1E293B,
+                                      ).withOpacity(0.78)
+                                      : Colors.white.withOpacity(0.82),
                               border: const OutlineInputBorder(),
                             ),
                             keyboardType: TextInputType.phone,
@@ -351,8 +403,8 @@ class AddPegawaiView extends GetView<AddPegawaiController> {
                             filled: true,
                             fillColor:
                                 isDark
-                                    ? Theme.of(context).canvasColor
-                                    : Colors.white,
+                                    ? const Color(0xFF1E293B).withOpacity(0.78)
+                                    : Colors.white.withOpacity(0.82),
                           ),
                         ),
                         suggestionsCallback: (pattern) {
@@ -377,6 +429,13 @@ class AddPegawaiView extends GetView<AddPegawaiController> {
                             ),
                           );
                         },
+                        suggestionsBoxDecoration: SuggestionsBoxDecoration(
+                          color:
+                              isDark
+                                  ? const Color(0xFF1E293B).withOpacity(0.78)
+                                  : Colors.white,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
                         onSuggestionSelected: (suggestion) {
                           controller.level.text = suggestion;
                           for (int i = 0; i < dataLevel.length; i++) {
@@ -423,6 +482,7 @@ class AddPegawaiView extends GetView<AddPegawaiController> {
                         context,
                         "add",
                         Data(),
+                        isDark,
                       );
                       controller.isLoading.value = false;
                       if (result == true) {
@@ -438,6 +498,7 @@ class AddPegawaiView extends GetView<AddPegawaiController> {
                             // Get.back(); // tutup dialog
                             Navigator.pop(context); // balik ke halaman profile
                           },
+                          isDark: isDark
                         );
                       }
                     },

@@ -31,6 +31,8 @@ class RiwayatVisitView extends GetView {
   @override
   Widget build(BuildContext context) {
     final userData = auth.logUser.value;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       // extendBodyBehindAppBar: true,
       appBar: AppBar(
@@ -88,7 +90,7 @@ class RiwayatVisitView extends GetView {
                 );
 
                 if (range != null) {
-                  loadingDialog("memuat data...", "");
+                  loadingDialog("memuat data...", "", isDark);
                   await visitC.getAllVisited(
                     userData.id!,
                     DateFormat('yyyy-MM-dd').format(range.start),
@@ -104,14 +106,18 @@ class RiwayatVisitView extends GetView {
             ),
           ],
         ),
-        backgroundColor: AppColors.itemsBackground,
+        backgroundColor: Colors.transparent,
         elevation: 0.0,
-         flexibleSpace: Container(
+        flexibleSpace: Container(
+          // height: 250,
           decoration: BoxDecoration(
-            gradient: AppColors.mainGradient(
-              context: context,
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
+            image: DecorationImage(
+              image: AssetImage(
+                isDark
+                    ? 'assets/image/bg-hd-drk.png'
+                    : 'assets/image/bg-hd.png',
+              ),
+              fit: BoxFit.cover,
             ),
           ),
         ),
@@ -119,18 +125,58 @@ class RiwayatVisitView extends GetView {
       // resizeToAvoidBottomInset: false,
       body: CustomMaterialIndicator(
         onRefresh: () async {
-          visitC.isLoading.value = true;
+          // visitC.isLoading.value = true;
+          // visitC.resetFilter();
+          // pickedRange.value = null;
+          // // selectedTab.value = 0;
+          // await visitC.getAllVisited(
+          //   userData.id!,
+          //   visitC.initDate1,
+          //   visitC.initDate2,
+          // );
+          // showToast("Page Refreshed");
+
+          final data = auth.logUser.value;
           visitC.resetFilter();
-          pickedRange.value = null;
-          // selectedTab.value = 0;
+
+          final now = DateTime.now();
+
+          DateTime start;
+          DateTime end;
+
+          if (selectedTab.value == 0) {
+            // This Week
+            final monday = now.subtract(Duration(days: now.weekday - 1));
+
+            start = DateTime(monday.year, monday.month, monday.day);
+            end = start.add(const Duration(days: 6));
+          } else if (selectedTab.value == 1 && pickedRange.value != null) {
+            // This Month / selected range
+            start = pickedRange.value!.start;
+            end = pickedRange.value!.end;
+          } else if (selectedTab.value == 1) {
+            // Default This Month
+            start = DateTime(now.year, now.month, 1);
+            end = DateTime(
+              now.year,
+              now.month + 1,
+              1,
+            ).subtract(const Duration(days: 1));
+          } else {
+            // Search: all data
+            start = DateTime(2000);
+            end = DateTime(2100);
+          }
+
           await visitC.getAllVisited(
-            userData.id!,
-            visitC.initDate1,
-            visitC.initDate2,
+            data.id!,
+            DateFormat('yyyy-MM-dd').format(start),
+            DateFormat('yyyy-MM-dd').format(end),
           );
+
           showToast("Page Refreshed");
         },
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.transparent,
         indicatorBuilder: (context, controller) {
           return Padding(
             padding: const EdgeInsets.all(6.0),
@@ -165,7 +211,11 @@ class RiwayatVisitView extends GetView {
 
             /// 🔹 CONTENT
             SliverPadding(
-              padding: const EdgeInsets.all(12),
+              padding: EdgeInsets.only(
+                left: 12,
+                right: 12,
+                bottom: 68 + MediaQuery.of(context).padding.bottom + 24,
+              ),
               sliver: Obx(() {
                 final now = DateTime.now();
 
@@ -339,13 +389,24 @@ class _HistoryRangeTabState extends State<HistoryRangeTab> {
             margin: const EdgeInsets.fromLTRB(12, 8, 12, 8),
             padding: const EdgeInsets.all(6),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(.65),
+              color:
+                  isDark
+                      ? const Color(0xFF1E293B).withOpacity(0.78)
+                      : Colors.white.withOpacity(0.82),
               borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: Colors.white.withOpacity(.4)),
+              border: Border.all(
+                color:
+                    isDark
+                        ? const Color(0xFF1E293B).withOpacity(0.78)
+                        : Colors.white.withOpacity(0.82),
+              ),
             ),
             child: AnimatedSwitcher(
               duration: const Duration(milliseconds: 250),
-              child: isSearching.value ? _searchField(isDark) : _segmentedIOS(),
+              child:
+                  isSearching.value
+                      ? _searchField(isDark)
+                      : _segmentedIOS(isDark),
             ),
           ),
         ),
@@ -354,11 +415,14 @@ class _HistoryRangeTabState extends State<HistoryRangeTab> {
   }
 
   // ================= CUPERTINO SEGMENTED =================
-  Widget _segmentedIOS() {
+  Widget _segmentedIOS(bool isDark) {
     return CupertinoSlidingSegmentedControl<int>(
       key: const ValueKey('segmented'),
       groupValue: widget.selectedIndex.value,
-      thumbColor: Theme.of(context).cardColor,
+      thumbColor:
+          isDark
+              ? CupertinoColors.systemGrey.withOpacity(0.50)
+              : Colors.white.withOpacity(0.82),
       backgroundColor: Colors.transparent,
       children: const {
         0: Padding(
@@ -402,16 +466,22 @@ class _HistoryRangeTabState extends State<HistoryRangeTab> {
             autofocus: true,
             placeholder: 'Search data...',
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-            prefix: const Padding(
-              padding: EdgeInsets.only(left: 8),
+            prefix: Padding(
+              padding: const EdgeInsets.only(left: 8),
               child: Icon(
                 CupertinoIcons.search,
                 size: 18,
-                color: CupertinoColors.systemGrey,
+                color:
+                    isDark
+                        ? Colors.white.withOpacity(0.82)
+                        : CupertinoColors.systemGrey,
               ),
             ),
             decoration: BoxDecoration(
-              color: isDark ? Theme.of(context).cardColor : Colors.white,
+              color:
+                  isDark
+                      ? CupertinoColors.systemGrey.withOpacity(0.50)
+                      : Colors.white.withOpacity(0.82),
               borderRadius: BorderRadius.circular(10),
             ),
             style: TextStyle(color: isDark ? Colors.white : Colors.black),
@@ -428,10 +498,13 @@ class _HistoryRangeTabState extends State<HistoryRangeTab> {
             searchC.clear();
             widget.onSearch('');
           },
-          child: const Icon(
+          child: Icon(
             CupertinoIcons.clear_circled_solid,
             size: 22,
-            color: CupertinoColors.systemGrey,
+            color:
+                isDark
+                    ? Colors.white.withOpacity(0.82)
+                    : CupertinoColors.systemGrey,
           ),
         ),
       ],

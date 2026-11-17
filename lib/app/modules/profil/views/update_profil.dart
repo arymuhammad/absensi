@@ -28,6 +28,7 @@ class UpdateProfil extends GetView {
     ctr.store.text = userData!.namaCabang ?? '';
     ctr.joinDate.text = userData!.createdAt ?? '';
     final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
@@ -40,21 +41,26 @@ class UpdateProfil extends GetView {
       resizeToAvoidBottomInset: true,
       body: Stack(
         children: [
-          // const CsBgImg(),
           Container(
-            height: 250,
+            height: 400,
             decoration: BoxDecoration(
-              gradient: AppColors.mainGradient(
-                context: context,
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
+              image: DecorationImage(
+                image: AssetImage(
+                  isDark
+                      ? 'assets/image/bg-hd-drk.png'
+                      : 'assets/image/bg-hd.png',
+                ),
+                fit: BoxFit.cover,
               ),
             ),
           ),
           Padding(
-            padding: const EdgeInsets.only(top: 150, left: 15.0, right: 15.0),
+            padding: const EdgeInsets.only(top: 100, left: 15.0, right: 15.0),
             child: SingleChildScrollView(
               controller: scrollController,
+              padding: EdgeInsets.only(
+                bottom: 68 + MediaQuery.of(context).padding.bottom + 24,
+              ),
               child: ConstrainedBox(
                 constraints: BoxConstraints(
                   minHeight: MediaQuery.of(context).size.height,
@@ -73,8 +79,12 @@ class UpdateProfil extends GetView {
                       Card(
                         color:
                             isDark
-                                ? Theme.of(context).cardColor
-                                : Colors.blueGrey[100],
+                                ? const Color(0xFF1E293B).withOpacity(0.78)
+                                : Colors.white.withOpacity(0.82),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        elevation: 4,
                         child: Padding(
                           padding: const EdgeInsets.all(10.0),
                           child: Column(
@@ -510,6 +520,7 @@ class UpdateProfil extends GetView {
                               const SizedBox(height: 10),
 
                               _buildAttachmentTile(
+                                isDark: isDark,
                                 title: "KTP",
                                 icon: Icons.badge_outlined,
                                 color: AppColors.contentColorBlue,
@@ -518,6 +529,7 @@ class UpdateProfil extends GetView {
                               ),
 
                               _buildAttachmentTile(
+                                isDark: isDark,
                                 title: "Kartu Keluarga",
                                 icon: Icons.groups_outlined,
                                 color: AppColors.contentColorCyan,
@@ -526,6 +538,7 @@ class UpdateProfil extends GetView {
                               ),
 
                               _buildAttachmentTile(
+                                isDark: isDark,
                                 title: "NPWP",
                                 icon: Icons.receipt_long_outlined,
                                 color: AppColors.contentColorOrange,
@@ -534,6 +547,7 @@ class UpdateProfil extends GetView {
                               ),
 
                               _buildAttachmentTile(
+                                isDark: isDark,
                                 title: "Sertifikat Vaksin Covid",
                                 icon: Icons.health_and_safety_outlined,
                                 color: AppColors.contentColorGreenAccent,
@@ -557,6 +571,7 @@ class UpdateProfil extends GetView {
                               const SizedBox(height: 10),
 
                               _buildAttachmentTile(
+                                isDark: isDark,
                                 title: "Sertifikat Pelatihan",
                                 icon: Icons.workspace_premium_outlined,
                                 color: AppColors.contentColorPurple,
@@ -589,6 +604,7 @@ class UpdateProfil extends GetView {
                                         context,
                                         "update",
                                         userData!,
+                                        isDark,
                                       );
                                       ctr.isLoading.value = false;
                                       if (result == true) {
@@ -606,6 +622,7 @@ class UpdateProfil extends GetView {
                                               context,
                                             ); // balik ke halaman profile
                                           },
+                                          isDark: isDark
                                         );
                                       }
                                     },
@@ -658,6 +675,7 @@ class UpdateProfil extends GetView {
   }
 
   Widget _buildAttachmentTile({
+    required bool isDark,
     required String title,
     required IconData icon,
     required Color color,
@@ -665,6 +683,10 @@ class UpdateProfil extends GetView {
     Function()? onPressed,
   }) {
     return Card(
+      color:
+          isDark
+              ? const Color(0xFF1E293B).withOpacity(0.78)
+              : Colors.white.withOpacity(0.82),
       margin: const EdgeInsets.only(bottom: 10),
       elevation: 1,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),

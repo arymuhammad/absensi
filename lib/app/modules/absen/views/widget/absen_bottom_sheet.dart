@@ -29,7 +29,10 @@ class AbsenBottomSheet extends StatelessWidget {
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeOut,
       decoration: BoxDecoration(
-        color: isDark ? Theme.of(context).cardColor : Colors.blueGrey[100],
+        color:
+            isDark
+                ? const Color(0xFF1E293B).withOpacity(0.95)
+                : Colors.white.withOpacity(0.82),
         borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
         boxShadow: [
           BoxShadow(
@@ -95,27 +98,25 @@ class AbsenBottomSheet extends StatelessWidget {
               final data = auth.logUser.value;
 
               final isOutside =
-                  controller.distanceStore.value > num.parse(data.areaCover!);
+                  controller.distanceStore.value >
+                  double.parse(controller.selectedAreaCoverage.value);
 
               final bypass = controller.canBypassArea(data);
               // final isRnD =
               //     controller.optVisitSelected.value ==
               //     "Research and Development";
 
-              return Visibility(
-                visible: isOutside && !bypass,
-                child: Column(
-                  children: [
-                    Text(
-                      controller.locNote.value,
-                      style: TextStyle(
-                        color: (isOutside && !bypass) ? red : green,
-                        fontWeight: FontWeight.w600,
-                      ),
+              return Column(
+                children: [
+                  Text(
+                    controller.locNote.value,
+                    style: TextStyle(
+                      color: (isOutside && !bypass) ? red : Colors.green,
+                      fontWeight: FontWeight.w600,
                     ),
-                    const SizedBox(height: 5),
-                  ],
-                ),
+                  ),
+                  const SizedBox(height: 5),
+                ],
               );
             }),
 
@@ -123,7 +124,8 @@ class AbsenBottomSheet extends StatelessWidget {
             Obx(() {
               final data = auth.logUser.value;
               final isOutside =
-                  controller.distanceStore.value > num.parse(data.areaCover!);
+                  controller.distanceStore.value >
+                  double.parse(controller.selectedAreaCoverage.value);
 
               final bypass = controller.canBypassArea(data);
               // final isRnD =
@@ -184,7 +186,8 @@ class AbsenBottomSheet extends StatelessWidget {
                 //     controller.optVisitSelected.value ==
                 //     "Research and Development";
                 final isOutside =
-                    controller.distanceStore.value > num.parse(data.areaCover!);
+                    controller.distanceStore.value >
+                    double.parse(controller.selectedAreaCoverage.value);
 
                 final locationValid =
                     bypass
@@ -195,16 +198,16 @@ class AbsenBottomSheet extends StatelessWidget {
                     !controller.isTimeUntrusted.value &&
                     !controller.isAppLocked.value;
 
-//                 print('''
-// distanceStore : ${controller.distanceStore.value}
-// areaCover     : ${data.areaCover}
-// isQrValidated : ${controller.isQrValidated.value}
-// isEnabled     : ${controller.isEnabled.value}
-// bypass        : $bypass
-// isOutside     : $isOutside
-// locationValid : $locationValid
-// enabled       : $enabled
-// ''');
+                //                 print('''
+                // distanceStore : ${controller.distanceStore.value}
+                // areaCover     : ${data.areaCover}
+                // isQrValidated : ${controller.isQrValidated.value}
+                // isEnabled     : ${controller.isEnabled.value}
+                // bypass        : $bypass
+                // isOutside     : $isOutside
+                // locationValid : $locationValid
+                // enabled       : $enabled
+                // ''');
 
                 return Container(
                   decoration: BoxDecoration(
@@ -268,7 +271,10 @@ class AbsenBottomSheet extends StatelessWidget {
                         //   return false;
                         // }
 
-                        final result = await controller.executeAction(data);
+                        final result = await controller.executeAction(
+                          data,
+                          isDark,
+                        );
 
                         if (!result.success) {
                           showToast(result.message);

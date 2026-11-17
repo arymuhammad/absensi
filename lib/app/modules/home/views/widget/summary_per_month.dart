@@ -77,7 +77,8 @@ _buildAbsen(Data userData, HomeController homeC, bool isDark) {
 Widget genSummaryAbsen(HomeController homeC, bool isDark) {
   if (homeC.isLoadingSumm.value) {
     return Row(
-      children: [presentShimmer(), presentShimmer(), presentShimmer()],
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [presentShimmer(isDark), presentShimmer(isDark), presentShimmer(isDark)],
     );
   }
 
@@ -116,6 +117,7 @@ Widget genSummaryAbsen(HomeController homeC, bool isDark) {
           color: AppColors.contentColorBlue,
           total: homeC.hadir.value.toString(),
           title: 'Present',
+          isDark: isDark,
         ),
       ),
       Expanded(
@@ -132,6 +134,7 @@ Widget genSummaryAbsen(HomeController homeC, bool isDark) {
           color: green!,
           total: homeC.tepatWaktu.value.toString(),
           title: 'On Time',
+          isDark: isDark,
         ),
       ),
       Expanded(
@@ -149,6 +152,7 @@ Widget genSummaryAbsen(HomeController homeC, bool isDark) {
           color: red!,
           total: homeC.telat.value.toString(),
           title: 'Late',
+          isDark: isDark,
         ),
       ),
     ],
@@ -218,16 +222,22 @@ class CardSummPermonth extends StatelessWidget {
     required this.color,
     required this.total,
     required this.title,
+    required this.isDark,
   });
 
   final IconData icon;
   final Color color;
   final String total;
   final String title;
+  final bool isDark;
 
   @override
   Widget build(BuildContext context) {
     return Card(
+      color:
+          isDark
+              ? const Color(0xFF1E293B).withOpacity(0.78)
+              : Colors.white.withOpacity(0.82),
       elevation: 8,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       child: Padding(

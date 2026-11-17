@@ -1,3 +1,4 @@
+import 'package:absensi/app/data/model/visit_model.dart';
 import 'package:absensi/app/modules/adjust_presence/controllers/adjust_presence_controller.dart';
 import 'package:absensi/app/modules/shared/elevated_button_icon.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
@@ -9,7 +10,7 @@ import 'package:intl/intl.dart';
 import '../../shared/text_field.dart';
 
 class ExpandedDataVisit extends StatelessWidget {
-  final RxList dataVisit;
+  final RxList<Visit> dataVisit;
   ExpandedDataVisit({super.key, required this.dataVisit});
 
   final ctrl = Get.put(AdjustPresenceController());
@@ -96,6 +97,7 @@ class ExpandedDataVisit extends StatelessWidget {
                                           i.id,
                                           i.tglVisit,
                                           i.visitIn,
+                                          isDark
                                         ),
                                     size: Size(
                                       Get.mediaQuery.size.width / 3,

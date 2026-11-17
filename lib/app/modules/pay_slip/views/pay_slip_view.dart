@@ -27,7 +27,7 @@ class PaySlipView extends GetView<PaySlipController> {
   @override
   Widget build(BuildContext context) {
     final userData = auth.logUser.value;
-    
+
     late PayslipResult? payslip;
     late PayslipResult? payslipstore;
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -38,10 +38,13 @@ class PaySlipView extends GetView<PaySlipController> {
         backgroundColor: AppColors.itemsBackground,
         flexibleSpace: Container(
           decoration: BoxDecoration(
-            gradient: AppColors.mainGradient(
-              context: context,
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
+            image: DecorationImage(
+              image: AssetImage(
+                isDark
+                    ? 'assets/image/bg-hd-drk.png'
+                    : 'assets/image/bg-hd.png',
+              ),
+              fit: BoxFit.cover,
             ),
           ),
         ),
@@ -126,6 +129,7 @@ class PaySlipView extends GetView<PaySlipController> {
                 /// 🔥 DIGANTI DI SINI SAJA
                 onShowPicker: (context, currentValue) async {
                   return await payC.showCustomMonthYearPicker(
+                    isDark,
                     context,
                     initialDate: currentValue,
                   );

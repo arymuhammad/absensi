@@ -54,7 +54,7 @@ class _PulseGlowState extends State<PulseGlow>
           style: TextStyle(
             shadows: [
               Shadow(
-                color: Colors.blueAccent.withOpacity(_anim.value),
+                color: Colors.white.withOpacity(_anim.value),
                 blurRadius: 14 * _anim.value,
               ),
             ],
@@ -63,7 +63,7 @@ class _PulseGlowState extends State<PulseGlow>
             data: IconThemeData(
               shadows: [
                 Shadow(
-                  color: Colors.blueAccent.withOpacity(_anim.value),
+                  color: Colors.white.withOpacity(_anim.value),
                   blurRadius: 14 * _anim.value,
                 ),
               ],

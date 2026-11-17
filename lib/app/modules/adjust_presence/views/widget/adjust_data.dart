@@ -13,11 +13,13 @@ import '../expanded_data_absen.dart';
 import '../expanded_data_visit.dart';
 
 class AdjustData extends GetView<AdjustPresenceController> {
-  AdjustData({super.key,});
- 
+  AdjustData({super.key});
+
   final ctrl = Get.find<AdjustPresenceController>();
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Column(
       children: [
         const Row(
@@ -77,7 +79,10 @@ class AdjustData extends GetView<AdjustPresenceController> {
                         );
                       } else {
                         ctrl.isLoading.value = true;
-                        await ctrl.getDataAbsen(ctrl.selectedUserCabang.value);
+                        await ctrl.getDataAbsen(
+                          ctrl.selectedUserCabang.value,
+                          isDark,
+                        );
                       }
                     } else {
                       if (ctrl.date1.text == "" ||
@@ -97,6 +102,7 @@ class AdjustData extends GetView<AdjustPresenceController> {
                           ctrl.date1.text,
                           ctrl.selectedDept.value,
                           ctrl.selectedUserDept.value,
+                          isDark,
                         );
                       }
                     }
@@ -312,7 +318,8 @@ class AdjustData extends GetView<AdjustPresenceController> {
                           future: ctrl.getUserCabang(
                             ctrl.selectedCabang.isNotEmpty
                                 ? ctrl.selectedCabang.value
-                                : "UE526",""
+                                : "UE526",
+                            "",
                           ),
                           builder: (ctx, snapshot) {
                             if (snapshot.hasData) {

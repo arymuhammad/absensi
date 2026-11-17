@@ -1,29 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
 
-Widget presentShimmer() {
+Widget presentShimmer(bool isDark) {
   return Expanded(
-    flex: 1,
-    child: Container(
-      decoration: const BoxDecoration(
-        // borderRadius: BorderRadius.only(
-        //   topLeft: Radius.circular(5),
-        //   bottomLeft: Radius.circular(5),
-        // ),
-        color: Colors.white,
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Shimmer.fromColors(
-          baseColor: Colors.grey.shade300,
-          highlightColor: Colors.grey.shade100,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                height: 28,
-                alignment: Alignment.center,
-                child: Row(
+    // flex: 1,
+    child: Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      child: Container(
+        height: 52,
+        decoration: BoxDecoration(
+          borderRadius: const BorderRadius.all(Radius.circular(10)),
+          color:
+              isDark
+                  ? const Color(0xFF1E293B).withOpacity(0.78)
+                  : Colors.white.withOpacity(0.82),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Shimmer.fromColors(
+            baseColor: Colors.grey.shade300,
+            highlightColor: Colors.grey.shade100,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Column(
                   children: [
                     Container(
                       width: 28,
@@ -33,33 +34,34 @@ Widget presentShimmer() {
                         shape: BoxShape.circle,
                       ),
                     ),
-                    const SizedBox(width: 5),
+                  ],
+                ),
+                const SizedBox(width: 5),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
                     Container(
-                      width: 55,
-                      height: 12,
-                      color: Colors.white,
+                      width: 45,
+                      height: 14,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                    ),
+                    const SizedBox(height: 5),
+                    Container(
+                      width: 20,
+                      height: 14,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(5),
+                      ),
                     ),
                   ],
                 ),
-              ),
-              const SizedBox(height: 15),
-              Row(
-                children: [
-                  Container(
-                    width: 20,
-                    height: 16,
-                    color: Colors.white,
-                  ),
-                  const SizedBox(width: 5),
-                  Container(
-                    width: 30,
-                    height: 12,
-                    color: Colors.white,
-                  ),
-                ],
-              ),
-              const SizedBox(height: 5),
-            ],
+                // const SizedBox(height: 5),
+              ],
+            ),
           ),
         ),
       ),

@@ -102,6 +102,7 @@ void succesDialog({
   required DialogType type,
   required String title,
   required Function()? btnOkOnPress,
+  required bool isDark,
 }) {
   AwesomeDialog(
     context: context,
@@ -112,6 +113,7 @@ void succesDialog({
     dismissOnBackKeyPress: false,
     title: title,
     desc: desc,
+    dialogBackgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
     btnOkOnPress: btnOkOnPress,
     btnOkIcon: Icons.check_circle,
     onDismissCallback: (type) {
@@ -120,7 +122,7 @@ void succesDialog({
   ).show();
 }
 
-warningDialog(context, title, desc) {
+warningDialog(context, title, desc, bool isDark) {
   AwesomeDialog(
     context: context,
     animType: AnimType.scale,
@@ -130,6 +132,7 @@ warningDialog(context, title, desc) {
     dismissOnBackKeyPress: false,
     title: title,
     desc: desc,
+    dialogBackgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
     btnOkOnPress: () {},
     btnOkIcon: Icons.cancel,
     btnOkText: 'Close',
@@ -166,6 +169,7 @@ infoDialog(
   String desc,
   String confirmText,
   Function()? btnOkOnPress,
+  bool isDark,
 ) {
   AwesomeDialog(
     context: context,
@@ -176,6 +180,7 @@ infoDialog(
     dismissOnBackKeyPress: false,
     title: title,
     desc: desc,
+    dialogBackgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
     btnOkOnPress: btnOkOnPress,
     btnOkIcon: Icons.camera_front,
     btnOkText: confirmText,
@@ -191,6 +196,7 @@ void promptDialog({
   required String desc,
   required String title,
   required Function()? btnOkOnPress,
+  required bool isDark,
 }) {
   AwesomeDialog(
     context: context,
@@ -208,6 +214,7 @@ void promptDialog({
     animType: AnimType.bottomSlide,
     title: title,
     desc: desc,
+    dialogBackgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
     btnCancelOnPress: () {},
     btnOkOnPress: btnOkOnPress,
     btnCancelColor: Colors.redAccent[700],
@@ -217,12 +224,13 @@ void promptDialog({
   ).show();
 }
 
-loadingDialog(msg, String? msg2) {
+loadingDialog(msg, String? msg2, bool isDark) {
   Get.defaultDialog(
     title: '',
     onWillPop: () async {
       return false;
     },
+    backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
     content: Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,

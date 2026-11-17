@@ -36,10 +36,7 @@ class ReqAppUpdate extends GetView {
         children: [
           Row(
             children: [
-              const Icon(
-              Typicons.th_list,
-                color: AppColors.contentColorBlue,
-              ),
+              const Icon(Typicons.th_list, color: AppColors.contentColorBlue),
               const SizedBox(width: 5),
               Text(
                 'Data Adjusment List',
@@ -69,7 +66,9 @@ class ReqAppUpdate extends GetView {
                     adjCtrl.selectedType.value = "";
 
                     await adjCtrl.getReqAppUpt(
-                      '',
+                      adjCtrl.selectedStatus.value.isNotEmpty
+                          ? adjCtrl.selectedStatus.value
+                          : 'pending',
                       '',
                       dataUser.level,
                       dataUser.id,
@@ -242,8 +241,8 @@ class ReqAppUpdate extends GetView {
                             final color = getStatusColor(status);
 
                             return ExpansionTileItem(
-                              key: Key(
-                                'adjust_tile_$i',
+                              key: ValueKey(
+                                'adjust_tile_${excData.id}',
                               ), // key unik per item penting!
                               tilePadding: const EdgeInsets.fromLTRB(
                                 2,
@@ -364,15 +363,21 @@ class ReqAppUpdate extends GetView {
                                         excData.status == "update_masuk_cst" ||
                                         excData.status == "update_pulang"
                                     ? UptMasukPulang(
+                                      key: ValueKey('upt_${excData.id}'),
                                       data: excData,
                                       isInbox: isInbox,
                                     )
                                     : excData.status == "update_data_absen"
                                     ? UptDataAbsen(
+                                      key: ValueKey('upt_${excData.id}'),
                                       data: excData,
                                       isInbox: isInbox,
                                     )
-                                    : UptShift(data: excData, isInbox: isInbox),
+                                    : UptShift(
+                                      key: ValueKey('upt_${excData.id}'),
+                                      data: excData,
+                                      isInbox: isInbox,
+                                    ),
                               ],
                             );
                           }),

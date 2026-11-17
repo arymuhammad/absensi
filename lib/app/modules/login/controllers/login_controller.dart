@@ -13,6 +13,7 @@ import 'package:crypto/crypto.dart';
 import '../../../services/service_api.dart';
 import '../../../data/model/login_model.dart';
 import '../../absen/controllers/absen_controller.dart';
+import '../../home/controllers/home_controller.dart';
 
 class LoginController extends GetxController with GetTickerProviderStateMixin {
   late TextEditingController email, username, password;
@@ -239,8 +240,6 @@ class LoginController extends GetxController with GetTickerProviderStateMixin {
       // UPDATE TOKEN FCM
       await updateFcmToken();
 
-     
-
       if (pendingNotification != null && !notificationHandled) {
         notificationHandled = true;
 
@@ -256,38 +255,38 @@ class LoginController extends GetxController with GetTickerProviderStateMixin {
     isReady.value = true;
   }
 
-  logout() async {
+  Future<void> logout() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
-
-    // await pref.clear();
 
     final userId = logUser.value.id;
     final token = await FirebaseMessaging.instance.getToken();
-    // hapus relasi user-token di server
-    await ServiceApi().deleteToken({"id_user": userId, "token": token});
-    // await FirebaseMessaging.instance.deleteToken();
+
+    try {
+      await ServiceApi().deleteToken({"id_user": userId, "token": token});
+    } catch (e) {
+      debugPrint('Delete FCM token error: $e');
+    }
 
     await pref.remove("is_login");
-    await pref.remove('userDataLogin');
+    await pref.remove("userDataLogin");
 
+    // Reset data akun aktif.
     logUser.value = Data();
-
     isAuth.value = false;
     selected.value = 0;
 
-    // Hapus semua controller yang memang ingin dihapus saja
-    // if (Get.isRegistered<AbsenController>()) {
-    //   final absenC = Get.find<AbsenController>();
-    //   absenC.resetData(); // Reset semua nilai observable
-    //   await Future.delayed(
-    //     Duration(milliseconds: 100),
-    //   ); // Opsional delay sebentar untuk proses reset
-    // }
+    // Hapus controller milik sesi sebelumnya.
+    if (Get.isRegistered<HomeController>()) {
+      Get.delete<HomeController>(force: true);
+    }
 
-    Get.delete<AbsenController>(force: true); // Hapus instance controller lama
-    Get.delete<PaySlipController>(force: true);
+    if (Get.isRegistered<AbsenController>()) {
+      Get.delete<AbsenController>(force: true);
+    }
 
-    // Get.back();
+    if (Get.isRegistered<PaySlipController>()) {
+      Get.delete<PaySlipController>(force: true);
+    }
   }
 
   final navigatorKeys = List.generate(5, (_) => GlobalKey<NavigatorState>());

@@ -15,7 +15,9 @@ import 'package:absensi/app/data/helper/custom_dialog.dart';
 import 'package:absensi/app/modules/absen/controllers/absen_controller.dart';
 import 'package:icons_flutter/icons_flutter.dart';
 import 'package:intl/intl.dart';
+import 'package:printing/printing.dart';
 
+import '../../../data/helper/custom_fab_location.dart';
 import '../../../data/helper/duration_count.dart';
 import '../../../data/helper/format_waktu.dart';
 import '../../detail_absen/views/detail_absen_view.dart';
@@ -36,6 +38,8 @@ class SemuaAbsenView extends GetView {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       appBar: AppBar(
         title: Row(
@@ -93,7 +97,7 @@ class SemuaAbsenView extends GetView {
 
                 if (range != null) {
                   final data = auth.logUser.value;
-                  loadingDialog("memuat data...", "");
+                  loadingDialog("memuat data...", "", isDark);
                   await absenC.getAllAbsen(
                     data.id!,
                     DateFormat('yyyy-MM-dd').format(range.start),
@@ -109,14 +113,18 @@ class SemuaAbsenView extends GetView {
             ),
           ],
         ),
-        backgroundColor: AppColors.itemsBackground,
+        backgroundColor: Colors.transparent,
         elevation: 0.0,
         flexibleSpace: Container(
+          // height: 250,
           decoration: BoxDecoration(
-            gradient: AppColors.mainGradient(
-              context: context,
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
+            image: DecorationImage(
+              image: AssetImage(
+                isDark
+                    ? 'assets/image/bg-hd-drk.png'
+                    : 'assets/image/bg-hd.png',
+              ),
+              fit: BoxFit.cover,
             ),
           ),
         ),
@@ -126,16 +134,45 @@ class SemuaAbsenView extends GetView {
         onRefresh: () async {
           final data = auth.logUser.value;
           absenC.resetFilter();
-          // ctrl.pickedRange.value = null;
-          // selectedTab.value = 0;
-          absenC.isLoading.value = true;
+
+          final now = DateTime.now();
+
+          DateTime start;
+          DateTime end;
+
+          if (selectedTab.value == 0) {
+            // This Week
+            final monday = now.subtract(Duration(days: now.weekday - 1));
+
+            start = DateTime(monday.year, monday.month, monday.day);
+            end = start.add(const Duration(days: 6));
+          } else if (selectedTab.value == 1 && ctrl.pickedRange.value != null) {
+            // This Month / selected range
+            start = ctrl.pickedRange.value!.start;
+            end = ctrl.pickedRange.value!.end;
+          } else if (selectedTab.value == 1) {
+            // Default This Month
+            start = DateTime(now.year, now.month, 1);
+            end = DateTime(
+              now.year,
+              now.month + 1,
+              1,
+            ).subtract(const Duration(days: 1));
+          } else {
+            // Search: all data
+            start = DateTime(2000);
+            end = DateTime(2100);
+          }
+
           await absenC.getAllAbsen(
             data.id!,
-            DateFormat('yyyy-MM-dd').format(ctrl.pickedRange.value!.start),
-            DateFormat('yyyy-MM-dd').format(ctrl.pickedRange.value!.end),
+            DateFormat('yyyy-MM-dd').format(start),
+            DateFormat('yyyy-MM-dd').format(end),
           );
+
           showToast("Page Refreshed");
         },
+
         backgroundColor: Colors.white,
         indicatorBuilder: (context, controller) {
           return Padding(
@@ -171,7 +208,11 @@ class SemuaAbsenView extends GetView {
 
             /// ðŸ”¹ CONTENT
             SliverPadding(
-              padding: const EdgeInsets.all(12),
+              padding: EdgeInsets.only(
+                left: 12,
+                right: 12,
+                bottom: 68 + MediaQuery.of(context).padding.bottom + 24,
+              ),
               sliver: Obx(() {
                 final now = DateTime.now();
 
@@ -390,6 +431,8 @@ class SemuaAbsenView extends GetView {
         ),
       ),
 
+      floatingActionButtonLocation: const RaisedFabLocation(offsetY: 70),
+
       /// ðŸ”¹ PDF BUTTON
       floatingActionButton: Obx(
         () => Visibility(
@@ -398,9 +441,33 @@ class SemuaAbsenView extends GetView {
             heroTag: 'pdf',
             backgroundColor: Colors.redAccent[700],
             onPressed: () async {
-              loadingDialog('Please wait until', 'Data is ready to print');
-              await absenC.exportPdf();
-              Get.back();
+              loadingDialog(
+                'Please wait until',
+                'Data is ready to print',
+                isDark,
+              );
+
+              try {
+                // Generate PDF terlebih dahulu
+                final pdfBytes = await absenC.generatePdf();
+
+                // Tutup loading setelah PDF selesai dibuat
+                if (Get.isDialogOpen ?? false) {
+                  Get.back();
+                }
+
+                // Baru buka print dialog
+                await Printing.layoutPdf(onLayout: (format) async => pdfBytes);
+              } catch (e, stackTrace) {
+                if (Get.isDialogOpen ?? false) {
+                  Get.back();
+                }
+
+                // debugPrint('PDF ERROR: $e');
+                debugPrintStack(stackTrace: stackTrace);
+
+                Get.snackbar('Gagal', 'Terjadi kesalahan saat membuat PDF: $e');
+              }
             },
             child: const Icon(FontAwesome.file_pdf_o, color: Colors.white),
           ),
@@ -458,13 +525,24 @@ class _HistoryRangeTabState extends State<HistoryRangeTab> {
             margin: const EdgeInsets.fromLTRB(12, 8, 12, 8),
             padding: const EdgeInsets.all(6),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(.65),
+              color:
+                  isDark
+                      ? const Color(0xFF1E293B).withOpacity(0.78)
+                      : Colors.white.withOpacity(0.82),
               borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: Colors.white.withOpacity(.4)),
+              border: Border.all(
+                color:
+                    isDark
+                        ? const Color(0xFF1E293B).withOpacity(0.78)
+                        : Colors.white.withOpacity(0.82),
+              ),
             ),
             child: AnimatedSwitcher(
               duration: const Duration(milliseconds: 250),
-              child: isSearching.value ? _searchField(isDark) : _segmentedIOS(),
+              child:
+                  isSearching.value
+                      ? _searchField(isDark)
+                      : _segmentedIOS(isDark),
             ),
           ),
         ),
@@ -473,11 +551,14 @@ class _HistoryRangeTabState extends State<HistoryRangeTab> {
   }
 
   // ================= CUPERTINO SEGMENTED =================
-  Widget _segmentedIOS() {
+  Widget _segmentedIOS(bool isDark) {
     return CupertinoSlidingSegmentedControl<int>(
       key: const ValueKey('segmented'),
       groupValue: widget.selectedIndex.value,
-      thumbColor: Theme.of(context).cardColor,
+      thumbColor:
+          isDark
+              ? CupertinoColors.systemGrey.withOpacity(0.50)
+              : Colors.white.withOpacity(0.82),
       backgroundColor: Colors.transparent,
       children: const {
         0: Padding(
@@ -521,16 +602,22 @@ class _HistoryRangeTabState extends State<HistoryRangeTab> {
             autofocus: true,
             placeholder: 'Search data...',
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-            prefix: const Padding(
-              padding: EdgeInsets.only(left: 8),
+            prefix: Padding(
+              padding: const EdgeInsets.only(left: 8),
               child: Icon(
                 CupertinoIcons.search,
                 size: 18,
-                color: CupertinoColors.systemGrey,
+                color:
+                    isDark
+                        ? Colors.white.withOpacity(0.82)
+                        : CupertinoColors.systemGrey,
               ),
             ),
             decoration: BoxDecoration(
-              color: isDark ? Theme.of(context).cardColor : Colors.white,
+              color:
+                  isDark
+                      ? CupertinoColors.systemGrey.withOpacity(0.50)
+                      : Colors.white.withOpacity(0.82),
               borderRadius: BorderRadius.circular(10),
             ),
             style: TextStyle(color: isDark ? Colors.white : Colors.black),
@@ -546,10 +633,13 @@ class _HistoryRangeTabState extends State<HistoryRangeTab> {
             searchC.clear();
             widget.onSearch('');
           },
-          child: const Icon(
+          child: Icon(
             CupertinoIcons.clear_circled_solid,
             size: 22,
-            color: CupertinoColors.systemGrey,
+            color:
+                isDark
+                    ? Colors.white.withOpacity(0.82)
+                    : CupertinoColors.systemGrey,
           ),
         ),
       ],

@@ -16,7 +16,9 @@ addOvertime(BuildContext context, OvertimeController ctrl, Data userData){
       height: 250,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(8),
-        color: isDark ? Theme.of(context).cardColor : Colors.grey[300],
+        color:   isDark
+                            ? const Color(0xFF1E293B)
+                            : Colors.white.withOpacity(0.82),
       ),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -134,6 +136,7 @@ addOvertime(BuildContext context, OvertimeController ctrl, Data userData){
                           desc: 'Batalkan pengajuan ini?',
                           title: 'Warning',
                           btnOkOnPress: ctrl.resetForm,
+                          isDark: isDark
                         );
                       } else {
                         Get.back();

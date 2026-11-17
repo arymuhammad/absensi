@@ -16,7 +16,8 @@ class AbsenView extends GetView<AbsenController> {
   AbsenView({super.key, this.exitTimeout = const Duration(seconds: 2)});
 
   final auth = Get.find<LoginController>();
-  final absenC = Get.find<AbsenController>();
+  AbsenController get absenC => Get.find<AbsenController>();
+
   final Duration exitTimeout;
 
   final DraggableScrollableController bottomSheetController =
@@ -53,10 +54,13 @@ class AbsenView extends GetView<AbsenController> {
           centerTitle: true,
           flexibleSpace: Container(
             decoration: BoxDecoration(
-              gradient: AppColors.mainGradient(
-                context: context,
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
+              image: DecorationImage(
+                image: AssetImage(
+                  isDark
+                      ? 'assets/image/bg-hd-drk.png'
+                      : 'assets/image/bg-hd.png',
+                ),
+                fit: BoxFit.cover,
               ),
             ),
           ),
@@ -203,7 +207,7 @@ class AbsenView extends GetView<AbsenController> {
             children: [
               Positioned.fill(
                 child: MapSectionView(
-                  controller: controller,
+                  controller: absenC,
                   userPoint: userPoint,
                   storePoint: storePoint,
                   animatedPoint: animatedPoint,

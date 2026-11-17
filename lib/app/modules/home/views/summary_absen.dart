@@ -13,6 +13,7 @@ import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:icons_flutter/icons_flutter.dart';
 import 'package:intl/intl.dart';
 
 import '../../../data/helper/duration_count.dart';
@@ -30,6 +31,8 @@ class SummaryAbsen extends GetView {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Expanded(
       child: Column(
         children: [
@@ -41,13 +44,12 @@ class SummaryAbsen extends GetView {
                 final uData = auth.logUser.value;
                 final online = await absenC.isOnline();
                 if (online) {
-                 
                   homeC.getPendingAdj(
                     idUser: uData.id!,
                     idCabang: uData.kodeCabang!,
                     level: uData.level!,
                   );
-                  homeC.getSummAttPerMonth(uData.id!);
+                  await homeC.getSummAttPerMonth(uData.id!);
                   await absenC.getLastUserData(dataUser: uData);
                 }
                 var paramLimit = {
@@ -124,18 +126,45 @@ class SummaryAbsen extends GetView {
                             )
                             : absenC.dataLimitAbsen.isEmpty
                             ? Card(
+                              color:
+                                  isDark
+                                      ? const Color(
+                                        0xFF1E293B,
+                                      ).withOpacity(0.78)
+                                      : Colors.white.withOpacity(0.82),
                               elevation: 8,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: const Padding(
-                                padding: EdgeInsets.fromLTRB(8, 25, 8, 25),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
+                                padding: EdgeInsets.all(12),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Icon(Icons.assignment_ind),
-                                    SizedBox(height: 5),
-                                    Text('There is no attendance history yet'),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: [
+                                        Icon(
+                                          FontAwesome.calendar,
+                                          size: 18,
+                                          color: AppColors.contentColorBlue,
+                                        ),
+                                        SizedBox(width: 5),
+                                        Text(
+                                          'There is no attendance history yet',
+                                          style: TextStyle(
+                                            color: AppColors.contentColorBlue,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    Icon(
+                                      CupertinoIcons.chevron_forward,
+                                      size: 18,
+                                      color: AppColors.contentColorBlue,
+                                    ),
                                   ],
                                 ),
                               ),

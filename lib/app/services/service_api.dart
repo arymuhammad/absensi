@@ -151,23 +151,29 @@ class ServiceApi {
     }
   }
 
-  getCabang(Map<String, dynamic>? data) async {
+  Future<List<Cabang>> getCabang(Map<String, dynamic>? data) async {
     try {
-      final response = await http.post(
-        Uri.parse('${baseUrl}cabang'),
-        body: data,
-      );
+      final response = await http
+          .post(Uri.parse('${baseUrl}cabang'), body: data)
+          .timeout(const Duration(seconds: 15));
 
       switch (response.statusCode) {
         case 200:
-          List<dynamic> result = json.decode(response.body)['data'];
-          List<Cabang> data = result.map((e) => Cabang.fromJson(e)).toList();
-          return data;
+          final List<dynamic> result = json.decode(response.body)['data'];
+
+          return result.map((e) => Cabang.fromJson(e)).toList();
+
         default:
-          throw Exception(response.reasonPhrase);
+          throw Exception(
+            'Gagal mengambil data cabang: ${response.statusCode}',
+          );
       }
-    } on SocketException catch (_) {
+    } on SocketException {
       rethrow;
+    } on TimeoutException {
+      throw TimeoutException(
+        'Request getCabang melewati batas waktu 15 detik.',
+      );
     }
   }
 
@@ -342,8 +348,8 @@ class ServiceApi {
       // print("RAW RESPONSE:");
       // print(responseString);
       // ignore: unused_local_variable
-      print("RAW RESPONSE:");
-      print(responseString);
+      // print("RAW RESPONSE:");
+      // print(responseString);
       final dataDecode = jsonDecode(responseString);
       lastMessage = dataDecode['message'] ?? '';
       lastType = dataDecode['type'] ?? '';
@@ -361,7 +367,7 @@ class ServiceApi {
       // print(e);
 
       // print("STACKTRACE:");
-      print(stacktrace);
+      // print(stacktrace);
       lastMessage = e.toString();
       return false;
     }
@@ -1357,7 +1363,7 @@ class ServiceApi {
   //   }
   // }
 
-  reqUpdateAbs(Map<String, dynamic> data) async {
+  reqUpdateAbs(Map<String, dynamic> data, bool isDark) async {
     try {
       Map<String, String> headers = {
         'Content-Type': 'application/json; charset=UTF-8',
@@ -1452,8 +1458,8 @@ class ServiceApi {
 
       // ================= SEND =================
 
-      print(request.fields);
-      print(request.files.map((e) => e.field).toList());
+      // print(request.fields);
+      // print(request.files.map((e) => e.field).toList());
 
       final streamedResponse = await request.send().timeout(
         const Duration(minutes: 1),
@@ -1478,6 +1484,7 @@ class ServiceApi {
             type: DialogType.success,
             title: 'SUKSES',
             btnOkOnPress: () => Get.back(),
+            isDark: isDark,
           );
         } else {
           failedDialog(
@@ -1748,58 +1755,26 @@ class ServiceApi {
     }
   }
 
-  getNotif(Map<String, dynamic> param) async {
-    try {
-      final response = await http
-          .post(
-            Uri.parse('${baseUrl}get_notif'),
-            // headers: {'Content-Type': 'application/json'},
-            body: jsonEncode(param),
-          )
-          .timeout(const Duration(seconds: 60));
-      // print('${baseUrl}get_notif');
-      // print(param);
-      if (param['type'] == "summ_month") {
-        if (response.statusCode == 200) {
-          final decoded = jsonDecode(response.body);
-          if (decoded['data'] == null) {
-            throw Exception('Response data is null');
-          }
-          SummaryAbsenModel notif = SummaryAbsenModel.fromJson(decoded['data']);
+  Future<dynamic> getNotif(Map<String, dynamic> param) async {
+    final response = await http
+        .post(Uri.parse('${baseUrl}get_notif'), body: jsonEncode(param))
+        .timeout(const Duration(seconds: 30));
 
-          return notif;
-        } else {
-          throw Exception(
-            'Failed to load doclang data, status: ${response.statusCode}',
-          );
-        }
-      }
-      // else if (param['type'] == "approval") {
-      else {
-        if (response.statusCode == 200) {
-          final decoded = jsonDecode(response.body);
-          if (decoded['data'] == null) {
-            throw Exception('Response data is null');
-          }
-          NotifModel notif = NotifModel.fromJson(decoded['data']);
-
-          return notif;
-        } else {
-          throw Exception(
-            'Failed to load dobol data, status: ${response.statusCode}',
-          );
-        }
-      }
-    } catch (e) {
-      showToast(e.toString());
-      // print(param);
-      if (param['type'] == "summ_month") {
-        return SummaryAbsenModel(); // fallback kosong untuk mencegah crash UI
-      } else {
-        // else if (param['type'] == "approval") {
-        return NotifModel(); // fallback kosong untuk mencegah crash UI
-      }
+    if (response.statusCode != 200) {
+      throw Exception('HTTP Error: ${response.statusCode}');
     }
+
+    final decoded = jsonDecode(response.body);
+
+    if (decoded['data'] == null) {
+      throw Exception('Response data is null');
+    }
+
+    if (param['type'] == 'summ_month') {
+      return SummaryAbsenModel.fromJson(decoded['data']);
+    }
+
+    return NotifModel.fromJson(decoded['data']);
   }
 
   Future<PayslipResult?> getPaySlip(Map<String, dynamic> data) async {
@@ -1854,9 +1829,9 @@ class ServiceApi {
 
       final res = json.decode(response.body);
 
-      debugPrint('[OVERTIME API] TYPE : ${data['type']}');
-      debugPrint('[OVERTIME API] STATUS : ${response.statusCode}');
-      debugPrint('[OVERTIME API] BODY : ${response.body}');
+      // debugPrint('[OVERTIME API] TYPE : ${data['type']}');
+      // debugPrint('[OVERTIME API] STATUS : ${response.statusCode}');
+      // debugPrint('[OVERTIME API] BODY : ${response.body}');
 
       if (response.statusCode == 200) {
         // =========================================================
@@ -1897,7 +1872,7 @@ class ServiceApi {
     } on SocketException {
       return {'success': false, 'message': 'Tidak dapat terhubung ke server'};
     } catch (e, stackTrace) {
-      debugPrint('[OVERTIME API] ERROR : $e');
+      // debugPrint('[OVERTIME API] ERROR : $e');
       debugPrint('[OVERTIME API] STACK : $stackTrace');
 
       return {'success': false, 'error': e.toString()};
@@ -1940,8 +1915,8 @@ class ServiceApi {
       final streamedResponse = await request.send();
 
       final response = await http.Response.fromStream(streamedResponse);
-      print(response.statusCode);
-      print(response.body);
+      // print(response.statusCode);
+      // print(response.body);
       return jsonDecode(response.body);
     } on TimeoutException {
       return false;

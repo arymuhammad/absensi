@@ -3,7 +3,6 @@ import 'package:absensi/app/data/helper/const.dart';
 import 'package:absensi/app/modules/home/views/summary_absen.dart';
 import 'package:absensi/app/modules/home/views/summary_absen_area.dart';
 import 'package:absensi/app/modules/leave/controllers/leave_controller.dart';
-import 'package:absensi/app/modules/shared/container_main_color.dart';
 import 'package:absensi/app/modules/shared/rounded_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -22,16 +21,25 @@ class HomeView extends GetView<HomeController> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: Stack(
+        // fit: StackFit.expand,
         children: [
-          ContainerMainColor(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            radius: 0,
-            child: Container(height: 230),
+          // Background image
+
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            height: 400,
+            child: Image.asset(
+              isDark ? 'assets/image/bg-hd-drk.png' : 'assets/image/bg-hd.png',
+              fit: BoxFit.fill,
+            ),
           ),
+
           Padding(
             padding: const EdgeInsets.only(left: 15.0, top: 45.0, right: 15.0),
             child: Obx(() {

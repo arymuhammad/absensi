@@ -44,6 +44,7 @@ import 'package:path_provider/path_provider.dart';
 import '../../login/controllers/login_controller.dart';
 import '../views/logic/absen_usecase.dart';
 import '../views/widget/custom_qr_page.dart';
+import 'package:path/path.dart' as p;
 
 class AbsenController extends GetxController
     with GetTickerProviderStateMixin, WidgetsBindingObserver {
@@ -81,6 +82,8 @@ class AbsenController extends GetxController
   var locNote = "".obs; // keterangan lokasi (dalam radius/diluar radius)
   var lat = "".obs; // tampung koordinat lat dari store yang dipilih
   var long = "".obs; // tampung koordinat long dari store yang dipilih
+  var selectedAreaCoverage =
+      "".obs; // tampung area coverage dari store yang dipilih
   var latFromGps = 0.0.obs; // tampung koordinat lat dari gps device
   var longFromGps = 0.0.obs; // tampung koordinat long dari gps device
   Rx<LatLng?> validatedQrLatLng = Rx<LatLng?>(null);
@@ -269,6 +272,7 @@ class AbsenController extends GetxController
     WidgetsBinding.instance.removeObserver(this);
     connectivitySub?.cancel();
     filterAbsen.dispose();
+
     super.onClose();
   }
 
@@ -555,8 +559,12 @@ class AbsenController extends GetxController
     return now!.isBefore(DateTime(now.year, now.month, now.day, 9, 1));
   }
 
-  Future<DbResult> executeAction(Data data) async {
-    return await useCase.handleAction(data: data, controller: this);
+  Future<DbResult> executeAction(Data data, bool isDark) async {
+    return await useCase.handleAction(
+      data: data,
+      controller: this,
+      isDark: isDark,
+    );
   }
 
   Future<void> refreshAbsen(Data data) async {
@@ -640,27 +648,42 @@ class AbsenController extends GetxController
   }
 
   Future<List<Cabang>> getCabang() async {
-    var tempCabang = await SQLHelper.instance.getCabang();
-    if (tempCabang.isNotEmpty) {
-      return cabang.value = tempCabang;
-    } else {
-      final response = await ServiceApi().getCabang({});
-      cabang.value = response;
-      cabang
-          .map(
-            (e) async => await SQLHelper.instance.insertCabang(
-              Cabang(
-                kodeCabang: e.kodeCabang,
-                brandCabang: e.brandCabang,
-                namaCabang: e.namaCabang,
-                lat: e.lat,
-                long: e.long,
-              ),
-            ),
-          )
-          .toList();
-      return cabang;
+    final online = await isOnline();
+
+    // OFFLINE
+    if (!online) {
+      final tempCabang = await SQLHelper.instance.getCabang();
+      cabang.value = tempCabang;
+      return tempCabang;
     }
+
+    // ONLINE
+    final response = await ServiceApi().getCabang({});
+
+    // Update data reactive
+    cabang.value = response;
+
+    // Kosongkan data lama
+    await SQLHelper.instance.truncateCabang();
+
+    // Simpan seluruh data dan tunggu sampai selesai
+    await Future.wait(
+      response.map(
+        (e) => SQLHelper.instance.insertCabang(
+          Cabang(
+            kodeCabang: e.kodeCabang,
+            brandCabang: e.brandCabang,
+            namaCabang: e.namaCabang,
+            lat: e.lat,
+            long: e.long,
+            cvrArea: e.cvrArea,
+            cvrAreaQR: e.cvrAreaQR,
+          ),
+        ),
+      ),
+    );
+
+    return response;
   }
 
   Future<List<User>> getUserCabang(String idStore, String parentId) async {
@@ -671,6 +694,7 @@ class AbsenController extends GetxController
   getLoc(Data? dataUser) async {
     startLoading(seconds: 30);
     Position position;
+
     try {
       position = await determinePosition();
       final deviceNames = DeviceMarketingNames();
@@ -706,7 +730,7 @@ class AbsenController extends GetxController
         LatLng(position.latitude, position.longitude),
       );
 
-      if (distanceStore.value > num.parse(dataUser!.areaCover!)) {
+      if (distanceStore.value > double.parse(selectedAreaCoverage.value)) {
         isLoading.value = false;
         isEnabled.value = false;
         locNote.value =
@@ -714,7 +738,8 @@ class AbsenController extends GetxController
       } else {
         isLoading.value = false;
         isEnabled.value = true;
-        locNote.value = "Inside area";
+        locNote.value =
+            "your distance (${(distanceStore.value / 1000).toStringAsFixed(2)} Km)";
       }
     }
 
@@ -842,7 +867,7 @@ class AbsenController extends GetxController
 
       for (int attempt = 1; attempt <= 3; attempt++) {
         try {
-          debugPrint('[GPS] ATTEMPT $attempt/3');
+          // debugPrint('[GPS] ATTEMPT $attempt/3');
 
           // Cek lagi karena GPS bisa berubah status ketika
           // aplikasi sedang menunggu.
@@ -867,18 +892,18 @@ class AbsenController extends GetxController
             timeLimit: const Duration(seconds: 30),
           );
 
-          debugPrint(
-            '[GPS] POSITION RECEIVED '
-            'lat=${fresh.latitude} '
-            'lng=${fresh.longitude} '
-            'accuracy=${fresh.accuracy}',
-          );
+          // debugPrint(
+          //   '[GPS] POSITION RECEIVED '
+          //   'lat=${fresh.latitude} '
+          //   'lng=${fresh.longitude} '
+          //   'accuracy=${fresh.accuracy}',
+          // );
 
           break;
         } on TimeoutException catch (e) {
           lastError = e;
 
-          debugPrint('[GPS] ATTEMPT $attempt TIMEOUT');
+          // debugPrint('[GPS] ATTEMPT $attempt TIMEOUT');
 
           if (attempt < 3) {
             await Future.delayed(const Duration(seconds: 1));
@@ -886,7 +911,7 @@ class AbsenController extends GetxController
         } catch (e) {
           lastError = Exception(e.toString());
 
-          debugPrint('[GPS] ATTEMPT $attempt ERROR: $e');
+          // debugPrint('[GPS] ATTEMPT $attempt ERROR: $e');
 
           if (attempt < 3) {
             await Future.delayed(const Duration(seconds: 1));
@@ -906,11 +931,11 @@ class AbsenController extends GetxController
         if (lastKnown != null) {
           final age = DateTime.now().difference(lastKnown.timestamp);
 
-          debugPrint(
-            '[GPS] LAST KNOWN '
-            'age=${age.inSeconds}s '
-            'accuracy=${lastKnown.accuracy}',
-          );
+          // debugPrint(
+          //   '[GPS] LAST KNOWN '
+          //   'age=${age.inSeconds}s '
+          //   'accuracy=${lastKnown.accuracy}',
+          // );
 
           if (age.inSeconds < 30 &&
               lastKnown.accuracy <= maxLastKnownAccuracy) {
@@ -919,7 +944,7 @@ class AbsenController extends GetxController
             isGpsLoading.value = false;
             gpsError.value = '';
 
-            debugPrint('[GPS] USING LAST KNOWN POSITION');
+            // debugPrint('[GPS] USING LAST KNOWN POSITION');
 
             return lastKnown;
           }
@@ -933,14 +958,14 @@ class AbsenController extends GetxController
 
         gpsError.value = "Failed to get location";
 
-        debugPrint(
-          '[GPS] FAILED AFTER 3 ATTEMPTS '
-          'ERROR=$lastError',
-        );
+        // debugPrint(
+        //   '[GPS] FAILED AFTER 3 ATTEMPTS '
+        //   'ERROR=$lastError',
+        // );
 
         showToast("Failed to get location, please try again.");
 
-        return Future.error(lastError ?? 'Failed to get location');
+        return await Future.error(lastError ?? 'Failed to get location');
       }
 
       // ============================================================
@@ -979,7 +1004,7 @@ class AbsenController extends GetxController
 
         failedDialog(Get.context, 'Warning', 'Fake GPS detected');
 
-        return Future.error("Fake GPS detected");
+        return await Future.error("Fake GPS detected");
       }
 
       // ============================================================
@@ -990,12 +1015,12 @@ class AbsenController extends GetxController
       isGpsLoading.value = false;
       gpsError.value = '';
 
-      debugPrint(
-        '[GPS] SUCCESS '
-        'lat=${fresh.latitude} '
-        'lng=${fresh.longitude} '
-        'accuracy=${fresh.accuracy}',
-      );
+      // debugPrint(
+      //   '[GPS] SUCCESS '
+      //   'lat=${fresh.latitude} '
+      //   'lng=${fresh.longitude} '
+      //   'accuracy=${fresh.accuracy}',
+      // );
 
       return fresh;
     } on TimeoutException catch (e, s) {
@@ -1028,9 +1053,9 @@ $s
 
       gpsError.value = "Failed to get location";
 
-      debugPrint('[GPS] FINAL ERROR: $e');
+      // debugPrint('[GPS] FINAL ERROR: $e');
 
-      debugPrint('[GPS] STACK: $s');
+      // debugPrint('[GPS] STACK: $s');
 
       showToast("Failed to get location");
 
@@ -1130,11 +1155,11 @@ $s
           token: token,
         );
 
-        stopLoading();
-
         if (!qrRes['success']) {
           isQrValidated.value = false;
+          stopLoading();
           showToast('QR tidak valid');
+
           return;
         }
         final qrData = qrRes['data'];
@@ -1154,7 +1179,7 @@ $s
             timeLimit: const Duration(seconds: 15),
           );
           // Get.back();
-          stopLoading();
+          // stopLoading();
         } catch (e) {
           // Get.back();
           isQrValidated.value = false;
@@ -1211,6 +1236,7 @@ $s
           isEnabled.value = true;
           distanceStore.value = distanceMeter;
           locNote.value = "You are in the radius area";
+          stopLoading();
           showToast(
             'Location validation successful. You are within the QR code area.',
           );
@@ -1230,6 +1256,7 @@ $s
           locNote.value =
               "You are outside the QR area (${(distanceMeter / 1000).toStringAsFixed(2)} Km)";
           distanceStore.value = distanceMeter;
+          stopLoading();
           showToast('Validation failed!');
 
           updateCircleFromQr(qrLat, qrLong);
@@ -1309,8 +1336,9 @@ $s
     return cekVisit.value;
   }
 
-  exportPdf() async {
+  Future<Uint8List> generatePdf() async {
     final doc = pw.Document(version: PdfVersion.pdf_1_5, compress: true);
+
     final List<pw.TableRow> rows = await _loadData();
 
     doc.addPage(
@@ -1321,21 +1349,19 @@ $s
         ),
         build:
             (context) => [
-              pw.Center(
-                child: pw.Table(border: pw.TableBorder.all(), children: rows),
-              ),
+              pw.Table(border: pw.TableBorder.all(), children: rows),
             ],
       ),
     );
 
-    await Printing.layoutPdf(
-      onLayout: (PdfPageFormat format) async => doc.save(),
-    );
+    return await doc.save();
   }
 
   Future<List<pw.TableRow>> _loadData() async {
     List<pw.TableRow> rows = [];
-    final font = await PdfGoogleFonts.nunitoRegular();
+    final fontData = await rootBundle.load('assets/fonts/Nunito-Regular.ttf');
+
+    final font = pw.Font.ttf(fontData);
 
     rows.add(
       pw.TableRow(
@@ -1395,21 +1421,50 @@ $s
       ),
     );
 
+    final allowedExtensions = ['jpg', 'jpeg', 'png'];
+
+    final imageBytes = await rootBundle.load('assets/image/selfie.png');
+
+    final logo = pw.MemoryImage(imageBytes.buffer.asUint8List());
     for (var data in searchAbsen) {
-      pw.MemoryImage? imageMasuk;
-      if (data.fotoMasuk! != "") {
-        final img1 = await http
-            .get(Uri.parse('${ServiceApi().baseUrl}${data.fotoMasuk!}'))
-            .then((value) => value.bodyBytes);
-        imageMasuk = pw.MemoryImage(img1);
+      final fotoMasuk = data.fotoMasuk ?? '';
+      final fotoPulang = data.fotoPulang ?? '';
+
+      final extIn = p.extension(fotoMasuk).replaceFirst('.', '').toLowerCase();
+      final extOut =
+          p.extension(fotoPulang).replaceFirst('.', '').toLowerCase();
+
+      // FOTO MASUK
+      pw.MemoryImage imageMasuk = logo;
+
+      if (fotoMasuk.isNotEmpty && allowedExtensions.contains(extIn)) {
+        try {
+          final response = await http
+              .get(Uri.parse('${ServiceApi().baseUrl}$fotoMasuk'))
+              .timeout(const Duration(seconds: 15));
+          if (response.statusCode == 200) {
+            imageMasuk = pw.MemoryImage(response.bodyBytes);
+          }
+        } catch (e) {
+          print('Gagal mengambil foto masuk: $e');
+        }
       }
-      // // print('${img1.bodyBytes}');
-      pw.MemoryImage? imageKeluar;
-      if (data.fotoPulang! != "") {
-        final img2 = await http.get(
-          Uri.parse('${ServiceApi().baseUrl}${data.fotoPulang!}'),
-        );
-        imageKeluar = pw.MemoryImage(img2.bodyBytes);
+
+      // FOTO KELUAR
+      pw.MemoryImage imageKeluar = logo;
+
+      if (fotoPulang.isNotEmpty && allowedExtensions.contains(extOut)) {
+        try {
+          final response = await http
+              .get(Uri.parse('${ServiceApi().baseUrl}$fotoPulang'))
+              .timeout(const Duration(seconds: 15));
+
+          if (response.statusCode == 200) {
+            imageKeluar = pw.MemoryImage(response.bodyBytes);
+          }
+        } catch (e) {
+          print('Gagal mengambil foto keluar: $e');
+        }
       }
 
       rows.add(
@@ -1450,7 +1505,7 @@ $s
                 ? pw.Container(
                   width: 30,
                   height: 30,
-                  child: pw.Center(child: pw.Image(imageMasuk!)),
+                  child: pw.Center(child: pw.Image(imageMasuk)),
                 )
                 : pw.Container(width: 30, height: 30),
             pw.Text(
@@ -1467,11 +1522,11 @@ $s
               textAlign: pw.TextAlign.center,
               style: pw.TextStyle(font: font),
             ),
-            data.fotoPulang! != ""
+            data.fotoPulang != null
                 ? pw.Container(
                   width: 30,
                   height: 30,
-                  child: pw.Center(child: pw.Image(imageKeluar!)),
+                  child: pw.Center(child: pw.Image(imageKeluar)),
                 )
                 : pw.Container(width: 30, height: 30),
             pw.Text(
@@ -1606,11 +1661,14 @@ $s
   }
 
   Future<List<ShiftKerja>> getShift() async {
-    final localShift = await SQLHelper.instance.getShift();
-
     List<ShiftKerja> filterShift(List<ShiftKerja> data) {
       return data.where((e) => e.id != null && e.id != "0").toList();
     }
+
+    // ============================================================
+    // AMBIL CACHE LOCAL
+    // ============================================================
+    final localShift = await SQLHelper.instance.getShift();
 
     try {
       final online = await isOnline();
@@ -1632,24 +1690,26 @@ $s
 
       final serverShift = filterShift(response);
 
-      shiftKerja.value = serverShift;
-
       // ============================================================
       // UPDATE CACHE LOCAL
       // ============================================================
-
       await SQLHelper.instance.truncateShift();
 
-      for (final e in serverShift) {
-        await SQLHelper.instance.insertShift(
-          ShiftKerja(
-            id: e.id,
-            namaShift: e.namaShift,
-            jamMasuk: e.jamMasuk,
-            jamPulang: e.jamPulang,
+      await Future.wait(
+        serverShift.map(
+          (e) => SQLHelper.instance.insertShift(
+            ShiftKerja(
+              id: e.id,
+              namaShift: e.namaShift,
+              jamMasuk: e.jamMasuk,
+              jamPulang: e.jamPulang,
+            ),
           ),
-        );
-      }
+        ),
+      );
+
+      // Update reactive setelah penyimpanan berhasil
+      shiftKerja.value = serverShift;
 
       return shiftKerja;
     } catch (e) {
@@ -2524,7 +2584,7 @@ $s
       "tanggal1": (d1?.isNotEmpty ?? false) ? d1! : initDate1,
       "tanggal2": (d2?.isNotEmpty ?? false) ? d2! : initDate2,
     };
-    // print(param);
+    print(param);
 
     /// 🔥 ambil data lokal dulu (fallback)
     var localData = await SQLHelper.instance.getAllDataAbsen(
@@ -2683,9 +2743,9 @@ $s
     }).toList();
   }
 
-  Future<List<Absen>> getFilteredAbsen(idUser, d1, d2) async {
+  Future<List<Absen>> getFilteredAbsen(idUser, d1, d2, bool isDark) async {
     // if (date1.text != "" && date2.text != "") {
-    loadingDialog("Sedang memuat data...", "");
+    loadingDialog("Sedang memuat data...", "", isDark);
     var data = {
       "mode": "filtered",
       "id_user": idUser,
@@ -2703,7 +2763,7 @@ $s
     return dataAllAbsen;
   }
 
-  Future<List<Visit>> getFilteredVisit(idUser) async {
+  Future<List<Visit>> getFilteredVisit(idUser, bool isDark) async {
     if (date1.text != "" && date2.text != "") {
       var data = {
         "mode": "filter",
@@ -2711,7 +2771,7 @@ $s
         "tanggal1": date1.text,
         "tanggal2": date2.text,
       };
-      loadingDialog("Sedang memuat data...", "");
+      loadingDialog("Sedang memuat data...", "", isDark);
       final response = await ServiceApi().getFilteredVisit(data);
       dataAllVisit.value = response;
       isLoading.value = false;
@@ -3159,6 +3219,9 @@ $s
 
     lat.value = cabang.lat!;
     long.value = cabang.long!;
+    selectedAreaCoverage.value = cabang.cvrArea!;
+    // debugPrint('================SELECTED AREA COVERAGE================');
+    // debugPrint(selectedAreaCoverage.value);
 
     storeLatLng.value = LatLng(
       double.parse(cabang.lat!),

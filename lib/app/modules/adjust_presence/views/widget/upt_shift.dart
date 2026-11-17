@@ -376,7 +376,7 @@ class UptShift extends StatelessWidget {
                     "jam_masuk": data.jamMasuk,
                     "jam_pulang": data.jamPulang,
                   };
-                  adjCtrl.appAbs(dataUptApp, dataUptAbs, isInbox);
+                  adjCtrl.appAbs(dataUptApp, dataUptAbs, isInbox, isDark);
                   homeC.getPendingAdj(
                     idUser: dataUser.id!,
                     idCabang: dataUser.kodeCabang!,
@@ -416,7 +416,7 @@ class UptShift extends StatelessWidget {
                     "tgl_masuk": data.tglMasuk,
                     // "status": data.status,
                   };
-                  adjCtrl.appAbs(dataUptApp, {}, isInbox);
+                  adjCtrl.appAbs(dataUptApp, {}, isInbox, isDark);
                   homeC.getPendingAdj(
                     idUser: dataUser.id!,
                     idCabang: dataUser.kodeCabang!,

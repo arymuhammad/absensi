@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icons_flutter/icons_flutter.dart';
 
-import '../../../data/helper/app_colors.dart';
 import '../../../data/helper/const.dart';
 import '../../login/controllers/login_controller.dart';
 import '../controllers/add_pegawai_controller.dart';
@@ -20,17 +19,17 @@ class ListUserView extends StatelessWidget {
   Widget build(BuildContext context) {
     final userData = auth.logUser.value;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    
     return Scaffold(
       appBar: AppBar(
         title: Text('List User', style: titleTextStyle.copyWith(fontSize: 18)),
         backgroundColor: Colors.transparent,
         elevation: 0.0,
         flexibleSpace: Container(
-          decoration: BoxDecoration(
-            gradient: AppColors.mainGradient(
-              context: context,
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
+          decoration: const BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage('assets/image/bg-hd.png'),
+              fit: BoxFit.cover,
             ),
           ),
         ),
@@ -68,18 +67,22 @@ class ListUserView extends StatelessWidget {
                         ),
                       )
                       : Padding(
-                         padding: const EdgeInsets.fromLTRB(
-                                      11.0,
-                                      0.0,
-                                      11.0,
-                                      11.0,
-                                    ),
+                        padding: const EdgeInsets.fromLTRB(
+                          11.0,
+                          0.0,
+                          11.0,
+                          11.0,
+                        ),
                         child: Card(
+                          color:
+                              isDark
+                                  ? const Color(0xFF1E293B).withOpacity(0.78)
+                                  : Colors.white.withOpacity(0.82),
                           child: ListView.builder(
                             itemCount: data.length,
                             itemBuilder: (c, i) {
                               final user = data[i];
-                          
+
                               return ListTile(
                                 title: Text(user.nama!.capitalize!),
                                 subtitle: Text(user.namaLevel!.capitalize!),
@@ -88,7 +91,11 @@ class ListUserView extends StatelessWidget {
                                   onChanged: (value) async {
                                     // print(value);
                                     user.isActive = value;
-                                    loadingDialog("${!user.isActive! ?'disable':'activate'} user account", "");
+                                    loadingDialog(
+                                      "${!user.isActive! ? 'disable' : 'activate'} user account",
+                                      "",
+                                      isDark
+                                    );
                                     await ctrl.updateUsrState(
                                       id: user.id,
                                       active: value,

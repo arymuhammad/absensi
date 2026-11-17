@@ -26,7 +26,9 @@ class EditDataAbsen extends GetView<DetailAbsenController> {
     return Container(
       height: 500,
       decoration: BoxDecoration(
-        color: isDark ? Theme.of(context).cardColor : Colors.grey[300],
+        color: isDark
+                ? const Color(0xFF1E293B)
+                : Colors.white,
       ),
       child: SingleChildScrollView(
         scrollDirection: Axis.vertical,
@@ -179,7 +181,8 @@ class EditDataAbsen extends GetView<DetailAbsenController> {
                                 ),
                                 child:
                                     c.image != null
-                                        ? Card(
+                                        ? ClipRRect(
+                                          borderRadius: BorderRadius.circular(10),
                                           child: Image.file(
                                             File(c.image!.path),
                                             fit: BoxFit.cover,
@@ -211,7 +214,8 @@ class EditDataAbsen extends GetView<DetailAbsenController> {
                                 ),
                                 child:
                                     c.image2 != null
-                                        ? Card(
+                                        ? ClipRRect(
+                                          borderRadius: BorderRadius.circular(10),
                                           child: Image.file(
                                             File(c.image2!.path),
                                             fit: BoxFit.cover,
@@ -258,9 +262,11 @@ class EditDataAbsen extends GetView<DetailAbsenController> {
                         userData.kodeCabang!,
                         data['id_shift'],
                         userData.level!,
+                        isDark
                       );
                     },
                     backgroundColor: Colors.transparent,
+                    size: const Size(190, 46),
                   ),
                 ),
               ),

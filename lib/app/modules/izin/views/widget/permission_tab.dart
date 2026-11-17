@@ -4,8 +4,13 @@ import 'package:get/get.dart';
 
 class PermissionTab extends StatelessWidget {
   final RxString selected;
+  final bool isDark;
 
-  const PermissionTab({super.key, required this.selected});
+  const PermissionTab({
+    super.key,
+    required this.selected,
+    required this.isDark,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +24,10 @@ class PermissionTab extends StatelessWidget {
         ),
         child: CupertinoSlidingSegmentedControl<String>(
           groupValue: selected.value,
-          thumbColor: Theme.of(context).cardColor,
+          thumbColor:
+              isDark
+                  ? CupertinoColors.systemGrey.withOpacity(0.50)
+                  : Colors.white.withOpacity(0.82),
           backgroundColor: Colors.transparent,
           children: const {
             'all': Padding(

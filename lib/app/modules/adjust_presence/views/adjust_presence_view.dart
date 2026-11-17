@@ -12,17 +12,23 @@ class AdjustPresenceView extends GetView<AdjustPresenceController> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Adjust Presence'),
         centerTitle: true,
         backgroundColor: AppColors.itemsBackground,
         flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Color(0xFF1B2541), Color(0xFF3949AB)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
+          // height: 250,
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage(
+                isDark
+                    ? 'assets/image/bg-hd-drk.png'
+                    : 'assets/image/bg-hd.png',
+              ),
+              fit: BoxFit.cover,
             ),
           ),
         ),

@@ -30,7 +30,9 @@ class CsTextField extends StatelessWidget {
       controller: controller,
       maxLines: maxLines,
       decoration: InputDecoration(
-        fillColor: isDark ? Theme.of(context).cardColor : Colors.white,
+        fillColor:  isDark
+                      ? const Color(0xFF1E293B).withOpacity(0.78)
+                      : Colors.white.withOpacity(0.82),
         filled: true,
         // isDense: true, // 🔑 biar tinggi tetap rapih
         contentPadding: const EdgeInsets.all(5),

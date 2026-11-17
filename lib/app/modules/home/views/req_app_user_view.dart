@@ -11,6 +11,7 @@ import 'package:get/get.dart';
 import 'package:icons_flutter/icons_flutter.dart';
 import 'package:intl/intl.dart';
 
+import '../../../data/helper/custom_fab_location.dart';
 import '../../adjust_presence/controllers/adjust_presence_controller.dart';
 import '../../login/controllers/login_controller.dart';
 import '../../shared/dropdown.dart';
@@ -28,7 +29,7 @@ class ReqAppUserView extends GetView {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Notifications',
+          'Exception',
           style: titleTextStyle.copyWith(
             fontSize: 18,
             color: AppColors.contentColorWhite,
@@ -41,10 +42,13 @@ class ReqAppUserView extends GetView {
         actions: [Container()],
         flexibleSpace: Container(
           decoration: BoxDecoration(
-            gradient: AppColors.mainGradient(
-              context: context,
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
+            image: DecorationImage(
+              image: AssetImage(
+                isDark
+                    ? 'assets/image/bg-hd-drk.png'
+                    : 'assets/image/bg-hd.png',
+              ),
+              fit: BoxFit.cover,
             ),
           ),
         ),
@@ -53,9 +57,20 @@ class ReqAppUserView extends GetView {
       body: Stack(
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(8.0, 100, 8, 8),
+            padding: EdgeInsets.only(
+              left: 12,
+              right: 12,
+              top: 100,
+              bottom: 68 + MediaQuery.of(context).padding.bottom + 26,
+            ),
             child: Card(
-              color: isDark ? Theme.of(context).canvasColor : Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              color:
+                  isDark
+                      ? const Color(0xFF1E293B).withOpacity(0.78)
+                      : Colors.white.withOpacity(0.82),
               child: Container(
                 // height: 400,
                 decoration: BoxDecoration(
@@ -68,6 +83,9 @@ class ReqAppUserView extends GetView {
           ),
         ],
       ),
+      
+      floatingActionButtonLocation: const RaisedFabLocation(offsetY: 70),
+
       floatingActionButton: Builder(
         builder:
             (context) => ContainerMainColor(
@@ -96,13 +114,15 @@ class ReqAppUserView extends GetView {
     bool isInbox,
   ) {
     Get.bottomSheet(
-      backgroundColor: isDark ? Colors.black : Colors.white,
+   
       SingleChildScrollView(
         child: Container(
           // Atur tinggi sesuai kebutuhan, misal 400
           height: 250,
           decoration: BoxDecoration(
-            color: isDark ? Theme.of(context).cardColor : Colors.white,
+            color:   isDark
+                      ? const Color(0xFF1E293B).withOpacity(0.78)
+                      : Colors.white.withOpacity(0.82),
             borderRadius: const BorderRadius.only(
               topLeft: Radius.circular(10),
               topRight: Radius.circular(10),
@@ -202,7 +222,9 @@ class ReqAppUserView extends GetView {
                           prefixIcon: const Icon(Typicons.calendar_outlilne),
                           hintText: 'Tanggal Awal',
                           filled: true,
-                          fillColor: isDark ? Colors.black : Colors.white,
+                          fillColor:   isDark
+                      ? const Color(0xFF1E293B).withOpacity(0.78)
+                      : Colors.white.withOpacity(0.82),
                           border: const OutlineInputBorder(),
                         ),
                         format: DateFormat("yyyy-MM-dd"),
@@ -226,7 +248,9 @@ class ReqAppUserView extends GetView {
                           prefixIcon: const Icon(Typicons.calendar_outlilne),
                           hintText: 'Tanggal Akhir',
                           filled: true,
-                          fillColor: isDark ? Colors.black : Colors.white,
+                          fillColor:   isDark
+                      ? const Color(0xFF1E293B).withOpacity(0.78)
+                      : Colors.white.withOpacity(0.82),
                           border: const OutlineInputBorder(),
                         ),
                         format: DateFormat("yyyy-MM-dd"),

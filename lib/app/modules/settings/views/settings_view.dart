@@ -29,18 +29,20 @@ class SettingsView extends GetView<SettingsController> {
   Widget build(BuildContext context) {
     final listDataUser = auth.logUser.value;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       body: Stack(
         children: [
-          // const CsBgImg(
-          // ),
           Container(
-            height: 250,
+            height: 400,
             decoration: BoxDecoration(
-              gradient: AppColors.mainGradient(
-                context: context,
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
+              image: DecorationImage(
+                image: AssetImage(
+                  isDark
+                      ? 'assets/image/bg-hd-drk.png'
+                      : 'assets/image/bg-hd.png',
+                ),
+                fit: BoxFit.cover,
               ),
             ),
           ),
@@ -51,6 +53,10 @@ class SettingsView extends GetView<SettingsController> {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),
               ),
+              color:
+                  isDark
+                      ? const Color(0xFF1E293B).withOpacity(0.78)
+                      : Colors.white.withOpacity(0.82),
               child: SizedBox(
                 height: Get.height - 200,
                 child: Column(
@@ -157,7 +163,7 @@ class SettingsView extends GetView<SettingsController> {
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Icon(
-                               Typicons.key,
+                                Typicons.key,
                                 color:
                                     isDark
                                         ? Colors.blue
@@ -206,7 +212,7 @@ class SettingsView extends GetView<SettingsController> {
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Icon(
-                              Typicons.database,
+                                Typicons.database,
                                 color:
                                     isDark
                                         ? Colors.blue
@@ -268,19 +274,17 @@ class SettingsView extends GetView<SettingsController> {
                                     : false,
                             child: ListTile(
                               onTap: () {
+                                ctrl.isLoading.value = true;
+
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (_) {
-                                      ctrl.isLoading.value = true;
-                                      ctrl.getUser(
-                                        listDataUser.kodeCabang!,
-                                        listDataUser.parentId!,
-                                      );
-
-                                      return ListUserView();
-                                    },
+                                    builder: (_) => ListUserView(),
                                   ),
+                                );
+                                ctrl.getUser(
+                                  listDataUser.kodeCabang!,
+                                  listDataUser.parentId!,
                                 );
                               },
                               leading: Container(
@@ -399,7 +403,7 @@ class SettingsView extends GetView<SettingsController> {
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Icon(
-                               Typicons.mail,
+                                Typicons.mail,
                                 color:
                                     isDark
                                         ? Colors.blue
@@ -448,7 +452,7 @@ class SettingsView extends GetView<SettingsController> {
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Icon(
-                              Typicons.info,
+                                Typicons.info,
                                 color:
                                     isDark
                                         ? Colors.blue
@@ -517,90 +521,90 @@ class SettingsView extends GetView<SettingsController> {
                           ),
                           // ListTile(
                           //   onTap: () async {
-                              // Get.to(
-                              //   () => AboutView(),
-                              //   transition: Transition.cupertino,
-                              // );
-                              // Navigator.push(
-                              //   context,
-                              //   MaterialPageRoute(builder: (_) => AboutView()),
-                              // );
+                          // Get.to(
+                          //   () => AboutView(),
+                          //   transition: Transition.cupertino,
+                          // );
+                          // Navigator.push(
+                          //   context,
+                          //   MaterialPageRoute(builder: (_) => AboutView()),
+                          // );
 
-//                               const nomor = '6285124034523';
+                          //                               const nomor = '6285124034523';
 
-//                               final pesan = Uri.encodeComponent('''
-// ðŸ”” *NOTIFIKASI CUTI*
+                          //                               final pesan = Uri.encodeComponent('''
+                          // ðŸ”” *NOTIFIKASI CUTI*
 
-// Halo, Ade ðŸ‘‹
+                          // Halo, Ade ðŸ‘‹
 
-// Pengajuan cuti Anda memiliki pembaruan:
+                          // Pengajuan cuti Anda memiliki pembaruan:
 
-// â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”
-// ðŸ“‹ *Status* : DIBATALKAN
-// ðŸ“… *Tanggal* : 20 Agustus 2026
-// ðŸ·ï¸ *Jenis* : Cuti Tahunan
-// â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”
+                          // â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”
+                          // ðŸ“‹ *Status* : DIBATALKAN
+                          // ðŸ“… *Tanggal* : 20 Agustus 2026
+                          // ðŸ·ï¸ *Jenis* : Cuti Tahunan
+                          // â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”
 
-// Pengajuan tersebut telah dibatalkan oleh Admin.
+                          // Pengajuan tersebut telah dibatalkan oleh Admin.
 
-// Jika ada pertanyaan, silakan hubungi Admin.
+                          // Jika ada pertanyaan, silakan hubungi Admin.
 
-// Terima kasih ðŸ™
+                          // Terima kasih ðŸ™
 
-// ðŸ¢ *URBAN&CO Spot*
-// ''');
+                          // ðŸ¢ *URBAN&CO Spot*
+                          // ''');
 
-//                               final url = Uri.parse(
-//                                 'https://api.whatsapp.com/send'
-//                                 '?phone=$nomor'
-//                                 '&text=$pesan',
-//                               );
+                          //                               final url = Uri.parse(
+                          //                                 'https://api.whatsapp.com/send'
+                          //                                 '?phone=$nomor'
+                          //                                 '&text=$pesan',
+                          //                               );
 
-//                               await launchUrl(
-//                                 url,
-//                                 mode: LaunchMode.externalApplication,
-//                               );
-//                               // } else {
-//                               // throw 'Tidak bisa buka WhatsApp';
-//                               // }
-//                             },
-//                             leading: Container(
-//                               height: 40,
-//                               width: 40,
-//                               decoration: BoxDecoration(
-//                                 color:
-//                                     isDark
-//                                         ? Colors.blue.withOpacity(0.15)
-//                                         : bgContainer,
-//                                 borderRadius: BorderRadius.circular(8),
-//                               ),
-//                               child: Icon(
-//                                 Iconsax.info_circle_bold,
-//                                 color:
-//                                     isDark
-//                                         ? Colors.blue
-//                                         : AppColors.itemsBackground,
-//                               ),
-//                             ),
-//                             title: const Text(
-//                               'Kirim WA',
-//                               style: TextStyle(
-//                                 // color: titleColor,
-//                                 fontWeight: FontWeight.bold,
-//                               ),
-//                             ),
-//                             subtitle: Text(
-//                               'Send chat',
-//                               style: TextStyle(
-//                                 color: subTitleColor,
-//                                 fontSize: 13,
-//                               ),
-//                             ),
-//                             trailing: Icon(
-//                               Icons.keyboard_arrow_right_rounded,
-//                               color: subTitleColor,
-//                             ),
-//                           ),
+                          //                               await launchUrl(
+                          //                                 url,
+                          //                                 mode: LaunchMode.externalApplication,
+                          //                               );
+                          //                               // } else {
+                          //                               // throw 'Tidak bisa buka WhatsApp';
+                          //                               // }
+                          //                             },
+                          //                             leading: Container(
+                          //                               height: 40,
+                          //                               width: 40,
+                          //                               decoration: BoxDecoration(
+                          //                                 color:
+                          //                                     isDark
+                          //                                         ? Colors.blue.withOpacity(0.15)
+                          //                                         : bgContainer,
+                          //                                 borderRadius: BorderRadius.circular(8),
+                          //                               ),
+                          //                               child: Icon(
+                          //                                 Iconsax.info_circle_bold,
+                          //                                 color:
+                          //                                     isDark
+                          //                                         ? Colors.blue
+                          //                                         : AppColors.itemsBackground,
+                          //                               ),
+                          //                             ),
+                          //                             title: const Text(
+                          //                               'Kirim WA',
+                          //                               style: TextStyle(
+                          //                                 // color: titleColor,
+                          //                                 fontWeight: FontWeight.bold,
+                          //                               ),
+                          //                             ),
+                          //                             subtitle: Text(
+                          //                               'Send chat',
+                          //                               style: TextStyle(
+                          //                                 color: subTitleColor,
+                          //                                 fontSize: 13,
+                          //                               ),
+                          //                             ),
+                          //                             trailing: Icon(
+                          //                               Icons.keyboard_arrow_right_rounded,
+                          //                               color: subTitleColor,
+                          //                             ),
+                          //                           ),
                           // ListTile(
                           //   onTap: () {
                           //     promptDialog(

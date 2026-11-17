@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:absensi/app/data/helper/convert_time.dart';
 import 'package:absensi/app/data/helper/custom_dialog.dart';
 import 'package:absensi/app/data/model/overtime_model.dart';
 import 'package:absensi/app/services/service_api.dart';
@@ -13,7 +14,7 @@ class OvertimeController extends GetxController {
   var isLoading = true.obs;
   late TextEditingController date1, date2, clockIn, clockOut, remark;
   var listOvt = <OvertimeModel>[].obs;
-  final selectedStatus = 'all'.obs;
+  final RxString selectedStatus = 'all'.obs;
   final RxString searchQuery = ''.obs;
   final TextEditingController searchC = TextEditingController();
   Timer? debounce;
@@ -82,39 +83,39 @@ class OvertimeController extends GetxController {
       "status": status,
     };
 
-    debugPrint('======================================');
-    debugPrint('[OVERTIME] RELOAD');
-    debugPrint('[OVERTIME] PARAM : $data');
+    // debugPrint('======================================');
+    // debugPrint('[OVERTIME] RELOAD');
+    // debugPrint('[OVERTIME] PARAM : $data');
 
     try {
       isLoading.value = true;
 
       final response = await ServiceApi().overtime(data);
 
-      debugPrint('[OVERTIME] RESPONSE TYPE : ${response.runtimeType}');
+      // debugPrint('[OVERTIME] RESPONSE TYPE : ${response.runtimeType}');
 
       if (response is List<OvertimeModel>) {
-        debugPrint('[OVERTIME] RESPONSE LIST : ${response.length}');
+        // debugPrint('[OVERTIME] RESPONSE LIST : ${response.length}');
 
         listOvt.assignAll(response);
       } else if (response is Map<String, dynamic>) {
-        debugPrint('[OVERTIME] RESPONSE MAP : $response');
+        // debugPrint('[OVERTIME] RESPONSE MAP : $response');
 
         // API berhasil tetapi tidak ada data
         if (response['success'] == true && response['data'] == null) {
           listOvt.clear();
         }
       } else {
-        debugPrint('[OVERTIME] RESPONSE TIDAK VALID : $response');
+        // debugPrint('[OVERTIME] RESPONSE TIDAK VALID : $response');
 
         listOvt.clear();
       }
 
-      debugPrint('[OVERTIME] LIST AFTER RELOAD : ${listOvt.length}');
+      // debugPrint('[OVERTIME] LIST AFTER RELOAD : ${listOvt.length}');
 
       return listOvt.toList();
     } catch (e, stackTrace) {
-      debugPrint('[OVERTIME] RELOAD ERROR : $e');
+      // debugPrint('[OVERTIME] RELOAD ERROR : $e');
       debugPrint('[OVERTIME] STACK : $stackTrace');
 
       return listOvt.toList();
@@ -213,8 +214,8 @@ class OvertimeController extends GetxController {
       "photo": photo,
       "init_date": initDate,
       "end_date": endDate,
-      "start": start,
-      "end": end,
+      "start": start.to24Hour()??'',
+      "end": end.to24Hour()??'',
       "remark": remarks,
     };
     final res = await ServiceApi().overtime(data);
@@ -262,6 +263,7 @@ class OvertimeController extends GetxController {
     clockIn.clear();
     clockOut.clear();
     remark.clear();
+    selectedStatus.value = 'all';
     Get.back();
   }
 

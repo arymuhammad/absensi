@@ -79,7 +79,7 @@ class ExpandedDataAbsen extends StatelessWidget {
                                   label: '',
                                   icon: const Icon(Icons.save_as_rounded),
                                   onPressed: () => ctrl.updateDataAbsen(
-                                      data.idUser, data.tanggalMasuk!),
+                                      data.idUser, data.tanggalMasuk!,isDark),
                                   size: Size(Get.mediaQuery.size.width / 3, 50),
                                   fontSize: 18,
                                 )

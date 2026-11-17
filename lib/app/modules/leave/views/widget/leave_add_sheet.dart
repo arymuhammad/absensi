@@ -1,5 +1,6 @@
 ﻿import 'dart:io';
 
+import 'package:absensi/app/modules/shared/container_main_color.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icons_flutter/icons_flutter.dart';
@@ -35,7 +36,10 @@ class LeaveAddSheet extends StatelessWidget {
         return Container(
           padding: const EdgeInsets.only(left: 5, right: 5),
           decoration: BoxDecoration(
-            color: Theme.of(context).cardColor,
+            color:
+                isDark
+                    ? const Color(0xFF1E293B).withValues(alpha: 0.78)
+                    : Colors.white.withValues(alpha: 0.82),
             borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
           ),
           child: Column(
@@ -317,16 +321,23 @@ class LeaveAddSheet extends StatelessWidget {
                         ),
                       ),
 
-                      CsTextField(
-                        enabled: true,
-                        controller: leaveC.reasonLeave,
-                        label: 'Alasan cuti',
-                        maxLines: 3,
-                        isDark: isDark,
-                        icon: const Icon(Typicons.pencil, size: 18),
+                      Visibility(
+                        visible:
+                            leaveC.selectedLeave.value != "Replacement Off",
+                        child: Column(
+                          children: [
+                            CsTextField(
+                              enabled: true,
+                              controller: leaveC.reasonLeave,
+                              label: 'Alasan cuti',
+                              maxLines: 3,
+                              isDark: isDark,
+                              icon: const Icon(Typicons.pencil, size: 18),
+                            ),
+                            const SizedBox(height: 10),
+                          ],
+                        ),
                       ),
-
-                      const SizedBox(height: 10),
 
                       CsTextField(
                         enabled: true,
@@ -335,8 +346,9 @@ class LeaveAddSheet extends StatelessWidget {
                         maxLines: 3,
                         isDark: isDark,
                         icon: const Icon(
-                        Typicons.home,
+                          Typicons.home,
                           size: 18,
+                          color: Colors.blue,
                         ),
                       ),
 
@@ -349,7 +361,11 @@ class LeaveAddSheet extends StatelessWidget {
                         hint: '6285xxxxxx',
                         keyboardType: TextInputType.number,
                         isDark: isDark,
-                        icon: const Icon(FontAwesome.whatsapp, size: 18),
+                        icon: const Icon(
+                          FontAwesome.whatsapp,
+                          size: 18,
+                          color: AppColors.contentColorGreenAccent,
+                        ),
                       ),
 
                       const SizedBox(height: 10),
@@ -521,38 +537,44 @@ class LeaveAddSheet extends StatelessWidget {
                             invalidTotalLeave ||
                             insufficientBalance;
 
-                        return CsElevatedButton(
-                          color: AppColors.itemsBackground,
+                        return ContainerMainColor(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          radius: 30,
+                          child: CsElevatedButton(
+                            color: Colors.transparent,
 
-                          label:
-                              leaveType.isEmpty
-                                  ? 'Pilih jenis pengajuan'
-                                  : noLeaveSelection
-                                  ? 'Pilih jenis cuti'
-                                  : invalidTotalLeave
-                                  ? 'Jumlah cuti harus lebih dari 0'
-                                  : insufficientBalance
-                                  ? 'Saldo cuti tidak cukup'
-                                  : 'Tanda tangan',
+                            label:
+                                leaveType.isEmpty
+                                    ? 'Pilih jenis pengajuan'
+                                    : noLeaveSelection
+                                    ? 'Pilih jenis cuti'
+                                    : invalidTotalLeave
+                                    ? 'Jumlah cuti harus lebih dari 0'
+                                    : insufficientBalance
+                                    ? 'Saldo cuti tidak cukup'
+                                    : 'Tanda tangan',
 
-                          fontsize: 14,
+                            fontsize: 14,
 
-                          onPressed:
-                              invalidLeave
-                                  ? null
-                                  : () {
-                                    if (leaveC.images.isEmpty &&
-                                        leaveType == "Lainnya" &&
-                                        selectedLeave != "Replacement Off") {
-                                      showToast('Upload file pendukung');
-                                    } else {
-                                      openDialogSign(context);
-                                    }
-                                  },
+                            onPressed:
+                                invalidLeave
+                                    ? null
+                                    : () {
+                                      if (leaveC.images.isEmpty &&
+                                          leaveType == "Lainnya" &&
+                                          selectedLeave != "Replacement Off") {
+                                        showToast('Upload file pendukung');
+                                      } else {
+                                        openDialogSign(context, isDark);
+                                      }
+                                    },
+                            size: const Size(150, 46),
+                          ),
                         );
                       }),
 
-                      const SizedBox(height: 20),
+                      // const SizedBox(height: 40),
                     ],
                   ),
                 ),
@@ -565,19 +587,31 @@ class LeaveAddSheet extends StatelessWidget {
   }
 
   /// ðŸ”¥ SIGNATURE (TETAP SAMA LOGIC LU)
-  void openDialogSign(BuildContext context) {
+  void openDialogSign(BuildContext context, bool isDark) {
     Get.bottomSheet(
       Container(
         height: 250,
-        padding: const EdgeInsets.all(8),
-        color: Colors.white,
+        decoration: BoxDecoration(
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(20),
+          ),
+          color:
+              isDark ? const Color(0xFF1E293B).withOpacity(0.60) : Colors.white,
+        ),
+        padding: const EdgeInsets.all(12),
+
         child: Column(
           children: [
             Signature(
               controller: leaveC.ctrSign,
               height: 150,
-              backgroundColor: Colors.grey[300]!,
+              backgroundColor:
+                  isDark
+                      ? const Color(0xFF1E293B).withOpacity(0.95)
+                      : Colors.grey[300]!,
             ),
+            const SizedBox(height: 5),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
@@ -585,55 +619,66 @@ class LeaveAddSheet extends StatelessWidget {
                   onPressed: () => leaveC.ctrSign.clear(),
                   child: const Text('Hapus'),
                 ),
-                ElevatedButton(
-                  onPressed: () async {
-                    // ðŸ”¥ VALIDASI LU TETAP
-                    if (leaveC.datePick1.text.isEmpty ||
-                        leaveC.datePick2.text.isEmpty) {
-                      showToast("Tanggal kosong");
-                      return;
-                    }
+                const SizedBox(width: 5),
+                ContainerMainColor(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  radius: 30,
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      // ðŸ”¥ VALIDASI LU TETAP
+                      if (leaveC.datePick1.text.isEmpty ||
+                          leaveC.datePick2.text.isEmpty) {
+                        showToast("Tanggal kosong");
+                        return;
+                      }
 
-                    if (leaveC.reasonLeave.text.isEmpty) {
-                      showToast("Harap isi alasan cuti");
-                      return;
-                    }
-                    if (leaveC.addrLeave.text.isEmpty) {
-                      showToast("Harap isi alamat selama cuti");
-                      return;
-                    }
+                      if (leaveC.reasonLeave.text.isEmpty) {
+                        showToast("Harap isi alasan cuti");
+                        return;
+                      }
+                      if (leaveC.addrLeave.text.isEmpty) {
+                        showToast("Harap isi alamat selama cuti");
+                        return;
+                      }
 
-                    if (leaveC.phone.text.isEmpty) {
-                      showToast("Harap isi no whatsapp aktif");
-                      return;
-                    }
+                      if (leaveC.phone.text.isEmpty) {
+                        showToast("Harap isi no whatsapp aktif");
+                        return;
+                      }
 
-                    if (leaveC.ctrSign.isEmpty) {
-                      showToast("Harap buat tanda tangan dahulu");
-                      return;
-                    }
+                      if (leaveC.ctrSign.isEmpty) {
+                        showToast("Harap buat tanda tangan dahulu");
+                        return;
+                      }
 
-                    await leaveC.submitLeaveReq(
-                      cabang: userData!.kodeCabang!,
-                      idUser: userData!.id!,
-                      level: userData!.level!,
-                      nama: userData!.nama!,
-                      jumlahCuti: leaveC.amtTkn.text,
-                      saldoCuti: userData!.leaveBalance!,
-                      jenisCuti:
-                          leaveC.selectedLeave.value.isNotEmpty
-                              ? leaveC.selectedLeave.value
-                              : leaveC.selectedLeaveType.value,
-                      alasanCuti: leaveC.reasonLeave.text,
-                      alamatCuti: leaveC.addrLeave.text,
-                      telp: leaveC.phone.text,
-                      // userPengganti: leaveC.selectedIdUser.value,
-                      // levelUserPengganti: leaveC.selectedLevelUser.value,
-                      parentId: userData!.parentId!,
-                    );
-                    // Get.back(); // tutup sheet
-                  },
-                  child: const Text('Ajukan'),
+                      await leaveC.submitLeaveReq(
+                        cabang: userData!.kodeCabang!,
+                        idUser: userData!.id!,
+                        level: userData!.level!,
+                        nama: userData!.nama!,
+                        jumlahCuti: leaveC.amtTkn.text,
+                        saldoCuti: userData!.leaveBalance!,
+                        jenisCuti:
+                            leaveC.selectedLeave.value.isNotEmpty
+                                ? leaveC.selectedLeave.value
+                                : leaveC.selectedLeaveType.value,
+                        alasanCuti: leaveC.reasonLeave.text,
+                        alamatCuti: leaveC.addrLeave.text,
+                        telp: leaveC.phone.text,
+                        // userPengganti: leaveC.selectedIdUser.value,
+                        // levelUserPengganti: leaveC.selectedLevelUser.value,
+                        parentId: userData!.parentId!,
+                        isDark: isDark,
+                      );
+                      // Get.back(); // tutup sheet
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.transparent,
+                      elevation: 4,
+                    ),
+                    child: const Text('Ajukan'),
+                  ),
                 ),
               ],
             ),

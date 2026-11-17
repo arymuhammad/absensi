@@ -15,6 +15,8 @@ class WidgetTblCalendar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Obx(
       () => TableCalendar(
         locale: 'id_ID',
@@ -63,7 +65,8 @@ class WidgetTblCalendar extends StatelessWidget {
 
           if (start != null && end != null) {
             // Saat range selesai dipilih, panggil API untuk fetch data antara start dan end
-            if (absenC.searchAbsen.isEmpty) loadingDialog("Searching data", "");
+            if (absenC.searchAbsen.isEmpty)
+              loadingDialog("Searching data", "", isDark);
 
             await absenC.getAllAbsen(
               userData!.id!,
@@ -75,10 +78,8 @@ class WidgetTblCalendar extends StatelessWidget {
             // Optional: update tglStream ke end / start sesuai logika Anda
             absenC.tglStream.value = end;
             absenC.rangeSelectionMode.value = RangeSelectionMode.toggledOff;
-       
           } else {
             absenC.rangeSelectionMode.value = RangeSelectionMode.toggledOff;
-           
           }
         },
         selectedDayPredicate: (day) {
@@ -101,7 +102,7 @@ class WidgetTblCalendar extends StatelessWidget {
 
           if (absenC.tglStream.value.month != selectedDay.month ||
               absenC.tglStream.value.year != selectedDay.year) {
-            loadingDialog("Searching data", "");
+            loadingDialog("Searching data", "", isDark);
             await absenC.getAllAbsen(
               userData!.id!,
               DateFormat('yyyy-MM-dd').format(

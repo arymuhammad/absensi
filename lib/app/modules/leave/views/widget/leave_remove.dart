@@ -6,6 +6,7 @@ Widget liveRemove(
   String desc,
   String title,
   dynamic Function()? onPress,
+  bool isDark,
 ) {
   return SizedBox(
     height: 30,
@@ -20,6 +21,7 @@ Widget liveRemove(
             desc: desc,
             title: title,
             btnOkOnPress: onPress,
+            isDark: isDark
           );
         }
       },

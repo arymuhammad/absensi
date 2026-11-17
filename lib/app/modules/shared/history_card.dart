@@ -38,11 +38,15 @@ class HistoryCard extends StatelessWidget {
     final smallScreen = screenWidth < 360;
     final hasSyncStatus =
         isLocal && statusSync.isNotEmpty && statusSync != "SUCCESS";
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 2, vertical: 6),
       decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
+        color:
+            isDark
+                ? const Color(0xFF1E293B).withOpacity(0.78)
+                : Colors.white.withOpacity(0.82),
         borderRadius: BorderRadius.circular(14),
         boxShadow: [
           BoxShadow(

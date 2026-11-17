@@ -246,7 +246,7 @@ class MainMenu extends StatelessWidget {
               if (userData.parentId == "3" || userData.parentId == "4")
                 // child:
                 DashboardMenuCard(
-                  title: 'Inbox  ',
+                  title: 'Exception',
                   icon: Icons.all_inbox_rounded,
                   color: const Color.fromARGB(255, 59, 132, 221),
                   badge: 0.obs,
@@ -370,6 +370,8 @@ class DashboardMenuCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Obx(
       () => Stack(
         clipBehavior: Clip.none,
@@ -381,11 +383,21 @@ class DashboardMenuCard extends StatelessWidget {
               width: double.infinity,
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
               decoration: BoxDecoration(
-                color: Theme.of(context).cardColor,
+                color:
+                    isDark
+                        ? const Color(0xFF1E293B).withValues(alpha: 0.78)
+                        : Colors.white.withValues(alpha: 0.82),
                 borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                  color:
+                      isDark
+                          ? Colors.white.withValues(alpha: 0.10)
+                          : Colors.white.withValues(alpha: 0.85),
+                  width: 1,
+                ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(.03),
+                    color: Colors.black.withValues(alpha: isDark ? 0.12 : 0.03),
                     blurRadius: 10,
                     offset: const Offset(0, 3),
                   ),

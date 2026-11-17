@@ -89,6 +89,8 @@ class HomeController extends GetxController
   var search = ''.obs;
   var isTabLoading = true.obs;
 
+  bool _tabControllerInitialized = false;
+
   @override
   void onInit() {
     super.onInit();
@@ -103,7 +105,7 @@ class HomeController extends GetxController
     currPatchVer.value = await ShorebirdHelper.currentPatchVersion();
 
     if (!await isOnline()) {
-      _initializeHome();
+      await _initializeHome();
       return;
     }
 
@@ -111,10 +113,11 @@ class HomeController extends GetxController
     // PRIORITAS 1 : CEK APK
     // ==========================
     final hasNewApk = await checkApkUpdate();
+    final isDark = Theme.of(Get.context!).brightness == Brightness.dark;
 
     if (hasNewApk) {
       if (Platform.isAndroid) {
-        checkForUpdates("onInit");
+        checkForUpdates("onInit", isDark);
       } else {
         launchUrl(
           Uri.parse('https://apps.apple.com/us/app/urbanco-spot/id6476486235'),
@@ -122,7 +125,7 @@ class HomeController extends GetxController
       }
 
       // jangan cek shorebird
-      _initializeHome();
+      await _initializeHome();
       return;
     }
 
@@ -134,7 +137,7 @@ class HomeController extends GetxController
     // ==========================
     // LOAD DATA HOME
     // ==========================
-    _initializeHome();
+    await _initializeHome();
   }
 
   Future<void> _initializeHome() async {
@@ -145,6 +148,7 @@ class HomeController extends GetxController
     );
 
     tabController = TabController(length: 3, vsync: this);
+    _tabControllerInitialized = true;
 
     tabController.animation!.addListener(() {
       final value = tabController.animation!.value.round();
@@ -154,8 +158,25 @@ class HomeController extends GetxController
       }
     });
 
+    // print(
+    //   '================================= data user visit ==========================',
+    // );
+    // print(dataUserLogin.visit);
+    // print('=================================');
+    // Reset state summary setiap inisialisasi akun.
     if (dataUserLogin.visit == "0") {
-      getSummAttPerMonth(dataUserLogin.id!);
+      hadir.value = 0;
+      tepatWaktu.value = 0;
+      telat.value = 0;
+
+      isLoadingSumm.value = true;
+      isErrorSumm.value = false;
+
+      await getSummAttPerMonth(dataUserLogin.id ?? '');
+      // print('panggil fungsi summ per mont');
+    } else {
+      isLoadingSumm.value = false;
+      isErrorSumm.value = false;
     }
 
     if ((dataUserLogin.parentId == "3" &&
@@ -282,10 +303,13 @@ class HomeController extends GetxController
   }
 
   @override
-  void dispose() {
-    tabController.dispose();
+  void onClose() {
     timer?.cancel();
-    super.dispose();
+
+    if (_tabControllerInitialized) {
+      tabController.dispose();
+    }
+    super.onClose();
   }
 
   Stream<String> getTime() async* {
@@ -324,25 +348,44 @@ class HomeController extends GetxController
   }
 
   Future<void> getSummAttPerMonth(String idUser) async {
-    var data = {
-      "type": "summ_month",
-      "date1": initDate,
-      "date2": endDate,
-      "id_user": idUser,
-    };
+    // print(idUser);
+    if (idUser.isEmpty) {
+      isErrorSumm.value = true;
+      isLoadingSumm.value = false;
+      return;
+    }
+
     try {
       isLoadingSumm.value = true;
       isErrorSumm.value = false;
 
-      SummaryAbsenModel res = await ServiceApi().getNotif(data);
+      debugPrint('SUMMARY: START - $idUser');
+
+      final data = {
+        "type": "summ_month",
+        "date1": initDate,
+        "date2": endDate,
+        "id_user": idUser,
+      };
+
+      final SummaryAbsenModel res = await ServiceApi()
+          .getNotif(data)
+          .timeout(const Duration(seconds: 35));
 
       hadir.value = res.hadir ?? 0;
       tepatWaktu.value = res.tepatWaktu ?? 0;
       telat.value = res.telat ?? 0;
-    } catch (e) {
+
+      // debugPrint('SUMMARY: SUCCESS');
+    } catch (e, stackTrace) {
       isErrorSumm.value = true;
+
+      // debugPrint('SUMMARY ERROR: $e');
+      debugPrintStack(stackTrace: stackTrace);
     } finally {
       isLoadingSumm.value = false;
+
+      // debugPrint('SUMMARY: FINISHED');
     }
   }
 
@@ -597,9 +640,9 @@ class HomeController extends GetxController
     }
   }
 
-  checkForUpdates(status) async {
+  checkForUpdates(status, bool isDark) async {
     if (status != "onInit") {
-      loadingDialog("Checking for updates...", "");
+      loadingDialog("Checking for updates...", "", isDark);
     }
 
     try {
@@ -655,6 +698,7 @@ class HomeController extends GetxController
               type: DialogType.info,
               title: 'INFO',
               btnOkOnPress: () => Get.back(),
+              isDark: isDark,
             );
           }
         }
@@ -677,7 +721,7 @@ class HomeController extends GetxController
         textConfirm: 'Refresh',
         confirmTextColor: Colors.white,
         onConfirm: () {
-          checkForUpdates("");
+          checkForUpdates("", isDark);
           Get.back(closeOverlays: true);
         },
       );

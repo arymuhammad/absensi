@@ -12,14 +12,16 @@ import '../../../../data/helper/custom_dialog.dart';
 import '../../../../data/helper/db_helper.dart';
 import '../../../../services/service_api.dart';
 
-final absC = Get.find<AbsenController>();
-final homeC = Get.find<HomeController>();
-
 Future<DbResult> checkOut(
   Data dataUser,
   double latitude,
   double longitude,
+  bool isDark,
 ) async {
+
+  final absC = Get.find<AbsenController>();
+  final homeC = Get.find<HomeController>();
+
   bool checkoutSucceeded = false;
   bool isLoadingShown = false;
 
@@ -48,7 +50,7 @@ Future<DbResult> checkOut(
       }
 
       if (absC.cekAbsen.value.total == "0") {
-        _resetState();
+        _resetState(absC);
         Get.back();
         // failedDialog(
         //   Get.context,
@@ -67,7 +69,7 @@ Future<DbResult> checkOut(
       );
 
       if (localCheck.isEmpty || localCheck.first.jamAbsenMasuk == null) {
-        _resetState();
+        _resetState(absC);
         Get.back();
         // failedDialog(
         //   Get.context,
@@ -85,7 +87,7 @@ Future<DbResult> checkOut(
     // Get.back();
 
     if (absC.image == null) {
-      _resetState();
+      _resetState(absC);
       // failedDialog(Get.context, "Warning", "Check out was cancelled");
       return DbResult(success: false, message: "Check out was cancelled");
     }
@@ -98,7 +100,7 @@ Future<DbResult> checkOut(
       targetDate,
     );
 
-    loadingDialog("Sending data...", "");
+    loadingDialog("Sending data...", "", isDark);
     isLoadingShown = true;
 
     final data = {
@@ -299,17 +301,18 @@ Future<DbResult> checkOut(
           Future.delayed(const Duration(milliseconds: 300));
           Get.back();
         },
+        isDark: isDark,
       );
       absC.cekAbsen.value.total = "0";
     }
-    _resetState();
+    _resetState(absC);
   }
 }
 
 // =======================
 // 🧹 RESET UI STATE
 // =======================
-void _resetState() {
+void _resetState(AbsenController absC) {
   absC.stsAbsenSelected.value = "";
   absC.selectedShift.value = "";
   absC.selectedCabang.value = "";

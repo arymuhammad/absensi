@@ -30,15 +30,19 @@ class VerifikasiUpdatePassword extends GetView {
       body: Stack(
         children: [
           Container(
-            height: 250,
+            height: 400,
             decoration: BoxDecoration(
-              gradient: AppColors.mainGradient(
-                context: context,
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
+              image: DecorationImage(
+                image: AssetImage(
+                  isDark
+                      ? 'assets/image/bg-hd-drk.png'
+                      : 'assets/image/bg-hd.png',
+                ),
+                fit: BoxFit.cover,
               ),
             ),
           ),
+
           Padding(
             padding: const EdgeInsets.all(20.0),
             child: ListView(
@@ -72,8 +76,8 @@ class VerifikasiUpdatePassword extends GetView {
                   padding: const EdgeInsets.symmetric(horizontal: 60),
                   child: Container(
                     decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFF1B2541), Color(0xFF3949AB)],
+                      gradient: AppColors.mainGradient(
+                        context: context,
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
@@ -88,7 +92,7 @@ class VerifikasiUpdatePassword extends GetView {
                     ),
                     child: ElevatedButton(
                       onPressed: () {
-                        pegawaiC.cekUser(context);
+                        pegawaiC.cekUser(context, isDark);
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.transparent,

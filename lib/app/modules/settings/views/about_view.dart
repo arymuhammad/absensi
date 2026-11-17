@@ -23,6 +23,8 @@ class AboutView extends GetView {
   final setC = Get.put(SettingsController());
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
@@ -35,14 +37,16 @@ class AboutView extends GetView {
       resizeToAvoidBottomInset: false,
       body: Stack(
         children: [
-          // const CsBgImg(),
           Container(
-            height: 250,
+            height: 400,
             decoration: BoxDecoration(
-              gradient: AppColors.mainGradient(
-                context: context,
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
+              image: DecorationImage(
+                image: AssetImage(
+                  isDark
+                      ? 'assets/image/bg-hd-drk.png'
+                      : 'assets/image/bg-hd.png',
+                ),
+                fit: BoxFit.cover,
               ),
             ),
           ),
@@ -50,6 +54,13 @@ class AboutView extends GetView {
             padding: const EdgeInsets.only(top: 110, left: 15.0, right: 15.0),
             child: Card(
               elevation: 4,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              color:
+                  isDark
+                      ? const Color(0xFF1E293B).withOpacity(0.78)
+                      : Colors.white.withOpacity(0.82),
               child: SizedBox(
                 height: 600,
                 child: Column(
@@ -60,7 +71,7 @@ class AboutView extends GetView {
                       title: const Text('Check for app updates'),
                       onTap: () {
                         if (Platform.isAndroid) {
-                          homeC.checkForUpdates("about");
+                          homeC.checkForUpdates("about", isDark);
                           // launchUrl(
                           //     Uri.parse('http://103.156.15.61/update apk/absensiApp.apk'));
                         } else {

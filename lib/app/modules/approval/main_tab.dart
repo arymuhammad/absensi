@@ -33,16 +33,21 @@ class MainTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final userData = logC.logUser.value;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Request Approval'),
         elevation: 0.0,
         flexibleSpace: Container(
           decoration: BoxDecoration(
-            gradient: AppColors.mainGradient(
-              context: context,
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
+            image: DecorationImage(
+              image: AssetImage(
+                isDark
+                    ? 'assets/image/bg-hd-drk.png'
+                    : 'assets/image/bg-hd.png',
+              ),
+              fit: BoxFit.cover,
             ),
           ),
         ),
@@ -57,12 +62,17 @@ class MainTab extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.all(4),
                   decoration: BoxDecoration(
-                    color: CupertinoColors.systemGrey5.resolveFrom(context),
+                    color:
+                        isDark
+                            ? const Color(0xFF1E293B).withOpacity(0.78)
+                            : Colors.white.withOpacity(0.82),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: CupertinoSlidingSegmentedControl<int>(
                     groupValue: ctrl.selectedTab.value,
-                    thumbColor: Colors.white,
+                    thumbColor:  isDark
+              ? CupertinoColors.systemGrey.withOpacity(0.50)
+              : Colors.white.withOpacity(0.82),
                     backgroundColor: Colors.transparent,
                     children: const {
                       0: Padding(
@@ -74,7 +84,6 @@ class MainTab extends StatelessWidget {
                           'Leave',
                           style: TextStyle(
                             fontWeight: FontWeight.w600,
-                            color: CupertinoColors.label,
                           ),
                         ),
                       ),
@@ -87,7 +96,6 @@ class MainTab extends StatelessWidget {
                           'Overtime',
                           style: TextStyle(
                             fontWeight: FontWeight.w600,
-                            color: CupertinoColors.label,
                           ),
                         ),
                       ),
@@ -100,7 +108,6 @@ class MainTab extends StatelessWidget {
                           'Presence',
                           style: TextStyle(
                             fontWeight: FontWeight.w600,
-                            color: CupertinoColors.label,
                           ),
                         ),
                       ),
@@ -113,7 +120,6 @@ class MainTab extends StatelessWidget {
                           'Permission',
                           style: TextStyle(
                             fontWeight: FontWeight.w600,
-                            color: CupertinoColors.label,
                           ),
                         ),
                       ),
@@ -190,6 +196,10 @@ class MainTab extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: CupertinoSearchTextField(
+                backgroundColor:
+                    isDark
+                        ? const Color(0xFF1E293B).withOpacity(0.78)
+                        : Colors.white.withOpacity(0.82),
                 placeholder: 'Search...',
                 onChanged: (val) {
                   ctrl.search.value = val;

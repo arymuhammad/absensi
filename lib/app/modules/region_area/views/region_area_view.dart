@@ -2,7 +2,6 @@ import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../../data/helper/app_colors.dart';
 import '../controllers/region_area_controller.dart';
 
 /// =======================
@@ -16,15 +15,20 @@ class RegionAreaView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Region Area"),
         flexibleSpace: Container(
+          // height: 400,
           decoration: BoxDecoration(
-            gradient: AppColors.mainGradient(
-              context: context,
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
+            image: DecorationImage(
+              image: AssetImage(
+                isDark
+                    ? 'assets/image/bg-hd-drk.png'
+                    : 'assets/image/bg-hd.png',
+              ),
+              fit: BoxFit.cover,
             ),
           ),
         ),
@@ -69,6 +73,10 @@ class RegionAreaView extends StatelessWidget {
                 final data = ctrl.regions[index];
                 // print(data['store_name']);
                 return Card(
+                  color:
+                      isDark
+                          ? const Color(0xFF1E293B).withOpacity(0.78)
+                          : Colors.white.withOpacity(0.82),
                   // margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                   child: ListTile(
                     title: Text(

@@ -23,12 +23,19 @@ class CsDropDown extends StatelessWidget {
       onChanged: onChanged,
       value: value,
       selectedItemBuilder: selectedItemBuilder,
+      dropdownColor:
+          isDark
+              ? const Color(0xFF1E293B).withOpacity(0.98)
+              : Colors.white.withOpacity(0.82),
       decoration: InputDecoration(
         labelText: label,
         border: const OutlineInputBorder(),
         contentPadding: const EdgeInsets.all(8),
         filled: true,
-        fillColor: isDark ? Colors.black : Colors.white,
+        fillColor:
+            isDark
+                ? const Color(0xFF1E293B).withOpacity(0.78)
+                : Colors.white.withOpacity(0.82),
       ),
     );
   }

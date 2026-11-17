@@ -11,21 +11,24 @@ import '../../../../data/helper/custom_dialog.dart';
 import '../../../../data/helper/db_helper.dart';
 import '../../../../data/model/absen_model.dart';
 import '../../../../data/model/login_model.dart';
-// import '../../../../services/service_api.dart';
 
-final absC = Get.find<AbsenController>();
-final homeC = Get.find<HomeController>();
+// import '../../../../services/service_api.dart';
 
 Future<DbResult> checkIn(
   Data dataUser,
   double latitude,
   double longitude,
+  bool isDark,
 ) async {
+  // Ambil instance terbaru saat fungsi dipanggil
+  final absC = Get.find<AbsenController>();
+  final homeC = Get.find<HomeController>();
+
   /// 🔒 LOCK biar ga double klik
   if (absC.isLoading.value) return DbResult(success: false, message: "unknown");
   absC.isLoading.value = true;
   try {
-    final selectedShift = absC.selectedShift.value;
+    final selectedShift = absC.selectedShift.value.trim();
 
     // ✅ VALIDASI 1: kosong / 0
     if (selectedShift.isEmpty || selectedShift == "0") {
@@ -92,6 +95,7 @@ Future<DbResult> checkIn(
         type: DialogType.info,
         title: 'INFO',
         btnOkOnPress: () => Get.back(),
+        isDark: isDark,
       );
       return DbResult(success: false, message: "You have checked in today");
     }
@@ -118,6 +122,7 @@ Future<DbResult> checkIn(
     if (absC.image == null) {
       // _resetForm();
       // failedDialog(Get.context, "Warning", "Check in was cancelled");
+      absC.getLoc(dataUser);
       return DbResult(success: false, message: "Check in was cancelled");
     }
     final imagePath = absC.image!.path;
@@ -161,7 +166,7 @@ Future<DbResult> checkIn(
       // absC.jamMasuk.value = jamMasuk;
       // absC.jamPulang.value = jamPulang;
     }
-    loadingDialog("Sending data...", ""); // loading
+    loadingDialog("Sending data...", "", isDark); // loading
 
     // ===============================
     // 7️⃣ DATA ABSEN
@@ -239,6 +244,7 @@ Future<DbResult> checkIn(
           Future.delayed(const Duration(milliseconds: 300));
           Get.back();
         },
+        isDark: isDark,
       );
     }
     // ===============================
@@ -281,12 +287,12 @@ Future<DbResult> checkIn(
     failedDialog(Get.context, "Error", e.toString());
     return DbResult(success: false, message: e.toString());
   } finally {
-    _resetForm();
+    _resetForm(absC);
     absC.isLoading.value = false;
   }
 }
 
-void _resetForm() {
+void _resetForm(AbsenController absC) {
   absC.stsAbsenSelected.value = "";
   absC.selectedShift.value = "";
   absC.selectedCabang.value = "";

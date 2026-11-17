@@ -9,6 +9,7 @@ import 'package:icons_flutter/icons_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:shimmer/shimmer.dart';
 
+import '../../../data/helper/custom_fab_location.dart';
 import '../../login/controllers/login_controller.dart';
 import 'search_form.dart';
 
@@ -22,6 +23,16 @@ class MonitoringAbsenView extends GetView {
   Widget build(BuildContext context) {
     final userData = auth.logUser.value;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    // Ambil inset langsung dari FlutterView
+    final view = View.of(context);
+    final viewMedia = MediaQueryData.fromView(view);
+
+    final keyboardHeight = viewMedia.viewInsets.bottom;
+    final keyboardOpen = keyboardHeight > 0;
+
+    final bottomPadding =
+        keyboardOpen ? 8.0 : 68.0 + viewMedia.padding.bottom + 26.0;
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
@@ -35,10 +46,13 @@ class MonitoringAbsenView extends GetView {
         // backgroundColor: AppColors.itemsBackground,
         flexibleSpace: Container(
           decoration: BoxDecoration(
-            gradient: AppColors.mainGradient(
-              context: context,
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
+            image: DecorationImage(
+              image: AssetImage(
+                isDark
+                    ? 'assets/image/bg-hd-drk.png'
+                    : 'assets/image/bg-hd.png',
+              ),
+              fit: BoxFit.cover,
             ),
           ),
         ),
@@ -71,6 +85,11 @@ class MonitoringAbsenView extends GetView {
                         prefixIcon: const Icon(Icons.search),
                         hintText: 'Cari berdasarkan tanggal',
                         labelText: 'Cari Absen',
+                        filled: true,
+                        fillColor:
+                            isDark
+                                ? const Color(0xFF1E293B).withOpacity(0.95)
+                                : Colors.white.withOpacity(0.95),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
@@ -126,8 +145,8 @@ class MonitoringAbsenView extends GetView {
                 child: Obx(() {
                   return absenC.isLoading.value
                       ? ListView.builder(
-                        padding: const EdgeInsets.only(
-                          bottom: 20.0,
+                        padding: EdgeInsets.only(
+                          bottom: bottomPadding,
                           left: 20.0,
                           right: 20.0,
                         ),
@@ -262,8 +281,8 @@ class MonitoringAbsenView extends GetView {
                       )
                       : ListView.builder(
                         shrinkWrap: true,
-                        padding: const EdgeInsets.only(
-                          bottom: 20.0,
+                        padding: EdgeInsets.only(
+                          bottom: bottomPadding,
                           left: 20.0,
                           right: 20.0,
                         ),
@@ -356,6 +375,12 @@ class MonitoringAbsenView extends GetView {
                               // absenC.filterDataAbsen("");
                             },
                             child: Card(
+                              color:
+                                  isDark
+                                      ? const Color(
+                                        0xFF1E293B,
+                                      ).withOpacity(0.95)
+                                      : Colors.white.withOpacity(0.95),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(6),
                               ),
@@ -408,12 +433,14 @@ class MonitoringAbsenView extends GetView {
                                       absenC.searchAbsen[i].tanggalMasuk!,
                                     ),
                                     endDate: DateTime.parse(
-                                      absenC.searchAbsen[i].tanggalPulang ?? absenC.searchAbsen[i].tanggalMasuk!,
+                                      absenC.searchAbsen[i].tanggalPulang ??
+                                          absenC.searchAbsen[i].tanggalMasuk!,
                                     ),
                                   ),
                                   const SizedBox(width: 20),
                                   Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         DateFormat("EEEE", "id_ID").format(
@@ -424,7 +451,12 @@ class MonitoringAbsenView extends GetView {
                                         style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                           fontSize: 16,
-                                          color: titleColor,
+                                          color:
+                                              isDark
+                                                  ? Colors.white.withOpacity(
+                                                    0.95,
+                                                  )
+                                                  : titleColor,
                                         ),
                                       ),
                                       const SizedBox(width: 10),
@@ -511,7 +543,10 @@ class MonitoringAbsenView extends GetView {
                                                   .jamAbsenMasuk!,
                                               style: TextStyle(
                                                 fontWeight: FontWeight.bold,
-                                                color: titleColor,
+                                                color:
+                                                    isDark
+                                                        ? mainColor
+                                                        : titleColor,
                                               ),
                                             ),
                                           ],
@@ -531,7 +566,10 @@ class MonitoringAbsenView extends GetView {
                                                   : "-",
                                               style: TextStyle(
                                                 fontWeight: FontWeight.bold,
-                                                color: titleColor,
+                                                color:
+                                                    isDark
+                                                        ? mainColor
+                                                        : titleColor,
                                               ),
                                             ),
                                           ],
@@ -551,6 +589,8 @@ class MonitoringAbsenView extends GetView {
           ),
         ],
       ),
+      floatingActionButtonLocation: const RaisedFabLocation(offsetY: 70),
+
       floatingActionButton: ContainerMainColor(
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
@@ -561,7 +601,7 @@ class MonitoringAbsenView extends GetView {
             searchForm(context, userData, isDark, absenC);
           },
           child: Icon(
-           Typicons.calendar_outlilne,
+            Typicons.calendar_outlilne,
             color: isDark ? Colors.blue : Colors.white,
           ),
         ),

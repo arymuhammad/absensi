@@ -254,12 +254,13 @@ class UptDataAbsen extends StatelessWidget {
         const SizedBox(height: 10),
         Text('Alasan Perubahan Data', style: titleTextStyle),
         Text(data.alasan?.capitalizeFirst ?? '-', style: subtitleTextStyle),
+        const SizedBox(height: 10),
         // Obx(() {
         //   final dataUser = auth.logUser.value;
         //   return
         Visibility(
           visible:
-              !isInbox
+              !isInbox && data.statusExcep == "pending"
                   // data.statusExcep == "pending" &&
                   //         data.keterangan == "" &&
                   //         ([
@@ -431,7 +432,7 @@ class UptDataAbsen extends StatelessWidget {
                     "long_out": data.longOut,
                     "device_info2": data.devInfo,
                   };
-                  adjCtrl.appAbs(dataUptApp, dataUptAbs, isInbox);
+                  adjCtrl.appAbs(dataUptApp, dataUptAbs, isInbox, isDark);
                   homeC.getPendingAdj(
                     idUser: dataUser.id!,
                     idCabang: dataUser.kodeCabang!,
@@ -472,7 +473,7 @@ class UptDataAbsen extends StatelessWidget {
                     // "status": data.status,
                     // "date": data.tglMasuk,
                   };
-                  adjCtrl.appAbs(dataUptApp, {}, isInbox);
+                  adjCtrl.appAbs(dataUptApp, {}, isInbox, isDark);
                   homeC.getPendingAdj(
                     idUser: dataUser.id!,
                     idCabang: dataUser.kodeCabang!,

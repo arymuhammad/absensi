@@ -21,9 +21,14 @@ class CsDropdownShiftKerja extends StatelessWidget {
   Widget build(BuildContext context) {
     return Obx(
       () => DropdownButtonFormField(
+        dropdownColor: isDark
+                ? const Color(0xFF1E293B).withOpacity(0.98)
+                : Colors.white.withOpacity(0.98),
         decoration: InputDecoration(
           // contentPadding: EdgeInsets.all(8),
-          fillColor: isDark ? Theme.of(context).canvasColor : Colors.white,
+          fillColor: isDark
+                ? const Color(0xFF1E293B).withOpacity(0.98)
+                : Colors.white.withOpacity(0.98),
           filled: true,
           // isDense: true, // 🔑 biar tinggi tetap rapih
           contentPadding: const EdgeInsets.all(5),

@@ -24,6 +24,7 @@ class BackupView extends GetView {
   Widget build(BuildContext context) {
     final userData = auth.logUser.value;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
@@ -41,12 +42,15 @@ class BackupView extends GetView {
         children: [
           // const CsBgImg(),
           Container(
-            height: 250,
+            height: 400,
             decoration: BoxDecoration(
-              gradient: AppColors.mainGradient(
-                context: context,
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
+              image: DecorationImage(
+                image: AssetImage(
+                  isDark
+                      ? 'assets/image/bg-hd-drk.png'
+                      : 'assets/image/bg-hd.png',
+                ),
+                fit: BoxFit.cover,
               ),
             ),
           ),
@@ -199,7 +203,7 @@ class BackupView extends GetView {
                           icon: Icon(Icons.people, color: red),
                           onPressed: () async {
                             try {
-                              loadingDialog("menghapus data...", "");
+                              loadingDialog("menghapus data...", "", isDark);
 
                               if (userData.visit == '0') {
                                 // cek data absen

@@ -3,6 +3,7 @@ import 'dart:math' as math;
 
 import 'package:absensi/app/data/helper/calendar_badge.dart';
 import 'package:absensi/app/data/helper/const.dart';
+import 'package:absensi/app/data/helper/convert_time.dart';
 import 'package:absensi/app/modules/approval/widget/bottom_search_overtime.dart';
 import 'package:absensi/app/modules/login/controllers/login_controller.dart';
 import 'package:absensi/app/modules/shared/elevated_button.dart';
@@ -13,9 +14,11 @@ import 'package:get/get.dart';
 import 'package:icons_flutter/icons_flutter.dart';
 
 import '../../../data/helper/app_colors.dart';
+import '../../../data/helper/custom_fab_location.dart';
 import '../../../data/helper/helper_ui.dart';
 import '../../../data/helper/loading_platform.dart';
 import '../../../services/service_api.dart';
+import '../../home/controllers/home_controller.dart';
 import '../../overtime/controllers/overtime_controller.dart';
 import '../../shared/container_main_color.dart';
 
@@ -23,10 +26,20 @@ class ReqOvertimeView extends StatelessWidget {
   ReqOvertimeView({super.key});
   final ctrl = Get.find<OvertimeController>();
   final auth = Get.find<LoginController>();
+  final homeC = Get.find<HomeController>();
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final view = View.of(context);
+    final viewMedia = MediaQueryData.fromView(view);
+
+    final keyboardHeight = viewMedia.viewInsets.bottom;
+    final keyboardOpen = keyboardHeight > 0;
+
+    final bottomPadding =
+        keyboardOpen ? 8.0 : 68.0 + viewMedia.padding.bottom + 26.0;
 
     return Scaffold(
       body: CustomMaterialIndicator(
@@ -63,16 +76,34 @@ class ReqOvertimeView extends StatelessWidget {
           if (ctrl.isLoading.value) {
             return Center(child: platFormDevice());
           }
-          final list = ctrl.filteredList;
+          final keyword = homeC.search.value.toLowerCase();
+
+          final list =
+              ctrl.filteredList.where((leave) {
+                return (leave.name ?? '').toLowerCase().contains(keyword) ||
+                    (leave.idUser ?? '').toLowerCase().contains(keyword) ||
+                    (leave.branchName ?? '').toLowerCase().contains(keyword);
+              }).toList();
 
           if (list.isEmpty) {
             return Padding(
-              padding: const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 8.0),
+              padding: EdgeInsets.only(
+                left: 8,
+                right: 8,
+                bottom: bottomPadding,
+              ),
               child: Card(
+                color:
+                    isDark
+                        ? const Color(0xFF1E293B).withOpacity(0.78)
+                        : Colors.white.withOpacity(0.82),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
                 child: ListView(
                   physics: const AlwaysScrollableScrollPhysics(),
                   children: [
-                    SizedBox(height: MediaQuery.of(context).size.height * 0.3),
+                    SizedBox(height: MediaQuery.of(context).size.height * 0.2),
                     const Icon(Icons.inbox, size: 50, color: Colors.grey),
                     const SizedBox(height: 10),
                     const Center(child: Text('No overtime request')),
@@ -81,10 +112,20 @@ class ReqOvertimeView extends StatelessWidget {
               ),
             );
           }
+
           return Padding(
-            padding: const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 8.0),
+            padding: EdgeInsets.only(left: 8, right: 8, bottom: bottomPadding),
             child: Card(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              color:
+                  isDark
+                      ? const Color(0xFF1E293B).withOpacity(0.78)
+                      : Colors.white.withOpacity(0.82),
+              elevation: 4,
               child: ListView.builder(
+                padding: const EdgeInsets.only(left: 6, right: 6),
                 itemCount: list.length,
                 physics: const AlwaysScrollableScrollPhysics(),
                 itemBuilder: (context, index) {
@@ -117,9 +158,9 @@ class ReqOvertimeView extends StatelessWidget {
 
                   final duration = getDuration(
                     item.initDate ?? '',
-                    item.start ?? '',
+                    item.start.to24Hour() ?? '',
                     item.endDate ?? '',
-                    item.end ?? '',
+                    item.end.to24Hour() ?? '',
                   );
 
                   //==================================
@@ -136,6 +177,10 @@ class ReqOvertimeView extends StatelessWidget {
                       );
                     },
                     child: Card(
+                      color:
+                          isDark
+                              ? const Color(0xFF1E293B).withOpacity(0.78)
+                              : Colors.white.withOpacity(0.82),
                       elevation: 4,
                       margin: const EdgeInsets.symmetric(
                         horizontal: 12,
@@ -260,7 +305,7 @@ class ReqOvertimeView extends StatelessWidget {
                                             color: Colors.grey,
                                           ),
                                           const SizedBox(width: 4),
-                                          Text('${item.start} - ${item.end}'),
+                                          Text('${item.start.to24Hour()} - ${item.end.to24Hour()}'),
                                         ],
                                       ),
 
@@ -349,6 +394,8 @@ class ReqOvertimeView extends StatelessWidget {
           );
         }),
       ),
+      floatingActionButtonLocation: const RaisedFabLocation(offsetY: 70),
+
       floatingActionButton: Builder(
         builder:
             (context) => Obx(

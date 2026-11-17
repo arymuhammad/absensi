@@ -52,7 +52,15 @@ class LeaveView extends GetView<LeaveController> {
               final list = ['Cuti', 'Replacement Off'];
               Get.defaultDialog(
                 title: 'Leave',
+                backgroundColor:
+                    isDark
+                        ? const Color(0xFF1E293B).withOpacity(0.95)
+                        : Colors.white,
                 content: DropdownButtonFormField(
+                  dropdownColor:
+                      isDark
+                          ? const Color(0xFF1E293B).withOpacity(0.95)
+                          : Colors.white,
                   items:
                       list
                           .map(
@@ -186,10 +194,13 @@ class LeaveView extends GetView<LeaveController> {
         ],
         flexibleSpace: Container(
           decoration: BoxDecoration(
-            gradient: AppColors.mainGradient(
-              context: context,
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
+            image: DecorationImage(
+              image: AssetImage(
+                isDark
+                    ? 'assets/image/bg-hd-drk.png'
+                    : 'assets/image/bg-hd.png',
+              ),
+              fit: BoxFit.cover,
             ),
           ),
         ),
@@ -359,7 +370,8 @@ class LeaveView extends GetView<LeaveController> {
                                                 Row(
                                                   children: [
                                                     const Icon(
-                                                    Typicons.calendar_outlilne,
+                                                      Typicons
+                                                          .calendar_outlilne,
                                                       color: Colors.blue,
                                                       size: 20,
                                                     ),
@@ -429,6 +441,7 @@ class LeaveView extends GetView<LeaveController> {
                                                           leaveC.deleteLeaveReq(
                                                             leave.uid!,
                                                           ),
+                                                          isDark
                                                     ),
                                                 ],
                                               ),

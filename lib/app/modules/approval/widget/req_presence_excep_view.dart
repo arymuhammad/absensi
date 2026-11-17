@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 
 import '../../../data/helper/const.dart';
 import '../../../data/helper/custom_dialog.dart';
+import '../../../data/helper/custom_fab_location.dart';
 import '../../../data/model/login_model.dart';
 import '../../adjust_presence/controllers/adjust_presence_controller.dart';
 import '../../adjust_presence/views/widget/req_app_update.dart';
@@ -24,18 +25,35 @@ class ReqPresenceExcepView extends StatelessWidget {
   Widget build(BuildContext context) {
     final userData = auth.logUser.value;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    // Ambil inset langsung dari FlutterView
+    final view = View.of(context);
+    final viewMedia = MediaQueryData.fromView(view);
+
+    final keyboardHeight = viewMedia.viewInsets.bottom;
+    final keyboardOpen = keyboardHeight > 0;
+
+    final bottomPadding =
+        keyboardOpen ? 8.0 : 68.0 + viewMedia.padding.bottom + 26.0;
+
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       body: Stack(
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(8.0, 0.0, 8, 8),
+            padding: EdgeInsets.only(left: 8, right: 8, bottom: bottomPadding),
             child: Card(
-              // color: isDark ? Theme.of(context).canvasColor : Colors.white,
+              color:
+                  isDark
+                      ? const Color(0xFF1E293B).withOpacity(0.78)
+                      : Colors.white.withOpacity(0.82),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              elevation: 4,
               child: Container(
-                // height: 400,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10),
-                  // color: isDark ? Theme.of(context).canvasColor : Colors.white,
                 ),
                 child: ReqAppUpdate(isInbox: false),
               ),
@@ -43,6 +61,7 @@ class ReqPresenceExcepView extends StatelessWidget {
           ),
         ],
       ),
+      floatingActionButtonLocation: const RaisedFabLocation(offsetY: 70),
       floatingActionButton: Builder(
         builder:
             (context) => ContainerMainColor(
@@ -173,9 +192,7 @@ class ReqPresenceExcepView extends StatelessWidget {
                           style: const TextStyle(fontSize: 16),
                           decoration: InputDecoration(
                             contentPadding: const EdgeInsets.all(0.5),
-                            prefixIcon: const Icon(
-                             Typicons.calendar_outlilne,
-                            ),
+                            prefixIcon: const Icon(Typicons.calendar_outlilne),
                             hintText: 'Tanggal Awal',
                             filled: true,
                             fillColor: isDark ? Colors.black : Colors.white,
@@ -201,9 +218,7 @@ class ReqPresenceExcepView extends StatelessWidget {
                           style: const TextStyle(fontSize: 16),
                           decoration: InputDecoration(
                             contentPadding: const EdgeInsets.all(0.5),
-                            prefixIcon: const Icon(
-                             Typicons.calendar_outlilne
-                            ),
+                            prefixIcon: const Icon(Typicons.calendar_outlilne),
                             hintText: 'Tanggal Akhir',
                             filled: true,
                             fillColor: isDark ? Colors.black : Colors.white,

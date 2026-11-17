@@ -66,9 +66,9 @@ Widget buildAbsen({
             height: 40,
             child: DropdownButtonFormField<String>(
               key: const ValueKey('sts_absen'),
+              dropdownColor: isDark ? const Color(0xFF1E293B) : Colors.white,
               decoration: InputDecoration(
-                fillColor:
-                    isDark ? Theme.of(context).canvasColor : Colors.white,
+                fillColor: isDark ? const Color(0xFF1E293B) : Colors.white,
                 filled: true,
                 // isDense: true,
                 contentPadding: const EdgeInsets.all(5),
@@ -126,8 +126,11 @@ Widget buildAbsen({
                         ? null
                         : controller.selectedShift.value,
                 onChanged: (val) async {
+                  if (val == null || val.isEmpty) return;
+
                   if (val == "5") {
                     final DateTime now = await getSecureTime();
+
                     final nowTime = FormatWaktu.formatJamMenit(
                       jamMenit:
                           "${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}",
@@ -139,7 +142,6 @@ Widget buildAbsen({
                         nowTime.isBefore(
                           FormatWaktu.formatJamMenit(jamMenit: '15:00'),
                         )) {
-                      controller.selectedShift.value = "";
                       dialogMsg(
                         'INFO',
                         'Cannot select this shift before\n15:00 local time.',
@@ -147,18 +149,25 @@ Widget buildAbsen({
                       return;
                     }
 
-                    controller.selectedShift.value = val!;
+                    controller.selectedShift.value = val;
                   } else {
-                    for (final s in controller.shiftKerja) {
-                      if (s.id == val) {
-                        
-                        controller.selectedShift.value = val!;
-                        controller.jamMasuk.value = s.jamMasuk!;
-                        controller.jamPulang.value = s.jamPulang!;
-                        break;
-                      }
+                    final shift = controller.shiftKerja.firstWhereOrNull(
+                      (s) => s.id == val,
+                    );
+
+                    if (shift == null) {
+                      debugPrint('SHIFT TIDAK DITEMUKAN: [$val]');
+                      return;
                     }
+
+                    controller.selectedShift.value = val;
+                    controller.jamMasuk.value = shift.jamMasuk ?? '';
+                    controller.jamPulang.value = shift.jamPulang ?? '';
                   }
+
+                  debugPrint(
+                    'SHIFT DIPILIH: [${controller.selectedShift.value}]',
+                  );
 
                   dialogMsg(
                     'INFO',

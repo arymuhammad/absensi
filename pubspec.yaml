@@ -1,5 +1,5 @@
 name: absensi
-version: 2.3.55+49
+version: 2.4.0+01
 publish_to: none
 description: URBAN&CO Spot
 environment: 
@@ -14,7 +14,7 @@ dependencies:
   device_marketing_names: ^0.9.1
   file_picker: ^8.0.5
   # flutter_barcode_scanner: 2.0.0
-  flutter_launcher_icons: ^0.14.4
+  
   flutter_map: 6.1.0
   flutter_map_location_marker: any
   # flutter_native_timezone_updated_gradle: 2.0.3
@@ -41,7 +41,8 @@ dependencies:
   splash_screen_view: any
   sqflite: ^2.3.3+1
   xml: ^6.2.2
-  expansion_tile_group: 2.0.0
+  expansion_tile_group:
+    path: packages/expansion_tile_group
   widget_zoom: ^0.0.4
   path: ^1.9.0
   # flutter_speed_dial: 7.0.0
@@ -52,7 +53,7 @@ dependencies:
     sdk: flutter
   flutter_dotenv: ^5.2.1
   table_calendar: ^3.1.3
-  awesome_bottom_bar: ^1.2.4
+  # awesome_bottom_bar: ^1.2.4
   slider_button: 3.1.0
   qr_code_scanner: 1.0.1
   signature: ^6.3.0
@@ -73,6 +74,8 @@ dependencies:
   flutter_image_compress: ^2.4.0
   shorebird_code_push: ^2.0.6
   icons_flutter: 1.0.0
+  circular_theme_reveal:
+    path: third_party/circular_theme_reveal
   
   # firebase_core: ^3.4.0
   # firebase_messaging: ^15.1.0
@@ -82,6 +85,7 @@ dev_dependencies:
   flutter_lints: ^4.0.0
   flutter_test: 
     sdk: flutter
+  flutter_launcher_icons: ^0.14.4
 
 flutter_launcher_icons: 
   android: launcher_icon

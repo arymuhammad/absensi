@@ -103,7 +103,10 @@ class RegionAreaController extends GetxController {
         height: Get.height * .85,
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: isDark ? Theme.of(context).cardColor : Colors.white,
+          color:
+              isDark
+                  ? const Color(0xFF1E293B).withOpacity(0.93)
+                  : Colors.white.withOpacity(0.82),
           borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
         ),
         child: Column(

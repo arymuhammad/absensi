@@ -12,6 +12,7 @@ class AbsenUseCase {
   Future<DbResult> handleAction({
     required Data data,
     required AbsenController controller,
+    required bool isDark,
   }) async {
     try {
       await controller.initTime();
@@ -44,6 +45,7 @@ class AbsenUseCase {
             controller: controller,
             latitude: controller.latFromGps.value,
             longitude: controller.longFromGps.value,
+            isDark: isDark,
           );
           if (!result.success) {
             return result;
@@ -54,6 +56,7 @@ class AbsenUseCase {
             controller: controller,
             latitude: controller.latFromGps.value,
             longitude: controller.longFromGps.value,
+            isDark: isDark,
           );
           if (!result.success) {
             return result;
@@ -71,6 +74,7 @@ class AbsenUseCase {
             data,
             controller.latFromGps.value,
             controller.longFromGps.value,
+            isDark,
           );
           if (!result.success) {
             return result;
@@ -80,6 +84,7 @@ class AbsenUseCase {
             data,
             controller.latFromGps.value,
             controller.longFromGps.value,
+            isDark,
           );
           if (!result.success) {
             return result;

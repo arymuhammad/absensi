@@ -289,7 +289,7 @@ class AddPegawaiController extends GetxController {
     }
   }
 
-  Future<bool> addUpdatePegawai(context, String mode, Data dataUser) async {
+  Future<bool> addUpdatePegawai(context, String mode, Data dataUser, bool isDark) async {
     try {
       Random random = Random();
       int randomNumber = random.nextInt(100);
@@ -304,7 +304,7 @@ class AddPegawaiController extends GetxController {
       //   );
       // }
       if (mode == "add") {
-        loadingDialog("Registering user", "Please wait");
+        loadingDialog("Registering user", "Please wait", isDark);
         //===================|| LOADING DIALOG ||====================
 
         final response = await ServiceApi().getUser();
@@ -352,16 +352,19 @@ class AddPegawaiController extends GetxController {
             if (isUsrExist && isPhoneExist(inputTelp)) {
               _showWarning(
                 "Username and Phone Number are already registered\nPlease change both",
+                isDark
               );
               return false;
             } else if (isUsrExist) {
               _showWarning(
                 "Username is already registered\nPlease change it to another username",
+                isDark
               );
               return false;
             } else if (isPhoneExist(inputTelp)) {
               _showWarning(
                 "This phone number is already registered\nPlease enter another phone number",
+                isDark
               );
               return false;
             } else {
@@ -409,16 +412,19 @@ class AddPegawaiController extends GetxController {
             if (isUsrExist && isPhoneExist(inputTelp)) {
               _showWarning(
                 "Username and Phone Number are already registered\nPlease change both",
+                isDark
               );
               return false;
             } else if (isUsrExist) {
               _showWarning(
                 "Username is already registered\nPlease change it to another username",
+                isDark
               );
               return false;
             } else if (isPhoneExist(inputTelp)) {
               _showWarning(
                 "This phone number is already registered\nPlease enter another phone number",
+                isDark
               );
               return false;
             } else {
@@ -451,12 +457,12 @@ class AddPegawaiController extends GetxController {
             }
           }
         } else {
-          _showWarning("Please fill in the data in all columns");
+          _showWarning("Please fill in the data in all columns", isDark);
 
           return false;
         }
       } else {
-        loadingDialog("Updating data", "Please wait");
+        loadingDialog("Updating data", "Please wait", isDark);
 
         if (image != null &&
                 (image!.name.endsWith("jpg") ||
@@ -492,6 +498,7 @@ class AddPegawaiController extends GetxController {
           if (inputTelp.isNotEmpty && isPhoneExist(inputTelp)) {
             _showWarning(
               "This phone number is already registered\nPlease enter another phone number",
+              isDark
             );
 
             isLoading.value = false;
@@ -648,6 +655,7 @@ class AddPegawaiController extends GetxController {
           if (inputTelp.isNotEmpty && isPhoneExist(inputTelp)) {
             _showWarning(
               "This phone number is already registered\nPlease enter another phone number",
+              isDark
             );
 
             isLoading.value = false;
@@ -810,7 +818,7 @@ class AddPegawaiController extends GetxController {
         }
       }
     } catch (e, stackTrace) {
-      debugPrint("ERROR addUpdatePegawai: $e");
+      // debugPrint("ERROR addUpdatePegawai: $e");
       debugPrint("STACKTRACE: $stackTrace");
 
       if (Get.isDialogOpen ?? false) {
@@ -847,10 +855,10 @@ class AddPegawaiController extends GetxController {
     return cekDataUser.any((dt) => (dt.notelp ?? '').trim() == val);
   }
 
-  void cekUser(context) async {
+  void cekUser(BuildContext context, bool isDark) async {
     var data = {"no_telp": telp.text};
     if (telp.text != "") {
-      loadingDialog("Looking for user data", "");
+      loadingDialog("Looking for user data", "", isDark);
       final response = await ServiceApi().cekUser(data);
       cekDataUser.value = response;
       Get.back();
@@ -872,6 +880,7 @@ class AddPegawaiController extends GetxController {
           context,
           "Warning",
           "No user found with phone number ${telp.text}. Make sure the phone number entered is correct",
+          isDark
         );
       }
     } else {
@@ -879,10 +888,10 @@ class AddPegawaiController extends GetxController {
     }
   }
 
-  updatePassword(context, String id, String username) async {
+  updatePassword(context, String id, String username, bool isDark) async {
     var data = {"id": id, "username": username, "password": pass.text};
     if (pass.text != "") {
-      loadingDialog("Updating user data...", "");
+      loadingDialog("Updating user data...", "", isDark);
 
       SQLHelper.instance.updateDataUser(
         {"password": md5.convert(utf8.encode(pass.text)).toString()},
@@ -906,6 +915,7 @@ class AddPegawaiController extends GetxController {
           Get.back();
           // });
         },
+        isDark: isDark
       );
       // });
       // cekDataUser.value = response;
@@ -1091,9 +1101,9 @@ class AddPegawaiController extends GetxController {
     }
   }
 
-  void _showWarning(String msg) {
+  void _showWarning(String msg, bool isDark) {
     Get.back();
-    warningDialog(Get.context!, "Warning", msg);
+    warningDialog(Get.context!, "Warning", msg, isDark);
   }
 
   updateUsrState({String? id, required bool active}) async {

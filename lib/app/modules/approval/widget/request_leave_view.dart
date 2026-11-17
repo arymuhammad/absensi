@@ -16,6 +16,7 @@ import 'package:signature/signature.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../data/helper/app_colors.dart';
 import '../../../data/helper/custom_dialog.dart';
+import '../../../data/helper/custom_fab_location.dart';
 import '../../../data/helper/format_waktu.dart';
 import '../../../data/helper/loading_platform.dart';
 import '../../../data/model/login_model.dart';
@@ -35,6 +36,17 @@ class RequestLeaveView extends GetView<LeaveController> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    // Ambil inset langsung dari FlutterView
+    final view = View.of(context);
+    final viewMedia = MediaQueryData.fromView(view);
+
+    final keyboardHeight = viewMedia.viewInsets.bottom;
+    final keyboardOpen = keyboardHeight > 0;
+
+    final bottomPadding =
+        keyboardOpen ? 8.0 : 68.0 + viewMedia.padding.bottom + 26.0;
+
     return Scaffold(
       body: Stack(
         children: [
@@ -89,13 +101,24 @@ class RequestLeaveView extends GetView<LeaveController> {
 
               if (filteredList.isEmpty) {
                 return Padding(
-                  padding: const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 8.0),
+                  padding: EdgeInsets.only(
+                    left: 10,
+                    right: 10,
+                    bottom: bottomPadding,
+                  ),
                   child: Card(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    color:
+                        isDark
+                            ? const Color(0xFF1E293B).withOpacity(0.78)
+                            : Colors.white.withOpacity(0.82),
                     child: ListView(
                       physics: const AlwaysScrollableScrollPhysics(),
                       children: [
                         SizedBox(
-                          height: MediaQuery.of(context).size.height * 0.3,
+                          height: MediaQuery.of(context).size.height * 0.2,
                         ),
                         const Icon(Icons.inbox, size: 50, color: Colors.grey),
                         const SizedBox(height: 10),
@@ -107,12 +130,24 @@ class RequestLeaveView extends GetView<LeaveController> {
               }
 
               return Padding(
-                padding: const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 8.0),
-                child: ListView(
-                  children: [
-                    Card(
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
+                padding: EdgeInsets.only(
+                  left: 10,
+                  right: 10,
+                  bottom: bottomPadding,
+                ),
+                child: Card(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  color:
+                      isDark
+                          ? const Color(0xFF1E293B).withOpacity(0.78)
+                          : Colors.white.withOpacity(0.82),
+                  elevation: 4,
+                  child: ListView(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(left: 8, right: 8),
                         child: ExpansionTileGroup(
                           toggleType: ToggleType.expandOnlyCurrent,
                           spaceBetweenItem: 5,
@@ -125,12 +160,29 @@ class RequestLeaveView extends GetView<LeaveController> {
                             );
                             final DateTime now = DateTime.now();
 
-                            // Request aktif sampai tanggal 9 bulan berikutnya.
-                            // Expired mulai tanggal 10.
-                            final DateTime expiredAt = DateTime(
+                            /// Tambah 1 bulan kalender, menyesuaikan jumlah hari dalam bulan.
+                            final DateTime nextMonth = DateTime(
                               created.year,
                               created.month + 1,
-                              10,
+                              1,
+                            );
+
+                            final int lastDay =
+                                DateTime(
+                                  nextMonth.year,
+                                  nextMonth.month + 1,
+                                  0,
+                                ).day;
+
+                            final DateTime oneMonthLater = DateTime(
+                              nextMonth.year,
+                              nextMonth.month,
+                              created.day > lastDay ? lastDay : created.day,
+                            );
+
+                            // Tambah 10 hari.
+                            final DateTime expiredAt = oneMonthLater.add(
+                              const Duration(days: 10),
                             );
 
                             final bool isExpired = !now.isBefore(expiredAt);
@@ -579,6 +631,7 @@ class RequestLeaveView extends GetView<LeaveController> {
                                               leaveC.isLoading.value = true;
                                               leaveC.getLeaveReq(reload);
                                             },
+                                            isDark: isDark,
                                           );
                                         },
                                         size: const Size(double.infinity, 30),
@@ -597,6 +650,7 @@ class RequestLeaveView extends GetView<LeaveController> {
                                             leave.uid!,
                                             leave.tgl1!,
                                             leave.alasan ?? '',
+                                            isDark,
                                           );
                                         },
                                         size: const Size(double.infinity, 30),
@@ -616,29 +670,30 @@ class RequestLeaveView extends GetView<LeaveController> {
                                         userData,
                                         leave.uid!,
                                         leave.tgl1!,
+                                        isDark,
                                       );
 
                                       final pesan = Uri.encodeComponent('''
-🔔 *NOTIFIKASI CUTI*
-
-Halo, ${leave.nama} 👋
-
-Pengajuan cuti Anda memiliki pembaruan:
-
-━━━━━━━━━━━━━━━━━━
-📋 *Status* : DIBATALKAN
-📅 *Tanggal* : ${FormatWaktu.formatIndo(tanggal: DateTime.parse(leave.tgl1!))}
-🏷️ *Jenis* : ${leave.jenisCuti}
-━━━━━━━━━━━━━━━━━━
-
-Pengajuan tersebut telah dibatalkan oleh HR.
-
-Jika ada pertanyaan, silakan hubungi HR.
-
-Terima kasih 🙏
-
-🏢 *URBAN&CO Spot*
-''');
+                🔔 *NOTIFIKASI CUTI*
+                
+                Halo, ${leave.nama} 👋
+                
+                Pengajuan cuti Anda memiliki pembaruan:
+                
+                ━━━━━━━━━━━━━━━━━━
+                📋 *Status* : DIBATALKAN
+                📅 *Tanggal* : ${FormatWaktu.formatIndo(tanggal: DateTime.parse(leave.tgl1!))}
+                🏷️ *Jenis* : ${leave.jenisCuti}
+                ━━━━━━━━━━━━━━━━━━
+                
+                Pengajuan tersebut telah dibatalkan oleh HR.
+                
+                Jika ada pertanyaan, silakan hubungi HR.
+                
+                Terima kasih 🙏
+                
+                🏢 *URBAN&CO Spot*
+                ''');
 
                                       final url = Uri.parse(
                                         'https://api.whatsapp.com/send'
@@ -658,14 +713,16 @@ Terima kasih 🙏
                           }),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               );
             }),
           ),
         ],
       ),
+      floatingActionButtonLocation: const RaisedFabLocation(offsetY: 70),
+
       floatingActionButton: Builder(
         builder:
             (context) => ContainerMainColor(
@@ -694,6 +751,7 @@ Terima kasih 🙏
     String uid,
     String date,
     String alasan,
+    bool isDark,
   ) {
     Get.bottomSheet(
       Container(
@@ -729,7 +787,14 @@ Terima kasih 🙏
                     if (leaveC.ctrSign.value.isEmpty) {
                       showToast("Harap buat tanda tangan dahulu");
                     } else {
-                      leaveC.approveLeave(context, userData, uid, date, alasan);
+                      leaveC.approveLeave(
+                        context,
+                        userData,
+                        uid,
+                        date,
+                        alasan,
+                        isDark,
+                      );
                     }
                   },
                   child: const Text('Approve'),

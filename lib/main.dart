@@ -1,12 +1,13 @@
 import 'dart:convert';
 import 'dart:ui';
 
-import 'package:absensi/app/data/helper/app_colors.dart';
 import 'package:absensi/app/data/helper/notif_helper.dart';
-import 'package:absensi/app/modules/home/controllers/home_controller.dart';
 import 'package:absensi/app/modules/login/controllers/login_controller.dart';
+import 'package:absensi/app/modules/shared/global_bg.dart';
+import 'package:circular_theme_reveal/circular_theme_reveal.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 
 // import 'package:alarm/alarm.dart';
@@ -20,6 +21,7 @@ import 'package:month_year_picker/month_year_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'app/data/helper/error_logger.dart';
 import 'app/data/helper/navigator_helper.dart';
+import 'app/data/helper/preload_image.dart';
 import 'app/data/model/login_model.dart';
 import 'app/data/theme_controller.dart';
 import 'app/routes/app_pages.dart';
@@ -68,16 +70,18 @@ void main() async {
     DeviceOrientation.portraitDown,
   ]);
 
-  SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+  // SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
 
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
       statusBarIconBrightness: Brightness.light,
       statusBarBrightness: Brightness.dark,
-      systemNavigationBarColor: Colors.transparent,
+
+      systemNavigationBarColor: Color(0xFF18265E),
       systemNavigationBarDividerColor: Colors.transparent,
-      systemNavigationBarIconBrightness: Brightness.dark,
+      systemNavigationBarIconBrightness: Brightness.light,
+      systemNavigationBarContrastEnforced: false,
     ),
   );
 
@@ -199,8 +203,8 @@ void main() async {
   }
 
   Get.put(LoginController(), permanent: true);
-  Get.put(HomeController());
-  final themeC = Get.put(ThemeController());
+
+  final themeC = Get.put(ThemeController(), permanent: true);
 
   FirebaseMessaging.instance.onTokenRefresh.listen((newToken) async {
     try {
@@ -252,37 +256,44 @@ void main() async {
         theme: ThemeData(
           brightness: Brightness.light,
           useMaterial3: false,
-          canvasColor: AppColors.pageBackground,
+          canvasColor: Colors.transparent,
+          scaffoldBackgroundColor: Colors.transparent,
           fontFamily: 'Nunito',
-          appBarTheme: const AppBarTheme(
-            systemOverlayStyle: SystemUiOverlayStyle(
-              statusBarColor: Colors.transparent,
-              statusBarIconBrightness: Brightness.light,
-              statusBarBrightness: Brightness.dark,
-            ),
+          pageTransitionsTheme: const PageTransitionsTheme(
+            builders: {
+              TargetPlatform.android: ZoomPageTransitionsBuilder(),
+              TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+            },
           ),
         ),
 
         darkTheme: ThemeData(
           brightness: Brightness.dark,
           useMaterial3: false,
-          canvasColor: const Color(0xFF121212),
+          canvasColor: Colors.transparent,
+          scaffoldBackgroundColor: Colors.transparent,
           fontFamily: 'Nunito',
-          appBarTheme: const AppBarTheme(
-            systemOverlayStyle: SystemUiOverlayStyle(
-              statusBarColor: Colors.transparent,
-              statusBarIconBrightness: Brightness.light,
-              statusBarBrightness: Brightness.dark,
-            ),
+          pageTransitionsTheme: const PageTransitionsTheme(
+            builders: {
+              TargetPlatform.android: ZoomPageTransitionsBuilder(),
+              TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+            },
           ),
         ),
 
         themeMode: themeC.themeMode.value,
-        home: const RootView(),
+
+        home: const AppBackgroundPreloader(child: RootView()),
         localizationsDelegates: const [MonthYearPickerLocalizations.delegate],
         getPages: AppPages.routes,
         navigatorObservers: [FlutterSmartDialog.observer],
-        builder: FlutterSmartDialog.init(),
+        builder: (context, child) {
+          return GlobalBackground(
+            child: CircularThemeRevealOverlay(
+              child: FlutterSmartDialog.init()(context, child),
+            ),
+          );
+        },
       ),
     ),
   );

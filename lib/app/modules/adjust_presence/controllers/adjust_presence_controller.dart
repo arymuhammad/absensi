@@ -219,7 +219,7 @@ class AdjustPresenceController extends GetxController
     }
   }
 
-  getDataAbsen(idUser) async {
+  getDataAbsen(idUser, bool isDark) async {
     if (date1.text != "") {
       var data = {};
       if (target.value == "absen") {
@@ -236,7 +236,7 @@ class AdjustPresenceController extends GetxController
         };
       }
 
-      loadingDialog("Sedang memuat data...", "");
+      loadingDialog("Sedang memuat data...", "", isDark);
       final response = await ServiceApi().getDataAdjust(data);
       resultData.value = response;
       isLoading.value = false;
@@ -248,8 +248,8 @@ class AdjustPresenceController extends GetxController
     return resultData;
   }
 
-  updateDataAbsen(idUser, tglMasuk) async {
-    loadingDialog("Sedang memuat data...", "");
+  updateDataAbsen(idUser, tglMasuk, bool isDark) async {
+    loadingDialog("Sedang memuat data...", "", isDark);
 
     var data = {
       "mode": "update_${target.value}",
@@ -276,6 +276,7 @@ class AdjustPresenceController extends GetxController
       type: DialogType.success,
       title: 'SUKSES',
       btnOkOnPress: () => Get.back(),
+      isDark: isDark
     );
   }
 
@@ -289,7 +290,13 @@ class AdjustPresenceController extends GetxController
     return response;
   }
 
-  Future<List<Visit>> getDataVisit(date1, date2, idDept, idUser) async {
+  Future<List<Visit>> getDataVisit(
+    date1,
+    date2,
+    idDept,
+    idUser,
+    bool isDark,
+  ) async {
     var data = {
       "mode": "filter",
       "id_dept": idDept,
@@ -298,7 +305,7 @@ class AdjustPresenceController extends GetxController
       "tanggal2": date2,
     };
 
-    loadingDialog("Sedang memuat data...", "");
+    loadingDialog("Sedang memuat data...", "", isDark);
     final response = await ServiceApi().getVisit(data);
     dataVisit.value = response;
     isLoading.value = false;
@@ -306,7 +313,7 @@ class AdjustPresenceController extends GetxController
     return dataVisit;
   }
 
-  updateDataVisit(String? id, String? tglVisit, String? visitIn) async {
+  updateDataVisit(String? id, String? tglVisit, String? visitIn, bool isDark) async {
     var data = {
       "mode": "update_visit",
       "id_user": id,
@@ -329,6 +336,7 @@ class AdjustPresenceController extends GetxController
         type: DialogType.success,
         title: 'SUKSES',
         btnOkOnPress: () => Get.back(),
+        isDark: isDark
       );
     }
   }
@@ -342,10 +350,11 @@ class AdjustPresenceController extends GetxController
     Map<String, dynamic> dataUptApp,
     Map<String, dynamic>? dataUptAbs,
     bool isInbox,
+    bool isDark,
   ) async {
     // print(dataUptApp['accept']);
     // print(dataUptApp['acc_4']);
-    loadingDialog("processing data", "");
+    loadingDialog("processing data", "", isDark);
     try {
       bool success = await ServiceApi().updateReqApp(dataUptApp);
 

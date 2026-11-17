@@ -91,6 +91,7 @@ class DetailAbsenController extends GetxController {
     String kodeCabang,
     String idShift,
     String level,
+    bool isDark
   ) async {
     if (jamAbsenMasuk.text != "" && jamAbsenPulang.text == "") {
       if (alasan.text == "") {
@@ -142,9 +143,9 @@ class DetailAbsenController extends GetxController {
               "foto_masuk": image != null ? File(image!.path) : null,
               "alasan": alasan.text,
             };
-            loadingDialog("Mengirim data...", "");
+            loadingDialog("Mengirim data...", "", isDark);
             // print(data);
-            await ServiceApi().reqUpdateAbs(data);
+            await ServiceApi().reqUpdateAbs(data, isDark);
           } else {
             var data = {
               "status": "update_masuk",
@@ -157,9 +158,9 @@ class DetailAbsenController extends GetxController {
               "foto_masuk": image != null ? File(image!.path) : null,
               "alasan": alasan.text,
             };
-            loadingDialog("Mengirim data...", "");
+            loadingDialog("Mengirim data...", "", isDark);
             // print(data);
-            await ServiceApi().reqUpdateAbs(data);
+            await ServiceApi().reqUpdateAbs(data, isDark);
           }
 
           // after 2 sec
@@ -193,7 +194,7 @@ class DetailAbsenController extends GetxController {
               "Harap lampirkan bukti foto absen pulang",
             );
           } else {
-            loadingDialog("Mengirim data...", "");
+            loadingDialog("Mengirim data...", "", isDark);
             await getLoc();
             var data = {
               "status": "update_pulang",
@@ -211,7 +212,7 @@ class DetailAbsenController extends GetxController {
               "alasan": alasan.text,
             };
 
-            await ServiceApi().reqUpdateAbs(data);
+            await ServiceApi().reqUpdateAbs(data, isDark);
             // after 2 sec
             // if (!Get.isRegistered<AdController>()) {
             //   Get.put(AdController());
@@ -249,7 +250,7 @@ class DetailAbsenController extends GetxController {
               "Harap lampirkan bukti foto absen masuk & pulang",
             );
           } else {
-            loadingDialog("Mengirim data...", "");
+            loadingDialog("Mengirim data...", "", isDark);
             await getLoc();
             var data = {
               "status": "update_data_absen",
@@ -268,7 +269,7 @@ class DetailAbsenController extends GetxController {
               "device_info2": devInfo.value,
               "alasan": alasan.text,
             };
-            await ServiceApi().reqUpdateAbs(data);
+            await ServiceApi().reqUpdateAbs(data, isDark);
             // after 2 sec
             // if (!Get.isRegistered<AdController>()) {
             //   Get.put(AdController());
@@ -308,8 +309,8 @@ class DetailAbsenController extends GetxController {
           "tgl_masuk": tglMasuk.text,
           "alasan": alasan.text,
         };
-        loadingDialog("Mengirim data...", "");
-        await ServiceApi().reqUpdateAbs(data);
+        loadingDialog("Mengirim data...", "", isDark);
+        await ServiceApi().reqUpdateAbs(data, isDark);
         // after 2 sec
         // if (!Get.isRegistered<AdController>()) {
         //   Get.put(AdController());

@@ -17,7 +17,9 @@ permissionAdd(BuildContext context, IzinController ctrl, Data userData) {
       height: 290,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(8),
-        color: isDark ? Theme.of(context).cardColor : Colors.grey[300],
+        color:   isDark
+                      ? const Color(0xFF1E293B).withOpacity(0.95)
+                      : Colors.grey[300]!,
       ),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -178,6 +180,7 @@ permissionAdd(BuildContext context, IzinController ctrl, Data userData) {
                         initDate: ctrl.date1.text,
                         endDate: ctrl.date2.text,
                         remarks: ctrl.remark.text,
+                        isDark: isDark
                       );
                     },
                   ),
@@ -200,6 +203,7 @@ permissionAdd(BuildContext context, IzinController ctrl, Data userData) {
                           desc: 'Batalkan pengajuan ini?',
                           title: 'Warning',
                           btnOkOnPress: ctrl.resetForm,
+                          isDark: isDark
                         );
                       } else {
                         Get.back();

@@ -71,7 +71,7 @@ class IzinController extends GetxController {
     String? date2,
     required String status,
   }) async {
-    listPrm.clear();
+    // listPrm.clear();
     var data = {
       "type": type,
       "id_user": idUser,
@@ -85,7 +85,7 @@ class IzinController extends GetxController {
     // print(data);
     final response = await ServiceApi().permission(data);
     isLoading.value = false;
-    if (response != null) listPrm.value = response;
+    if (response != null) listPrm.assignAll(response);
     return listPrm;
   }
 
@@ -128,9 +128,10 @@ class IzinController extends GetxController {
     required String initDate,
     required String endDate,
     required String remarks,
+    required bool isDark,
   }) async {
     Get.back();
-    loadingDialog("Membuat pengajuan izin", "");
+    loadingDialog("Membuat pengajuan izin", "", isDark);
     try {
       final Map<String, dynamic> data = {
         "type": "add",
@@ -169,13 +170,17 @@ class IzinController extends GetxController {
 
   List<PermissionModel> get filteredList {
     return listPrm.where((e) {
-      /// 🔹 FILTER STATUS
-      if (selectedStatus.value != 'all') {
-        if ((e.status ?? 'pending') != selectedStatus.value) return false;
+      // FILTER STATUS
+      final status = selectedStatus.value;
+
+      if (status.isNotEmpty && status != 'all') {
+        if ((e.status ?? 'pending') != status) {
+          return false;
+        }
       }
 
-      /// 🔹 FILTER SEARCH
-      final q = searchQuery.value.toLowerCase();
+      // FILTER SEARCH
+      final q = searchQuery.value.trim().toLowerCase();
 
       if (q.isNotEmpty) {
         final name = (e.nama ?? '').toLowerCase();
@@ -198,6 +203,14 @@ class IzinController extends GetxController {
     Get.back();
   }
 
+  void resetFilter() {
+    date1.clear();
+    date2.clear();
+    selectedStatus.value = 'all';
+    searchQuery.value = '';
+    searchC.clear();
+  }
+
   bool get canSubmit {
     return date1.text.isNotEmpty &&
         date2.text.isNotEmpty &&
@@ -215,6 +228,7 @@ class IzinController extends GetxController {
     required String date2,
     required String noted,
     required String remark,
+    required bool isDark,
   }) async {
     var data = {
       {
@@ -252,7 +266,7 @@ class IzinController extends GetxController {
       "remark": remark,
     };
     // print(data);
-    loadingDialog("Menolak pengajuan izin", "");
+    loadingDialog("Menolak pengajuan izin", "", isDark);
 
     final response = await ServiceApi().permission(data);
     if (response['success'] == true) {
@@ -282,6 +296,7 @@ class IzinController extends GetxController {
     required String date2,
     required String noted,
     required String remark,
+    required bool isDark,
   }) async {
     var data = {
       {
@@ -319,7 +334,7 @@ class IzinController extends GetxController {
       "remark": remark,
     };
     // print(data);
-    loadingDialog("Menyetujui pengajuan izin", "");
+    loadingDialog("Menyetujui pengajuan izin", "", isDark);
 
     final response = await ServiceApi().permission(data);
     if (response['success'] == true) {
@@ -345,8 +360,9 @@ class IzinController extends GetxController {
     String parentId,
     String level,
     String kodeCabang,
+    bool isDark,
   ) async {
-    loadingDialog("Menghapus pengajuan izin", "");
+    loadingDialog("Menghapus pengajuan izin", "", isDark);
 
     final response = await http.post(
       Uri.parse('${ServiceApi().baseUrl}perm'),

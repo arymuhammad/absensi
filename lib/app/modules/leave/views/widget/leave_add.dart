@@ -79,7 +79,7 @@ class LeaveAdd extends StatelessWidget {
                 },
                 isDark: isDark,
               ),
-           
+
               const SizedBox(height: 10),
               DataTable(
                 border: TableBorder.all(),
@@ -303,7 +303,7 @@ class LeaveAdd extends StatelessWidget {
                 fontsize: 14,
                 label: 'Tanda tangan',
                 onPressed: () {
-                  openDialogSign(context);
+                  openDialogSign(context, isDark);
                 },
               ),
               const SizedBox(height: 10),
@@ -314,7 +314,7 @@ class LeaveAdd extends StatelessWidget {
     );
   }
 
-  openDialogSign(BuildContext context) {
+  openDialogSign(BuildContext context, bool isDark) {
     Get.bottomSheet(
       Container(
         height: 250,
@@ -353,8 +353,7 @@ class LeaveAdd extends StatelessWidget {
                       showToast(
                         "Jenis pengajuan cuti tidak boleh kosong, harap pilih salah satu",
                       );
-                    } else if (leaveC.selectedLeaveType.value ==
-                            "Lainnya" &&
+                    } else if (leaveC.selectedLeaveType.value == "Lainnya" &&
                         leaveC.selectedLeave.value.isEmpty) {
                       showToast("Harap pilih jenis cuti'");
                     } else if (leaveC.amtTkn.text.isEmpty) {
@@ -391,6 +390,7 @@ class LeaveAdd extends StatelessWidget {
                         // userPengganti: leaveC.selectedIdUser.value,
                         // levelUserPengganti: leaveC.selectedLevelUser.value,
                         parentId: userData!.parentId!,
+                        isDark: isDark,
                       );
                       // Navigator.pop(context);
                     }

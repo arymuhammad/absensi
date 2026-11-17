@@ -6,9 +6,9 @@ import 'package:get/get.dart';
 import 'package:icons_flutter/icons_flutter.dart';
 import 'package:intl/intl.dart';
 
-import '../../../data/helper/app_colors.dart';
 import '../../../data/helper/const.dart';
 import '../../../data/helper/custom_dialog.dart';
+import '../../shared/container_main_color.dart';
 import '../../shared/dropdown.dart';
 import '../../shared/elevated_button_icon.dart';
 
@@ -19,13 +19,19 @@ bottomSearchPerm(
   IzinController ctrl,
 ) {
   Get.bottomSheet(
-    backgroundColor: isDark ? Colors.black : Colors.white,
+    backgroundColor:
+        isDark
+            ? const Color(0xFF1E293B).withOpacity(0.78)
+            : Colors.white.withOpacity(0.82),
     SingleChildScrollView(
       child: Container(
         // Atur tinggi sesuai kebutuhan, misal 400
         height: 250,
         decoration: BoxDecoration(
-          color: isDark ? Theme.of(context).cardColor : Colors.white,
+          color:
+              isDark
+                  ? const Color(0xFF1E293B).withOpacity(0.78)
+                  : Colors.white.withOpacity(0.82),
           borderRadius: const BorderRadius.only(
             topLeft: Radius.circular(10),
             topRight: Radius.circular(10),
@@ -127,7 +133,10 @@ bottomSearchPerm(
                           prefixIcon: const Icon(Typicons.calendar_outlilne),
                           hintText: 'Tanggal Awal',
                           filled: true,
-                          fillColor: isDark ? Colors.black : Colors.white,
+                          fillColor:
+                              isDark
+                                  ? const Color(0xFF1E293B).withOpacity(0.78)
+                                  : Colors.white.withOpacity(0.82),
                           border: const OutlineInputBorder(),
                         ),
                         format: DateFormat("yyyy-MM-dd"),
@@ -153,7 +162,10 @@ bottomSearchPerm(
                           prefixIcon: const Icon(Typicons.calendar_outlilne),
                           hintText: 'Tanggal Akhir',
                           filled: true,
-                          fillColor: isDark ? Colors.black : Colors.white,
+                          fillColor:
+                              isDark
+                                  ? const Color(0xFF1E293B).withOpacity(0.78)
+                                  : Colors.white.withOpacity(0.82),
                           border: const OutlineInputBorder(),
                         ),
                         format: DateFormat("yyyy-MM-dd"),
@@ -180,69 +192,72 @@ bottomSearchPerm(
                     label: 'Batal',
                     backgroundColor: red,
                     onPressed: () {
+                      ctrl.resetFilter();
                       Get.back();
-                      ctrl.date1.clear();
-                      ctrl.date2.clear();
-                      ctrl.selectedStatus.value = "";
-                      // ctrl.selectedType.value = "";
                     },
                   ),
                   const SizedBox(width: 5),
-                  CsElevatedButtonIcon(
-                    backgroundColor: AppColors.itemsBackground,
-                    icon: const Icon(Icons.save_as_rounded),
-                    fontSize: 14,
-                    label: 'Cari',
-                    onPressed: () {
-                      if (ctrl.date1.text.isEmpty || ctrl.date2.text.isEmpty) {
-                        showToast(
-                          'Harap pilih tanggal data adjusment terlebih dahulu',
-                        );
-                      } else {
-                        var tglA = DateFormat(
-                          'yyyy-MM-dd',
-                        ).format(DateTime.parse(ctrl.date1.text));
-                        var tglB = DateFormat(
-                          'yyyy-MM-dd',
-                        ).format(DateTime.parse(ctrl.date2.text));
-
-                        if (DateTime.parse(
-                          tglA,
-                        ).isAfter(DateTime.parse(tglB))) {
-                          Get.back();
-                          failedDialog(
-                            context,
-                            'ERROR',
-                            'Rentang tanggal yang Anda masukkan salah',
+                  ContainerMainColor(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    radius: 30,
+                    child: CsElevatedButtonIcon(
+                      backgroundColor: Colors.transparent,
+                      icon: const Icon(Icons.save_as_rounded),
+                      fontSize: 14,
+                      label: 'Cari',
+                      onPressed: () {
+                        if (ctrl.date1.text.isEmpty ||
+                            ctrl.date2.text.isEmpty) {
+                          showToast(
+                            'Harap pilih tanggal data adjusment terlebih dahulu',
                           );
                         } else {
-                          Get.back();
-                          Future.delayed(
-                            const Duration(milliseconds: 300),
-                            () async {
-                              ctrl.listPrm.clear();
-                              ctrl.isLoading.value = true;
+                          var tglA = DateFormat(
+                            'yyyy-MM-dd',
+                          ).format(DateTime.parse(ctrl.date1.text));
+                          var tglB = DateFormat(
+                            'yyyy-MM-dd',
+                          ).format(DateTime.parse(ctrl.date2.text));
 
-                              await ctrl.getPermissionList(
-                                idUser: userData.id!,
-                                kodeCabang: userData.kodeCabang!,
-                                parentId: userData.parentId!,
-                                level: userData.level!,
-                                date1: ctrl.date1.text,
-                                date2: ctrl.date2.text,
-                                type: "get_pending_req_permission",
-                                status: ctrl.selectedstatusPrm.value,
-                              );
+                          if (DateTime.parse(
+                            tglA,
+                          ).isAfter(DateTime.parse(tglB))) {
+                            Get.back();
+                            failedDialog(
+                              context,
+                              'ERROR',
+                              'Rentang tanggal yang Anda masukkan salah',
+                            );
+                          } else {
+                            Get.back();
+                            Future.delayed(
+                              const Duration(milliseconds: 300),
+                              () async {
+                                ctrl.listPrm.clear();
+                                ctrl.isLoading.value = true;
 
-                              // ctrl.date1.clear();
-                              // ctrl.date2.clear();
-                              // ctrl.selectedstatusPrm.value = "";
-                              // ctrl.selectedType.value = "";
-                            },
-                          );
+                                await ctrl.getPermissionList(
+                                  idUser: userData.id!,
+                                  kodeCabang: userData.kodeCabang!,
+                                  parentId: userData.parentId!,
+                                  level: userData.level!,
+                                  date1: ctrl.date1.text,
+                                  date2: ctrl.date2.text,
+                                  type: "get_pending_req_permission",
+                                  status: ctrl.selectedstatusPrm.value,
+                                );
+
+                                // ctrl.date1.clear();
+                                // ctrl.date2.clear();
+                                // ctrl.selectedstatusPrm.value = "";
+                                // ctrl.selectedType.value = "";
+                              },
+                            );
+                          }
                         }
-                      }
-                    },
+                      },
+                    ),
                   ),
                 ],
               ),

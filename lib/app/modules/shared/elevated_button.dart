@@ -21,7 +21,7 @@ class CsElevatedButton extends StatelessWidget {
           backgroundColor: color,
           foregroundColor: Colors.white,
           shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
           fixedSize: size),
       onPressed: onPressed,
       child: Text(

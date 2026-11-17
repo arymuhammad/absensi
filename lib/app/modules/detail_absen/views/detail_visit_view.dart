@@ -23,7 +23,10 @@ class DetailVisitView extends GetView {
           double.parse(detailData["lat_in"]),
           double.parse(detailData["long_in"]),
         ),
-        child: const Icon(Typicons.pin_outline, color: AppColors.contentColorBlue),
+        child: const Icon(
+          Typicons.pin_outline,
+          color: AppColors.contentColorBlue,
+        ),
       ),
     ];
 
@@ -39,7 +42,10 @@ class DetailVisitView extends GetView {
             detailData["long_out"] != "" ? detailData["long_out"] : "0.0",
           ),
         ),
-        child: const Icon(Typicons.pin_outline, color: AppColors.contentColorBlue),
+        child: const Icon(
+          Typicons.pin_outline,
+          color: AppColors.contentColorBlue,
+        ),
       ),
     ];
 
@@ -61,10 +67,13 @@ class DetailVisitView extends GetView {
         centerTitle: true,
         flexibleSpace: Container(
           decoration: BoxDecoration(
-            gradient: AppColors.mainGradient(
-              context: context,
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
+            image: DecorationImage(
+              image: AssetImage(
+                isDark
+                    ? 'assets/image/bg-hd-drk.png'
+                    : 'assets/image/bg-hd.png',
+              ),
+              fit: BoxFit.cover,
             ),
           ),
         ),
@@ -74,7 +83,12 @@ class DetailVisitView extends GetView {
       body: Stack(
         children: [
           ListView(
-            padding: const EdgeInsets.fromLTRB(20, 100, 20, 10),
+            padding: EdgeInsets.only(
+              bottom: 68 + MediaQuery.of(context).padding.bottom + 24,
+              left: 20,
+              top: 100,
+              right: 20,
+            ),
             children: [
               buildCard(
                 context: context,
@@ -134,7 +148,9 @@ class DetailVisitView extends GetView {
       margin: const EdgeInsets.symmetric(vertical: 10),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(24),
-        color: isDark ? Theme.of(context).cardColor : Colors.white,
+        color:  isDark
+                                ? const Color(0xFF1E293B).withOpacity(0.78)
+                                : Colors.white.withOpacity(0.82),
         boxShadow: [
           BoxShadow(
             blurRadius: 30,
@@ -316,9 +332,12 @@ class DetailVisitView extends GetView {
                                   data['store'].toString().capitalize!,
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(color:  isDark
+                                  style: TextStyle(
+                                    color:
+                                        isDark
                                             ? Colors.white60
-                                            : Colors.grey[600]),
+                                            : Colors.grey[600],
+                                  ),
                                 ),
 
                                 const SizedBox(height: 4),
@@ -336,9 +355,14 @@ class DetailVisitView extends GetView {
                                 const SizedBox(height: 4),
                                 Row(
                                   children: [
-                                    Icon(Icons.smartphone, size: 14,color:  isDark
-                                            ? Colors.white60
-                                            : Colors.grey[600]),
+                                    Icon(
+                                      Icons.smartphone,
+                                      size: 14,
+                                      color:
+                                          isDark
+                                              ? Colors.white60
+                                              : Colors.grey[600],
+                                    ),
                                     const SizedBox(width: 4),
                                     Expanded(
                                       child: Text(

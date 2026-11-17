@@ -48,9 +48,15 @@ class CsDropdownCabang extends StatelessWidget {
           return SizedBox(
             height: 40,
             child: DropdownButtonFormField(
+              dropdownColor:
+                  isDark
+                      ? const Color(0xFF1E293B)
+                      : Colors.white,
               decoration: InputDecoration(
                 fillColor:
-                    isDark ? Theme.of(context).canvasColor : Colors.white,
+                    isDark
+                        ? const Color(0xFF1E293B)
+                        : Colors.white,
                 filled: true,
                 // isDense: true, // 🔑 biar tinggi tetap rapih
                 contentPadding: const EdgeInsets.all(5),

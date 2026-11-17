@@ -25,7 +25,9 @@ searchForm(
     Container(
       height: 270,
       decoration: BoxDecoration(
-        color: isDark ? Theme.of(context).cardColor : Colors.white,
+        color: isDark
+                      ? const Color(0xFF1E293B).withOpacity(0.95)
+                      : Colors.white.withOpacity(0.95),
         borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(10),
           topRight: Radius.circular(10),
@@ -72,9 +74,9 @@ searchForm(
                             hintText: 'Tanggal Awal',
                             filled: true,
                             fillColor:
-                                isDark
-                                    ? Theme.of(context).canvasColor
-                                    : Colors.white,
+                               isDark
+                      ? const Color(0xFF1E293B).withOpacity(0.95)
+                      : Colors.white.withOpacity(0.95),
                             border: const OutlineInputBorder(),
                           ),
                           format: DateFormat("yyyy-MM-dd"),
@@ -371,6 +373,7 @@ searchForm(
                                   absC.selectedUserCabang.value,
                                   absC.date1.text,
                                   absC.date2.text,
+                                  isDark
                                 );
                                 absC.userCab.clear();
                                 absC.selectedUserCabang.value = "";

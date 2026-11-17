@@ -12,6 +12,7 @@ class ContainerMainColor extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      // height: 45,
       decoration: BoxDecoration(
         gradient:  AppColors.mainGradient(context: context, begin: begin, end: end),
         borderRadius: BorderRadius.circular(radius),

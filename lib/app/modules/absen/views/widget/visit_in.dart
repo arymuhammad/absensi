@@ -18,6 +18,7 @@ Future<DbResult> visitIn({
   required AbsenController controller,
   required double latitude,
   required double longitude,
+  required bool isDark
 }) async {
   bool insertSuccess = false;
 
@@ -79,6 +80,7 @@ Future<DbResult> visitIn({
         type: DialogType.info,
         title: 'INFO',
         btnOkOnPress: () => Get.back(),
+        isDark: isDark
       );
       return DbResult(success: false, message: "You have checked in today");
     }
@@ -94,7 +96,7 @@ Future<DbResult> visitIn({
       return DbResult(success: false, message: "Check in cancelled");
     }
 
-    loadingDialog("Sending data...", "");
+    loadingDialog("Sending data...", "", isDark);
 
     var data = {
       "status": "add",
@@ -218,6 +220,7 @@ Future<DbResult> visitIn({
         Future.delayed(const Duration(milliseconds: 300));
         Get.back();
       },
+      isDark: isDark
     );
 
     return DbResult(success: true, message: "Check in success");

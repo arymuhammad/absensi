@@ -28,18 +28,27 @@ class UpdatePassword extends GetView {
       ),
       resizeToAvoidBottomInset: true,
       body: Stack(
+        fit: StackFit.expand,
         children: [
-          // const CsBgImg(),
-          Container(
-            height: 250,
-            decoration: BoxDecoration(
-              gradient: AppColors.mainGradient(
-                context: context,
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
+          // GLOBAL BACKGROUND
+          Image.asset(
+            isDark ? 'assets/image/bg-ctn-drk.png' : 'assets/image/bg-ctn.png',
+            fit: BoxFit.cover,
+          ),
+
+          // BLUE HEADER
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            height: 400,
+            child: Image.asset(
+              isDark ? 'assets/image/bg-hd-drk.png' : 'assets/image/bg-hd.png',
+              fit: BoxFit.cover,
+              alignment: Alignment.topCenter,
             ),
           ),
+
           Padding(
             padding: const EdgeInsets.all(20.0),
             child: ListView(
@@ -74,7 +83,7 @@ class UpdatePassword extends GetView {
                     ),
                   ],
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 5),
                 Text(
                   'Username : ${Get.arguments["username"]}',
                   style: const TextStyle(fontSize: 18),
@@ -95,8 +104,8 @@ class UpdatePassword extends GetView {
                   padding: const EdgeInsets.symmetric(horizontal: 80),
                   child: Container(
                     decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFF1B2541), Color(0xFF3949AB)],
+                      gradient: AppColors.mainGradient(
+                        context: context,
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
@@ -115,6 +124,7 @@ class UpdatePassword extends GetView {
                           context,
                           Get.arguments["id_user"],
                           Get.arguments["username"],
+                          isDark,
                         );
                         //  Restart.restartApp();
                       },

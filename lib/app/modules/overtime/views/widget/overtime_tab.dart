@@ -4,12 +4,18 @@ import 'package:get/get.dart';
 
 class OvertimeTab extends StatelessWidget {
   final RxString selected;
+  final bool isDark;
 
-  const OvertimeTab({super.key, required this.selected});
+  const OvertimeTab({super.key, required this.selected, required this.isDark});
 
   @override
   Widget build(BuildContext context) {
     return Obx(() {
+      const validValues = ['all', 'approved', 'pending', 'rejected'];
+
+      final currentValue =
+          validValues.contains(selected.value) ? selected.value : 'all';
+
       return Container(
         margin: const EdgeInsets.all(12),
         padding: const EdgeInsets.all(6),
@@ -18,8 +24,11 @@ class OvertimeTab extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
         ),
         child: CupertinoSlidingSegmentedControl<String>(
-          groupValue: selected.value,
-          thumbColor: Theme.of(context).cardColor,
+          groupValue: currentValue,
+          thumbColor:
+              isDark
+                  ? CupertinoColors.systemGrey.withOpacity(0.50)
+                  : Colors.white.withOpacity(0.82),
           backgroundColor: Colors.transparent,
           children: const {
             'all': Padding(
@@ -40,7 +49,9 @@ class OvertimeTab extends StatelessWidget {
             ),
           },
           onValueChanged: (val) {
-            if (val != null) selected.value = val;
+            if (val != null) {
+              selected.value = val;
+            }
           },
         ),
       );

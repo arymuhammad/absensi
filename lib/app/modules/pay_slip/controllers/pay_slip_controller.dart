@@ -5,7 +5,6 @@ import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
-
 class PaySlipController extends GetxController {
   var isLoading = true.obs;
   // var payData = PayslipModel().obs;
@@ -117,6 +116,7 @@ class PaySlipController extends GetxController {
   }
 
   Future<DateTime?> showCustomMonthYearPicker(
+    bool isDark,
     BuildContext context, {
     DateTime? initialDate,
   }) async {
@@ -129,6 +129,10 @@ class PaySlipController extends GetxController {
     await showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      backgroundColor:
+          isDark
+              ? const Color(0xFF1E293B).withOpacity(0.95)
+              : Colors.white.withOpacity(0.82),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -136,7 +140,11 @@ class PaySlipController extends GetxController {
         return StatefulBuilder(
           builder: (context, setState) {
             return Padding(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+               padding: EdgeInsets.only(
+                left: 16,
+                right: 16,
+                bottom: 68 + MediaQuery.of(context).padding.bottom + 30,
+              ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [

@@ -23,7 +23,11 @@ class PaySlipDesc extends StatelessWidget {
 
     return SingleChildScrollView(
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
+        padding: EdgeInsets.only(
+          left: 16,
+          right: 16,
+          bottom: 68 + MediaQuery.of(context).padding.bottom + 30,
+        ),
         child: Material(
           elevation: 16,
           shadowColor: Colors.black.withOpacity(.3),
@@ -31,7 +35,10 @@ class PaySlipDesc extends StatelessWidget {
           child: ClipPath(
             clipper: ReceiptClipper(),
             child: Container(
-              color: isDark? Theme.of(context).cardColor: const Color(0xFFFFFDF7),
+              color:
+                  isDark
+                      ? Theme.of(context).cardColor
+                      : const Color(0xFFFFFDF7),
               child: Stack(
                 children: [
                   /// 🔹 WATERMARK
