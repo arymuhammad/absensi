@@ -321,23 +321,15 @@ class LeaveAddSheet extends StatelessWidget {
                         ),
                       ),
 
-                      Visibility(
-                        visible:
-                            leaveC.selectedLeave.value != "Replacement Off",
-                        child: Column(
-                          children: [
-                            CsTextField(
-                              enabled: true,
-                              controller: leaveC.reasonLeave,
-                              label: 'Alasan cuti',
-                              maxLines: 3,
-                              isDark: isDark,
-                              icon: const Icon(Typicons.pencil, size: 18),
-                            ),
-                            const SizedBox(height: 10),
-                          ],
-                        ),
+                      CsTextField(
+                        enabled: true,
+                        controller: leaveC.reasonLeave,
+                        label: 'Alasan cuti',
+                        maxLines: 3,
+                        isDark: isDark,
+                        icon: const Icon(Typicons.pencil, size: 18),
                       ),
+                          const SizedBox(height: 10),
 
                       CsTextField(
                         enabled: true,

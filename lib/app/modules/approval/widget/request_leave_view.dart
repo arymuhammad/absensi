@@ -344,12 +344,13 @@ class RequestLeaveView extends GetView<LeaveController> {
                                       ),
                                       TextSpan(
                                         text:
-                                            'Hendak mengajukan permohonan cuti ',
+                                            'Hendak mengajukan ${leave.jenisCuti == 'Replacement Off' ? 'Replacement Off' : 'Permohonan Cuti'}',
                                         style: TextStyle(
                                           color:
                                               isDark
                                                   ? Colors.grey
                                                   : Colors.black,
+                                                  fontWeight: FontWeight.bold
                                         ),
                                       ),
                                       TextSpan(
