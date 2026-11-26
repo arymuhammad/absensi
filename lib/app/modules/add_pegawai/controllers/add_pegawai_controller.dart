@@ -29,6 +29,7 @@ import '../../../data/model/cek_user_model.dart';
 import '../../../data/model/foto_profil_model.dart';
 import '../../../data/model/user_model.dart';
 import '../../login/controllers/login_controller.dart';
+
 // import 'package:google_ml_vision/google_ml_vision.dart';
 
 class AddPegawaiController extends GetxController {
@@ -40,7 +41,9 @@ class AddPegawaiController extends GetxController {
       telp,
       level,
       joinDate,
-      filterUser;
+      filterUser,
+      emrName,
+      emrNo;
   final RxString searchKeyword = ''.obs;
   final FocusNode focusNodecabang = FocusNode();
   final FocusNode focusNodelevel = FocusNode();
@@ -104,18 +107,21 @@ class AddPegawaiController extends GetxController {
   // var supportedAbi = "";
 
   RxString ktpPath = ''.obs;
+  RxString ffbPath = ''.obs;
   RxString kkPath = ''.obs;
   RxString vaksinPath = ''.obs;
   RxString npwpPath = ''.obs;
   RxString sertifikatPath = ''.obs;
 
   RxString ktpFileName = ''.obs;
+  RxString ffbFileName = ''.obs;
   RxString kkFileName = ''.obs;
   RxString vaksinFileName = ''.obs;
   RxString npwpFileName = ''.obs;
   RxString sertifikatFileName = ''.obs;
 
   PlatformFile? ktpFile;
+  PlatformFile? ffbFile;
   PlatformFile? kkFile;
   PlatformFile? vaksinFile;
   PlatformFile? npwpFile;
@@ -133,6 +139,8 @@ class AddPegawaiController extends GetxController {
     level = TextEditingController();
     joinDate = TextEditingController();
     filterUser = TextEditingController();
+    emrName = TextEditingController();
+    emrNo = TextEditingController();
     getBrandCabang();
     getLevel();
 
@@ -152,7 +160,6 @@ class AddPegawaiController extends GetxController {
 
   @override
   void onClose() {
-    super.dispose();
     nip.dispose();
     name.dispose();
     username.dispose();
@@ -162,6 +169,13 @@ class AddPegawaiController extends GetxController {
     level.dispose();
     joinDate.dispose();
     filterUser.dispose();
+    emrName.dispose();
+    emrNo.dispose();
+
+    focusNodecabang.dispose();
+    focusNodelevel.dispose();
+
+    super.onClose();
   }
 
   getBrandCabang() async {
@@ -233,6 +247,20 @@ class AddPegawaiController extends GetxController {
     }
   }
 
+  Future<void> pickFfb() async {
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['jpg', 'jpeg', 'png', 'pdf'],
+    );
+
+    if (result != null) {
+      ffbFile = result.files.single;
+      ffbPath.value = ffbFile?.path ?? '';
+      ffbFileName.value = ffbFile?.name ?? '';
+      update();
+    }
+  }
+
   Future<void> pickKk() async {
     final result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
@@ -289,13 +317,21 @@ class AddPegawaiController extends GetxController {
     }
   }
 
-  Future<bool> addUpdatePegawai(context, String mode, Data dataUser, bool isDark) async {
+  Future<bool> addUpdatePegawai(
+    context,
+    String mode,
+    Data dataUser,
+    bool isDark,
+  ) async {
     try {
       Random random = Random();
       int randomNumber = random.nextInt(100);
 
       final inputTelp = telp.text.trim();
       final oldTelp = dataUser.noTelp?.trim() ?? '';
+
+      final inputEmrNo = emrNo.text.trim();
+      final oldEmrNo = dataUser.emrNo?.trim() ?? '';
 
       // // hanya validasi kalau user isi field
       // if (inputTelp.isNotEmpty) {
@@ -352,19 +388,19 @@ class AddPegawaiController extends GetxController {
             if (isUsrExist && isPhoneExist(inputTelp)) {
               _showWarning(
                 "Username and Phone Number are already registered\nPlease change both",
-                isDark
+                isDark,
               );
               return false;
             } else if (isUsrExist) {
               _showWarning(
                 "Username is already registered\nPlease change it to another username",
-                isDark
+                isDark,
               );
               return false;
             } else if (isPhoneExist(inputTelp)) {
               _showWarning(
                 "This phone number is already registered\nPlease enter another phone number",
-                isDark
+                isDark,
               );
               return false;
             } else {
@@ -412,19 +448,19 @@ class AddPegawaiController extends GetxController {
             if (isUsrExist && isPhoneExist(inputTelp)) {
               _showWarning(
                 "Username and Phone Number are already registered\nPlease change both",
-                isDark
+                isDark,
               );
               return false;
             } else if (isUsrExist) {
               _showWarning(
                 "Username is already registered\nPlease change it to another username",
-                isDark
+                isDark,
               );
               return false;
             } else if (isPhoneExist(inputTelp)) {
               _showWarning(
                 "This phone number is already registered\nPlease enter another phone number",
-                isDark
+                isDark,
               );
               return false;
             } else {
@@ -473,7 +509,7 @@ class AddPegawaiController extends GetxController {
             "status": mode,
             "id": dataUser.id,
             "username": dataUser.username,
-            "nama": name.text != "" ? name.text : dataUser.nama,
+            "nama": name.text != "" ? name.text.capitalize : dataUser.nama?.capitalize,
             "no_telp": inputTelp.isNotEmpty ? inputTelp : oldTelp,
             "kode_cabang":
                 selectedCabang.value != ""
@@ -488,17 +524,31 @@ class AddPegawaiController extends GetxController {
                     ? fileResult!.files.single
                     : File(image!.path.toString()),
             "ktp": ktpFile,
+            "ffb": ffbFile,
             "kk": kkFile,
             "npwp": npwpFile,
             "vaksin": vaksinFile,
             "sertifikat": sertifikatFile,
             "created_at": joinDate.text.isNotEmpty ? joinDate.text : null,
+            "emr_name":
+                emrName.text != ""
+                    ? emrName.text.capitalize
+                    : dataUser.emrName?.capitalize,
+            "emr_no": inputEmrNo.isNotEmpty ? inputEmrNo : oldEmrNo,
           };
 
           if (inputTelp.isNotEmpty && isPhoneExist(inputTelp)) {
             _showWarning(
               "This phone number is already registered\nPlease enter another phone number",
-              isDark
+              isDark,
+            );
+
+            isLoading.value = false;
+            return false;
+          } else if (inputEmrNo.isNotEmpty && isPhoneExist(inputEmrNo)) {
+            _showWarning(
+              "This Emergency contact number is already registered\nPlease enter another phone number",
+              isDark,
             );
 
             isLoading.value = false;
@@ -640,6 +690,8 @@ class AddPegawaiController extends GetxController {
             name.clear();
             telp.clear();
             joinDate.clear();
+            emrName.clear();
+            emrNo.clear();
             selectedLevel.value = "";
             brandCabang.value = "";
 
@@ -655,7 +707,15 @@ class AddPegawaiController extends GetxController {
           if (inputTelp.isNotEmpty && isPhoneExist(inputTelp)) {
             _showWarning(
               "This phone number is already registered\nPlease enter another phone number",
-              isDark
+              isDark,
+            );
+
+            isLoading.value = false;
+            return false;
+          } else if (inputEmrNo.isNotEmpty && isPhoneExist(inputEmrNo)) {
+            _showWarning(
+              "This Emergency contact number is already registered\nPlease enter another phone number",
+              isDark,
             );
 
             isLoading.value = false;
@@ -665,7 +725,7 @@ class AddPegawaiController extends GetxController {
               "status": mode,
               "id": dataUser.id,
               "username": dataUser.username,
-              "nama": name.text != "" ? name.text : dataUser.nama,
+              "nama": name.text != "" ? name.text.capitalize : dataUser.nama?.capitalize,
               "no_telp": inputTelp.isNotEmpty ? inputTelp : oldTelp,
               "kode_cabang":
                   selectedCabang.value != ""
@@ -676,11 +736,17 @@ class AddPegawaiController extends GetxController {
                       ? selectedLevel.value
                       : dataUser.level,
               "ktp": ktpFile,
+              "ffb": ffbFile,
               "kk": kkFile,
               "npwp": npwpFile,
               "vaksin": vaksinFile,
               "sertifikat": sertifikatFile,
               "created_at": joinDate.text.isNotEmpty ? joinDate.text : null,
+              "emr_name":
+                  emrName.text != ""
+                      ? emrName.text.capitalize
+                      : dataUser.emrName?.capitalize,
+              "emr_no": inputEmrNo.isNotEmpty ? inputEmrNo : oldEmrNo,
             };
             // loadingDialog("updating data", "");
             // print(data);
@@ -807,6 +873,8 @@ class AddPegawaiController extends GetxController {
             name.clear();
             telp.clear();
             joinDate.clear();
+            emrName.clear();
+            emrNo.clear();
             selectedLevel.value = "";
             brandCabang.value = "";
 
@@ -837,12 +905,14 @@ class AddPegawaiController extends GetxController {
 
   void clearDocumentFiles() {
     ktpFile = null;
+    ffbFile = null;
     kkFile = null;
     npwpFile = null;
     vaksinFile = null;
     sertifikatFile = null;
 
     ktpFileName.value = '';
+    ffbFileName.value = '';
     kkFileName.value = '';
     npwpFileName.value = '';
     vaksinFileName.value = '';
@@ -880,7 +950,7 @@ class AddPegawaiController extends GetxController {
           context,
           "Warning",
           "No user found with phone number ${telp.text}. Make sure the phone number entered is correct",
-          isDark
+          isDark,
         );
       }
     } else {
@@ -915,7 +985,7 @@ class AddPegawaiController extends GetxController {
           Get.back();
           // });
         },
-        isDark: isDark
+        isDark: isDark,
       );
       // });
       // cekDataUser.value = response;

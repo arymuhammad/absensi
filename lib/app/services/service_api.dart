@@ -260,12 +260,23 @@ class ServiceApi {
         request.fields['no_telp'] = data["no_telp"];
         request.fields['kode_cabang'] = data["kode_cabang"];
         request.fields['level'] = data["level"];
+        request.fields['emr_name'] = data["emr_name"];
+        request.fields['emr_no'] = data["emr_no"];
         if (data["ktp"] != null) {
           request.files.add(
             await http.MultipartFile.fromPath(
               'ktp',
               data["ktp"].path,
               filename: data["ktp"].name,
+            ),
+          );
+        }
+        if (data["ffb"] != null) {
+          request.files.add(
+            await http.MultipartFile.fromPath(
+              'ffb',
+              data["ffb"].path,
+              filename: data["ffb"].name,
             ),
           );
         }

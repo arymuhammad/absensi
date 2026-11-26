@@ -44,10 +44,13 @@ class Data {
   String? parentId;
   String? namaParent;
   String? ktp;
+  String? ffb;
   String? kk;
   String? npwp;
   String? vaksin;
   String? sertifikat;
+  String? emrName;
+  String? emrNo;
 
   Data({
     this.id,
@@ -72,10 +75,13 @@ class Data {
     this.parentId,
     this.namaParent,
     this.ktp,
+    this.ffb,
     this.kk,
     this.npwp,
     this.vaksin,
     this.sertifikat,
+    this.emrName,
+    this.emrNo,
   });
 
   Data.fromJson(Map<String, dynamic> json) {
@@ -101,10 +107,13 @@ class Data {
     parentId = json['parent_id'] ?? '';
     namaParent = json['nama_parent'] ?? '';
     ktp = json['ktp'] ?? '';
+    ffb = json['ffb'] ?? '';
     kk = json['kk'] ?? '';
     npwp = json['npwp'] ?? '';
     vaksin = json['vaksin'] ?? '';
     sertifikat = json['sertifikat'] ?? '';
+    emrName = json['emr_name'] ?? '';
+    emrNo = json['emr_no'] ?? '';
   }
 
   Map<String, dynamic> toJson() {
@@ -131,10 +140,13 @@ class Data {
     data['parent_id'] = parentId;
     data['nama_parent'] = namaParent;
     data['ktp'] = ktp;
+    data['ffb'] = ffb;
     data['kk'] = kk;
     data['npwp'] = npwp;
     data['vaksin'] = vaksin;
     data['sertifikat'] = sertifikat;
+    data['emr_name'] = emrName;
+    data['emr_no'] = emrNo;
     return data;
   }
 }

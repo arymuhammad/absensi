@@ -133,39 +133,7 @@ class LoginController extends GetxController with GetTickerProviderStateMixin {
       // showToast("ambil data dari server");
       // dataUser.value = response;
       if (response.success == true) {
-        await pref.setString(
-          'userDataLogin',
-          jsonEncode(
-            Data(
-              id: response.data!.id,
-              nama: response.data!.nama,
-              username: response.data!.username,
-              password: response.data!.password,
-              kodeCabang: response.data!.kodeCabang,
-              namaCabang: response.data!.namaCabang,
-              nik: response.data!.nik,
-              lat: response.data!.lat,
-              long: response.data!.long,
-              foto: response.data!.foto,
-              noTelp: response.data!.noTelp,
-              level: response.data!.level,
-              levelUser: response.data!.levelUser,
-              areaCover: response.data!.areaCover,
-              cekStok: response.data!.cekStok,
-              visit: response.data!.visit,
-              idRegion: response.data!.idRegion,
-              leaveBalance: response.data!.leaveBalance,
-              createdAt: response.data!.createdAt,
-              parentId: response.data!.parentId,
-              namaParent: response.data!.namaParent,
-              ktp: response.data!.ktp,
-              kk: response.data!.kk,
-              npwp: response.data!.npwp,
-              vaksin: response.data!.vaksin,
-              sertifikat: response.data!.sertifikat,
-            ),
-          ),
-        );
+        await pref.setString('userDataLogin', jsonEncode(response.data));
 
         var tempUser = pref.getString('userDataLogin');
         logUser.value = Data.fromJson(jsonDecode(tempUser!));

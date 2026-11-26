@@ -16,6 +16,7 @@ import 'package:icons_flutter/icons_flutter.dart';
 import 'package:step_progress/step_progress.dart';
 import 'package:get/get.dart';
 import '../../../data/helper/const.dart';
+import '../../../data/helper/custom_fab_location.dart';
 import '../../../data/helper/helper_ui.dart';
 import '../../approval/widget/bottom_search_live.dart';
 import '../../login/controllers/login_controller.dart';
@@ -441,7 +442,7 @@ class LeaveView extends GetView<LeaveController> {
                                                           leaveC.deleteLeaveReq(
                                                             leave.uid!,
                                                           ),
-                                                          isDark
+                                                      isDark,
                                                     ),
                                                 ],
                                               ),
@@ -686,6 +687,8 @@ class LeaveView extends GetView<LeaveController> {
           ),
         ],
       ),
+      floatingActionButtonLocation: const RaisedFabLocation(offsetY: 70),
+      
       floatingActionButton: Builder(
         builder:
             (context) => ContainerMainColor(

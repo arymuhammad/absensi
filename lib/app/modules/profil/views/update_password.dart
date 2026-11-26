@@ -9,7 +9,7 @@ import '../../shared/input_decoration.dart';
 
 class UpdatePassword extends GetView {
   UpdatePassword({super.key});
-  final pegawaiC = Get.put(AddPegawaiController());
+  final pegawaiC = Get.find<AddPegawaiController>();
 
   @override
   Widget build(BuildContext context) {

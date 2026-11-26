@@ -321,15 +321,23 @@ class LeaveAddSheet extends StatelessWidget {
                         ),
                       ),
 
-                      CsTextField(
-                        enabled: true,
-                        controller: leaveC.reasonLeave,
-                        label: 'Alasan cuti',
-                        maxLines: 3,
-                        isDark: isDark,
-                        icon: const Icon(Typicons.pencil, size: 18),
+                      Visibility(
+                        visible:
+                            leaveC.selectedLeave.value != "Replacement Off",
+                        child: Column(
+                          children: [
+                            CsTextField(
+                              enabled: true,
+                              controller: leaveC.reasonLeave,
+                              label: 'Alasan cuti',
+                              maxLines: 3,
+                              isDark: isDark,
+                              icon: const Icon(Typicons.pencil, size: 18),
+                            ),
+                            const SizedBox(height: 10),
+                          ],
+                        ),
                       ),
-                          const SizedBox(height: 10),
 
                       CsTextField(
                         enabled: true,
@@ -625,10 +633,12 @@ class LeaveAddSheet extends StatelessWidget {
                         return;
                       }
 
-                      if (leaveC.reasonLeave.text.isEmpty) {
+                      if (leaveC.selectedLeave.value != "Replacement Off" &&
+                          leaveC.reasonLeave.text.isEmpty) {
                         showToast("Harap isi alasan cuti");
                         return;
                       }
+                      
                       if (leaveC.addrLeave.text.isEmpty) {
                         showToast("Harap isi alamat selama cuti");
                         return;

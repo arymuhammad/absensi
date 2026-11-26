@@ -38,9 +38,10 @@ class ReqAppUpdate extends GetView {
             children: [
               const Icon(Typicons.th_list, color: AppColors.contentColorBlue),
               const SizedBox(width: 5),
-              Text(
-                'Data Adjusment List',
-                style: titleTextStyle.copyWith(fontSize: 16),
+              Obx(()=> Text(
+                  'Data Adjusment List (${adjCtrl.listReqUpt.length})',
+                  style: titleTextStyle.copyWith(fontSize: 16),
+                ),
               ),
             ],
           ),

@@ -58,7 +58,7 @@ class SettingsView extends GetView<SettingsController> {
                       ? const Color(0xFF1E293B).withOpacity(0.78)
                       : Colors.white.withOpacity(0.82),
               child: SizedBox(
-                height: Get.height - 200,
+                height: Get.height / 1.37,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [

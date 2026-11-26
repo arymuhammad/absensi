@@ -276,7 +276,7 @@ class AdjustPresenceController extends GetxController
       type: DialogType.success,
       title: 'SUKSES',
       btnOkOnPress: () => Get.back(),
-      isDark: isDark
+      isDark: isDark,
     );
   }
 
@@ -313,7 +313,12 @@ class AdjustPresenceController extends GetxController
     return dataVisit;
   }
 
-  updateDataVisit(String? id, String? tglVisit, String? visitIn, bool isDark) async {
+  updateDataVisit(
+    String? id,
+    String? tglVisit,
+    String? visitIn,
+    bool isDark,
+  ) async {
     var data = {
       "mode": "update_visit",
       "id_user": id,
@@ -336,7 +341,7 @@ class AdjustPresenceController extends GetxController
         type: DialogType.success,
         title: 'SUKSES',
         btnOkOnPress: () => Get.back(),
-        isDark: isDark
+        isDark: isDark,
       );
     }
   }
@@ -352,9 +357,8 @@ class AdjustPresenceController extends GetxController
     bool isInbox,
     bool isDark,
   ) async {
-    // print(dataUptApp['accept']);
-    // print(dataUptApp['acc_4']);
     loadingDialog("processing data", "", isDark);
+
     try {
       bool success = await ServiceApi().updateReqApp(dataUptApp);
 
@@ -363,7 +367,11 @@ class AdjustPresenceController extends GetxController
       }
 
       if (dataUptApp['acc_4'] == "approved") {
-        success = await ServiceApi().updateReqAdjAbs(dataUptAbs!);
+        if (dataUptAbs == null) {
+          throw Exception("Data absensi tidak tersedia");
+        }
+
+        success = await ServiceApi().updateReqAdjAbs(dataUptAbs);
 
         if (!success) {
           throw Exception("Gagal update absensi");
@@ -380,12 +388,13 @@ class AdjustPresenceController extends GetxController
         lastDate,
       );
 
+      closeLoading();
       dialogMsg('INFO', 'Data berhasil diupdate');
     } catch (e) {
+      closeLoading();
       failedDialog(Get.context!, 'ERROR', e.toString());
     } finally {
       keteranganApp.clear();
-      closeLoading();
     }
   }
 

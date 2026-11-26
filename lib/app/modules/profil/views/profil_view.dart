@@ -38,7 +38,11 @@ class ProfilView extends GetView<ProfilController> {
             height: 400,
             decoration: BoxDecoration(
               image: DecorationImage(
-                image: AssetImage( isDark ? 'assets/image/bg-hd-drk.png' : 'assets/image/bg-hd.png'),
+                image: AssetImage(
+                  isDark
+                      ? 'assets/image/bg-hd-drk.png'
+                      : 'assets/image/bg-hd.png',
+                ),
                 fit: BoxFit.cover,
               ),
             ),
@@ -69,12 +73,15 @@ class ProfilView extends GetView<ProfilController> {
             top: 180,
             left: 16,
             right: 16,
-            height: Get.height / 1.5,
+            height: Get.height / 1.53,
             child: Card(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-              color:  isDark
-                          ? const Color(0xFF1E293B).withOpacity(0.78)
-                          : Colors.white.withOpacity(0.82),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              color:
+                  isDark
+                      ? const Color(0xFF1E293B).withOpacity(0.78)
+                      : Colors.white.withOpacity(0.82),
               elevation: 4,
               child: Container(
                 decoration: const BoxDecoration(
@@ -401,7 +408,7 @@ class ProfilView extends GetView<ProfilController> {
                                       ),
                                       const SizedBox(width: 5),
                                       Text(
-                                        'Registered In',
+                                        'Placement',
                                         style: subtitleTextStyle,
                                       ),
                                     ],
@@ -500,6 +507,15 @@ class ProfilView extends GetView<ProfilController> {
 
                             _buildDocumentTile(
                               context,
+                              title: 'Foto Full Body',
+                              icon: Icons.emoji_people,
+                              color: AppColors.contentColorOrange,
+                              path: listDataUser.ffb ?? '',
+                              isDark: isDark,
+                            ),
+
+                            _buildDocumentTile(
+                              context,
                               title: 'Kartu Keluarga',
                               icon: Icons.groups_outlined,
                               color: AppColors.contentColorCyan,
@@ -549,16 +565,25 @@ class ProfilView extends GetView<ProfilController> {
                                 vertical: 0,
                               ),
                               onTap: () {
-                                // Get.to(
-                                //   () => UpdateProfil(userData: listDataUser!),
-                                // );
+                                //==================================
+                                // INIT DATA
+                                //==================================
+                                ctr.store.text = listDataUser.namaCabang ?? '';
+                                ctr.telp.text = listDataUser.noTelp ?? '';
+                                ctr.name.text = listDataUser.nama ?? '';
+                                ctr.joinDate.text =
+                                    listDataUser.createdAt ?? '';
+                                ctr.emrNo.text = listDataUser.emrNo ?? '';
+                                ctr.emrName.text = listDataUser.emrName ?? '';
+                                ctr.level.text = listDataUser.levelUser ?? '';
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder:
-                                        (_) => UpdateProfil(
-                                          userData: listDataUser,
-                                        ),
+                                    builder: (_) {
+                                      return UpdateProfil(
+                                        userData: listDataUser,
+                                      );
+                                    },
                                   ),
                                 );
                               },
@@ -614,7 +639,7 @@ class ProfilView extends GetView<ProfilController> {
                                   title: 'LOG OUT',
                                   desc: 'Anda yakin ingin keluar?',
                                   btnOkOnPress: () => auth.logout(),
-                                  isDark: isDark
+                                  isDark: isDark,
                                 );
                               },
                               title: Row(
@@ -731,7 +756,7 @@ class ProfilView extends GetView<ProfilController> {
                 style: subtitleTextStyle.copyWith(
                   fontWeight: FontWeight.normal,
                   fontSize: 13,
-                  color: exist ? Colors.grey : Colors.red,
+                  color: exist ? Colors.lightBlue : Colors.red,
                 ),
               ),
             ],

@@ -16,18 +16,25 @@ import '../../../data/helper/const.dart';
 import '../../../data/helper/custom_dialog.dart';
 import '../../../services/service_api.dart';
 import '../../shared/input_decoration.dart';
+import 'profile_attachment_tile.dart';
 
 class UpdateProfil extends GetView {
   UpdateProfil({super.key, this.userData});
   final Data? userData;
-  final ctr = Get.put(AddPegawaiController());
-  final scrollController = ScrollController();
+  final ctr = Get.find<AddPegawaiController>();
 
   @override
   Widget build(BuildContext context) {
-    ctr.store.text = userData!.namaCabang ?? '';
-    ctr.joinDate.text = userData!.createdAt ?? '';
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    // Ambil inset langsung dari FlutterView
+    final view = View.of(context);
+    final viewMedia = MediaQueryData.fromView(view);
+
+    final keyboardHeight = viewMedia.viewInsets.bottom;
+    final keyboardOpen = keyboardHeight > 0;
+
+    final bottomPadding =
+        keyboardOpen ? 8.0 : 68.0 + viewMedia.padding.bottom + 28.0;
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -35,8 +42,6 @@ class UpdateProfil extends GetView {
         title: Text('Profile', style: titleTextStyle.copyWith(fontSize: 18)),
         backgroundColor: Colors.transparent,
         elevation: 0.0,
-        // iconTheme: const IconThemeData(color: Colors.black,),
-        // centerTitle: true,
       ),
       resizeToAvoidBottomInset: true,
       body: Stack(
@@ -55,45 +60,46 @@ class UpdateProfil extends GetView {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.only(top: 100, left: 15.0, right: 15.0),
-            child: SingleChildScrollView(
-              controller: scrollController,
-              padding: EdgeInsets.only(
-                bottom: 68 + MediaQuery.of(context).padding.bottom + 24,
-              ),
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  minHeight: MediaQuery.of(context).size.height,
+            padding: const EdgeInsets.only(top: 100, left: 15, right: 15),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Update Your Account',
+                  style: subtitleTextStyle.copyWith(
+                    fontSize: 18,
+                    color: AppColors.contentColorWhite,
+                  ),
                 ),
-                child: IntrinsicHeight(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Update Your Account',
-                        style: subtitleTextStyle.copyWith(
-                          fontSize: 18,
-                          color: AppColors.contentColorWhite,
-                        ),
+                const SizedBox(height: 10),
+                Expanded(
+                  child: Padding(
+                    padding: EdgeInsets.only(bottom: bottomPadding),
+                    child: Card(
+                      color:
+                          isDark
+                              ? const Color(0xFF1E293B).withOpacity(0.78)
+                              : Colors.white.withOpacity(0.82),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
                       ),
-                      Card(
-                        color:
-                            isDark
-                                ? const Color(0xFF1E293B).withOpacity(0.78)
-                                : Colors.white.withOpacity(0.82),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        elevation: 4,
-                        child: Padding(
-                          padding: const EdgeInsets.all(10.0),
+                      elevation: 4,
+                      child: Padding(
+                        padding: const EdgeInsets.all(10),
+                        child: SingleChildScrollView(
                           child: Column(
-                            // padding: EdgeInsets.only(
-                            //   bottom:
-                            //       MediaQuery.of(context).viewInsets.bottom +
-                            //       100,
-                            // ),
                             children: [
+                              const Align(
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  "Profile",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                              const Divider(height: 12),
                               Obx(
                                 () => Row(
                                   mainAxisAlignment:
@@ -155,7 +161,6 @@ class UpdateProfil extends GetView {
                                                       data.namaCabang!,
                                                     );
                                                   }).toList();
-
                                                   return TypeAheadFormField<
                                                     String
                                                   >(
@@ -341,7 +346,7 @@ class UpdateProfil extends GetView {
                               SizedBox(
                                 height: 44,
                                 child: TextField(
-                                  controller: ctr.name..text = userData!.nama!,
+                                  controller: ctr.name,
                                   decoration: inputDecoration(
                                     label: 'Full Name',
                                     isDark: isDark,
@@ -361,7 +366,7 @@ class UpdateProfil extends GetView {
                                         keyboardType: TextInputType.phone,
                                         decoration: inputDecoration(
                                           label: 'Phone No',
-                                          hint: userData!.noTelp!,
+                                          // hint: userData?.noTelp ?? '',
                                           isDark: isDark,
                                           context: context,
                                         ),
@@ -374,14 +379,11 @@ class UpdateProfil extends GetView {
                                     child: SizedBox(
                                       height: 44,
                                       child: DateTimeField(
-                                        // enabled: userData!.createdAt!="" ?false:true,
                                         controller: ctr.joinDate,
                                         style: const TextStyle(fontSize: 15),
                                         decoration: inputDecoration(
                                           label: 'Join Date',
                                           hint: 'Join Date',
-                                          // suffixIcon:
-                                          //     Iconsax.calendar_edit_outline,
                                           isDark: isDark,
                                           context: context,
                                         ),
@@ -412,7 +414,6 @@ class UpdateProfil extends GetView {
                                       dataLevel!.map((data) {
                                         allLevel.add(data.namaLevel!);
                                       }).toList();
-
                                       return TypeAheadFormField<String>(
                                         autoFlipDirection: true,
                                         hideOnEmpty: true,
@@ -426,10 +427,7 @@ class UpdateProfil extends GetView {
                                             ),
                                         textFieldConfiguration:
                                             TextFieldConfiguration(
-                                              controller:
-                                                  ctr.level
-                                                    ..text =
-                                                        userData!.levelUser!,
+                                              controller: ctr.level,
                                               decoration: inputDecoration(
                                                 label: 'User Level',
                                                 suffixIcon:
@@ -477,13 +475,6 @@ class UpdateProfil extends GetView {
                                                   dataLevel[i].cekStok!;
                                             }
                                           }
-                                          //                  Future.delayed(const Duration(milliseconds: 300), () {
-                                          //   scrollController.animateTo(
-                                          //     scrollController.position.maxScrollExtent,
-                                          //     duration: const Duration(milliseconds: 300),
-                                          //     curve: Curves.easeInOut,
-                                          //   );
-                                          // });
                                         },
                                       );
                                     } else if (snapshot.hasError) {
@@ -503,9 +494,43 @@ class UpdateProfil extends GetView {
                                   },
                                 ),
                               ),
-
                               const SizedBox(height: 20),
-
+                              const Align(
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  "Emergency Contact",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                              const Divider(height: 12),
+                              SizedBox(
+                                height: 44,
+                                child: TextField(
+                                  controller: ctr.emrName,
+                                  decoration: inputDecoration(
+                                    label: 'Name',
+                                    isDark: isDark,
+                                    context: context,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 10),
+                              SizedBox(
+                                height: 44,
+                                child: TextField(
+                                  controller: ctr.emrNo,
+                                  keyboardType: TextInputType.phone,
+                                  decoration: inputDecoration(
+                                    label: 'Contact Number',
+                                    isDark: isDark,
+                                    context: context,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 20),
                               const Align(
                                 alignment: Alignment.centerLeft,
                                 child: Text(
@@ -516,47 +541,44 @@ class UpdateProfil extends GetView {
                                   ),
                                 ),
                               ),
-
-                              const SizedBox(height: 10),
-
-                              _buildAttachmentTile(
+                              const Divider(height: 12),
+                              ProfileAttachmentTile(
                                 isDark: isDark,
                                 title: "KTP",
                                 icon: Icons.badge_outlined,
                                 color: AppColors.contentColorBlue,
                                 fileName: ctr.ktpFileName,
                                 onPressed: () => ctr.pickKtp(),
+                                data: userData?.ktp ?? '',
                               ),
-
-                              _buildAttachmentTile(
+                              ProfileAttachmentTile(
+                                isDark: isDark,
+                                title: "Foto Full Body",
+                                icon: Icons.emoji_people,
+                                color: AppColors.contentColorOrange,
+                                fileName: ctr.ffbFileName,
+                                onPressed: () => ctr.pickFfb(),
+                                data: userData?.ffb ?? '',
+                              ),
+                              ProfileAttachmentTile(
                                 isDark: isDark,
                                 title: "Kartu Keluarga",
                                 icon: Icons.groups_outlined,
                                 color: AppColors.contentColorCyan,
                                 fileName: ctr.kkFileName,
                                 onPressed: () => ctr.pickKk(),
+                                data: userData?.kk ?? '',
                               ),
-
-                              _buildAttachmentTile(
+                              ProfileAttachmentTile(
                                 isDark: isDark,
                                 title: "NPWP",
                                 icon: Icons.receipt_long_outlined,
                                 color: AppColors.contentColorOrange,
                                 fileName: ctr.npwpFileName,
                                 onPressed: () => ctr.pickNpwp(),
+                                data: userData?.npwp ?? '',
                               ),
-
-                              _buildAttachmentTile(
-                                isDark: isDark,
-                                title: "Sertifikat Vaksin Covid",
-                                icon: Icons.health_and_safety_outlined,
-                                color: AppColors.contentColorGreenAccent,
-                                fileName: ctr.vaksinFileName,
-                                onPressed: () => ctr.pickSertCovid(),
-                              ),
-
                               const SizedBox(height: 20),
-
                               const Align(
                                 alignment: Alignment.centerLeft,
                                 child: Text(
@@ -567,18 +589,25 @@ class UpdateProfil extends GetView {
                                   ),
                                 ),
                               ),
-
-                              const SizedBox(height: 10),
-
-                              _buildAttachmentTile(
+                              const Divider(height: 12),
+                              ProfileAttachmentTile(
                                 isDark: isDark,
-                                title: "Sertifikat Pelatihan",
+                                title: "Training certificate",
                                 icon: Icons.workspace_premium_outlined,
                                 color: AppColors.contentColorPurple,
                                 fileName: ctr.sertifikatFileName,
                                 onPressed: () => ctr.pickSertPel(),
+                                data: userData?.sertifikat ?? '',
                               ),
-
+                              ProfileAttachmentTile(
+                                isDark: isDark,
+                                title: "Covid Vaccine Certificate",
+                                icon: Icons.health_and_safety_outlined,
+                                color: AppColors.contentColorGreenAccent,
+                                fileName: ctr.vaksinFileName,
+                                onPressed: () => ctr.pickSertCovid(),
+                                data: userData?.vaksin ?? '',
+                              ),
                               const SizedBox(height: 10),
                               Padding(
                                 padding: const EdgeInsets.symmetric(
@@ -598,7 +627,6 @@ class UpdateProfil extends GetView {
                                       minimumSize: Size(Get.size.width / 2, 50),
                                     ),
                                     onPressed: () async {
-                                      // loadingDialog("updating data", "");
                                       ctr.isLoading.value = true;
                                       final result = await ctr.addUpdatePegawai(
                                         context,
@@ -609,7 +637,6 @@ class UpdateProfil extends GetView {
                                       ctr.isLoading.value = false;
                                       if (result == true) {
                                         Get.back(); // balik ke halaman sebelumnya
-
                                         succesDialog(
                                           context: Get.context!,
                                           pageAbsen: "N",
@@ -617,12 +644,11 @@ class UpdateProfil extends GetView {
                                           type: DialogType.success,
                                           title: 'SUKSES',
                                           btnOkOnPress: () {
-                                            // Get.back(); // tutup dialog
                                             Navigator.pop(
                                               context,
                                             ); // balik ke halaman profile
                                           },
-                                          isDark: isDark
+                                          isDark: isDark,
                                         );
                                       }
                                     },
@@ -663,59 +689,13 @@ class UpdateProfil extends GetView {
                           ),
                         ),
                       ),
-                    ],
+                    ),
                   ),
                 ),
-              ),
+              ],
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildAttachmentTile({
-    required bool isDark,
-    required String title,
-    required IconData icon,
-    required Color color,
-    required RxString fileName,
-    Function()? onPressed,
-  }) {
-    return Card(
-      color:
-          isDark
-              ? const Color(0xFF1E293B).withOpacity(0.78)
-              : Colors.white.withOpacity(0.82),
-      margin: const EdgeInsets.only(bottom: 10),
-      elevation: 1,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: ListTile(
-        leading: Icon(icon, color: color),
-        title: Text(title),
-        subtitle: Obx(
-          () => Text(
-            fileName.value.isEmpty ? "Belum ada file" : fileName.value,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ),
-        trailing: ContainerMainColor(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          radius: 10,
-          child: SizedBox(
-            height: 35,
-            child: ElevatedButton.icon(
-              onPressed: onPressed,
-              icon: const Icon(Icons.upload_file, size: 18),
-              label: const Text("Browse"),
-              style: const ButtonStyle(
-                backgroundColor: WidgetStatePropertyAll(Colors.transparent),
-              ),
-            ),
-          ),
-        ),
       ),
     );
   }
